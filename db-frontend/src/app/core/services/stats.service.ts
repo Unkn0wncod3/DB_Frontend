@@ -13,6 +13,7 @@ export interface StatsOverviewRecord {
   createdAt?: string;
   updatedAt?: string;
   timestamp?: string;
+  occurredAt?: string;
   metadata?: Record<string, unknown>;
   [key: string]: unknown;
 }
@@ -251,6 +252,7 @@ export class StatsService {
           type,
           createdAt: this.pickDateString(record, ['created_at', 'createdAt', 'timestamp']),
           updatedAt: this.pickDateString(record, ['updated_at', 'updatedAt']),
+          occurredAt: this.pickDateString(record, ['occurred_at', 'occurredAt', 'timestamp']),
           metadata: record
         });
 

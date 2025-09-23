@@ -105,7 +105,7 @@ export class DashboardComponent implements OnInit {
       return null;
     }
 
-    return record.updatedAt || record.timestamp || record.createdAt || null;
+    return record.updatedAt || record.timestamp || record.occurredAt || record.createdAt || null;
   }
 
   hasRecentItems(): boolean {
