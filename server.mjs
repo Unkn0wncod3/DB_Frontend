@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 
 const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const distFolder = join(__dirname, 'dist', 'db-frontend');
+const distFolder = join(__dirname, 'dist', 'db-frontend', 'browser');
 const indexFile = join(distFolder, 'index.html');
 const port = process.env.PORT || 8080;
 
