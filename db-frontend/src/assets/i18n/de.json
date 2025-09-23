@@ -62,7 +62,7 @@
       "last30Days": "Aenderungen in den letzten 30 Tagen"
     }
   },
-  "home": {
+  "apiExplorer": {
     "title": "DB API Explorer",
     "baseUrl": "Basis-URL:",
     "intro": "Konfiguriere Pfad und optionale Daten, um mit deiner Railway API zu sprechen.",
@@ -90,3 +90,4 @@
     }
   }
 }
+

@@ -61,7 +61,7 @@
                                        "last30Days":  "Changes in the last 30 days"
                                    }
                   },
-    "home":  {
+    "apiExplorer":  {
                  "title":  "DB API Explorer",
                  "baseUrl":  "Base URL:",
                  "intro":  "Configure the path and optional payload to talk to your Railway API.",
@@ -89,4 +89,6 @@
                             }
              }
 }
+
+
 

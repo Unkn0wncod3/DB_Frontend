@@ -9,14 +9,14 @@ import { ApiService, HttpMethod, RequestOptions } from '../../core/services/api.
 import { API_BASE_URL } from '../../core/tokens/api-base-url.token';
 
 @Component({
-  selector: 'app-home',
+  selector: 'app-api-explorer',
   standalone: true,
   imports: [NgIf, NgFor, ReactiveFormsModule, JsonPipe, TranslateModule],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.scss',
+  templateUrl: './api-explorer.component.html',
+  styleUrl: './api-explorer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HomeComponent {
+export class ApiExplorerComponent {
   readonly methods: HttpMethod[] = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
   readonly form = this.fb.nonNullable.group({
     method: this.fb.nonNullable.control<HttpMethod>('GET'),
@@ -72,11 +72,11 @@ export class HomeComponent {
     const options: RequestOptions = {};
 
     if (this.methodsRequiringBody.has(method) && body.trim().length > 0) {
-      options.body = this.parseJson(body, this.translate.instant('home.form.bodyLabel'));
+      options.body = this.parseJson(body, this.translate.instant('apiExplorer.form.bodyLabel'));
     }
 
     if (headers.trim().length > 0) {
-      options.headers = this.parseJson(headers, this.translate.instant('home.form.headersLabel'));
+      options.headers = this.parseJson(headers, this.translate.instant('apiExplorer.form.headersLabel'));
     }
 
     return options;
@@ -86,19 +86,19 @@ export class HomeComponent {
     try {
       return JSON.parse(content);
     } catch {
-      throw new Error(this.translate.instant('home.errors.invalidJson', { field: label }));
+      throw new Error(this.translate.instant('apiExplorer.errors.invalidJson', { field: label }));
     }
   }
 
   private stringifyError(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
       const statusAddition = error.status
-        ? this.translate.instant('home.errors.status', { status: error.status })
+        ? this.translate.instant('apiExplorer.errors.status', { status: error.status })
         : '';
       const message = typeof error.error === 'string' && error.error.trim().length > 0
         ? error.error
         : error.message;
-      return this.translate.instant('home.errors.http', { message, status: statusAddition });
+      return this.translate.instant('apiExplorer.errors.http', { message, status: statusAddition });
     }
 
     if (error instanceof Error) {
@@ -106,9 +106,10 @@ export class HomeComponent {
     }
 
     if (typeof error === 'object' && error !== null && 'message' in error) {
-      return String((error as { message: unknown }).message ?? this.translate.instant('home.errors.unknown'));
+      return String((error as { message: unknown }).message ?? this.translate.instant('apiExplorer.errors.unknown'));
     }
 
-    return this.translate.instant('home.errors.unknown');
+    return this.translate.instant('apiExplorer.errors.unknown');
   }
 }
+
