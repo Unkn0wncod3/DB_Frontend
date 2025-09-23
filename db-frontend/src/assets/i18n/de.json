@@ -43,7 +43,8 @@
       "itemType": "Typ: {{ value }}"
     },
     "status": {
-      "noRecent": "Keine aktuellen Eintraege vorhanden."
+      "noRecent": "Keine aktuellen Eintraege vorhanden.",
+      "emptyState": "Keine strukturierten Statistiken erkannt. Rohdaten siehe unten (falls vorhanden)."
     },
     "errors": {
       "loadFailed": "Dashboard-Daten konnten nicht geladen werden ({{ status }}): {{ message }}",

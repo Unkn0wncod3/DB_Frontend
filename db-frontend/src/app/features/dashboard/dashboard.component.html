@@ -19,6 +19,11 @@
     <p>{{ error }}</p>
   </section>
 
+  <section *ngIf="overview() && totalCards().length === 0 && activityCards().length === 0 && !hasRecentItems()" class="dashboard__panel dashboard__panel--empty">
+    <p>{{ 'dashboard.status.emptyState' | translate }}</p>
+    <pre class="dashboard__raw" *ngIf="overview() as raw">{{ raw | json }}</pre>
+  </section>
+
   <section *ngIf="totalCards().length > 0" class="dashboard__grid">
     <article *ngFor="let card of totalCards(); trackBy: trackByKey" class="dashboard__card dashboard__card--highlight">
       <h2>{{ card.label }}</h2>

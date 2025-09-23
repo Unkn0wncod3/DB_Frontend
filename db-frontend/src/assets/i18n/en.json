@@ -1,91 +1,92 @@
 {
-  "layout": {
-    "brand": "DB Frontend",
-    "nav": {
-      "dashboard": "Dashboard",
-      "explorer": "Explorer"
-    },
-    "language": "Language",
-    "languages": {
-      "en": "English",
-      "de": "German"
-    }
-  },
-  "dashboard": {
-    "title": "Database Overview",
-    "subtitle": "Key stats and recent activity from your Railway DB_API.",
-    "actions": {
-      "refresh": "Refresh now",
-      "refreshing": "Refreshing..."
-    },
-    "meta": {
-      "lastUpdated": "Last updated {{ value }}"
-    },
-    "sections": {
-      "activity": "Activity",
-      "latest": "Latest Changes",
-      "recent": "Recent Items"
-    },
-    "latest": {
-      "created": {
-        "title": "Last created",
-        "timestamp": "Created at {{ value }}"
-      },
-      "updated": {
-        "title": "Last updated",
-        "timestamp": "Updated at {{ value }}"
-      }
-    },
-    "labels": {
-      "unknownEntry": "Unnamed entry",
-      "noRecentCreate": "No recent creations",
-      "noRecentUpdate": "No recent updates",
-      "itemType": "Type: {{ value }}"
-    },
-    "status": {
-      "noRecent": "No recent items available."
-    },
-    "errors": {
-      "loadFailed": "Unable to load dashboard data ({{ status }}): {{ message }}",
-      "noStatus": "no status",
-      "generic": "Unexpected error"
-    },
-    "totals": {
-      "entries": "Total entries",
-      "collections": "Collections",
-      "users": "Users"
-    },
-    "activity": {
-      "last24Hours": "Changes in the last 24 hours",
-      "last7Days": "Changes in the last 7 days",
-      "last30Days": "Changes in the last 30 days"
-    }
-  },
-  "home": {
-    "title": "DB API Explorer",
-    "baseUrl": "Base URL:",
-    "intro": "Configure the path and optional payload to talk to your Railway API.",
-    "form": {
-      "methodLabel": "HTTP Method",
-      "endpointLabel": "Endpoint",
-      "endpointHint": "Path relative to the base URL.",
-      "endpointPlaceholder": "/health",
-      "bodyLabel": "Request Body (JSON)",
-      "bodyPlaceholder": "{\n  \"example\": true\n}",
-      "headersLabel": "Headers (JSON)",
-      "headersPlaceholder": "{\n  \"Authorization\": \"Bearer ...\"\n}",
-      "submit": "Send Request"
-    },
-    "status": {
-      "loading": "Sending request...",
-      "errorTitle": "Error",
-      "successTitle": "Response"
-    },
-    "errors": {
-      "invalidJson": "{{field}} must contain valid JSON.",
-      "unknown": "Unknown error",
-      "status": " (Status {{status}})",
-      "http": "{{message}}{{status}}"
-    }
-  }
+    "layout":  {
+                   "brand":  "DB Frontend",
+                   "nav":  {
+                               "dashboard":  "Dashboard",
+                               "explorer":  "Explorer"
+                           },
+                   "language":  "Language",
+                   "languages":  {
+                                     "en":  "English",
+                                     "de":  "German"
+                                 }
+               },
+    "dashboard":  {
+                      "title":  "Database Overview",
+                      "subtitle":  "Key stats and recent activity from your Railway DB_API.",
+                      "actions":  {
+                                      "refresh":  "Refresh now",
+                                      "refreshing":  "Refreshing..."
+                                  },
+                      "meta":  {
+                                   "lastUpdated":  "Last updated {{ value }}"
+                               },
+                      "sections":  {
+                                       "activity":  "Activity",
+                                       "latest":  "Latest Changes",
+                                       "recent":  "Recent Items"
+                                   },
+                      "latest":  {
+                                     "created":  {
+                                                     "title":  "Last created",
+                                                     "timestamp":  "Created at {{ value }}"
+                                                 },
+                                     "updated":  {
+                                                     "title":  "Last updated",
+                                                     "timestamp":  "Updated at {{ value }}"
+                                                 }
+                                 },
+                      "labels":  {
+                                     "unknownEntry":  "Unnamed entry",
+                                     "noRecentCreate":  "No recent creations",
+                                     "noRecentUpdate":  "No recent updates",
+                                     "itemType":  "Type: {{ value }}"
+                                 },
+                      "status":  {
+                                     "noRecent":  "No recent items available."
+                                 },
+                      "errors":  {
+                                     "loadFailed":  "Unable to load dashboard data ({{ status }}): {{ message }}",
+                                     "noStatus":  "no status",
+                                     "generic":  "Unexpected error"
+                                 },
+                      "totals":  {
+                                     "entries":  "Total entries",
+                                     "collections":  "Collections",
+                                     "users":  "Users"
+                                 },
+                      "activity":  {
+                                       "last24Hours":  "Changes in the last 24 hours",
+                                       "last7Days":  "Changes in the last 7 days",
+                                       "last30Days":  "Changes in the last 30 days"
+                                   }
+                  },
+    "home":  {
+                 "title":  "DB API Explorer",
+                 "baseUrl":  "Base URL:",
+                 "intro":  "Configure the path and optional payload to talk to your Railway API.",
+                 "form":  {
+                              "methodLabel":  "HTTP Method",
+                              "endpointLabel":  "Endpoint",
+                              "endpointHint":  "Path relative to the base URL.",
+                              "endpointPlaceholder":  "/health",
+                              "bodyLabel":  "Request Body (JSON)",
+                              "bodyPlaceholder":  "{\n  \"example\": true\n}",
+                              "headersLabel":  "Headers (JSON)",
+                              "headersPlaceholder":  "{\n  \"Authorization\": \"Bearer ...\"\n}",
+                              "submit":  "Send Request"
+                          },
+                 "status":  {
+                                "loading":  "Sending request...",
+                                "errorTitle":  "Error",
+                                "successTitle":  "Response"
+                            },
+                 "errors":  {
+                                "invalidJson":  "{{field}} must contain valid JSON.",
+                                "unknown":  "Unknown error",
+                                "status":  " (Status {{status}})",
+                                "http":  "{{message}}{{status}}"
+                            }
+             }
 }
+
