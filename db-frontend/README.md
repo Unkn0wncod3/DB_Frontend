@@ -13,7 +13,7 @@ npm install
 
 ## Entwicklung
 ```bash
-npm start
+npm run dev
 ```
 Der Dev-Server laeuft auf `http://localhost:4200`. Die Entwicklungsbasis-URL fuer API-Calls steht in `src/environments/environment.development.ts`.
 
@@ -21,11 +21,11 @@ Der Dev-Server laeuft auf `http://localhost:4200`. Die Entwicklungsbasis-URL fue
 ```bash
 npm run preview
 ```
-Kompiliert die App (`npm run build`) und startet anschliessend den Express-Server (`npm run serve:dist`).
+Kompiliert die App (`npm run build`) und startet anschliessend den Express-Server (`npm start`).
 
 ## Railway Deploy
 1. Passe `src/environments/environment.ts` an und hinterlege die Railway-URL deiner DB_API.
-2. Setze in Railway als *Build Command* `npm run build` und als *Start Command* `npm run serve:dist`.
+2. Setze in Railway als *Build Command* `npm run build` und als *Start Command* `npm start`.
 3. Railway stellt zur Laufzeit `PORT` bereit, der Express-Server (`server.mjs`) nutzt diesen automatisch.
 4. Optional: Lege Railway-Environment-Variablen fuer spaetere Anpassungen an und baue die App neu, falls sich die Basis-URL aendert.
 

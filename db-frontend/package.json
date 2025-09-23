@@ -3,12 +3,13 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "node server.mjs",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:dist": "node server.mjs",
-    "preview": "npm run build && npm run serve:dist"
+    "preview": "npm run build && npm start",
+    "dev": "ng serve"
   },
   "private": true,
   "dependencies": {

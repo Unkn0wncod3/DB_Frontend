@@ -9,9 +9,9 @@ Angular-Frontend fuer deine Railway DB_API.
 ## Schnellstart
 1. `cd db-frontend`
 2. `npm install`
-3. `npm start`
+3. `npm run dev`
 
 ## Deployment (Railway)
 - Build Command: `npm run build`
-- Start Command: `npm run serve:dist`
+- Start Command: `npm start`
 - Passe `src/environments/environment.ts` vor dem Build an, damit die richtige API-URL gebundled wird.
