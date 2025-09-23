@@ -70,7 +70,7 @@
       "methodLabel": "HTTP-Methode",
       "endpointLabel": "Endpoint",
       "endpointHint": "Pfad relativ zur Basis-URL.",
-      "endpointPlaceholder": "/health",
+      "endpointPlaceholder": "/",
       "bodyLabel": "Request Body (JSON)",
       "bodyPlaceholder": "{\n  \"example\": true\n}",
       "headersLabel": "Header (JSON)",

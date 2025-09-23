@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { JsonPipe, NgFor, NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
@@ -20,16 +20,15 @@ export class ApiExplorerComponent {
   readonly methods: HttpMethod[] = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
   readonly form = this.fb.nonNullable.group({
     method: this.fb.nonNullable.control<HttpMethod>('GET'),
-    endpoint: this.fb.nonNullable.control<string>('/health'),
+    endpoint: this.fb.nonNullable.control<string>('/'),
     body: this.fb.nonNullable.control<string>(''),
     headers: this.fb.nonNullable.control<string>('')
   });
-  readonly requiresBody = computed(() => this.methodsRequiringBody.has(this.form.controls.method.value));
   readonly isLoading = signal(false);
   readonly response = signal<unknown | null>(null);
   readonly error = signal<string | null>(null);
 
-  private readonly methodsRequiringBody = new Set<HttpMethod>(['POST', 'PUT', 'PATCH']);
+  private readonly methodsRequiringBody = new Set<HttpMethod>(['POST', 'PUT', 'PATCH', 'DELETE']);
 
   constructor(
     private readonly fb: FormBuilder,
@@ -37,6 +36,10 @@ export class ApiExplorerComponent {
     private readonly translate: TranslateService,
     @Inject(API_BASE_URL) readonly baseUrl: string
   ) {}
+
+  requiresBody(): boolean {
+    return this.methodsRequiringBody.has(this.form.controls.method.value);
+  }
 
   async submit(): Promise<void> {
     if (this.form.invalid) {
@@ -112,4 +115,3 @@ export class ApiExplorerComponent {
     return this.translate.instant('apiExplorer.errors.unknown');
   }
 }
-
