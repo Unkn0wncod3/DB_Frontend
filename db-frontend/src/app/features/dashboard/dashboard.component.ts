@@ -86,6 +86,11 @@ export class DashboardComponent implements OnInit {
       return this.translate.instant(fallbackKey);
     }
 
+    const typeSpecific = this.getTypeSpecificLabel(record);
+    if (typeSpecific) {
+      return typeSpecific;
+    }
+
     return (
       record.title ||
       record.name ||
@@ -117,10 +122,47 @@ export class DashboardComponent implements OnInit {
     return this.humanizeKey(fallbackKey);
   }
 
+  private getTypeSpecificLabel(record: StatsOverviewRecord): string | undefined {
+    const metadata = (record.metadata ?? {}) as Record<string, unknown>;
+    const type = (record.type ?? '').toString().toLowerCase();
+
+    switch (type) {
+      case 'persons':
+      case 'person': {
+        const first = this.selectText(metadata, ['first_name', 'firstname', 'firstName']);
+        const last = this.selectText(metadata, ['last_name', 'lastname', 'lastName']);
+        const fullName = [first, last].filter(Boolean).join(' ').trim();
+        return fullName.length > 0 ? fullName : undefined;
+      }
+      case 'profiles':
+      case 'profile':
+        return this.selectText(metadata, ['username', 'user_name', 'user', 'name']);
+      case 'activities':
+      case 'activity': {
+        const activityType = this.selectText(metadata, ['activity_type', 'type', 'name']);
+        return activityType ? this.humanizeKey(activityType) : undefined;
+      }
+      default:
+        return undefined;
+    }
+  }
+
+  private selectText(source: Record<string, unknown>, keys: string[]): string | undefined {
+    for (const key of keys) {
+      const value = source[key];
+      if (typeof value === 'string' && value.trim().length > 0) {
+        return value.trim();
+      }
+    }
+    return undefined;
+  }
+
   private humanizeKey(value: string): string {
     return value
+      .replace(/_/g, ' ')
       .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-      .replace(/[-_]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
       .replace(/\b\w/g, (char) => char.toUpperCase());
   }
 }
