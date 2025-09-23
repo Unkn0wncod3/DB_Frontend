@@ -11,7 +11,7 @@
     </nav>
     <div class="app-shell__language">
       <label class="app-shell__language-label" for="language-select">{{ 'layout.language' | translate }}</label>
-      <select id="language-select" [value]="currentLang" (change)="onLanguageChange($event)">
+      <select id="language-select" [(ngModel)]="currentLang" (ngModelChange)="changeLanguage($event)">
         <option *ngFor="let lang of languages" [value]="lang">
           {{ ('layout.languages.' + lang) | translate }}
         </option>
