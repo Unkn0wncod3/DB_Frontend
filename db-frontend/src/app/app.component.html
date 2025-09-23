@@ -1,9 +1,19 @@
 <div class="app-shell">
   <header class="app-shell__header">
-    <span class="app-shell__brand">DB Frontend</span>
+    <span class="app-shell__brand">{{ 'layout.brand' | translate }}</span>
     <nav class="app-shell__nav">
-      <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Explorer</a>
+      <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
+        {{ 'layout.nav.explorer' | translate }}
+      </a>
     </nav>
+    <div class="app-shell__language">
+      <label class="app-shell__language-label" for="language-select">{{ 'layout.language' | translate }}</label>
+      <select id="language-select" [value]="currentLang" (change)="onLanguageChange($event)">
+        <option *ngFor="let lang of languages" [value]="lang">
+          {{ ('layout.languages.' + lang) | translate }}
+        </option>
+      </select>
+    </div>
   </header>
 
   <main class="app-shell__content">

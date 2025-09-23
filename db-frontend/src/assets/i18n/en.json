@@ -1,0 +1,41 @@
+{
+  "layout": {
+    "brand": "DB Frontend",
+    "nav": {
+      "explorer": "Explorer"
+    },
+    "language": "Language",
+    "languages": {
+      "en": "English",
+      "de": "German"
+    }
+  },
+  "home": {
+    "title": "DB API Explorer",
+    "baseUrl": "Base URL:",
+    "intro": "Configure the path and optional payload to talk to your Railway API.",
+    "form": {
+      "methodLabel": "HTTP Method",
+      "endpointLabel": "Endpoint",
+      "endpointHint": "Path relative to the base URL.",
+      "endpointPlaceholder": "/health",
+      "bodyLabel": "Request Body (JSON)",
+      "bodyPlaceholder": "{\n  \"example\": true\n}",
+      "headersLabel": "Headers (JSON)",
+      "headersPlaceholder": "{\n  \"Authorization\": \"Bearer ...\"\n}",
+      "submit": "Send Request"
+    },
+    "status": {
+      "loading": "Sending request...",
+      "errorTitle": "Error",
+      "successTitle": "Response"
+    },
+    "errors": {
+      "invalidJson": "{{field}} must contain valid JSON.",
+      "unknown": "Unknown error",
+      "status": " (Status {{status}})",
+      "http": "{{message}}{{status}}"
+    }
+  }
+}
+

@@ -1,0 +1,41 @@
+{
+  "layout": {
+    "brand": "DB Frontend",
+    "nav": {
+      "explorer": "Explorer"
+    },
+    "language": "Sprache",
+    "languages": {
+      "en": "Englisch",
+      "de": "Deutsch"
+    }
+  },
+  "home": {
+    "title": "DB API Explorer",
+    "baseUrl": "Basis-URL:",
+    "intro": "Konfiguriere Pfad und optionale Daten, um mit deiner Railway API zu sprechen.",
+    "form": {
+      "methodLabel": "HTTP-Methode",
+      "endpointLabel": "Endpoint",
+      "endpointHint": "Pfad relativ zur Basis-URL.",
+      "endpointPlaceholder": "/health",
+      "bodyLabel": "Request Body (JSON)",
+      "bodyPlaceholder": "{\n  \"example\": true\n}",
+      "headersLabel": "Header (JSON)",
+      "headersPlaceholder": "{\n  \"Authorization\": \"Bearer ...\"\n}",
+      "submit": "Anfrage senden"
+    },
+    "status": {
+      "loading": "Anfrage wird gesendet...",
+      "errorTitle": "Fehler",
+      "successTitle": "Antwort"
+    },
+    "errors": {
+      "invalidJson": "{{field}} muss gueltiges JSON enthalten.",
+      "unknown": "Unbekannter Fehler",
+      "status": " (Status {{status}})",
+      "http": "{{message}}{{status}}"
+    }
+  }
+}
+

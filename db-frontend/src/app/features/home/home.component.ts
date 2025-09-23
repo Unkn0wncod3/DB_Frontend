@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { JsonPipe, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject, computed, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
 import { ApiService, HttpMethod, RequestOptions } from '../../core/services/api.service';
@@ -10,7 +11,7 @@ import { API_BASE_URL } from '../../core/tokens/api-base-url.token';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [NgIf, NgFor, ReactiveFormsModule, JsonPipe],
+  imports: [NgIf, NgFor, ReactiveFormsModule, JsonPipe, TranslateModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -33,6 +34,7 @@ export class HomeComponent {
   constructor(
     private readonly fb: FormBuilder,
     private readonly api: ApiService,
+    private readonly translate: TranslateService,
     @Inject(API_BASE_URL) readonly baseUrl: string
   ) {}
 
@@ -70,11 +72,11 @@ export class HomeComponent {
     const options: RequestOptions = {};
 
     if (this.methodsRequiringBody.has(method) && body.trim().length > 0) {
-      options.body = this.parseJson(body, 'Body');
+      options.body = this.parseJson(body, this.translate.instant('home.form.bodyLabel'));
     }
 
     if (headers.trim().length > 0) {
-      options.headers = this.parseJson(headers, 'Headers');
+      options.headers = this.parseJson(headers, this.translate.instant('home.form.headersLabel'));
     }
 
     return options;
@@ -84,17 +86,19 @@ export class HomeComponent {
     try {
       return JSON.parse(content);
     } catch {
-      throw new Error(`${label}-Feld enthaelt kein gueltiges JSON.`);
+      throw new Error(this.translate.instant('home.errors.invalidJson', { field: label }));
     }
   }
 
   private stringifyError(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
-      const statusText = error.status ? ` (Status ${error.status})` : '';
+      const statusAddition = error.status
+        ? this.translate.instant('home.errors.status', { status: error.status })
+        : '';
       const message = typeof error.error === 'string' && error.error.trim().length > 0
         ? error.error
         : error.message;
-      return `${message}${statusText}`;
+      return this.translate.instant('home.errors.http', { message, status: statusAddition });
     }
 
     if (error instanceof Error) {
@@ -102,9 +106,9 @@ export class HomeComponent {
     }
 
     if (typeof error === 'object' && error !== null && 'message' in error) {
-      return String((error as { message: unknown }).message ?? 'Unbekannter Fehler');
+      return String((error as { message: unknown }).message ?? this.translate.instant('home.errors.unknown'));
     }
 
-    return 'Unbekannter Fehler';
+    return this.translate.instant('home.errors.unknown');
   }
 }
