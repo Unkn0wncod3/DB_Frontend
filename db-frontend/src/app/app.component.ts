@@ -23,6 +23,10 @@ export class AppComponent {
 
     translate.use(initialLang);
     this.currentLang = translate.currentLang || initialLang;
+
+    translate.onLangChange.subscribe(({ lang }) => {
+      this.currentLang = lang;
+    });
   }
 
   onLanguageChange(event: Event): void {
@@ -43,3 +47,4 @@ export class AppComponent {
     this.currentLang = lang;
   }
 }
+
