@@ -2,12 +2,63 @@
   "layout": {
     "brand": "DB Frontend",
     "nav": {
+      "dashboard": "Dashboard",
       "explorer": "Explorer"
     },
     "language": "Sprache",
     "languages": {
       "en": "Englisch",
       "de": "Deutsch"
+    }
+  },
+  "dashboard": {
+    "title": "Datenbank-Uebersicht",
+    "subtitle": "Wichtige Kennzahlen und Aktivitaeten deiner Railway DB_API.",
+    "actions": {
+      "refresh": "Jetzt aktualisieren",
+      "refreshing": "Aktualisiere..."
+    },
+    "meta": {
+      "lastUpdated": "Zuletzt aktualisiert am {{ value }}"
+    },
+    "sections": {
+      "activity": "Aktivitaet",
+      "latest": "Neueste Aenderungen",
+      "recent": "Aktuelle Eintraege"
+    },
+    "latest": {
+      "created": {
+        "title": "Zuletzt erstellt",
+        "timestamp": "Erstellt am {{ value }}"
+      },
+      "updated": {
+        "title": "Zuletzt aktualisiert",
+        "timestamp": "Aktualisiert am {{ value }}"
+      }
+    },
+    "labels": {
+      "unknownEntry": "Unbenannter Eintrag",
+      "noRecentCreate": "Keine aktuellen Erstellungen",
+      "noRecentUpdate": "Keine aktuellen Aktualisierungen",
+      "itemType": "Typ: {{ value }}"
+    },
+    "status": {
+      "noRecent": "Keine aktuellen Eintraege vorhanden."
+    },
+    "errors": {
+      "loadFailed": "Dashboard-Daten konnten nicht geladen werden ({{ status }}): {{ message }}",
+      "noStatus": "kein Status",
+      "generic": "Unerwarteter Fehler"
+    },
+    "totals": {
+      "entries": "Gesamtanzahl Eintraege",
+      "collections": "Sammlungen",
+      "users": "Benutzer"
+    },
+    "activity": {
+      "last24Hours": "Aenderungen in den letzten 24 Stunden",
+      "last7Days": "Aenderungen in den letzten 7 Tagen",
+      "last30Days": "Aenderungen in den letzten 30 Tagen"
     }
   },
   "home": {
@@ -38,4 +89,3 @@
     }
   }
 }
-

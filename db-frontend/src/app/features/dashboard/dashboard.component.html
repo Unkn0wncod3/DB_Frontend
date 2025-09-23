@@ -1,0 +1,94 @@
+<section class="dashboard">
+  <header class="dashboard__header">
+    <div>
+      <h1>{{ 'dashboard.title' | translate }}</h1>
+      <p>{{ 'dashboard.subtitle' | translate }}</p>
+    </div>
+    <div class="dashboard__actions">
+      <button type="button" class="dashboard__refresh" (click)="forceRefresh()" [disabled]="isLoading()">
+        <span *ngIf="isLoading(); else idleState">{{ 'dashboard.actions.refreshing' | translate }}</span>
+        <ng-template #idleState>{{ 'dashboard.actions.refresh' | translate }}</ng-template>
+      </button>
+      <span class="dashboard__meta" *ngIf="lastUpdated() as timestamp">
+        {{ 'dashboard.meta.lastUpdated' | translate:{ value: (timestamp | date:'short') } }}
+      </span>
+    </div>
+  </header>
+
+  <section *ngIf="errorMessage() as error" class="dashboard__error">
+    <p>{{ error }}</p>
+  </section>
+
+  <section *ngIf="totalCards().length > 0" class="dashboard__grid">
+    <article *ngFor="let card of totalCards(); trackBy: trackByKey" class="dashboard__card dashboard__card--highlight">
+      <h2>{{ card.label }}</h2>
+      <p class="dashboard__value">{{ card.value | number }}</p>
+    </article>
+  </section>
+
+  <section *ngIf="activityCards().length > 0" class="dashboard__panel">
+    <header>
+      <h2>{{ 'dashboard.sections.activity' | translate }}</h2>
+    </header>
+    <ul>
+      <li *ngFor="let item of activityCards(); trackBy: trackByKey">
+        <span>{{ item.label }}</span>
+        <strong>{{ item.value | number }}</strong>
+      </li>
+    </ul>
+  </section>
+
+  <section *ngIf="overview()?.latest as latest" class="dashboard__panel">
+    <header>
+      <h2>{{ 'dashboard.sections.latest' | translate }}</h2>
+    </header>
+    <div class="dashboard__latest">
+      <article class="dashboard__latest-item">
+        <h3>{{ 'dashboard.latest.created.title' | translate }}</h3>
+        <ng-container *ngIf="latest.created; else createdFallback">
+          <p class="dashboard__latest-title">{{ formatRecordLabel(latest.created, 'dashboard.labels.noRecentCreate') }}</p>
+          <p class="dashboard__latest-meta" *ngIf="formatRecordTimestamp(latest.created) as createdTs">
+            {{ 'dashboard.latest.created.timestamp' | translate:{ value: (createdTs | date:'short') } }}
+          </p>
+        </ng-container>
+        <ng-template #createdFallback>
+          <p class="dashboard__latest-empty">{{ 'dashboard.labels.noRecentCreate' | translate }}</p>
+        </ng-template>
+      </article>
+      <article class="dashboard__latest-item">
+        <h3>{{ 'dashboard.latest.updated.title' | translate }}</h3>
+        <ng-container *ngIf="latest.updated; else updatedFallback">
+          <p class="dashboard__latest-title">{{ formatRecordLabel(latest.updated, 'dashboard.labels.noRecentUpdate') }}</p>
+          <p class="dashboard__latest-meta" *ngIf="formatRecordTimestamp(latest.updated) as updatedTs">
+            {{ 'dashboard.latest.updated.timestamp' | translate:{ value: (updatedTs | date:'short') } }}
+          </p>
+        </ng-container>
+        <ng-template #updatedFallback>
+          <p class="dashboard__latest-empty">{{ 'dashboard.labels.noRecentUpdate' | translate }}</p>
+        </ng-template>
+      </article>
+    </div>
+  </section>
+
+  <section class="dashboard__panel" *ngIf="hasRecentItems(); else noRecent">
+    <header>
+      <h2>{{ 'dashboard.sections.recent' | translate }}</h2>
+    </header>
+    <ul class="dashboard__recent-list">
+      <li *ngFor="let item of overview()?.recent ?? []; trackBy: trackByRecord" class="dashboard__recent-item">
+        <div>
+          <strong>{{ formatRecordLabel(item, 'dashboard.labels.unknownEntry') }}</strong>
+          <p *ngIf="item.summary || item.type" class="dashboard__recent-meta">
+            {{ item.summary || ('dashboard.labels.itemType' | translate:{ value: item.type }) }}
+          </p>
+        </div>
+        <time *ngIf="formatRecordTimestamp(item) as ts">{{ ts | date:'short' }}</time>
+      </li>
+    </ul>
+  </section>
+  <ng-template #noRecent>
+    <section class="dashboard__panel dashboard__panel--empty">
+      <p>{{ 'dashboard.status.noRecent' | translate }}</p>
+    </section>
+  </ng-template>
+</section>

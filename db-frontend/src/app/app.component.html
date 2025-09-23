@@ -3,6 +3,9 @@
     <span class="app-shell__brand">{{ 'layout.brand' | translate }}</span>
     <nav class="app-shell__nav">
       <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
+        {{ 'layout.nav.dashboard' | translate }}
+      </a>
+      <a routerLink="/explorer" routerLinkActive="is-active">
         {{ 'layout.nav.explorer' | translate }}
       </a>
     </nav>

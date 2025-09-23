@@ -2,12 +2,63 @@
   "layout": {
     "brand": "DB Frontend",
     "nav": {
+      "dashboard": "Dashboard",
       "explorer": "Explorer"
     },
     "language": "Language",
     "languages": {
       "en": "English",
       "de": "German"
+    }
+  },
+  "dashboard": {
+    "title": "Database Overview",
+    "subtitle": "Key stats and recent activity from your Railway DB_API.",
+    "actions": {
+      "refresh": "Refresh now",
+      "refreshing": "Refreshing..."
+    },
+    "meta": {
+      "lastUpdated": "Last updated {{ value }}"
+    },
+    "sections": {
+      "activity": "Activity",
+      "latest": "Latest Changes",
+      "recent": "Recent Items"
+    },
+    "latest": {
+      "created": {
+        "title": "Last created",
+        "timestamp": "Created at {{ value }}"
+      },
+      "updated": {
+        "title": "Last updated",
+        "timestamp": "Updated at {{ value }}"
+      }
+    },
+    "labels": {
+      "unknownEntry": "Unnamed entry",
+      "noRecentCreate": "No recent creations",
+      "noRecentUpdate": "No recent updates",
+      "itemType": "Type: {{ value }}"
+    },
+    "status": {
+      "noRecent": "No recent items available."
+    },
+    "errors": {
+      "loadFailed": "Unable to load dashboard data ({{ status }}): {{ message }}",
+      "noStatus": "no status",
+      "generic": "Unexpected error"
+    },
+    "totals": {
+      "entries": "Total entries",
+      "collections": "Collections",
+      "users": "Users"
+    },
+    "activity": {
+      "last24Hours": "Changes in the last 24 hours",
+      "last7Days": "Changes in the last 7 days",
+      "last30Days": "Changes in the last 30 days"
     }
   },
   "home": {
@@ -38,4 +89,3 @@
     }
   }
 }
-

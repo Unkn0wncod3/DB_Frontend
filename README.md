@@ -43,9 +43,11 @@ The root `package.json` forwards commands to the Angular project:
 - `npm run preview` – Build + serve via Express.
 
 ## Project Highlights
-- `src/environments/` – Environment-specific API base URLs for dev/prod builds.
-- `src/app/core/services/api.service.ts` – Centralised HTTP client that uses the injected base URL.
-- `src/app/features/home/home.component.*` – Lightweight API explorer UI for testing your endpoints.
-- `server.mjs` – Express server that serves the built SPA and performs a build-output check on startup.
+- `src/environments/` - Environment-specific API base URLs for dev/prod builds.
+- `src/app/core/services/api.service.ts` - Centralised HTTP client that uses the injected base URL.
+- `src/app/core/services/stats.service.ts` - Cached access to `/stats/overview` (20 minute TTL).
+- `src/app/features/dashboard/dashboard.component.*` - Overview dashboard consuming `/stats/overview` with translations and refresh control.
+- `src/app/features/home/home.component.*` - Lightweight API explorer UI for ad-hoc requests.
+- `server.mjs` - Express server that serves the built SPA and performs a build-output check on startup.
 
 Have fun building on top of it!
