@@ -1,0 +1,21 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+code,
+pre {
+  font-family: 'Fira Code', 'Source Code Pro', Menlo, Monaco, Consolas, monospace;
+  font-size: 0.95rem;
+}

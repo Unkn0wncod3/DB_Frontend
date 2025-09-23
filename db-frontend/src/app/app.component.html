@@ -1,0 +1,12 @@
+<div class="app-shell">
+  <header class="app-shell__header">
+    <span class="app-shell__brand">DB Frontend</span>
+    <nav class="app-shell__nav">
+      <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Explorer</a>
+    </nav>
+  </header>
+
+  <main class="app-shell__content">
+    <router-outlet />
+  </main>
+</div>
