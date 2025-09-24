@@ -51,15 +51,19 @@
       <article class="dashboard__latest-item">
         <h3>{{ 'dashboard.latest.created.title' | translate }}</h3>
         <ng-container *ngIf="resolveLatestRecord(latest.created, 'created') as createdRecord; else createdFallback">
-          <div class="dashboard__latest-entry">
-            <strong class="dashboard__latest-name">{{ formatRecordLabel(createdRecord, 'dashboard.labels.noRecentCreate') }}</strong>
-            <p *ngIf="formatRecordType(createdRecord) as createdType" class="dashboard__recent-meta">
-              {{ createdType }}
-            </p>
-            <p *ngIf="formatRecordTimestampFor(createdRecord, 'created') as createdTs" class="dashboard__recent-meta">
-              {{ 'dashboard.latest.created.timestamp' | translate:{ value: (createdTs | date:'short') } }}
-            </p>
-          </div>
+          <ng-container *ngIf="entryLink(createdRecord) as createdLink; else createdStatic">
+            <a
+              [routerLink]="createdLink"
+              class="dashboard__latest-entry dashboard__latest-entry--link"
+            >
+              <ng-container *ngTemplateOutlet="latestEntry; context: { $implicit: createdRecord, kind: 'created', fallback: 'dashboard.labels.noRecentCreate', tsKey: 'dashboard.latest.created.timestamp' }"></ng-container>
+            </a>
+          </ng-container>
+          <ng-template #createdStatic>
+            <div class="dashboard__latest-entry">
+              <ng-container *ngTemplateOutlet="latestEntry; context: { $implicit: createdRecord, kind: 'created', fallback: 'dashboard.labels.noRecentCreate', tsKey: 'dashboard.latest.created.timestamp' }"></ng-container>
+            </div>
+          </ng-template>
         </ng-container>
         <ng-template #createdFallback>
           <p class="dashboard__latest-empty">{{ 'dashboard.labels.noRecentCreate' | translate }}</p>
@@ -68,21 +72,34 @@
       <article class="dashboard__latest-item">
         <h3>{{ 'dashboard.latest.updated.title' | translate }}</h3>
         <ng-container *ngIf="resolveLatestRecord(latest.updated, 'updated') as updatedRecord; else updatedFallback">
-          <div class="dashboard__latest-entry">
-            <strong class="dashboard__latest-name">{{ formatRecordLabel(updatedRecord, 'dashboard.labels.noRecentUpdate') }}</strong>
-            <p *ngIf="formatRecordType(updatedRecord) as updatedType" class="dashboard__recent-meta">
-              {{ updatedType }}
-            </p>
-            <p *ngIf="formatRecordTimestampFor(updatedRecord, 'updated') as updatedTs" class="dashboard__recent-meta">
-              {{ 'dashboard.latest.updated.timestamp' | translate:{ value: (updatedTs | date:'short') } }}
-            </p>
-          </div>
+          <ng-container *ngIf="entryLink(updatedRecord) as updatedLink; else updatedStatic">
+            <a
+              [routerLink]="updatedLink"
+              class="dashboard__latest-entry dashboard__latest-entry--link"
+            >
+              <ng-container *ngTemplateOutlet="latestEntry; context: { $implicit: updatedRecord, kind: 'updated', fallback: 'dashboard.labels.noRecentUpdate', tsKey: 'dashboard.latest.updated.timestamp' }"></ng-container>
+            </a>
+          </ng-container>
+          <ng-template #updatedStatic>
+            <div class="dashboard__latest-entry">
+              <ng-container *ngTemplateOutlet="latestEntry; context: { $implicit: updatedRecord, kind: 'updated', fallback: 'dashboard.labels.noRecentUpdate', tsKey: 'dashboard.latest.updated.timestamp' }"></ng-container>
+            </div>
+          </ng-template>
         </ng-container>
         <ng-template #updatedFallback>
           <p class="dashboard__latest-empty">{{ 'dashboard.labels.noRecentUpdate' | translate }}</p>
         </ng-template>
       </article>
     </div>
+    <ng-template #latestEntry let-record let-kind="kind" let-fallback="fallback" let-tsKey="tsKey">
+      <strong class="dashboard__latest-name">{{ formatRecordLabel(record, fallback) }}</strong>
+      <p *ngIf="formatRecordType(record) as recordType" class="dashboard__recent-meta">
+        {{ recordType }}
+      </p>
+      <p *ngIf="formatRecordTimestampFor(record, kind) as ts" class="dashboard__recent-meta">
+        {{ tsKey | translate:{ value: (ts | date:'short') } }}
+      </p>
+    </ng-template>
   </section>
 
   <section class="dashboard__panel" *ngIf="hasRecentItems(); else noRecent">
@@ -123,8 +140,4 @@
     </section>
   </ng-template>
 </section>
-
-
-
-
 
