@@ -1,4 +1,5 @@
 import { AsyncPipe, DatePipe, DecimalPipe, JsonPipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -13,7 +14,7 @@ interface DisplayCard {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgIf, NgFor, JsonPipe, AsyncPipe, DatePipe, DecimalPipe, TranslateModule, NgClass],
+  imports: [NgIf, NgFor, JsonPipe, AsyncPipe, DatePipe, DecimalPipe, TranslateModule, NgClass, RouterLink],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -147,6 +148,20 @@ export class DashboardComponent implements OnInit {
     return this.formatRecordType(record);
   }
 
+  entryLink(record: StatsOverviewRecord | undefined): string[] | null {
+    if (!record) {
+      return null;
+    }
+
+    const type = (record.type ?? '').toString().trim();
+    const id = (record.id ?? '').toString().trim();
+
+    if (!type || !id) {
+      return null;
+    }
+
+    return ['/entries', type, id];
+  }
   resolveLatestRecord(record: StatsOverviewRecord | undefined, kind: 'created' | 'updated'): StatsOverviewRecord | undefined {
     if (!record) {
       return undefined;
@@ -251,4 +266,6 @@ export class DashboardComponent implements OnInit {
       .replace(/\b\w/g, (char) => char.toUpperCase());
   }
 }
+
+
 

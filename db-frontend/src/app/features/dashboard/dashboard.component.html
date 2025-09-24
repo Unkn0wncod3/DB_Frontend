@@ -90,16 +90,32 @@
       <h2>{{ 'dashboard.sections.recent' | translate }}</h2>
     </header>
     <ul class="dashboard__recent-list">
-      <li *ngFor="let item of overview()?.recent ?? []; trackBy: trackByRecord" class="dashboard__recent-item">
-        <div>
-          <strong>{{ formatRecordLabel(item, 'dashboard.labels.unknownEntry') }}</strong>
-          <p *ngIf="formatRecordMeta(item) as itemMeta" class="dashboard__recent-meta">
-            {{ itemMeta }}
-          </p>
-        </div>
-        <time *ngIf="formatRecordTimestamp(item) as ts">{{ ts | date:'short' }}</time>
+      <li
+        *ngFor="let item of overview()?.recent ?? []; trackBy: trackByRecord"
+        class="dashboard__recent-item"
+        [class.dashboard__recent-item--link]="entryLink(item)"
+      >
+        <a
+          *ngIf="entryLink(item) as link; else recentStatic"
+          [routerLink]="link"
+          class="dashboard__recent-link"
+        >
+          <ng-container *ngTemplateOutlet="recentRecord; context: { $implicit: item }"></ng-container>
+        </a>
+        <ng-template #recentStatic>
+          <ng-container *ngTemplateOutlet="recentRecord; context: { $implicit: item }"></ng-container>
+        </ng-template>
       </li>
     </ul>
+    <ng-template #recentRecord let-record>
+      <div class="dashboard__recent-content">
+        <strong>{{ formatRecordLabel(record, 'dashboard.labels.unknownEntry') }}</strong>
+        <p *ngIf="formatRecordMeta(record) as itemMeta" class="dashboard__recent-meta">
+          {{ itemMeta }}
+        </p>
+      </div>
+      <time *ngIf="formatRecordTimestamp(record) as ts">{{ ts | date:'short' }}</time>
+    </ng-template>
   </section>
   <ng-template #noRecent>
     <section class="dashboard__panel dashboard__panel--empty">
@@ -107,6 +123,7 @@
     </section>
   </ng-template>
 </section>
+
 
 
 

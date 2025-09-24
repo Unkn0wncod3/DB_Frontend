@@ -1,0 +1,63 @@
+<section class="entry-detail">
+  <header class="entry-detail__header">
+    <div class="entry-detail__title">
+      <a routerLink="/" class="entry-detail__back">{{ 'entryDetail.actions.back' | translate }}</a>
+      <h1>{{ 'entryDetail.title' | translate:{ id: entryId ?? ('entryDetail.labels.unknownId' | translate) } }}</h1>
+      <p *ngIf="entryType">{{ 'entryDetail.labels.type' | translate:{ type: entryType } }}</p>
+    </div>
+    <div class="entry-detail__actions">
+      <button type="button" class="entry-detail__refresh" (click)="refresh()" [disabled]="isLoading() || isSaving()">
+        <span *ngIf="isLoading(); else refreshLabel">{{ 'entryDetail.status.loading' | translate }}</span>
+        <ng-template #refreshLabel>{{ 'entryDetail.actions.refresh' | translate }}</ng-template>
+      </button>
+      <button type="submit" form="entryDetailForm" class="entry-detail__save" [disabled]="!hasChanges() || isSaving()">
+        <span *ngIf="isSaving(); else saveLabel">{{ 'entryDetail.status.saving' | translate }}</span>
+        <ng-template #saveLabel>{{ 'entryDetail.actions.save' | translate }}</ng-template>
+      </button>
+      <button type="button" class="entry-detail__delete" (click)="delete()" [disabled]="isDeleting()">
+        <span *ngIf="isDeleting(); else deleteLabel">{{ 'entryDetail.status.deleting' | translate }}</span>
+        <ng-template #deleteLabel>{{ 'entryDetail.actions.delete' | translate }}</ng-template>
+      </button>
+    </div>
+  </header>
+
+  <section *ngIf="errorMessage() as error" class="entry-detail__alert entry-detail__alert--error">
+    <p>{{ error }}</p>
+  </section>
+
+  <section *ngIf="successMessage() as success" class="entry-detail__alert entry-detail__alert--success">
+    <p>{{ success }}</p>
+  </section>
+
+  <form
+    id="entryDetailForm"
+    class="entry-detail__form"
+    [formGroup]="form"
+    (ngSubmit)="save()"
+    *ngIf="entry() as record"
+  >
+    <div class="entry-detail__grid">
+      <div *ngFor="let field of fields(); trackBy: trackByKey" class="entry-detail__field">
+        <label [attr.for]="field.key">{{ field.label }}</label>
+        <textarea
+          *ngIf="field.multiline; else singleLine"
+          [id]="field.key"
+          [formControlName]="field.key"
+          rows="4"
+        ></textarea>
+        <ng-template #singleLine>
+          <input type="text" [id]="field.key" [formControlName]="field.key" />
+        </ng-template>
+      </div>
+    </div>
+  </form>
+
+  <section *ngIf="!entry() && !isLoading()" class="entry-detail__state">
+    <p>{{ 'entryDetail.status.empty' | translate }}</p>
+  </section>
+
+  <section *ngIf="entry() as raw" class="entry-detail__raw">
+    <h2>{{ 'entryDetail.sections.raw' | translate }}</h2>
+    <pre>{{ raw | json }}</pre>
+  </section>
+</section>

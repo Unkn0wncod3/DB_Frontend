@@ -63,6 +63,38 @@
                                        "last30Days":  "Changes in the last 30 days"
                                    }
                   },
+    "entryDetail":  {
+                      "title":  "Entry {{ id }}",
+                      "labels":  {
+                                     "unknownId":  "Unknown entry",
+                                     "type":  "Type: {{ type }}"
+                                 },
+                      "actions":  {
+                                      "back":  "Back to dashboard",
+                                      "refresh":  "Reload",
+                                      "save":  "Save changes",
+                                      "delete":  "Delete"
+                                  },
+                      "status":  {
+                                     "loading":  "Loading...",
+                                     "saving":  "Saving...",
+                                     "deleting":  "Deleting...",
+                                     "saved":  "Changes saved.",
+                                     "deleted":  "Entry deleted.",
+                                     "empty":  "No data available for this entry."
+                                 },
+                      "sections":  {
+                                       "raw":  "Raw payload"
+                                   },
+                      "errors":  {
+                                     "missingParams":  "Missing entry parameters.",
+                                     "loadFailed":  "Unable to load entry: {{ message }}",
+                                     "saveFailed":  "Unable to save entry: {{ message }}",
+                                     "deleteFailed":  "Unable to delete entry: {{ message }}",
+                                     "invalidPayload":  "The API returned an unexpected response.",
+                                     "unknown":  "Unknown error"
+                                 }
+                  },
     "apiExplorer":  {
                  "title":  "DB API Explorer",
                  "baseUrl":  "Base URL:",
@@ -91,3 +123,6 @@
                             }
              }
 }
+
+
+

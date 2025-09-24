@@ -64,6 +64,38 @@
       "last30Days": "Aenderungen in den letzten 30 Tagen"
     }
   },
+  "entryDetail": {
+    "title": "Eintrag {{ id }}",
+    "labels": {
+      "unknownId": "Unbekannter Eintrag",
+      "type": "Typ: {{ type }}"
+    },
+    "actions": {
+      "back": "Zurueck zum Dashboard",
+      "refresh": "Neu laden",
+      "save": "Speichern",
+      "delete": "Loeschen"
+    },
+    "status": {
+      "loading": "Lade...",
+      "saving": "Speichere...",
+      "deleting": "Loesche...",
+      "saved": "Aenderungen gespeichert.",
+      "deleted": "Eintrag geloescht.",
+      "empty": "Keine Daten fuer diesen Eintrag verfuegbar."
+    },
+    "sections": {
+      "raw": "Rohdaten"
+    },
+    "errors": {
+      "missingParams": "Eintragsparameter fehlen.",
+      "loadFailed": "Eintrag konnte nicht geladen werden: {{ message }}",
+      "saveFailed": "Eintrag konnte nicht gespeichert werden: {{ message }}",
+      "deleteFailed": "Eintrag konnte nicht geloescht werden: {{ message }}",
+      "invalidPayload": "Die API hat eine unerwartete Antwort geliefert.",
+      "unknown": "Unbekannter Fehler"
+    }
+  },
   "apiExplorer": {
     "title": "DB API Explorer",
     "baseUrl": "Basis-URL:",
@@ -92,3 +124,5 @@
     }
   }
 }
+
+
