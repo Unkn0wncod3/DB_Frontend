@@ -147,6 +147,52 @@ export class DashboardComponent implements OnInit {
     return this.formatRecordType(record);
   }
 
+  resolveLatestRecord(record: StatsOverviewRecord | undefined, kind: 'created' | 'updated'): StatsOverviewRecord | undefined {
+    if (!record) {
+      return undefined;
+    }
+
+    const recent = this.overview()?.recent;
+    if (!Array.isArray(recent) || recent.length === 0) {
+      return record;
+    }
+
+    const targetType = (record.type ?? '').toString().toLowerCase();
+    const targetTimestamp = this.getTimestampForKind(record, kind);
+
+    if (!targetType || !targetTimestamp) {
+      return record;
+    }
+
+    const match = recent.find((item) => {
+      const itemType = (item.type ?? '').toString().toLowerCase();
+      if (itemType !== targetType) {
+        return false;
+      }
+
+      const itemTimestamp = this.getTimestampForKind(item, kind);
+      return !!itemTimestamp && itemTimestamp === targetTimestamp;
+    });
+
+    return match ?? record;
+  }
+
+  formatRecordTimestampFor(record: StatsOverviewRecord | undefined, kind: 'created' | 'updated'): string | null {
+    if (!record) {
+      return null;
+    }
+
+    return this.getTimestampForKind(record, kind) ?? null;
+  }
+
+  private getTimestampForKind(record: StatsOverviewRecord, kind: 'created' | 'updated'): string | undefined {
+    if (kind === 'created') {
+      return record.createdAt || record.timestamp || record.occurredAt || record.updatedAt || undefined;
+    }
+
+    return record.updatedAt || record.timestamp || record.occurredAt || record.createdAt || undefined;
+  }
+
   hasRecentItems(): boolean {
     const recent = this.overview()?.recent;
     return Array.isArray(recent) && recent.length > 0;
@@ -205,3 +251,4 @@ export class DashboardComponent implements OnInit {
       .replace(/\b\w/g, (char) => char.toUpperCase());
   }
 }
+
