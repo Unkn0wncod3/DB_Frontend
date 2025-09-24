@@ -159,13 +159,18 @@
   }
 }
 
-.dashboard__latest-title {
-  margin: 0;
-  font-weight: 600;
-  color: #0f172a;
+.dashboard__latest-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
-.dashboard__latest-meta,
+.dashboard__latest-name {
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+
 .dashboard__latest-empty {
   margin: 0.35rem 0 0;
   font-size: 0.85rem;
@@ -226,3 +231,4 @@
   max-height: 240px;
   overflow: auto;
 }
+

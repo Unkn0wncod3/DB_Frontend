@@ -51,13 +51,15 @@
       <article class="dashboard__latest-item">
         <h3>{{ 'dashboard.latest.created.title' | translate }}</h3>
         <ng-container *ngIf="latest.created; else createdFallback">
-          <p class="dashboard__latest-title">{{ formatRecordLabel(latest.created, 'dashboard.labels.noRecentCreate') }}</p>
-          <p class="dashboard__latest-meta" *ngIf="formatRecordType(latest.created) as createdType">
-            {{ createdType }}
-          </p>
-          <p class="dashboard__latest-meta" *ngIf="formatRecordTimestamp(latest.created) as createdTs">
-            {{ 'dashboard.latest.created.timestamp' | translate:{ value: (createdTs | date:'short') } }}
-          </p>
+          <div class="dashboard__latest-entry">
+            <strong class="dashboard__latest-name">{{ formatRecordLabel(latest.created, 'dashboard.labels.noRecentCreate') }}</strong>
+            <p *ngIf="formatRecordType(latest.created) as createdType" class="dashboard__recent-meta">
+              {{ createdType }}
+            </p>
+            <p *ngIf="formatRecordTimestamp(latest.created) as createdTs" class="dashboard__recent-meta">
+              {{ 'dashboard.latest.created.timestamp' | translate:{ value: (createdTs | date:'short') } }}
+            </p>
+          </div>
         </ng-container>
         <ng-template #createdFallback>
           <p class="dashboard__latest-empty">{{ 'dashboard.labels.noRecentCreate' | translate }}</p>
@@ -66,13 +68,15 @@
       <article class="dashboard__latest-item">
         <h3>{{ 'dashboard.latest.updated.title' | translate }}</h3>
         <ng-container *ngIf="latest.updated; else updatedFallback">
-          <p class="dashboard__latest-title">{{ formatRecordLabel(latest.updated, 'dashboard.labels.noRecentUpdate') }}</p>
-          <p class="dashboard__latest-meta" *ngIf="formatRecordType(latest.updated) as updatedType">
-            {{ updatedType }}
-          </p>
-          <p class="dashboard__latest-meta" *ngIf="formatRecordTimestamp(latest.updated) as updatedTs">
-            {{ 'dashboard.latest.updated.timestamp' | translate:{ value: (updatedTs | date:'short') } }}
-          </p>
+          <div class="dashboard__latest-entry">
+            <strong class="dashboard__latest-name">{{ formatRecordLabel(latest.updated, 'dashboard.labels.noRecentUpdate') }}</strong>
+            <p *ngIf="formatRecordType(latest.updated) as updatedType" class="dashboard__recent-meta">
+              {{ updatedType }}
+            </p>
+            <p *ngIf="formatRecordTimestamp(latest.updated) as updatedTs" class="dashboard__recent-meta">
+              {{ 'dashboard.latest.updated.timestamp' | translate:{ value: (updatedTs | date:'short') } }}
+            </p>
+          </div>
         </ng-container>
         <ng-template #updatedFallback>
           <p class="dashboard__latest-empty">{{ 'dashboard.labels.noRecentUpdate' | translate }}</p>
@@ -103,3 +107,4 @@
     </section>
   </ng-template>
 </section>
+
