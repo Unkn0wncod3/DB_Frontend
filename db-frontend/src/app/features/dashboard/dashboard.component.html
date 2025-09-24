@@ -93,7 +93,7 @@
       <li
         *ngFor="let item of overview()?.recent ?? []; trackBy: trackByRecord"
         class="dashboard__recent-item"
-        [class.dashboard__recent-item--link]="entryLink(item)"
+        [class.dashboard__recent-item--link]="!!entryLink(item)"
       >
         <a
           *ngIf="entryLink(item) as link; else recentStatic"
@@ -123,6 +123,7 @@
     </section>
   </ng-template>
 </section>
+
 
 
 
