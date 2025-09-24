@@ -108,6 +108,45 @@ export class DashboardComponent implements OnInit {
     return record.updatedAt || record.timestamp || record.occurredAt || record.createdAt || null;
   }
 
+  formatRecordType(record: StatsOverviewRecord | undefined): string | null {
+    if (!record) {
+      return null;
+    }
+
+    const rawType = record.type;
+    const rawId = record.id;
+    const type = rawType != null ? String(rawType).trim() : '';
+    const id = rawId != null ? String(rawId).trim() : '';
+    const hasType = type.length > 0;
+    const hasId = id.length > 0;
+
+    if (hasType && hasId) {
+      return this.translate.instant('dashboard.labels.itemTypeWithId', { type, id });
+    }
+
+    if (hasType) {
+      return this.translate.instant('dashboard.labels.itemType', { value: type });
+    }
+
+    if (hasId) {
+      return this.translate.instant('dashboard.labels.itemId', { value: id });
+    }
+
+    return null;
+  }
+
+  formatRecordMeta(record: StatsOverviewRecord | undefined): string | null {
+    if (!record) {
+      return null;
+    }
+
+    if (typeof record.summary === 'string' && record.summary.trim().length > 0) {
+      return record.summary.trim();
+    }
+
+    return this.formatRecordType(record);
+  }
+
   hasRecentItems(): boolean {
     const recent = this.overview()?.recent;
     return Array.isArray(recent) && recent.length > 0;

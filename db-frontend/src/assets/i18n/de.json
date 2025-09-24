@@ -40,7 +40,9 @@
       "unknownEntry": "Unbenannter Eintrag",
       "noRecentCreate": "Keine aktuellen Erstellungen",
       "noRecentUpdate": "Keine aktuellen Aktualisierungen",
-      "itemType": "Typ: {{ value }}"
+      "itemType": "Typ: {{ value }}",
+      "itemTypeWithId": "Typ: {{ type }} (ID: {{ id }})",
+      "itemId": "ID: {{ value }}"
     },
     "status": {
       "noRecent": "Keine aktuellen Eintraege vorhanden.",
@@ -90,4 +92,3 @@
     }
   }
 }
-

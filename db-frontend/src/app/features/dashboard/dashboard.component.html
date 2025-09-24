@@ -52,6 +52,9 @@
         <h3>{{ 'dashboard.latest.created.title' | translate }}</h3>
         <ng-container *ngIf="latest.created; else createdFallback">
           <p class="dashboard__latest-title">{{ formatRecordLabel(latest.created, 'dashboard.labels.noRecentCreate') }}</p>
+          <p class="dashboard__latest-meta" *ngIf="formatRecordType(latest.created) as createdType">
+            {{ createdType }}
+          </p>
           <p class="dashboard__latest-meta" *ngIf="formatRecordTimestamp(latest.created) as createdTs">
             {{ 'dashboard.latest.created.timestamp' | translate:{ value: (createdTs | date:'short') } }}
           </p>
@@ -64,6 +67,9 @@
         <h3>{{ 'dashboard.latest.updated.title' | translate }}</h3>
         <ng-container *ngIf="latest.updated; else updatedFallback">
           <p class="dashboard__latest-title">{{ formatRecordLabel(latest.updated, 'dashboard.labels.noRecentUpdate') }}</p>
+          <p class="dashboard__latest-meta" *ngIf="formatRecordType(latest.updated) as updatedType">
+            {{ updatedType }}
+          </p>
           <p class="dashboard__latest-meta" *ngIf="formatRecordTimestamp(latest.updated) as updatedTs">
             {{ 'dashboard.latest.updated.timestamp' | translate:{ value: (updatedTs | date:'short') } }}
           </p>
@@ -83,8 +89,8 @@
       <li *ngFor="let item of overview()?.recent ?? []; trackBy: trackByRecord" class="dashboard__recent-item">
         <div>
           <strong>{{ formatRecordLabel(item, 'dashboard.labels.unknownEntry') }}</strong>
-          <p *ngIf="item.summary || item.type" class="dashboard__recent-meta">
-            {{ item.summary || ('dashboard.labels.itemType' | translate:{ value: item.type }) }}
+          <p *ngIf="formatRecordMeta(item) as itemMeta" class="dashboard__recent-meta">
+            {{ itemMeta }}
           </p>
         </div>
         <time *ngIf="formatRecordTimestamp(item) as ts">{{ ts | date:'short' }}</time>

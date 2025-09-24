@@ -40,7 +40,9 @@
                                      "unknownEntry":  "Unnamed entry",
                                      "noRecentCreate":  "No recent creations",
                                      "noRecentUpdate":  "No recent updates",
-                                     "itemType":  "Type: {{ value }}"
+                                     "itemType":  "Type: {{ value }}",
+                                     "itemTypeWithId":  "Type: {{ type }} (ID: {{ id }})",
+                                     "itemId":  "ID: {{ value }}"
                                  },
                       "status":  {
                                      "noRecent":  "No recent items available."
@@ -89,6 +91,3 @@
                             }
              }
 }
-
-
-
