@@ -25,9 +25,21 @@
   </section>
 
   <section *ngIf="totalCards().length > 0" class="dashboard__grid">
-    <article *ngFor="let card of totalCards(); trackBy: trackByKey" class="dashboard__card dashboard__card--highlight">
-      <h2>{{ card.label }}</h2>
-      <p class="dashboard__value">{{ card.value | number }}</p>
+    <article *ngFor="let card of totalCards(); trackBy: trackByKey" class="dashboard__card dashboard__card--highlight" [class.dashboard__card--linkable]="collectionLink(card.key)">
+      <a
+        *ngIf="collectionLink(card.key) as link; else totalStatic"
+        [routerLink]="link"
+        class="dashboard__card-link"
+      >
+        <h2>{{ card.label }}</h2>
+        <p class="dashboard__value">{{ card.value | number }}</p>
+      </a>
+      <ng-template #totalStatic>
+        <div class="dashboard__card-link">
+          <h2>{{ card.label }}</h2>
+          <p class="dashboard__value">{{ card.value | number }}</p>
+        </div>
+      </ng-template>
     </article>
   </section>
 
@@ -140,4 +152,5 @@
     </section>
   </ng-template>
 </section>
+
 

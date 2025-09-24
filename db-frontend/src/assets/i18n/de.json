@@ -97,7 +97,51 @@
       "unknown": "Unbekannter Fehler"
     }
   },
-  "apiExplorer": {
+  "entryList": {
+    "title": "Alle {{ type }}",
+    "actions": {
+      "back": "Zurueck zum Dashboard",
+      "refresh": "Aktualisieren",
+      "refreshing": "Aktualisiere...",
+      "view": "Eintrag oeffnen"
+    },
+    "filters": {
+      "searchLabel": "Suche",
+      "searchPlaceholder": "Suchbegriff eingeben...",
+      "pageSizeLabel": "Seitengroesse"
+    },
+    "meta": {
+      "total": "{{ value }} Eintraege",
+      "lastUpdated": "Zuletzt aktualisiert {{ value }}"
+    },
+    "table": {
+      "actions": "Aktionen"
+    },
+    "status": {
+      "loading": "Eintraege werden geladen...",
+      "empty": "Keine Eintraege gefunden."
+    },
+    "pagination": {
+      "previous": "Zurueck",
+      "next": "Weiter",
+      "page": "Seite {{ page }} - {{ pageSize }} pro Seite"
+    },
+    "errors": {
+      "missingType": "Eintragstyp fehlt.",
+      "loadFailed": "Eintraege konnten nicht geladen werden: {{ message }}",
+      "unknown": "Unbekannter Fehler"
+    },
+    "types": {
+      "persons": "Personen",
+      "profiles": "Profile",
+      "activities": "Aktivitaeten",
+      "vehicles": "Fahrzeuge",
+      "notes": "Notizen",
+      "platforms": "Plattformen",
+      "collections": "Sammlungen",
+      "users": "Benutzer"
+    }
+  },  "apiExplorer": {
     "title": "DB API Explorer",
     "baseUrl": "Basis-URL:",
     "intro": "Konfiguriere Pfad und optionale Daten, um mit deiner Railway API zu sprechen.",
@@ -125,4 +169,6 @@
     }
   }
 }
+
+
 

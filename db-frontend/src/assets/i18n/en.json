@@ -96,7 +96,51 @@
                                      "unknown":  "Unknown error"
                                  }
                   },
-    "apiExplorer":  {
+    "entryList":  {
+                      "title":  "All {{ type }}",
+                      "actions":  {
+                                      "back":  "Back to dashboard",
+                                      "refresh":  "Refresh",
+                                      "refreshing":  "Refreshing...",
+                                      "view":  "Open entry"
+                                  },
+                      "filters":  {
+                                      "searchLabel":  "Search",
+                                      "searchPlaceholder":  "Type to filter entries...",
+                                      "pageSizeLabel":  "Page size"
+                                  },
+                      "meta":  {
+                                   "total":  "{{ value }} entries",
+                                   "lastUpdated":  "Last updated {{ value }}"
+                               },
+                      "table":  {
+                                    "actions":  "Actions"
+                                },
+                      "status":  {
+                                    "loading":  "Loading entries...",
+                                    "empty":  "No entries found."
+                                },
+                      "pagination":  {
+                                        "previous":  "Previous",
+                                        "next":  "Next",
+                                        "page":  "Page {{ page }} - {{ pageSize }} per page"
+                                    },
+                      "errors":  {
+                                    "missingType":  "Entry type missing.",
+                                    "loadFailed":  "Unable to load entries: {{ message }}",
+                                    "unknown":  "Unknown error"
+                                },
+                      "types":  {
+                                   "persons":  "Persons",
+                                   "profiles":  "Profiles",
+                                   "activities":  "Activities",
+                                   "vehicles":  "Vehicles",
+                                   "notes":  "Notes",
+                                   "platforms":  "Platforms",
+                                   "collections":  "Collections",
+                                   "users":  "Users"
+                               }
+                  },    "apiExplorer":  {
                  "title":  "DB API Explorer",
                  "baseUrl":  "Base URL:",
                  "intro":  "Configure the path and optional payload to talk to your Railway API.",
@@ -124,4 +168,6 @@
                             }
              }
 }
+
+
 

@@ -1,0 +1,85 @@
+<section class="entry-list">
+  <header class="entry-list__header">
+    <div class="entry-list__title">
+      <a routerLink="/" class="entry-list__back">{{ 'entryList.actions.back' | translate }}</a>
+      <h1>{{ 'entryList.title' | translate:{ type: listTitle() } }}</h1>
+      <p *ngIf="total() as totalCount" class="entry-list__meta">
+        {{ 'entryList.meta.total' | translate:{ value: totalCount } }}
+      </p>
+      <p *ngIf="lastUpdatedAt() as timestamp" class="entry-list__meta">
+        {{ 'entryList.meta.lastUpdated' | translate:{ value: (timestamp | date:'short') } }}
+      </p>
+    </div>
+    <div class="entry-list__actions">
+      <button type="button" (click)="refresh()" [disabled]="isLoading()">
+        <span *ngIf="isLoading(); else refreshLabel">{{ 'entryList.actions.refreshing' | translate }}</span>
+        <ng-template #refreshLabel>{{ 'entryList.actions.refresh' | translate }}</ng-template>
+      </button>
+    </div>
+  </header>
+
+  <section *ngIf="errorMessage() as error" class="entry-list__alert entry-list__alert--error">
+    <p>{{ error }}</p>
+  </section>
+
+  <section class="entry-list__controls">
+    <label class="entry-list__search">
+      <span>{{ 'entryList.filters.searchLabel' | translate }}</span>
+      <input type="search" [formControl]="searchControl" [placeholder]="'entryList.filters.searchPlaceholder' | translate" />
+    </label>
+    <label class="entry-list__page-size">
+      <span>{{ 'entryList.filters.pageSizeLabel' | translate }}</span>
+      <select [formControl]="pageSizeControl">
+        <option *ngFor="let option of pageSizeOptionsView" [value]="option">{{ option }}</option>
+      </select>
+    </label>
+  </section>
+
+  <section class="entry-list__content" *ngIf="!isLoading() || items().length > 0">
+    <table class="entry-list__table" *ngIf="items().length > 0; else emptyState">
+      <thead>
+        <tr>
+          <th *ngFor="let column of columns(); trackBy: trackByColumn">{{ column.label }}</th>
+          <th class="entry-list__table-actions">{{ 'entryList.table.actions' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items(); trackBy: trackByIndex">
+          <td *ngFor="let column of columns(); trackBy: trackByColumn">
+            {{ formatValue(item[column.key]) }}
+          </td>
+          <td class="entry-list__table-actions">
+            <button type="button" (click)="navigateToEntry(item)" [disabled]="!hasEntryId(item)">
+              {{ 'entryList.actions.view' | translate }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <ng-template #emptyState>
+    <section class="entry-list__empty">
+      <p *ngIf="!isLoading(); else loadingState">{{ 'entryList.status.empty' | translate }}</p>
+      <ng-template #loadingState>
+        <p>{{ 'entryList.status.loading' | translate }}</p>
+      </ng-template>
+    </section>
+  </ng-template>
+
+  <section class="entry-list__pagination" *ngIf="items().length > 0">
+    <button type="button" (click)="goToPreviousPage()" [disabled]="page() <= 1 || isLoading()">
+      {{ 'entryList.pagination.previous' | translate }}
+    </button>
+    <span class="entry-list__pagination-info">
+      {{ 'entryList.pagination.page' | translate:{ page: page(), pageSize: pageSize() } }}
+    </span>
+    <button type="button" (click)="goToNextPage()" [disabled]="!hasMore() || isLoading()">
+      {{ 'entryList.pagination.next' | translate }}
+    </button>
+  </section>
+
+  <section *ngIf="items().length === 0 && isLoading()" class="entry-list__loading">
+    <p>{{ 'entryList.status.loading' | translate }}</p>
+  </section>
+</section>

@@ -78,6 +78,15 @@ export class DashboardComponent implements OnInit {
     return item.key;
   }
 
+  collectionLink(typeKey: string): string[] | null {
+    const normalized = (typeKey ?? '').toString().trim();
+    if (!normalized) {
+      return null;
+    }
+
+    return ['/entries', normalized];
+  }
+
   trackByRecord(index: number, item: StatsOverviewRecord): string {
     return item.id ?? `${item.title ?? item.name ?? 'entry'}-${index}`;
   }
@@ -266,6 +275,7 @@ export class DashboardComponent implements OnInit {
       .replace(/\b\w/g, (char) => char.toUpperCase());
   }
 }
+
 
 
 
