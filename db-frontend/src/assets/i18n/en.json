@@ -81,6 +81,7 @@
                                      "deleting":  "Deleting...",
                                      "saved":  "Changes saved.",
                                      "deleted":  "Entry deleted.",
+                                     "noChanges":  "No changes detected.",
                                      "empty":  "No data available for this entry."
                                  },
                       "sections":  {
@@ -123,6 +124,4 @@
                             }
              }
 }
-
-
 

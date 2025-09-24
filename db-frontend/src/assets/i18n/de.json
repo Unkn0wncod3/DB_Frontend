@@ -82,6 +82,7 @@
       "deleting": "Loesche...",
       "saved": "Aenderungen gespeichert.",
       "deleted": "Eintrag geloescht.",
+      "noChanges": "Keine Aenderungen erkannt.",
       "empty": "Keine Daten fuer diesen Eintrag verfuegbar."
     },
     "sections": {
@@ -124,5 +125,4 @@
     }
   }
 }
-
 

@@ -12,6 +12,7 @@ interface EntryFieldConfig {
   key: string;
   label: string;
   multiline: boolean;
+  readOnly: boolean;
 }
 
 @Component({
@@ -37,6 +38,7 @@ export class EntryDetailComponent {
   readonly successMessage = signal<string | null>(null);
   readonly entry = signal<Record<string, unknown> | null>(null);
   readonly fields: WritableSignal<EntryFieldConfig[]> = signal([]);
+  private readonly readOnlyKeys = new Set(['id', '_id', 'type', 'createdat', 'updatedat', 'created_at', 'updated_at', 'timestamp', 'occurredat', 'occurred_at']);
 
   form: FormGroup = this.fb.group({});
 
@@ -73,6 +75,12 @@ export class EntryDetailComponent {
     }
 
     const payload = this.buildPayload();
+
+    if (Object.keys(payload).length === 0) {
+      this.successMessage.set(this.translate.instant('entryDetail.status.noChanges'));
+      this.form.markAsPristine();
+      return;
+    }
 
     this.clearMessages();
     this.isSaving.set(true);
@@ -126,6 +134,19 @@ export class EntryDetailComponent {
     return this.form.dirty && !this.isSaving();
   }
 
+  private isReadOnlyKey(key: string): boolean {
+    const normalized = key.toLowerCase();
+    if (this.readOnlyKeys.has(normalized)) {
+      return true;
+    }
+
+    if (normalized.endsWith('id') && normalized !== 'metadata') {
+      return true;
+    }
+
+    return false;
+  }
+
   private async loadEntry(force = false): Promise<void> {
     if (!this.currentType || !this.currentId) {
       return;
@@ -156,14 +177,21 @@ export class EntryDetailComponent {
     const controls: Record<string, FormControl<string>> = {};
     const fieldConfigs: EntryFieldConfig[] = [];
 
-    const entries = Object.entries(record);
-    for (const [key, value] of entries) {
+    for (const [key, value] of Object.entries(record)) {
       const stringValue = this.stringifyValue(value);
-      controls[key] = this.fb.nonNullable.control(stringValue);
+      const control = this.fb.nonNullable.control(stringValue);
+      const readOnly = this.isReadOnlyKey(key);
+
+      if (readOnly) {
+        control.disable({ emitEvent: false });
+      }
+
+      controls[key] = control;
       fieldConfigs.push({
         key,
         label: this.humanizeKey(key),
-        multiline: this.shouldUseTextarea(stringValue)
+        multiline: this.shouldUseTextarea(stringValue),
+        readOnly
       });
     }
 
@@ -174,13 +202,28 @@ export class EntryDetailComponent {
 
   private buildPayload(): Record<string, unknown> {
     const payload: Record<string, unknown> = {};
-    const rawValues = this.form.getRawValue() as Record<string, string>;
     const original = this.entry();
 
-    for (const [key, rawValue] of Object.entries(rawValues)) {
-      const originalValue = original ? original[key] : undefined;
-      const parsed = this.parseValue(rawValue, originalValue);
-      payload[key] = parsed;
+    if (!original) {
+      return payload;
+    }
+
+    const controls = this.form.controls as Record<string, FormControl<string>>;
+
+    for (const [key, control] of Object.entries(controls)) {
+      if (control.disabled) {
+        continue;
+      }
+
+      const rawValue = control.value ?? '';
+      const originalValue = original[key];
+      const originalString = this.stringifyValue(originalValue);
+
+      if (originalString === rawValue) {
+        continue;
+      }
+
+      payload[key] = this.parseValue(rawValue, originalValue);
     }
 
     return payload;

@@ -37,7 +37,7 @@
     *ngIf="entry() as record"
   >
     <div class="entry-detail__grid">
-      <div *ngFor="let field of fields(); trackBy: trackByKey" class="entry-detail__field">
+      <div *ngFor="let field of fields(); trackBy: trackByKey" class="entry-detail__field" [class.entry-detail__field--readonly]="field.readOnly">
         <label [attr.for]="field.key">{{ field.label }}</label>
         <textarea
           *ngIf="field.multiline; else singleLine"
@@ -61,3 +61,4 @@
     <pre>{{ raw | json }}</pre>
   </section>
 </section>
+
