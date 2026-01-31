@@ -67,8 +67,11 @@ export class StatsService {
     this.errorSignal.set(null);
 
     try {
+      const requestOptions = forceRefresh
+        ? { params: { force_refresh: true } }
+        : undefined;
       const response = await firstValueFrom(
-        this.api.request<unknown>('GET', '/stats/overview')
+        this.api.request<unknown>('GET', '/stats/overview', requestOptions)
       );
 
       const overview = this.normalizeOverview(response);
@@ -256,13 +259,32 @@ export class StatsService {
           metadata: record
         });
 
-        if (results.length >= this.maxRecentItems) {
-          return results;
+        if (results.length >= this.maxRecentItems * 3) {
+          break;
         }
       }
     }
 
-    return results;
+    return this.sortRecent(results).slice(0, this.maxRecentItems);
+  }
+
+  private sortRecent(records: StatsOverviewRecord[]): StatsOverviewRecord[] {
+    return records.sort((a, b) => {
+      const aValue = this.getRecentSortValue(a);
+      const bValue = this.getRecentSortValue(b);
+      return bValue - aValue;
+    });
+  }
+
+  private getRecentSortValue(record: StatsOverviewRecord): number {
+    const timestamps = [record.updatedAt, record.timestamp, record.occurredAt, record.createdAt];
+    for (const value of timestamps) {
+      const parsed = typeof value === 'string' ? Date.parse(value) : NaN;
+      if (!Number.isNaN(parsed)) {
+        return parsed;
+      }
+    }
+    return Number.NEGATIVE_INFINITY;
   }
 
   private buildEntityRecord(
