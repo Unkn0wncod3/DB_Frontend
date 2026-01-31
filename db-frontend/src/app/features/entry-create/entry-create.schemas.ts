@@ -1,5 +1,7 @@
 export type EntryFieldType = 'text' | 'textarea' | 'number' | 'boolean' | 'date' | 'json';
 
+export type DateFieldVariant = 'date' | 'datetime';
+
 export interface EntrySchemaField {
   key: string;
   label: string;
@@ -8,6 +10,7 @@ export interface EntrySchemaField {
   placeholder?: string;
   description?: string;
   defaultValue?: string | number | boolean;
+  dateVariant?: DateFieldVariant;
 }
 
 export interface EntrySchemaRequirement {
@@ -35,7 +38,7 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
     fields: [
       { key: 'first_name', label: 'First name', type: 'text', required: true },
       { key: 'last_name', label: 'Last name', type: 'text', required: true },
-      { key: 'date_of_birth', label: 'Date of birth', type: 'date' },
+      { key: 'date_of_birth', label: 'Date of birth', type: 'date', dateVariant: 'date' },
       { key: 'gender', label: 'Gender', type: 'text', defaultValue: 'Unspecified' },
       { key: 'email', label: 'Email', type: 'text', defaultValue: 'not_provided@example.com' },
       { key: 'phone_number', label: 'Phone number', type: 'text', defaultValue: 'N/A' },
@@ -111,7 +114,7 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
     fields: [
       { key: 'person_id', label: 'Person ID', type: 'number', required: true, defaultValue: 1 },
       { key: 'activity_type', label: 'Activity type', type: 'text', required: true, defaultValue: 'Standard' },
-      { key: 'occurred_at', label: 'Occurred at', type: 'date' },
+      { key: 'occurred_at', label: 'Occurred at', type: 'date', dateVariant: 'datetime' },
       { key: 'vehicle_id', label: 'Vehicle ID', type: 'number' },
       { key: 'profile_id', label: 'Profile ID', type: 'number' },
       { key: 'community_id', label: 'Community ID', type: 'number' },
@@ -146,7 +149,7 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
       { key: 'energy_type', label: 'Energy type', type: 'text' },
       { key: 'color', label: 'Color', type: 'text' },
       { key: 'mileage_km', label: 'Mileage (km)', type: 'number' },
-      { key: 'last_service_at', label: 'Last service at', type: 'date' },
+      { key: 'last_service_at', label: 'Last service at', type: 'date', dateVariant: 'datetime' },
       {
         key: 'metadata',
         label: 'Metadata (JSON)',

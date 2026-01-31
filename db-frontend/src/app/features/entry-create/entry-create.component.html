@@ -60,7 +60,7 @@
 
           <input
             *ngSwitchCase="'date'"
-            type="datetime-local"
+            [attr.type]="item.field.dateVariant === 'date' ? 'date' : 'datetime-local'"
             [id]="item.field.key"
             [formControl]="item.control"
             [placeholder]="item.field.placeholder || ''"

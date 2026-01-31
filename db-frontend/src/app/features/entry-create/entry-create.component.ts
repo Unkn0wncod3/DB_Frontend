@@ -221,7 +221,7 @@ export class EntryCreateComponent {
         continue;
       }
 
-      payload[field.key] = this.transformValue(field.type, value);
+      payload[field.key] = this.transformValue(field, value);
     }
 
     const rawPayload = this.rawPayloadControl.value.trim();
@@ -254,7 +254,8 @@ export class EntryCreateComponent {
     return stringValue.length === 0;
   }
 
-  private transformValue(fieldType: EntryFieldType, value: string | number | boolean | null): unknown {
+  private transformValue(field: EntrySchemaField, value: string | number | boolean | null): unknown {
+    const fieldType = field.type;
     switch (fieldType) {
       case 'boolean':
         return Boolean(value);
@@ -264,13 +265,7 @@ export class EntryCreateComponent {
         }
         return Number(value);
       case 'date':
-        if (typeof value === 'string' && value.trim().length > 0) {
-          const parsed = Date.parse(value);
-          if (Number.isFinite(parsed)) {
-            return new Date(parsed).toISOString();
-          }
-        }
-        throw new Error(this.translate.instant('entryCreate.errors.invalidDate'));
+        return this.transformDate(field.dateVariant, value);
       case 'json':
         if (typeof value !== 'string') {
           throw new Error(this.translate.instant('entryCreate.errors.invalidJsonField'));
@@ -289,6 +284,27 @@ export class EntryCreateComponent {
         }
         return value;
     }
+  }
+
+  private transformDate(variant: 'date' | 'datetime' | undefined, value: string | number | boolean | null): string {
+    const normalized = (typeof value === 'string' ? value : String(value ?? '')).trim();
+    if (!normalized) {
+      throw new Error(this.translate.instant('entryCreate.errors.invalidDate'));
+    }
+
+    if ((variant ?? 'datetime') === 'date') {
+      const isValidDate = /^\d{4}-\d{2}-\d{2}$/.test(normalized);
+      if (!isValidDate) {
+        throw new Error(this.translate.instant('entryCreate.errors.invalidDate'));
+      }
+      return normalized;
+    }
+
+    const parsed = Date.parse(normalized);
+    if (Number.isNaN(parsed)) {
+      throw new Error(this.translate.instant('entryCreate.errors.invalidDate'));
+    }
+    return new Date(parsed).toISOString();
   }
 
   private extractId(record: unknown): string | null {
