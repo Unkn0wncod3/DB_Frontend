@@ -158,9 +158,10 @@
       <label class="entry-detail__modal-field">
         <span>{{ 'entryDetail.delete.passcodeLabel' | translate }}</span>
         <input
+          #deletePasscodeInput
           type="password"
           [value]="deletePasscode()"
-          (input)="onDeletePasscodeChange($event.target.value)"
+          (input)="onDeletePasscodeChange(deletePasscodeInput.value)"
           [placeholder]="'entryDetail.delete.passcodePlaceholder' | translate"
           [disabled]="isDeleting()"
         />
