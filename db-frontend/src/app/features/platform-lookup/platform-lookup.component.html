@@ -1,0 +1,44 @@
+<div class="platform-lookup" [class.platform-lookup--open]="isOpen()">
+  <div class="platform-lookup__control">
+    <input
+      type="text"
+      [formControl]="searchControl"
+      (focus)="openSearch()"
+      [attr.aria-label]="'platformLookup.accessibleLabel' | translate"
+      [placeholder]="'platformLookup.placeholder' | translate"
+      autocomplete="off"
+    />
+    <button
+      type="button"
+      (click)="clearSelection()"
+      *ngIf="(searchControl.value || '').length > 0"
+      class="platform-lookup__clear"
+      [attr.aria-label]="'platformLookup.clear' | translate"
+    >
+      &times;
+    </button>
+  </div>
+
+  <p class="platform-lookup__selected" *ngIf="selectedId()">
+    {{ 'platformLookup.selectedId' | translate:{ value: selectedId() } }}
+  </p>
+
+  <div class="platform-lookup__dropdown" *ngIf="isOpen()">
+    <p *ngIf="isLoading()" class="platform-lookup__state">{{ 'platformLookup.loading' | translate }}</p>
+    <ul *ngIf="!isLoading()">
+      <li *ngFor="let option of results(); trackBy: trackByOption" (click)="selectOption(option)">
+        <strong>{{ option.label }}</strong>
+        <span class="platform-lookup__id" *ngIf="option.id">{{ 'platformLookup.optionId' | translate:{ value: option.id } }}</span>
+        <span *ngIf="option.baseUrl">{{ option.baseUrl }}</span>
+        <span *ngIf="option.category" class="platform-lookup__status">{{ option.category }}</span>
+        <span *ngIf="option.isActive === false" class="platform-lookup__status platform-lookup__status--inactive">
+          {{ 'platformLookup.inactive' | translate }}
+        </span>
+      </li>
+      <li *ngIf="results().length === 0" class="platform-lookup__state">
+        {{ 'platformLookup.noResults' | translate }}
+      </li>
+    </ul>
+    <button type="button" class="platform-lookup__close" (click)="closeSearch()">{{ 'platformLookup.close' | translate }}</button>
+  </div>
+</div>

@@ -8,6 +8,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { EntryService } from '../../core/services/entry.service';
 import { EntrySchema, EntrySchemaField, EntryFieldType, getEntrySchema } from './entry-create.schemas';
+import { PlatformLookupComponent } from '../platform-lookup/platform-lookup.component';
 
 interface SchemaFieldControl {
   field: EntrySchemaField;
@@ -17,7 +18,7 @@ interface SchemaFieldControl {
 @Component({
   selector: 'app-entry-create',
   standalone: true,
-  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterLink, TranslateModule],
+  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterLink, TranslateModule, PlatformLookupComponent],
   templateUrl: './entry-create.component.html',
   styleUrl: './entry-create.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -61,6 +62,10 @@ export class EntryCreateComponent {
 
   trackField(_index: number, item: SchemaFieldControl): string {
     return item.field.key;
+  }
+
+  isPlatformLookupField(field: EntrySchemaField): boolean {
+    return (this.currentType ?? '').toLowerCase() === 'profiles' && field.key === 'platform_id';
   }
 
   backLink(): string[] | null {
@@ -194,6 +199,11 @@ export class EntryCreateComponent {
 
   private createControl(field: EntrySchemaField): FormControl<string | boolean | number | null> {
     const validators = field.required ? [Validators.required] : [];
+
+    if (this.isPlatformLookupField(field)) {
+      const defaultValue = field.defaultValue != null ? String(field.defaultValue) : '';
+      return this.fb.nonNullable.control<string>(defaultValue, validators);
+    }
 
     switch (field.type) {
       case 'boolean':

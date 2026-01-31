@@ -193,6 +193,19 @@
     "optionId": "ID {{ value }}",
     "unknown": "Unknown person"
   },
+  "platformLookup": {
+    "accessibleLabel": "Platform lookup field",
+    "placeholder": "Search by platform name or enter an ID",
+    "clear": "Clear selection",
+    "selectedId": "Selected platform ID: {{ value }}",
+    "loading": "Searching...",
+    "noResults": "No matching platforms",
+    "close": "Close list",
+    "optionId": "ID {{ value }}",
+    "inactive": "Inactive",
+    "unknown": "Unknown platform",
+    "error": "Unable to load platforms"
+  },
   "entryCreate": {
     "title": "Create {{ type }}",
     "subtitle": "Fill out the required fields and submit to create a new {{ type }} record.",

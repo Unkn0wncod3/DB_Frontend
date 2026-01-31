@@ -33,52 +33,58 @@
           {{ item.field.description }}
         </small>
 
-        <ng-container [ngSwitch]="item.field.type">
-          <textarea
-            *ngSwitchCase="'textarea'"
-            [id]="item.field.key"
-            [formControl]="item.control"
-            rows="4"
-            [placeholder]="item.field.placeholder || ''"
-          ></textarea>
-
-          <textarea
-            *ngSwitchCase="'json'"
-            [id]="item.field.key"
-            [formControl]="item.control"
-            rows="6"
-            [placeholder]="item.field.placeholder || '{ }'"
-          ></textarea>
-
-          <input
-            *ngSwitchCase="'number'"
-            type="number"
-            [id]="item.field.key"
-            [formControl]="item.control"
-            [placeholder]="item.field.placeholder || ''"
-          />
-
-          <input
-            *ngSwitchCase="'date'"
-            [attr.type]="item.field.dateVariant === 'date' ? 'date' : 'datetime-local'"
-            [id]="item.field.key"
-            [formControl]="item.control"
-            [placeholder]="item.field.placeholder || ''"
-          />
-
-          <label *ngSwitchCase="'boolean'" class="entry-create__checkbox">
-            <input type="checkbox" [formControl]="item.control" />
-            <span>{{ 'entryCreate.form.booleanTrue' | translate }}</span>
-          </label>
-
-          <input
-            *ngSwitchDefault
-            type="text"
-            [id]="item.field.key"
-            [formControl]="item.control"
-            [placeholder]="item.field.placeholder || ''"
-          />
+        <ng-container *ngIf="isPlatformLookupField(item.field); else regularField">
+          <app-platform-lookup [formControl]="item.control"></app-platform-lookup>
         </ng-container>
+
+        <ng-template #regularField>
+          <ng-container [ngSwitch]="item.field.type">
+            <textarea
+              *ngSwitchCase="'textarea'"
+              [id]="item.field.key"
+              [formControl]="item.control"
+              rows="4"
+              [placeholder]="item.field.placeholder || ''"
+            ></textarea>
+
+            <textarea
+              *ngSwitchCase="'json'"
+              [id]="item.field.key"
+              [formControl]="item.control"
+              rows="6"
+              [placeholder]="item.field.placeholder || '{ }'"
+            ></textarea>
+
+            <input
+              *ngSwitchCase="'number'"
+              type="number"
+              [id]="item.field.key"
+              [formControl]="item.control"
+              [placeholder]="item.field.placeholder || ''"
+            />
+
+            <input
+              *ngSwitchCase="'date'"
+              [attr.type]="item.field.dateVariant === 'date' ? 'date' : 'datetime-local'"
+              [id]="item.field.key"
+              [formControl]="item.control"
+              [placeholder]="item.field.placeholder || ''"
+            />
+
+            <label *ngSwitchCase="'boolean'" class="entry-create__checkbox">
+              <input type="checkbox" [formControl]="item.control" />
+              <span>{{ 'entryCreate.form.booleanTrue' | translate }}</span>
+            </label>
+
+            <input
+              *ngSwitchDefault
+              type="text"
+              [id]="item.field.key"
+              [formControl]="item.control"
+              [placeholder]="item.field.placeholder || ''"
+            />
+          </ng-container>
+        </ng-template>
 
         <p
           *ngIf="item.field.required && item.control.invalid && (item.control.touched || item.control.dirty)"

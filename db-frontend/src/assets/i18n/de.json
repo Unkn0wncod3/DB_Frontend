@@ -252,5 +252,18 @@
     "close": "Liste schliessen",
     "optionId": "ID {{ value }}",
     "unknown": "Unbekannte Person"
+  },
+  "platformLookup": {
+    "accessibleLabel": "Plattformsuche",
+    "placeholder": "Plattformnamen tippen oder ID eingeben",
+    "clear": "Auswahl loeschen",
+    "selectedId": "Ausgewaehlte Plattform-ID: {{ value }}",
+    "loading": "Suche...",
+    "noResults": "Keine passenden Plattformen",
+    "close": "Liste schliessen",
+    "optionId": "ID {{ value }}",
+    "inactive": "Inaktiv",
+    "unknown": "Unbekannte Plattform",
+    "error": "Plattformen konnten nicht geladen werden"
   }
 }

@@ -1,0 +1,104 @@
+.platform-lookup {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.platform-lookup__control {
+  display: flex;
+  align-items: center;
+  border: 1px solid #cbd5f5;
+  border-radius: 0.375rem;
+  background: #fff;
+  padding-right: 0.25rem;
+}
+
+.platform-lookup__control input {
+  border: none;
+  padding: 0.45rem 0.75rem;
+  flex: 1;
+}
+
+.platform-lookup__control input:focus {
+  outline: none;
+}
+
+.platform-lookup__clear {
+  border: none;
+  background: transparent;
+  color: #475569;
+  padding: 0 0.35rem;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.platform-lookup__selected {
+  font-size: 0.8rem;
+  color: #475569;
+  margin: 0;
+}
+
+.platform-lookup__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+  margin-top: 0.5rem;
+  z-index: 10;
+  max-height: 280px;
+  overflow: auto;
+}
+
+.platform-lookup__dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.platform-lookup__dropdown li {
+  padding: 0.65rem 0.9rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.platform-lookup__dropdown li:hover {
+  background: #f1f5f9;
+}
+
+.platform-lookup__id {
+  font-size: 0.8rem;
+  color: #0f172a;
+}
+
+.platform-lookup__status {
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+.platform-lookup__status--inactive {
+  color: #b91c1c;
+}
+
+.platform-lookup__state {
+  padding: 0.75rem 1rem;
+  color: #475569;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.platform-lookup__close {
+  width: 100%;
+  border: none;
+  background: #f8fafc;
+  padding: 0.5rem;
+  border-top: 1px solid #e2e8f0;
+  cursor: pointer;
+}
