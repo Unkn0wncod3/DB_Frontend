@@ -1,5 +1,5 @@
 import { NgFor, NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, forwardRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, forwardRef, inject, signal } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -35,6 +35,7 @@ export class PersonLookupComponent implements ControlValueAccessor {
   private readonly entryService = inject(EntryService);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly host = inject(ElementRef<HTMLElement>);
 
   readonly searchControl = this.fb.nonNullable.control('');
   readonly results = signal<PersonOption[]>([]);
@@ -52,6 +53,17 @@ export class PersonLookupComponent implements ControlValueAccessor {
       .subscribe((value) => {
         this.handleInputChange(value ?? '');
       });
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.isOpen()) {
+      return;
+    }
+    const target = event.target as Node | null;
+    if (target && !this.host.nativeElement.contains(target)) {
+      this.closeSearch();
+    }
   }
 
   writeValue(value: string | number | null): void {

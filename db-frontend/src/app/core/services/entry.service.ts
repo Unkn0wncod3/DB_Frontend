@@ -75,7 +75,9 @@ export class EntryService {
         if (value === undefined || value === null || value === '') {
           continue;
         }
-        query[`filter[${key}]`] = String(value);
+        const stringValue = String(value);
+        query[`filter[${key}]`] = stringValue;
+        query[key] = stringValue;
       }
     }
 
