@@ -1,8 +1,4 @@
-<div
-  class="person-lookup"
-  [class.person-lookup--open]="isOpen()"
-  [class.person-lookup--selected]="!!selectedId()"
->
+<div class="person-lookup" [class.person-lookup--open]="isOpen()">
   <div class="person-lookup__control">
     <input
       type="text"
@@ -21,10 +17,11 @@
     >
       &times;
     </button>
-    <span class="person-lookup__selected" *ngIf="selectedId()">
-      {{ 'personLookup.selectedId' | translate:{ value: selectedId() } }}
-    </span>
   </div>
+
+  <p class="person-lookup__selected" *ngIf="selectedId()">
+    {{ 'personLookup.selectedId' | translate:{ value: selectedId() } }}
+  </p>
 
   <div class="person-lookup__dropdown" *ngIf="isOpen()">
     <p *ngIf="isLoading()" class="person-lookup__state">{{ 'personLookup.loading' | translate }}</p>
