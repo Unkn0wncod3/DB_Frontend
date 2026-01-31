@@ -30,7 +30,7 @@ interface RelatedEntryItem {
   standalone: true,
   imports: [NgIf, NgFor, ReactiveFormsModule, JsonPipe, TranslateModule, RouterModule, DatePipe],
   templateUrl: './entry-detail.component.html',
-  styleUrl: './entry-detail.component.scss',
+  styleUrls: ['./entry-detail.component.scss', './entry-detail-modal.component.scss', './entry-detail-relations.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EntryDetailComponent {
