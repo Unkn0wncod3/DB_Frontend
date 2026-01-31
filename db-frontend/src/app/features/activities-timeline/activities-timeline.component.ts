@@ -6,6 +6,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { EntryListParams, EntryService } from '../../core/services/entry.service';
+import { PersonLookupComponent } from '../person-lookup/person-lookup.component';
 
 interface TimelineEntry {
   id?: string;
@@ -19,7 +20,7 @@ interface TimelineEntry {
 @Component({
   selector: 'app-activities-timeline',
   standalone: true,
-  imports: [NgIf, NgFor, ReactiveFormsModule, RouterModule, DatePipe, TranslateModule],
+  imports: [NgIf, NgFor, ReactiveFormsModule, RouterModule, DatePipe, TranslateModule, PersonLookupComponent],
   templateUrl: './activities-timeline.component.html',
   styleUrl: './activities-timeline.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

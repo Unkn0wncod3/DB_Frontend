@@ -157,12 +157,23 @@
     "timeline": {
       "title": "Activity timeline",
       "subtitle": "Visualise activities chronologically with optional filters.",
-      "personFilter": "Person ID",
+      "personFilter": "Name",
       "fromDate": "From date",
       "toDate": "To date",
       "reset": "Reset filters",
       "personLabel": "Person {{ value }}"
     }
+  },
+  "personLookup": {
+    "accessibleLabel": "Person lookup field",
+    "placeholder": "Start typing a name or enter an ID",
+    "clear": "Clear selection",
+    "selectedId": "Selected ID: {{ value }}",
+    "loading": "Searching...",
+    "noResults": "No matching persons",
+    "close": "Close list",
+    "optionId": "ID {{ value }}",
+    "unknown": "Unknown person"
   },
   "entryCreate": {
     "title": "Create {{ type }}",

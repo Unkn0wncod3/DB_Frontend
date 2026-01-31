@@ -17,7 +17,7 @@
     "actions": {
       "refresh": "Jetzt aktualisieren",
       "refreshing": "Aktualisiere...",
-      "createLabel": "Neuen Eintrag erstellen fÃ¼r",
+      "createLabel": "Neuen Eintrag erstellen f\u00c3\u00bcr",
       "createButton": "Eintrag erstellen"
     },
     "meta": {
@@ -71,8 +71,8 @@
     "labels": {
       "unknownId": "Unbekannter Eintrag",
       "type": "Typ: {{ type }}",
-      "relationships": "Verknüpfte Daten",
-      "connectedItems": "Verbundene Profile, Notizen und Aktivitäten"
+      "relationships": "Verkn\u00fcpfte Daten",
+      "connectedItems": "Verbundene Profile, Notizen und Aktivit\u00e4ten"
     },
     "actions": {
       "back": "Zurueck zum Dashboard",
@@ -117,7 +117,7 @@
       "refresh": "Aktualisieren",
       "refreshing": "Aktualisiere...",
       "view": "Eintrag oeffnen",
-      "timeline": "Timeline öffnen"
+      "timeline": "Timeline \u00f6ffnen"
     },
     "filters": {
       "searchLabel": "Suche",
@@ -156,12 +156,12 @@
       "users": "Benutzer"
     },
     "timeline": {
-      "title": "Aktivitäten-Timeline",
-      "subtitle": "Zeigt Aktivitäten chronologisch mit optionalen Filtern.",
-      "personFilter": "Personen-ID",
+      "title": "Aktivit\u00e4ten-Timeline",
+      "subtitle": "Zeigt Aktivit\u00e4ten chronologisch mit optionalen Filtern.",
+      "personFilter": "Name",
       "fromDate": "Von-Datum",
       "toDate": "Bis-Datum",
-      "reset": "Filter zurücksetzen",
+      "reset": "Filter zur\u00fccksetzen",
       "personLabel": "Person {{ value }}"
     }
   },
@@ -223,5 +223,16 @@
       "status": " (Status {{status}})",
       "http": "{{message}}{{status}}"
     }
+  },
+  "personLookup": {
+    "accessibleLabel": "Personensuche",
+    "placeholder": "Name tippen oder ID eingeben",
+    "clear": "Auswahl loeschen",
+    "selectedId": "Ausgewaehlte ID: {{ value }}",
+    "loading": "Suche...",
+    "noResults": "Keine passenden Personen",
+    "close": "Liste schliessen",
+    "optionId": "ID {{ value }}",
+    "unknown": "Unbekannte Person"
   }
 }

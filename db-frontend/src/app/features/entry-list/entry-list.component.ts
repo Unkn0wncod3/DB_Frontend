@@ -7,6 +7,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { EntryListParams, EntryService } from '../../core/services/entry.service';
+import { PersonLookupComponent } from '../person-lookup/person-lookup.component';
 
 interface DisplayColumn {
   key: string;
@@ -16,7 +17,7 @@ interface DisplayColumn {
 @Component({
   selector: 'app-entry-list',
   standalone: true,
-  imports: [NgIf, NgFor, NgClass, ReactiveFormsModule, RouterModule, AsyncPipe, JsonPipe, DatePipe, TranslateModule],
+  imports: [NgIf, NgFor, NgClass, ReactiveFormsModule, RouterModule, AsyncPipe, JsonPipe, DatePipe, TranslateModule, PersonLookupComponent],
   templateUrl: './entry-list.component.html',
   styleUrl: './entry-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -210,18 +211,15 @@ export class EntryListComponent {
     const page = this.normalizePage(Number(query.get('page')) || 1);
     const pageSize = this.normalizePageSize(Number(query.get('pageSize')) || Number(query.get('limit')) || this.defaultPageSize);
     const search = (query.get('search') ?? query.get('q') ?? '').toString();
+    const personId = (query.get('personId') ?? '').toString();
 
     this.page.set(page);
     this.pageSize.set(pageSize);
     this.searchControl.setValue(search, { emitEvent: false });
     this.pageSizeControl.setValue(pageSize, { emitEvent: false });
+    this.personFilterControl.setValue(personId, { emitEvent: false });
 
-    this.loadEntries({
-      type: this.currentType,
-      page,
-      pageSize,
-      search
-    });
+    this.loadEntries(this.buildParamsFromState());
   }
 
   private loadEntries(params: EntryListParams & { type: string }): void {
@@ -284,7 +282,25 @@ export class EntryListComponent {
       type: this.currentType,
       page: this.page(),
       pageSize: this.pageSize(),
-      search: this.searchControl.value ?? ''
+      search: this.searchControl.value ?? '',
+      ...this.buildFilters()
+    };
+  }
+
+  private buildFilters(): { filters?: Record<string, string> } {
+    if (!this.isActivitiesList()) {
+      return {};
+    }
+
+    const value = (this.personFilterControl.value ?? '').trim();
+    if (!value) {
+      return {};
+    }
+
+    return {
+      filters: {
+        person_id: value
+      }
     };
   }
 

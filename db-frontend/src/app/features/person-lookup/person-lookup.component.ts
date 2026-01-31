@@ -40,7 +40,7 @@ export class PersonLookupComponent implements ControlValueAccessor {
   readonly results = signal<PersonOption[]>([]);
   readonly isOpen = signal(false);
   readonly isLoading = signal(false);
-  readonly selectedLabel = signal('');
+  readonly selectedId = signal<string | null>(null);
 
   private onChange: (value: string | null) => void = () => {};
   private onTouched: () => void = () => {};
@@ -50,16 +50,13 @@ export class PersonLookupComponent implements ControlValueAccessor {
     this.searchControl.valueChanges
       .pipe(debounceTime(200), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe((value) => {
-        if (!this.isOpen()) {
-          return;
-        }
-        void this.performSearch(value ?? '');
+        this.handleInputChange(value ?? '');
       });
   }
 
   writeValue(value: string | number | null): void {
     if (!value) {
-      this.selectedLabel.set('');
+      this.selectedId.set(null);
       this.searchControl.setValue('', { emitEvent: false });
       return;
     }
@@ -98,17 +95,18 @@ export class PersonLookupComponent implements ControlValueAccessor {
   }
 
   selectOption(option: PersonOption): void {
-    this.selectedLabel.set(option.label);
     this.searchControl.setValue(option.label, { emitEvent: false });
+    this.selectedId.set(option.id || null);
     this.onChange(option.id);
     this.closeSearch();
   }
 
   clearSelection(): void {
-    this.selectedLabel.set('');
     this.searchControl.setValue('', { emitEvent: false });
+    this.selectedId.set(null);
     this.onChange(null);
     this.onTouched();
+    this.results.set([]);
   }
 
   async performSearch(term: string): Promise<void> {
@@ -127,6 +125,36 @@ export class PersonLookupComponent implements ControlValueAccessor {
       this.results.set([{ id: '', label: message }]);
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  trackByOption(_index: number, option: PersonOption): string {
+    return option.id || option.label;
+  }
+
+  private handleInputChange(rawValue: string): void {
+    const value = (rawValue ?? '').trim();
+
+    if (!value) {
+      this.selectedId.set(null);
+      this.onChange(null);
+      if (this.isOpen()) {
+        void this.performSearch('');
+      }
+      return;
+    }
+
+    if (/^\d+$/.test(value)) {
+      this.selectedId.set(value);
+      this.onChange(value);
+      this.closeSearch();
+      return;
+    }
+
+    this.selectedId.set(null);
+    this.onChange(null);
+    if (this.isOpen()) {
+      void this.performSearch(value);
     }
   }
 
@@ -164,10 +192,11 @@ export class PersonLookupComponent implements ControlValueAccessor {
     try {
       const result = await firstValueFrom(this.entryService.getEntry('persons', value.toString()));
       const option = this.toOption(result as Record<string, unknown>);
-      this.selectedLabel.set(option.label);
+      this.selectedId.set(option.id || null);
       this.searchControl.setValue(option.label, { emitEvent: false });
     } catch {
-      this.selectedLabel.set(value.toString());
+      const fallback = value.toString();
+      this.selectedId.set(fallback);
       this.searchControl.setValue(value.toString(), { emitEvent: false });
     }
   }
