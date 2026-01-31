@@ -158,6 +158,7 @@
       "title": "Activity timeline",
       "subtitle": "Visualise activities chronologically with optional filters.",
       "personFilter": "Name",
+      "personFilterId": "ID: {{ value }}",
       "fromDate": "From date",
       "toDate": "To date",
       "reset": "Reset filters",

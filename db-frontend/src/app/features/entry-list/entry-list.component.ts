@@ -144,6 +144,11 @@ export class EntryListComponent {
     return (this.currentType ?? '').toLowerCase() === 'activities';
   }
 
+  selectedPersonId(): string | null {
+    const value = (this.personFilterControl.value ?? '').toString().trim();
+    return value.length > 0 ? value : null;
+  }
+
   hasEntryId(item: Record<string, unknown>): boolean {
     return this.extractId(item) !== null;
   }

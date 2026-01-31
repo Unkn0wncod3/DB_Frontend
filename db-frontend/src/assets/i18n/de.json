@@ -159,6 +159,7 @@
       "title": "Aktivit\u00e4ten-Timeline",
       "subtitle": "Zeigt Aktivit\u00e4ten chronologisch mit optionalen Filtern.",
       "personFilter": "Name",
+      "personFilterId": "ID: {{ value }}",
       "fromDate": "Von-Datum",
       "toDate": "Bis-Datum",
       "reset": "Filter zur\u00fccksetzen",

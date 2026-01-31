@@ -13,7 +13,12 @@
   <section class="timeline__filters">
     <form [formGroup]="filterForm">
       <label>
-        <span>{{ 'entryList.timeline.personFilter' | translate }}</span>
+        <span>
+          {{ 'entryList.timeline.personFilter' | translate }}
+          <ng-container *ngIf="selectedFilterPersonId() as selectedTimelineId">
+            ({{ 'entryList.timeline.personFilterId' | translate:{ value: selectedTimelineId } }})
+          </ng-container>
+        </span>
         <app-person-lookup formControlName="personId"></app-person-lookup>
       </label>
       <label>

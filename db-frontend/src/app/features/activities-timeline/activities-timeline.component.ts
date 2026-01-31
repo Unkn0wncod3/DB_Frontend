@@ -96,6 +96,12 @@ export class ActivitiesTimelineComponent {
     return entry.id ?? `${entry.title}-${_index}`;
   }
 
+  selectedFilterPersonId(): string | null {
+    const control = this.filterForm.get('personId');
+    const value = (control?.value ?? '').toString().trim();
+    return value.length > 0 ? value : null;
+  }
+
   private applyDateRange(items: Record<string, unknown>[], fromDate?: string | null, toDate?: string | null): Record<string, unknown>[] {
     const fromTs = fromDate ? Date.parse(fromDate) : null;
     const toTs = toDate ? Date.parse(toDate) : null;

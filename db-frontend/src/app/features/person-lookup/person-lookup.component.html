@@ -19,10 +19,6 @@
     </button>
   </div>
 
-  <p class="person-lookup__selected" *ngIf="selectedId()">
-    {{ 'personLookup.selectedId' | translate:{ value: selectedId() } }}
-  </p>
-
   <div class="person-lookup__dropdown" *ngIf="isOpen()">
     <p *ngIf="isLoading()" class="person-lookup__state">{{ 'personLookup.loading' | translate }}</p>
     <ul *ngIf="!isLoading()">
