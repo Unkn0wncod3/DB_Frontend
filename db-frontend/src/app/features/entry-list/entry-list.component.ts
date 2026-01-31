@@ -1,7 +1,7 @@
 import { AsyncPipe, DatePipe, JsonPipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -76,16 +76,16 @@ export class EntryListComponent {
       this.listTitle.set(this.buildTitle(type));
       this.resetControls();
       this.skipNextQuerySync = true;
-      this.syncFromRoute();
+      this.syncFromRoute(this.route.snapshot.queryParamMap);
     });
 
-    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((queryParams) => {
       if (this.skipNextQuerySync) {
         this.skipNextQuerySync = false;
         return;
       }
 
-      this.syncFromRoute();
+      this.syncFromRoute(queryParams);
     });
 
     this.searchControl.valueChanges
@@ -207,12 +207,12 @@ export class EntryListComponent {
     this.loadEntries(this.buildParamsFromState());
   }
 
-  private syncFromRoute(): void {
+  private syncFromRoute(queryParamMap?: ParamMap | null): void {
     if (!this.currentType) {
       return;
     }
 
-    const query = this.route.snapshot.queryParamMap;
+    const query = queryParamMap ?? this.route.snapshot.queryParamMap;
     const page = this.normalizePage(Number(query.get('page')) || 1);
     const pageSize = this.normalizePageSize(Number(query.get('pageSize')) || Number(query.get('limit')) || this.defaultPageSize);
     const search = (query.get('search') ?? query.get('q') ?? '').toString();

@@ -13,7 +13,7 @@
   },
   "dashboard": {
     "title": "Database Overview",
-    "subtitle": "Key stats and recent activity from your Railway DB_API.",
+    "subtitle": "Key stats and recent activity from DB_API.",
     "actions": {
       "refresh": "Refresh now",
       "refreshing": "Refreshing...",

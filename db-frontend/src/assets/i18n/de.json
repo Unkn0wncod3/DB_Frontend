@@ -13,7 +13,7 @@
   },
   "dashboard": {
     "title": "Datenbank-Uebersicht",
-    "subtitle": "Wichtige Kennzahlen und Aktivitaeten deiner Railway DB_API.",
+    "subtitle": "Wichtige Kennzahlen und Aktivitaeten der DB_API.",
     "actions": {
       "refresh": "Jetzt aktualisieren",
       "refreshing": "Aktualisiere...",
