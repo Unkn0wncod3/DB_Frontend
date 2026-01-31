@@ -171,6 +171,7 @@
                                    "invalidRawJson":  "Raw payload must be valid JSON.",
                                    "invalidJsonField":  "JSON fields must contain valid JSON.",
                                    "invalidDate":  "Date fields require a valid ISO date/time value.",
+                                   "requireOneOf":  "Provide at least one of: {{ fields }}.",
                                    "requiredField":  "This field is required.",
                                    "unknown":  "Unknown error"
                                 }

@@ -10,11 +10,17 @@ export interface EntrySchemaField {
   defaultValue?: string | number | boolean;
 }
 
+export interface EntrySchemaRequirement {
+  keys: string[];
+  messageKey?: string;
+}
+
 export interface EntrySchema {
   type: string;
   title: string;
   description?: string;
   fields: EntrySchemaField[];
+  requireOneOf?: EntrySchemaRequirement;
 }
 
 /**
@@ -99,6 +105,9 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
     type: 'activities',
     title: 'Activity',
     description: 'Timeline entry describing actions tied to persons, profiles or vehicles.',
+    requireOneOf: {
+      keys: ['vehicle_id', 'profile_id', 'community_id', 'item']
+    },
     fields: [
       { key: 'person_id', label: 'Person ID', type: 'number', required: true },
       { key: 'activity_type', label: 'Activity type', type: 'text', required: true },

@@ -91,6 +91,10 @@ export class EntryCreateComponent {
       return;
     }
 
+    if (!this.validateSchemaRequirements(payload)) {
+      return;
+    }
+
     if (Object.keys(payload).length === 0) {
       this.errorMessage.set(this.translate.instant('entryCreate.errors.emptyPayload'));
       return;
@@ -119,6 +123,44 @@ export class EntryCreateComponent {
     } finally {
       this.isSubmitting.set(false);
     }
+  }
+
+  private validateSchemaRequirements(payload: Record<string, unknown>): boolean {
+    const schema = this.schema();
+    const requirement = schema?.requireOneOf;
+    if (!schema || !requirement || !Array.isArray(requirement.keys) || requirement.keys.length === 0) {
+      return true;
+    }
+
+    const satisfied = requirement.keys.some((key) => this.hasTruthyValue(payload[key]));
+    if (satisfied) {
+      return true;
+    }
+
+    const fieldsList = requirement.keys.map((key) => this.humanize(key)).join(', ');
+    const messageKey = requirement.messageKey ?? 'entryCreate.errors.requireOneOf';
+    this.errorMessage.set(this.translate.instant(messageKey, { fields: fieldsList }));
+    return false;
+  }
+
+  private hasTruthyValue(value: unknown): boolean {
+    if (value == null) {
+      return false;
+    }
+
+    if (typeof value === 'string') {
+      return value.trim().length > 0;
+    }
+
+    if (typeof value === 'number') {
+      return !Number.isNaN(value);
+    }
+
+    if (typeof value === 'boolean') {
+      return true;
+    }
+
+    return true;
   }
 
   private loadSchema(type: string): void {

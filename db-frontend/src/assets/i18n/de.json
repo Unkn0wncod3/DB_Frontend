@@ -172,6 +172,7 @@
       "invalidRawJson": "Zusaetzliche Daten muessen gueltiges JSON sein.",
       "invalidJsonField": "JSON-Felder muessen gueltiges JSON enthalten.",
       "invalidDate": "Datum benoetigt einen gueltigen ISO-Zeitstempel.",
+      "requireOneOf": "Bitte mindestens eines der folgenden Felder ausfuellen: {{ fields }}.",
       "requiredField": "Dieses Feld ist erforderlich.",
       "unknown": "Unbekannter Fehler"
     }
