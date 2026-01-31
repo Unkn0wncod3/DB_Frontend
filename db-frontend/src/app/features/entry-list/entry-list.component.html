@@ -33,6 +33,10 @@
       <span>{{ 'entryList.filters.searchLabel' | translate }}</span>
       <input type="search" [formControl]="searchControl" [placeholder]="'entryList.filters.searchPlaceholder' | translate" />
     </label>
+    <label class="entry-list__person" *ngIf="isActivitiesList()">
+      <span>{{ 'entryList.timeline.personFilter' | translate }}</span>
+      <app-person-lookup [formControl]="personFilterControl"></app-person-lookup>
+    </label>
     <label class="entry-list__page-size">
       <span>{{ 'entryList.filters.pageSizeLabel' | translate }}</span>
       <select [formControl]="pageSizeControl">

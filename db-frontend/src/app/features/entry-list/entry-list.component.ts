@@ -53,6 +53,7 @@ export class EntryListComponent {
   readonly lastUpdatedAt = signal<number | null>(null);
 
   readonly searchControl = this.fb.nonNullable.control<string>('');
+  readonly personFilterControl = this.fb.nonNullable.control<string>('');
   readonly pageSizeControl = this.fb.nonNullable.control<number>(this.defaultPageSize);
 
   private currentType: string | null = null;
@@ -97,6 +98,12 @@ export class EntryListComponent {
       .subscribe((value) => {
         const size = this.normalizePageSize(value ?? this.defaultPageSize);
         this.updateQuery({ pageSize: size, page: 1 });
+      });
+
+    this.personFilterControl.valueChanges
+      .pipe(distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => {
+        this.updateQuery({ page: 1 });
       });
   }
 
@@ -252,7 +259,8 @@ export class EntryListComponent {
     const merged = {
       page: params.page ?? this.page(),
       pageSize: params.pageSize ?? this.pageSize(),
-      search: params.search ?? this.searchControl.value ?? ''
+      search: params.search ?? this.searchControl.value ?? '',
+      personId: this.isActivitiesList() ? (this.personFilterControl.value || null) : null
     };
 
     void this.router.navigate([], {
@@ -260,7 +268,8 @@ export class EntryListComponent {
       queryParams: {
         page: merged.page,
         pageSize: merged.pageSize,
-        search: merged.search || null
+        search: merged.search || null,
+        personId: merged.personId
       },
       queryParamsHandling: 'merge'
     });

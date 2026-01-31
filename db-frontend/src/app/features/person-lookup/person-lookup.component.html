@@ -1,0 +1,30 @@
+<div class="person-lookup" [class.person-lookup--open]="isOpen()">
+  <label>
+    <span>{{ 'personLookup.label' | translate }}</span>
+    <div class="person-lookup__control">
+      <input
+        type="text"
+        [formControl]="searchControl"
+        [readonly]="isOpen()"
+        (focus)="openSearch()"
+        [placeholder]="'personLookup.placeholder' | translate"
+      />
+      <button type="button" (click)="clearSelection()" *ngIf="selectedLabel()" class="person-lookup__clear">×</button>
+    </div>
+  </label>
+
+  <div class="person-lookup__dropdown" *ngIf="isOpen()">
+    <p *ngIf="isLoading()" class="person-lookup__state">{{ 'personLookup.loading' | translate }}</p>
+    <ul *ngIf="!isLoading()">
+      <li *ngFor="let option of results(); trackBy: trackByOption" (click)="selectOption(option)">
+        <strong>{{ option.label }}</strong>
+        <span *ngIf="option.email">{{ option.email }}</span>
+        <span *ngIf="option.status" class="person-lookup__status">{{ option.status }}</span>
+      </li>
+      <li *ngIf="results().length === 0" class="person-lookup__state">
+        {{ 'personLookup.noResults' | translate }}
+      </li>
+    </ul>
+    <button type="button" class="person-lookup__close" (click)="closeSearch()">{{ 'personLookup.close' | translate }}</button>
+  </div>
+</div>
