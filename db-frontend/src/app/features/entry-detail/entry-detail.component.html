@@ -70,12 +70,28 @@
         <p>{{ 'entryDetail.status.noRelations' | translate }}</p>
       </section>
 
-      <section *ngIf="relatedProfiles().length > 0" class="entry-detail__relations-group">
+      <section *ngIf="showPersonRelations()" class="entry-detail__relations-group">
         <div class="entry-detail__relations-heading">
           <h3>{{ 'entryDetail.relations.profiles' | translate }}</h3>
           <a [routerLink]="relationListLink('profiles')">{{ 'entryDetail.relations.viewAll' | translate }}</a>
         </div>
-        <ul>
+        <form class="entry-detail__profile-link" [formGroup]="profileLinkForm" (ngSubmit)="linkProfile()">
+          <label>
+            <span>{{ 'entryDetail.relations.profileIdLabel' | translate }}</span>
+            <input type="number" formControlName="profileId" placeholder="42" />
+          </label>
+          <label>
+            <span>{{ 'entryDetail.relations.profileNoteLabel' | translate }}</span>
+            <input type="text" formControlName="note" [placeholder]="'entryDetail.relations.profileNotePlaceholder' | translate" />
+          </label>
+          <div class="entry-detail__profile-link-actions">
+            <p *ngIf="profileLinkError() as linkError" class="entry-detail__profile-link-error">{{ linkError }}</p>
+            <button type="submit" [disabled]="isManagingProfileLinks()">
+              {{ 'entryDetail.relations.linkProfile' | translate }}
+            </button>
+          </div>
+        </form>
+        <ul *ngIf="relatedProfiles().length > 0; else noProfiles">
           <li *ngFor="let profile of relatedProfiles(); trackBy: trackByRelation">
             <a *ngIf="profile.routerLink; else profileStatic" [routerLink]="profile.routerLink">
               <strong>{{ profile.label }}</strong>
@@ -87,8 +103,21 @@
                 <span>{{ profile.description }}</span>
               </div>
             </ng-template>
+            <button
+              type="button"
+              class="entry-detail__relation-unlink"
+              (click)="unlinkProfile(profile.id)"
+              [disabled]="isManagingProfileLinks()"
+            >
+              {{ 'entryDetail.relations.unlinkProfile' | translate }}
+            </button>
           </li>
         </ul>
+        <ng-template #noProfiles>
+          <p class="entry-detail__relations-state">
+            {{ 'entryDetail.status.noRelations' | translate }}
+          </p>
+        </ng-template>
       </section>
 
       <section *ngIf="relatedNotes().length > 0" class="entry-detail__relations-group">

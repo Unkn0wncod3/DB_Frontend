@@ -97,7 +97,15 @@
       "profiles": "Profiles",
       "notes": "Notes",
       "activities": "Activities",
-      "viewAll": "View all"
+      "viewAll": "View all",
+      "linkProfile": "Link profile",
+      "unlinkProfile": "Remove link",
+      "profileIdLabel": "Profile ID",
+      "profileNoteLabel": "Note",
+      "profileNotePlaceholder": "Optional note about this link",
+      "profileLinked": "Profile linked to this person.",
+      "profileUnlinked": "Profile unlinked.",
+      "profileLinkInvalid": "Enter a valid profile ID before linking."
     },
     "delete": {
       "dialogTitle": "Confirm deletion",

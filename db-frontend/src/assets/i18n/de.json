@@ -98,7 +98,15 @@
       "profiles": "Profile",
       "notes": "Notizen",
       "activities": "Aktivitaeten",
-      "viewAll": "Alle anzeigen"
+      "viewAll": "Alle anzeigen",
+      "linkProfile": "Profil verknuepfen",
+      "unlinkProfile": "Verknuepfung loesen",
+      "profileIdLabel": "Profil-ID",
+      "profileNoteLabel": "Notiz",
+      "profileNotePlaceholder": "Optionale Notiz zu dieser Verknuepfung",
+      "profileLinked": "Profil wurde mit dieser Person verknuepft.",
+      "profileUnlinked": "Verknuepfung entfernt.",
+      "profileLinkInvalid": "Bitte eine gueltige Profil-ID angeben."
     },
     "delete": {
       "dialogTitle": "Loeschen bestaetigen",

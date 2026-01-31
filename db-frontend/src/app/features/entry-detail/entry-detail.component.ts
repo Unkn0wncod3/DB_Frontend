@@ -1,6 +1,6 @@
 import { DatePipe, JsonPipe, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal, WritableSignal } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -61,6 +61,12 @@ export class EntryDetailComponent {
   readonly isDeleteDialogOpen = signal(false);
   readonly deletePasscode = signal('');
   readonly deleteDialogError = signal<string | null>(null);
+  readonly isManagingProfileLinks = signal(false);
+  readonly profileLinkError = signal<string | null>(null);
+  readonly profileLinkForm = this.fb.nonNullable.group({
+    profileId: ['', [Validators.required]],
+    note: ['']
+  });
 
   form: FormGroup = this.fb.group({});
 
@@ -426,6 +432,68 @@ export class EntryDetailComponent {
 
   trackByRelation(_index: number, item: RelatedEntryItem): string {
     return `${item.type}-${item.id ?? _index}`;
+  }
+
+  async linkProfile(): Promise<void> {
+    if (!this.showPersonRelations() || !this.currentId) {
+      return;
+    }
+
+    this.profileLinkForm.markAllAsTouched();
+    if (this.profileLinkForm.invalid) {
+      this.profileLinkError.set(this.translate.instant('entryDetail.relations.profileLinkInvalid'));
+      return;
+    }
+
+    const raw = this.profileLinkForm.getRawValue();
+    const parsedId = Number(raw.profileId);
+    if (!Number.isFinite(parsedId) || parsedId <= 0) {
+      this.profileLinkError.set(this.translate.instant('entryDetail.relations.profileLinkInvalid'));
+      return;
+    }
+
+    this.profileLinkError.set(null);
+    this.isManagingProfileLinks.set(true);
+    try {
+      await firstValueFrom(
+        this.api.request('POST', `/persons/${this.currentId}/profiles`, {
+          body: {
+            profile_id: parsedId,
+            note: raw.note?.trim().length ? raw.note.trim() : null
+          }
+        })
+      );
+      this.profileLinkForm.reset({ profileId: '', note: '' });
+      this.successMessage.set(this.translate.instant('entryDetail.relations.profileLinked'));
+      await this.loadPersonRelations(this.currentId);
+    } catch (error) {
+      this.profileLinkError.set(this.describeError(error));
+    } finally {
+      this.isManagingProfileLinks.set(false);
+    }
+  }
+
+  async unlinkProfile(profileId?: string): Promise<void> {
+    if (!this.showPersonRelations() || !this.currentId || !profileId) {
+      return;
+    }
+
+    const parsedId = Number(profileId);
+    if (!Number.isFinite(parsedId)) {
+      return;
+    }
+
+    this.isManagingProfileLinks.set(true);
+    this.profileLinkError.set(null);
+    try {
+      await firstValueFrom(this.api.request('DELETE', `/persons/${this.currentId}/profiles/${parsedId}`));
+      this.successMessage.set(this.translate.instant('entryDetail.relations.profileUnlinked'));
+      await this.loadPersonRelations(this.currentId);
+    } catch (error) {
+      this.profileLinkError.set(this.describeError(error));
+    } finally {
+      this.isManagingProfileLinks.set(false);
+    }
   }
 
   private clearMessages(): void {
