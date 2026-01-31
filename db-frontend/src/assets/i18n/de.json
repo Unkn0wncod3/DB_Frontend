@@ -103,7 +103,6 @@
     "delete": {
       "dialogTitle": "Loeschen bestaetigen",
       "confirm": "Bist du sicher, dass du diesen Eintrag loeschen moechtest? Das kann nicht rueckgaengig gemacht werden.",
-      "passcodePrompt": "Bitte den Sicherheitsschluessel \"{{ key }}\" eingeben um zu loeschen.",
       "passcodeLabel": "Sicherheitsschluessel",
       "passcodePlaceholder": "Schluessel eingeben",
       "confirmButton": "Eintrag loeschen",
