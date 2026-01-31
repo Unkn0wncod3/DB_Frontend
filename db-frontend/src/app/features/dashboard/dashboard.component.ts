@@ -88,6 +88,14 @@ export class DashboardComponent implements OnInit {
     this.selectedCreateType.set(type);
   }
 
+  handleCreateTypeChange(event: Event): void {
+    const target = event.target as HTMLSelectElement | null;
+    if (!target) {
+      return;
+    }
+    this.updateCreateType(target.value);
+  }
+
   startCreate(): void {
     const type = this.selectedCreateType();
     if (!type) {

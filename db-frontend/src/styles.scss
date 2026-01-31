@@ -19,3 +19,36 @@ pre {
   font-family: 'Fira Code', 'Source Code Pro', Menlo, Monaco, Consolas, monospace;
   font-size: 0.95rem;
 }
+
+.dashboard__quick-create {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+}
+
+.dashboard__quick-create label {
+  font-weight: 600;
+  color: #312e81;
+  margin-right: 0.5rem;
+}
+
+.dashboard__quick-create-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.dashboard__quick-create-select {
+  border: 1px solid #c7d2fe;
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  background: #fff;
+  font-weight: 600;
+  color: #1f2937;
+}

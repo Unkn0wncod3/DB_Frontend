@@ -22,7 +22,8 @@
     <div class="dashboard__quick-create-controls">
       <select
         id="create-type-select"
-        (change)="updateCreateType(($event.target as HTMLSelectElement).value)"
+        class="dashboard__quick-create-select"
+        (change)="handleCreateTypeChange($event)"
       >
         <option
           *ngFor="let option of createTypeOptions"
@@ -32,7 +33,7 @@
           {{ option.label }}
         </option>
       </select>
-      <button type="button" (click)="startCreate()">
+      <button type="button" class="dashboard__refresh" (click)="startCreate()">
         {{ 'dashboard.actions.createButton' | translate }}
       </button>
     </div>
