@@ -99,6 +99,11 @@
       "activities": "Activities",
       "viewAll": "View all"
     },
+    "delete": {
+      "confirm": "Are you sure you want to delete this entry? This action cannot be undone.",
+      "passcodePrompt": "Enter the security key \"{{ key }}\" to confirm deletion.",
+      "passcodeInvalid": "Security key did not match. Entry was not deleted."
+    },
     "errors": {
       "missingParams": "Missing entry parameters.",
       "loadFailed": "Unable to load entry: {{ message }}",

@@ -57,6 +57,7 @@ export class EntryDetailComponent {
   readonly relationsError = signal<string | null>(null);
   readonly hasRelations = computed(() => this.relatedProfiles().length > 0 || this.relatedNotes().length > 0 || this.relatedActivities().length > 0);
   private readonly readOnlyKeys = new Set(['id', '_id', 'type', 'createdat', 'updatedat', 'created_at', 'updated_at', 'timestamp', 'occurredat', 'occurred_at']);
+  private readonly deleteSecurityKey = 'del1';
 
   form: FormGroup = this.fb.group({});
 
@@ -125,6 +126,22 @@ export class EntryDetailComponent {
 
   async delete(): Promise<void> {
     if (!this.currentType || !this.currentId || this.isDeleting()) {
+      return;
+    }
+
+    const confirmed = window.confirm(this.translate.instant('entryDetail.delete.confirm'));
+    if (!confirmed) {
+      return;
+    }
+
+    const promptMessage = this.translate.instant('entryDetail.delete.passcodePrompt', { key: this.deleteSecurityKey });
+    const providedKey = window.prompt(promptMessage);
+    if (providedKey == null) {
+      return;
+    }
+
+    if (providedKey.trim() !== this.deleteSecurityKey) {
+      this.errorMessage.set(this.translate.instant('entryDetail.delete.passcodeInvalid'));
       return;
     }
 
