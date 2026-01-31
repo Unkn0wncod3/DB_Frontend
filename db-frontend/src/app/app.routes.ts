@@ -4,9 +4,11 @@ import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { ApiExplorerComponent } from './features/api-explorer/api-explorer.component';
 import { EntryDetailComponent } from './features/entry-detail/entry-detail.component';
 import { EntryListComponent } from './features/entry-list/entry-list.component';
+import { EntryCreateComponent } from './features/entry-create/entry-create.component';
 
 export const routes: Routes = [
   { path: '', component: DashboardComponent },
+  { path: 'entries/:type/new', component: EntryCreateComponent },
   { path: 'entries/:type', component: EntryListComponent },
   { path: 'entries/:type/:id', component: EntryDetailComponent },
   { path: 'explorer', component: ApiExplorerComponent },

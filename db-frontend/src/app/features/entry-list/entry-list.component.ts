@@ -103,6 +103,14 @@ export class EntryListComponent {
     return column.key;
   }
 
+  createLink(): string[] | null {
+    if (!this.currentType) {
+      return null;
+    }
+
+    return ['/entries', this.currentType, 'new'];
+  }
+
   hasEntryId(item: Record<string, unknown>): boolean {
     return this.extractId(item) !== null;
   }

@@ -1,0 +1,124 @@
+<section class="entry-create">
+  <header class="entry-create__header">
+    <div>
+      <a *ngIf="backLink() as back" [routerLink]="back" class="entry-create__back">
+        {{ 'entryCreate.actions.back' | translate }}
+      </a>
+      <h1>{{ 'entryCreate.title' | translate:{ type: typeLabel() } }}</h1>
+      <p class="entry-create__subtitle">
+        {{ 'entryCreate.subtitle' | translate:{ type: typeLabel() } }}
+      </p>
+      <p *ngIf="schema()?.description" class="entry-create__schema-description">
+        {{ schema()?.description }}
+      </p>
+    </div>
+  </header>
+
+  <section *ngIf="errorMessage() as error" class="entry-create__alert entry-create__alert--error">
+    <p>{{ error }}</p>
+  </section>
+
+  <section *ngIf="successMessage() as success" class="entry-create__alert entry-create__alert--success">
+    <p>{{ success }}</p>
+  </section>
+
+  <form class="entry-create__form" [formGroup]="form" (ngSubmit)="submit()">
+    <section *ngIf="hasSchema(); else missingSchema" class="entry-create__fields">
+      <article *ngFor="let item of schemaFields(); trackBy: trackField" class="entry-create__field">
+        <label [attr.for]="item.field.key">
+          {{ item.field.label }}
+          <span *ngIf="item.field.required" class="entry-create__required">*</span>
+        </label>
+        <small *ngIf="item.field.description" class="entry-create__hint">
+          {{ item.field.description }}
+        </small>
+
+        <ng-container [ngSwitch]="item.field.type">
+          <textarea
+            *ngSwitchCase="'textarea'"
+            [id]="item.field.key"
+            [formControl]="item.control"
+            rows="4"
+            [placeholder]="item.field.placeholder || ''"
+          ></textarea>
+
+          <textarea
+            *ngSwitchCase="'json'"
+            [id]="item.field.key"
+            [formControl]="item.control"
+            rows="6"
+            [placeholder]="item.field.placeholder || '{ }'"
+          ></textarea>
+
+          <input
+            *ngSwitchCase="'number'"
+            type="number"
+            [id]="item.field.key"
+            [formControl]="item.control"
+            [placeholder]="item.field.placeholder || ''"
+          />
+
+          <input
+            *ngSwitchCase="'date'"
+            type="datetime-local"
+            [id]="item.field.key"
+            [formControl]="item.control"
+            [placeholder]="item.field.placeholder || ''"
+          />
+
+          <label *ngSwitchCase="'boolean'" class="entry-create__checkbox">
+            <input type="checkbox" [formControl]="item.control" />
+            <span>{{ 'entryCreate.form.booleanTrue' | translate }}</span>
+          </label>
+
+          <input
+            *ngSwitchDefault
+            type="text"
+            [id]="item.field.key"
+            [formControl]="item.control"
+            [placeholder]="item.field.placeholder || ''"
+          />
+        </ng-container>
+
+        <p
+          *ngIf="item.field.required && item.control.invalid && (item.control.touched || item.control.dirty)"
+          class="entry-create__error"
+        >
+          {{ 'entryCreate.errors.requiredField' | translate }}
+        </p>
+      </article>
+    </section>
+
+    <ng-template #missingSchema>
+      <section class="entry-create__panel entry-create__panel--info">
+        <p>{{ 'entryCreate.status.noSchema' | translate }}</p>
+        <p class="entry-create__schema-hint">
+          {{ 'entryCreate.status.schemaHelp' | translate }}
+        </p>
+      </section>
+    </ng-template>
+
+    <section class="entry-create__panel">
+      <header>
+        <h2>{{ 'entryCreate.form.rawPayloadTitle' | translate }}</h2>
+        <p>{{ 'entryCreate.form.rawPayloadHint' | translate }}</p>
+      </header>
+      <textarea
+        class="entry-create__raw"
+        rows="8"
+        [formControl]="rawPayloadControl"
+        placeholder="{{ '{\n  \"field\": \"value\"\n}' }}"
+      ></textarea>
+    </section>
+
+    <footer class="entry-create__actions">
+      <button type="submit" [disabled]="isSubmitting()">
+        <span *ngIf="isSubmitting(); else submitLabel">{{ 'entryCreate.status.submitting' | translate }}</span>
+        <ng-template #submitLabel>{{ 'entryCreate.actions.submit' | translate }}</ng-template>
+      </button>
+      <a *ngIf="backLink() as link" [routerLink]="link" class="entry-create__cancel">
+        {{ 'entryCreate.actions.cancel' | translate }}
+      </a>
+    </footer>
+  </form>
+</section>

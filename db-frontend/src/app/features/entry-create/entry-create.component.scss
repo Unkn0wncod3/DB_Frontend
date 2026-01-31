@@ -1,0 +1,145 @@
+.entry-create {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.entry-create__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.entry-create__back {
+  text-decoration: none;
+  color: #4a67ff;
+  font-weight: 600;
+}
+
+.entry-create__subtitle,
+.entry-create__schema-description {
+  margin: 0;
+  color: #5a5a5a;
+}
+
+.entry-create__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.entry-create__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.entry-create__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.entry-create__field input,
+.entry-create__field textarea {
+  border: 1px solid #c7c7c7;
+  border-radius: 6px;
+  padding: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.entry-create__checkbox {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-weight: 500;
+}
+
+.entry-create__required {
+  color: #d33;
+  margin-left: 0.25rem;
+}
+
+.entry-create__hint {
+  font-size: 0.85rem;
+  color: #6b6b6b;
+}
+
+.entry-create__error {
+  font-size: 0.85rem;
+  color: #d33;
+  margin: 0;
+}
+
+.entry-create__panel {
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.entry-create__panel--info {
+  border-color: #c5d5ff;
+  background: #f4f7ff;
+  color: #274686;
+}
+
+.entry-create__raw {
+  width: 100%;
+  margin-top: 0.75rem;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+}
+
+.entry-create__actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.entry-create__actions button {
+  padding: 0.75rem 1.5rem;
+  background: #4a67ff;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.entry-create__actions button[disabled] {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.entry-create__cancel {
+  color: #555;
+  text-decoration: none;
+}
+
+.entry-create__alert {
+  padding: 0.85rem 1rem;
+  border-radius: 6px;
+}
+
+.entry-create__alert--error {
+  background: #fdecea;
+  border: 1px solid #f7c4c0;
+  color: #9d1c10;
+}
+
+.entry-create__alert--success {
+  background: #edf9f2;
+  border: 1px solid #b9e5cc;
+  color: #1b6e3d;
+}
+
+.entry-create__schema-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+}

@@ -16,7 +16,9 @@
     "subtitle": "Wichtige Kennzahlen und Aktivitaeten deiner Railway DB_API.",
     "actions": {
       "refresh": "Jetzt aktualisieren",
-      "refreshing": "Aktualisiere..."
+      "refreshing": "Aktualisiere...",
+      "createLabel": "Neuen Eintrag erstellen für",
+      "createButton": "Eintrag erstellen"
     },
     "meta": {
       "lastUpdated": "Zuletzt aktualisiert am {{ value }}"
@@ -101,6 +103,7 @@
     "title": "Alle {{ type }}",
     "actions": {
       "back": "Zurueck zum Dashboard",
+      "create": "Neuer Eintrag",
       "refresh": "Aktualisieren",
       "refreshing": "Aktualisiere...",
       "view": "Eintrag oeffnen"
@@ -141,7 +144,39 @@
       "collections": "Sammlungen",
       "users": "Benutzer"
     }
-  },  "apiExplorer": {
+  },
+  "entryCreate": {
+    "title": "Neuen {{ type }} anlegen",
+    "subtitle": "Pflichtfelder ausfuellen und absenden, um einen neuen {{ type }}-Datensatz zu erstellen.",
+    "actions": {
+      "back": "Zurueck zur Liste",
+      "submit": "Eintrag erstellen",
+      "cancel": "Abbrechen"
+    },
+    "form": {
+      "booleanTrue": "Wert setzen",
+      "rawPayloadTitle": "Zusaetzliche Daten (JSON)",
+      "rawPayloadHint": "Optionales JSON, das nach den Feldern in den Request uebernommen wird."
+    },
+    "status": {
+      "submitting": "Erstelle...",
+      "created": "Eintrag erfolgreich erstellt.",
+      "noSchema": "Fuer diesen Typ ist noch kein Schema hinterlegt.",
+      "schemaHelp": "Passe src/app/features/entry-create/entry-create.schemas.ts an, um die Felder fuer diesen Typ zu definieren."
+    },
+    "errors": {
+      "missingType": "Eintragstyp fehlt.",
+      "invalidPayload": "Payload ungueltig: {{ message }}",
+      "emptyPayload": "Bitte mindestens ein Feld oder ein JSON angeben.",
+      "createFailed": "Eintrag konnte nicht erstellt werden: {{ message }}",
+      "invalidRawJson": "Zusaetzliche Daten muessen gueltiges JSON sein.",
+      "invalidJsonField": "JSON-Felder muessen gueltiges JSON enthalten.",
+      "invalidDate": "Datum benoetigt einen gueltigen ISO-Zeitstempel.",
+      "requiredField": "Dieses Feld ist erforderlich.",
+      "unknown": "Unbekannter Fehler"
+    }
+  },
+  "apiExplorer": {
     "title": "DB API Explorer",
     "baseUrl": "Basis-URL:",
     "intro": "Konfiguriere Pfad und optionale Daten, um mit deiner Railway API zu sprechen.",

@@ -39,6 +39,12 @@ export class EntryService {
     return this.api.request<Record<string, unknown>>('GET', this.buildItemEndpoint(type, id));
   }
 
+  createEntry(type: string, payload: Record<string, unknown>): Observable<Record<string, unknown>> {
+    return this.api.request<Record<string, unknown>>('POST', this.buildCollectionEndpoint(type), {
+      body: payload
+    });
+  }
+
   updateEntry(type: string, id: string, payload: Record<string, unknown>): Observable<Record<string, unknown>> {
     return this.api.request<Record<string, unknown>>('PATCH', this.buildItemEndpoint(type, id), {
       body: payload

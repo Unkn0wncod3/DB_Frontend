@@ -1,14 +1,20 @@
 import { AsyncPipe, DatePipe, DecimalPipe, JsonPipe, NgClass, NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { StatsOverviewRecord, StatsService } from '../../core/services/stats.service';
+import { ENTRY_SCHEMAS } from '../entry-create/entry-create.schemas';
 
 interface DisplayCard {
   key: string;
   label: string;
   value: number | string;
+}
+
+interface CreateOption {
+  type: string;
+  label: string;
 }
 
 @Component({
@@ -22,10 +28,14 @@ interface DisplayCard {
 export class DashboardComponent implements OnInit {
   private readonly statsService = inject(StatsService);
   private readonly translate = inject(TranslateService);
+  private readonly router = inject(Router);
 
   readonly overview = this.statsService.overview;
   readonly isLoading = this.statsService.isLoading;
   readonly lastUpdated = this.statsService.lastUpdated;
+  readonly createTypeOptions = this.buildCreateOptions();
+  readonly selectedCreateType = signal(this.createTypeOptions[0]?.type ?? '');
+  readonly hasCreateOptions = this.createTypeOptions.length > 0;
 
   readonly errorMessage = computed(() => {
     const error = this.statsService.error();
@@ -72,6 +82,19 @@ export class DashboardComponent implements OnInit {
 
   forceRefresh(): void {
     void this.statsService.loadOverview(true);
+  }
+
+  updateCreateType(type: string): void {
+    this.selectedCreateType.set(type);
+  }
+
+  startCreate(): void {
+    const type = this.selectedCreateType();
+    if (!type) {
+      return;
+    }
+
+    void this.router.navigate(['/entries', type, 'new']);
   }
 
   trackByKey(_index: number, item: DisplayCard): string {
@@ -220,6 +243,16 @@ export class DashboardComponent implements OnInit {
   hasRecentItems(): boolean {
     const recent = this.overview()?.recent;
     return Array.isArray(recent) && recent.length > 0;
+  }
+
+  private buildCreateOptions(): CreateOption[] {
+    return Object.values(ENTRY_SCHEMAS)
+      .map((schema) => ({
+        type: schema.type,
+        label: schema.title ?? this.humanizeKey(schema.type)
+      }))
+      .filter((option) => !!option.type)
+      .sort((a, b) => a.label.localeCompare(b.label));
   }
 
   private getTransLabel(translationKey: string, fallbackKey: string): string {

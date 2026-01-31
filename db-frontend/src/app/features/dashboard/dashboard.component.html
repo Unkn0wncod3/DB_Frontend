@@ -15,6 +15,29 @@
     </div>
   </header>
 
+  <section *ngIf="hasCreateOptions" class="dashboard__quick-create">
+    <label for="create-type-select">
+      {{ 'dashboard.actions.createLabel' | translate }}
+    </label>
+    <div class="dashboard__quick-create-controls">
+      <select
+        id="create-type-select"
+        (change)="updateCreateType(($event.target as HTMLSelectElement).value)"
+      >
+        <option
+          *ngFor="let option of createTypeOptions"
+          [value]="option.type"
+          [selected]="selectedCreateType() === option.type"
+        >
+          {{ option.label }}
+        </option>
+      </select>
+      <button type="button" (click)="startCreate()">
+        {{ 'dashboard.actions.createButton' | translate }}
+      </button>
+    </div>
+  </section>
+
   <section *ngIf="errorMessage() as error" class="dashboard__error">
     <p>{{ error }}</p>
   </section>

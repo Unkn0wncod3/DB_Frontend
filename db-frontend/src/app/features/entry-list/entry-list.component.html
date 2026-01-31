@@ -11,6 +11,9 @@
       </p>
     </div>
     <div class="entry-list__actions">
+      <a *ngIf="createLink() as create" [routerLink]="create" class="entry-list__create">
+        {{ 'entryList.actions.create' | translate }}
+      </a>
       <button type="button" (click)="refresh()" [disabled]="isLoading()">
         <span *ngIf="isLoading(); else refreshLabel">{{ 'entryList.actions.refreshing' | translate }}</span>
         <ng-template #refreshLabel>{{ 'entryList.actions.refresh' | translate }}</ng-template>
