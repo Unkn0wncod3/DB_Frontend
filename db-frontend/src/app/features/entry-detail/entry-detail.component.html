@@ -2,7 +2,7 @@
   <header class="entry-detail__header">
     <div class="entry-detail__title">
       <a routerLink="/" class="entry-detail__back">{{ 'entryDetail.actions.back' | translate }}</a>
-      <h1>{{ 'entryDetail.title' | translate:{ id: entryId ?? ('entryDetail.labels.unknownId' | translate) } }}</h1>
+      <h1>{{ 'entryDetail.title' | translate:{ value: entryTitle() ?? (entryId ?? ('entryDetail.labels.unknownId' | translate)) } }}</h1>
       <p *ngIf="entryType">{{ 'entryDetail.labels.type' | translate:{ type: entryType } }}</p>
     </div>
     <div class="entry-detail__actions">

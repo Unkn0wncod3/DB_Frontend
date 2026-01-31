@@ -67,7 +67,7 @@
     }
   },
   "entryDetail": {
-    "title": " {{ value }}",
+    "title": "{{ value }}",
     "labels": {
       "unknownId": "Unbekannter Eintrag",
       "type": "Typ: {{ type }}",
@@ -88,8 +88,8 @@
       "deleted": "Eintrag geloescht.",
       "noChanges": "Keine Aenderungen erkannt.",
       "empty": "Keine Daten fuer diesen Eintrag verfuegbar.",
-      "loadingRelations": "Verknüpfungen werden geladen...",
-      "noRelations": "Keine verknüpften Einträge gefunden."
+      "loadingRelations": "Verknuepfungen werden geladen...",
+      "noRelations": "Keine verknuepften Eintraege gefunden."
     },
     "sections": {
       "raw": "Rohdaten"
@@ -97,7 +97,7 @@
     "relations": {
       "profiles": "Profile",
       "notes": "Notizen",
-      "activities": "Aktivitäten",
+      "activities": "Aktivitaeten",
       "viewAll": "Alle anzeigen"
     },
     "errors": {

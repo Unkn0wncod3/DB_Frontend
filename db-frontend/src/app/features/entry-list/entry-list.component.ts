@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { EntryListParams, EntryService } from '../../core/services/entry.service';
@@ -35,8 +36,8 @@ export class EntryListComponent {
     default: ['id', '_id'],
     persons: ['first_name', 'last_name', 'date_of_birth', 'email'],
     notes: ['title', 'created_at', 'text'],
-    profiles: ['username', 'platform_id', 'status', 'last_seen_at','region'],
-    activities: ['activity_type', 'item', 'person_id', 'occurred_at','notes'],
+    profiles: ['username', 'platform_id', 'status', 'last_seen_at', 'region'],
+    activities: ['activity_type', 'item', 'person_id', 'occurred_at', 'notes'],
     vehicles: ['label', 'model', 'vehicle_type', 'license_plate'],
     platforms: ['name', 'is_active', 'base_url']
   };
@@ -217,6 +218,7 @@ export class EntryListComponent {
           this.hasMore.set(result.hasMore);
           this.columns.set(this.deriveColumns(result.items));
           this.lastUpdatedAt.set(Date.now());
+          void this.hydratePrioritizedFields(result.items);
         },
         error: (error: unknown) => {
           const message = error instanceof Error ? error.message : this.translate.instant('entryList.errors.unknown');
@@ -327,6 +329,59 @@ export class EntryListComponent {
     const typeSpecific = this.columnPriority[normalizedType] ?? [];
     const defaults = this.columnPriority['default'] ?? [];
     return [...defaults, ...typeSpecific];
+  }
+
+  private async hydratePrioritizedFields(items: Record<string, unknown>[]): Promise<void> {
+    if (!items.length || !this.currentType) {
+      return;
+    }
+
+    const prioritizedKeys = this.getPrioritizedKeys();
+    if (prioritizedKeys.length === 0) {
+      return;
+    }
+
+    const missingKeys = prioritizedKeys.filter((key) => items.some((item) => this.isMissingValue(item[key])));
+    if (missingKeys.length === 0) {
+      return;
+    }
+
+    const type = this.currentType;
+    for (let index = 0; index < items.length; index++) {
+      const item = items[index];
+      if (!missingKeys.some((key) => this.isMissingValue(item[key]))) {
+        continue;
+      }
+
+      const id = this.extractId(item);
+      if (!id) {
+        continue;
+      }
+
+      try {
+        const detail = await firstValueFrom(this.entryService.getEntry(type, id));
+        const detailRecord = detail as Record<string, unknown>;
+        const updated = { ...item };
+        let hasUpdate = false;
+        for (const key of missingKeys) {
+          const value = detailRecord[key];
+          if (!this.isMissingValue(value)) {
+            updated[key] = value;
+            hasUpdate = true;
+          }
+        }
+        if (hasUpdate) {
+          items[index] = updated;
+          this.items.set([...items]);
+        }
+      } catch {
+        // Ignore hydration errors for individual records.
+      }
+    }
+  }
+
+  private isMissingValue(value: unknown): boolean {
+    return value === undefined || value === null || value === '';
   }
 
   private isDisplayable(value: unknown): boolean {
