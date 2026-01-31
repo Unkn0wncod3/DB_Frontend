@@ -33,10 +33,10 @@ export class EntryListComponent {
   private readonly pageSizeOptions = [10, 25, 50, 100];
   private readonly columnPriority: Record<string, string[]> = {
     default: ['id', '_id'],
-    persons: ['first_name', 'last_name', 'date_of_birth'],
+    persons: ['first_name', 'last_name', 'date_of_birth', 'email'],
     notes: ['title', 'created_at', 'text'],
-    profiles: ['username', 'platform_id', 'status', 'last_seen_at'],
-    activities: ['activity_type', 'item', 'person_id', 'occurred_at'],
+    profiles: ['username', 'platform_id', 'status', 'last_seen_at','region'],
+    activities: ['activity_type', 'item', 'person_id', 'occurred_at','notes'],
     vehicles: ['label', 'model', 'vehicle_type', 'license_plate'],
     platforms: ['name', 'is_active', 'base_url']
   };
@@ -275,6 +275,11 @@ export class EntryListComponent {
           keys.add(key);
         }
       }
+    }
+
+    const priorities = this.getPrioritizedKeys();
+    for (const priorityKey of priorities) {
+      keys.add(priorityKey);
     }
 
     if (keys.size === 0) {
