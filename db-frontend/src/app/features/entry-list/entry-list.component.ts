@@ -31,6 +31,15 @@ export class EntryListComponent {
 
   private readonly defaultPageSize = 25;
   private readonly pageSizeOptions = [10, 25, 50, 100];
+  private readonly columnPriority: Record<string, string[]> = {
+    default: ['id', '_id'],
+    persons: ['first_name', 'last_name', 'date_of_birth'],
+    notes: ['title', 'created_at', 'text'],
+    profiles: ['username', 'platform_id', 'status', 'last_seen_at'],
+    activities: ['activity_type', 'item', 'person_id', 'occurred_at'],
+    vehicles: ['label', 'model', 'vehicle_type', 'license_plate'],
+    platforms: ['name', 'is_active', 'base_url']
+  };
 
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -272,10 +281,47 @@ export class EntryListComponent {
       return [];
     }
 
-    return Array.from(keys)
-      .sort()
+    const orderedKeys = this.orderColumns(Array.from(keys));
+
+    return orderedKeys
       .slice(0, 6)
       .map((key) => ({ key, label: this.humanizeKey(key) }));
+  }
+
+  private orderColumns(keys: string[]): string[] {
+    if (keys.length === 0) {
+      return [];
+    }
+
+    const prioritizedKeys = this.getPrioritizedKeys();
+    const result: string[] = [];
+    const used = new Set<string>();
+
+    for (const priorityKey of prioritizedKeys) {
+      const actualKey = keys.find((key) => key === priorityKey);
+      if (actualKey && !used.has(actualKey)) {
+        result.push(actualKey);
+        used.add(actualKey);
+      }
+    }
+
+    keys
+      .sort()
+      .forEach((key) => {
+        if (!used.has(key)) {
+          result.push(key);
+          used.add(key);
+        }
+      });
+
+    return result;
+  }
+
+  private getPrioritizedKeys(): string[] {
+    const normalizedType = (this.currentType ?? '').toLowerCase();
+    const typeSpecific = this.columnPriority[normalizedType] ?? [];
+    const defaults = this.columnPriority['default'] ?? [];
+    return [...defaults, ...typeSpecific];
   }
 
   private isDisplayable(value: unknown): boolean {
