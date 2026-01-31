@@ -57,7 +57,10 @@ export class EntryDetailComponent {
   readonly relationsError = signal<string | null>(null);
   readonly hasRelations = computed(() => this.relatedProfiles().length > 0 || this.relatedNotes().length > 0 || this.relatedActivities().length > 0);
   private readonly readOnlyKeys = new Set(['id', '_id', 'type', 'createdat', 'updatedat', 'created_at', 'updated_at', 'timestamp', 'occurredat', 'occurred_at']);
-  private readonly deleteSecurityKey = 'del1';
+  readonly deleteSecurityKey = 'del1';
+  readonly isDeleteDialogOpen = signal(false);
+  readonly deletePasscode = signal('');
+  readonly deleteDialogError = signal<string | null>(null);
 
   form: FormGroup = this.fb.group({});
 
@@ -82,6 +85,45 @@ export class EntryDetailComponent {
       this.currentId = id;
       void this.loadEntry();
     });
+  }
+
+  openDeleteDialog(): void {
+    if (!this.currentType || !this.currentId) {
+      return;
+    }
+    this.deletePasscode.set('');
+    this.deleteDialogError.set(null);
+    this.isDeleteDialogOpen.set(true);
+  }
+
+  closeDeleteDialog(): void {
+    if (this.isDeleting()) {
+      return;
+    }
+    this.isDeleteDialogOpen.set(false);
+    this.deletePasscode.set('');
+    this.deleteDialogError.set(null);
+  }
+
+  onDeletePasscodeChange(value: string): void {
+    this.deletePasscode.set(value);
+    if (this.deleteDialogError()) {
+      this.deleteDialogError.set(null);
+    }
+  }
+
+  canConfirmDelete(): boolean {
+    return this.deletePasscode().trim() === this.deleteSecurityKey && !this.isDeleting();
+  }
+
+  async confirmDelete(): Promise<void> {
+    if (!this.canConfirmDelete()) {
+      this.deleteDialogError.set(this.translate.instant('entryDetail.delete.passcodeInvalid'));
+      return;
+    }
+
+    await this.performDelete();
+    this.closeDeleteDialog();
   }
 
   async refresh(): Promise<void> {
@@ -124,24 +166,8 @@ export class EntryDetailComponent {
     }
   }
 
-  async delete(): Promise<void> {
+  private async performDelete(): Promise<void> {
     if (!this.currentType || !this.currentId || this.isDeleting()) {
-      return;
-    }
-
-    const confirmed = window.confirm(this.translate.instant('entryDetail.delete.confirm'));
-    if (!confirmed) {
-      return;
-    }
-
-    const promptMessage = this.translate.instant('entryDetail.delete.passcodePrompt', { key: this.deleteSecurityKey });
-    const providedKey = window.prompt(promptMessage);
-    if (providedKey == null) {
-      return;
-    }
-
-    if (providedKey.trim() !== this.deleteSecurityKey) {
-      this.errorMessage.set(this.translate.instant('entryDetail.delete.passcodeInvalid'));
       return;
     }
 
