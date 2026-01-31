@@ -48,7 +48,7 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
       { key: 'status', label: 'Status', type: 'text', defaultValue: 'active' },
       { key: 'nationality', label: 'Nationality', type: 'text' },
       { key: 'occupation', label: 'Occupation', type: 'text' },
-      { key: 'risk_level', label: 'Risk level', type: 'text' },
+      { key: 'risk_level', label: 'Risk level', type: 'text', defaultValue: 'None' },
       {
         key: 'tags',
         label: 'Tags (JSON array)',
@@ -78,7 +78,7 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
       { key: 'status', label: 'Status', type: 'text', defaultValue: 'active' },
       { key: 'language', label: 'Language', type: 'text' },
       { key: 'region', label: 'Region', type: 'text' },
-      { key: 'is_verified', label: 'Is verified', type: 'boolean' },
+      { key: 'is_verified', label: 'Is verified', type: 'boolean' , defaultValue: false},
       { key: 'avatar_url', label: 'Avatar URL', type: 'text' },
       { key: 'bio', label: 'Bio', type: 'textarea' },
       {
@@ -109,8 +109,8 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
       keys: ['vehicle_id', 'profile_id', 'community_id', 'item']
     },
     fields: [
-      { key: 'person_id', label: 'Person ID', type: 'number', required: true },
-      { key: 'activity_type', label: 'Activity type', type: 'text', required: true },
+      { key: 'person_id', label: 'Person ID', type: 'number', required: true, defaultValue: 1 },
+      { key: 'activity_type', label: 'Activity type', type: 'text', required: true, defaultValue: 'Standard' },
       { key: 'occurred_at', label: 'Occurred at', type: 'date' },
       { key: 'vehicle_id', label: 'Vehicle ID', type: 'number' },
       { key: 'profile_id', label: 'Profile ID', type: 'number' },

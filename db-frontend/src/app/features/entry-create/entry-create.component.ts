@@ -139,7 +139,11 @@ export class EntryCreateComponent {
 
     const fieldsList = requirement.keys.map((key) => this.humanize(key)).join(', ');
     const messageKey = requirement.messageKey ?? 'entryCreate.errors.requireOneOf';
-    this.errorMessage.set(this.translate.instant(messageKey, { fields: fieldsList }));
+    let message = this.translate.instant(messageKey, { fields: fieldsList });
+    if (!message || message === messageKey) {
+      message = `Please provide at least one of: ${fieldsList}.`;
+    }
+    this.errorMessage.set(message);
     return false;
   }
 
