@@ -1,209 +1,179 @@
 {
-    "layout":  {
-                   "brand":  "DB Frontend",
-                   "nav":  {
-                               "dashboard":  "Dashboard",
-                               "explorer":  "Explorer"
-                           },
-                   "language":  "Language",
-                   "languages":  {
-                                     "en":  "English",
-                                     "de":  "German"
-                                 }
-               },
-    "dashboard":  {
-                      "title":  "Database Overview",
-                      "subtitle":  "Key stats and recent activity from your Railway DB_API.",
-                      "actions":  {
-                                      "refresh":  "Refresh now",
-                                      "refreshing":  "Refreshing...",
-                                      "createLabel":  "Create a new entry for",
-                                      "createButton":  "Create entry"
-                                  },
-                      "meta":  {
-                                   "lastUpdated":  "Last updated {{ value }}"
-                               },
-                      "sections":  {
-                                       "activity":  "Activity",
-                                       "latest":  "Latest Changes",
-                                       "recent":  "Recent Items"
-                                   },
-                      "latest":  {
-                                     "created":  {
-                                                     "title":  "Last created",
-                                                     "timestamp":  "Created at {{ value }}"
-                                                 },
-                                     "updated":  {
-                                                     "title":  "Last updated",
-                                                     "timestamp":  "Updated at {{ value }}"
-                                                 }
-                                 },
-                      "labels":  {
-                                     "unknownEntry":  "Unnamed entry",
-                                     "noRecentCreate":  "No recent creations",
-                                     "noRecentUpdate":  "No recent updates",
-                                     "itemType":  "Type: {{ value }}",
-                                     "itemTypeWithId":  "Type: {{ type }} (ID: {{ id }})",
-                                     "itemId":  "ID: {{ value }}"
-                                 },
-                      "status":  {
-                                     "noRecent":  "No recent items available."
-                                 },
-                      "errors":  {
-                                     "loadFailed":  "Unable to load dashboard data ({{ status }}): {{ message }}",
-                                     "noStatus":  "no status",
-                                     "generic":  "Unexpected error"
-                                 },
-                      "totals":  {
-                                     "entries":  "Total entries",
-                                     "collections":  "Collections",
-                                     "users":  "Users"
-                                 },
-                      "activity":  {
-                                       "last24Hours":  "Changes in the last 24 hours",
-                                       "last7Days":  "Changes in the last 7 days",
-                                       "last30Days":  "Changes in the last 30 days"
-                                   }
-                  },
-    "entryDetail":  {
-                      "title":  "Entry {{ id }}",
-                      "labels":  {
-                                     "unknownId":  "Unknown entry",
-                                     "type":  "Type: {{ type }}"
-                                 },
-                      "actions":  {
-                                      "back":  "Back to dashboard",
-                                      "refresh":  "Reload",
-                                      "save":  "Save changes",
-                                      "delete":  "Delete"
-                                  },
-                      "status":  {
-                                     "loading":  "Loading...",
-                                     "saving":  "Saving...",
-                                     "deleting":  "Deleting...",
-                                     "saved":  "Changes saved.",
-                                     "deleted":  "Entry deleted.",
-                                     "noChanges":  "No changes detected.",
-                                     "empty":  "No data available for this entry."
-                                 },
-                      "sections":  {
-                                       "raw":  "Raw payload"
-                                   },
-                      "errors":  {
-                                     "missingParams":  "Missing entry parameters.",
-                                     "loadFailed":  "Unable to load entry: {{ message }}",
-                                     "saveFailed":  "Unable to save entry: {{ message }}",
-                                     "deleteFailed":  "Unable to delete entry: {{ message }}",
-                                     "invalidPayload":  "The API returned an unexpected response.",
-                                     "unknown":  "Unknown error"
-                                 }
-                  },
-    "entryList":  {
-                      "title":  "All {{ type }}",
-                      "actions":  {
-                                      "back":  "Back to dashboard",
-                                      "create":  "New entry",
-                                      "refresh":  "Refresh",
-                                      "refreshing":  "Refreshing...",
-                                      "view":  "Open entry"
-                                  },
-                      "filters":  {
-                                      "searchLabel":  "Search",
-                                      "searchPlaceholder":  "Type to filter entries...",
-                                      "pageSizeLabel":  "Page size"
-                                  },
-                      "meta":  {
-                                   "total":  "{{ value }} entries",
-                                   "lastUpdated":  "Last updated {{ value }}"
-                               },
-                      "table":  {
-                                    "actions":  "Actions"
-                                },
-                      "status":  {
-                                    "loading":  "Loading entries...",
-                                    "empty":  "No entries found."
-                                },
-                      "pagination":  {
-                                        "previous":  "Previous",
-                                        "next":  "Next",
-                                        "page":  "Page {{ page }} - {{ pageSize }} per page"
-                                    },
-                      "errors":  {
-                                    "missingType":  "Entry type missing.",
-                                    "loadFailed":  "Unable to load entries: {{ message }}",
-                                    "unknown":  "Unknown error"
-                                },
-                      "types":  {
-                                   "persons":  "Persons",
-                                   "profiles":  "Profiles",
-                                   "activities":  "Activities",
-                                   "vehicles":  "Vehicles",
-                                   "notes":  "Notes",
-                                   "platforms":  "Platforms",
-                                   "collections":  "Collections",
-                                   "users":  "Users"
-                               }
-                  },
-    "entryCreate":  {
-                      "title":  "Create {{ type }}",
-                      "subtitle":  "Fill out the required fields and submit to create a new {{ type }} record.",
-                      "actions":  {
-                                      "back":  "Back to list",
-                                      "submit":  "Create entry",
-                                      "cancel":  "Cancel"
-                                  },
-                      "form":  {
-                                  "booleanTrue":  "Set value",
-                                  "rawPayloadTitle":  "Additional payload (JSON)",
-                                  "rawPayloadHint":  "Optional JSON that will be merged into the request body after the fields above."
-                               },
-                      "status":  {
-                                   "submitting":  "Creating...",
-                                   "created":  "Entry created successfully.",
-                                   "noSchema":  "No schema configured for this type yet.",
-                                   "schemaHelp":  "Update src/app/features/entry-create/entry-create.schemas.ts to describe the fields for this entry type."
-                                },
-                      "errors":  {
-                                   "missingType":  "Entry type missing.",
-                                   "invalidPayload":  "Payload invalid: {{ message }}",
-                                   "emptyPayload":  "Add at least one field or raw payload value before submitting.",
-                                   "createFailed":  "Unable to create entry: {{ message }}",
-                                   "invalidRawJson":  "Raw payload must be valid JSON.",
-                                   "invalidJsonField":  "JSON fields must contain valid JSON.",
-                                   "invalidDate":  "Date fields require a valid ISO date/time value.",
-                                   "requireOneOf":  "Provide at least one of: {{ fields }}.",
-                                   "requiredField":  "This field is required.",
-                                   "unknown":  "Unknown error"
-                                }
-                  },
-    "apiExplorer":  {
-                 "title":  "DB API Explorer",
-                 "baseUrl":  "Base URL:",
-                 "intro":  "Configure the path and optional payload to talk to your Railway API.",
-                 "form":  {
-                              "methodLabel":  "HTTP Method",
-                              "endpointLabel":  "Endpoint",
-                              "endpointHint":  "Path relative to the base URL.",
-                              "endpointPlaceholder":  "/",
-                              "bodyLabel":  "Request Body (JSON)",
-                              "bodyPlaceholder":  "{\n  \"example\": true\n}",
-                              "headersLabel":  "Headers (JSON)",
-                              "headersPlaceholder":  "{\n  \"Authorization\": \"Bearer ...\"\n}",
-                              "submit":  "Send Request"
-                          },
-                 "status":  {
-                                "loading":  "Sending request...",
-                                "errorTitle":  "Error",
-                                "successTitle":  "Response"
-                            },
-                 "errors":  {
-                                "invalidJson":  "{{field}} must contain valid JSON.",
-                                "unknown":  "Unknown error",
-                                "status":  " (Status {{status}})",
-                                "http":  "{{message}}{{status}}"
-                            }
-             }
+    "layout": {
+        "brand": "DB Frontend",
+        "nav": {
+            "dashboard": "Dashboard",
+            "explorer": "Explorer"
+        },
+        "language": "Language",
+        "languages": {
+            "en": "English",
+            "de": "German"
+        }
+    },
+    "dashboard": {
+        "title": "Database Overview",
+        "subtitle": "Key stats and recent activity from your Railway DB_API.",
+        "actions": {
+            "refresh": "Refresh now",
+            "refreshing": "Refreshing...",
+            "createLabel": "Create a new entry for",
+            "createButton": "Create entry"
+        },
+        "meta": {
+            "lastUpdated": "Last updated {{ value }}"
+        },
+        "sections": {
+            "activity": "Activity",
+            "latest": "Latest Changes",
+            "recent": "Recent Items"
+        },
+        "latest": {
+            "created": {
+                "title": "Last created",
+                "timestamp": "Created at {{ value }}"
+            },
+            "updated": {
+                "title": "Last updated",
+                "timestamp": "Updated at {{ value }}"
+            }
+        },
+        "labels": {
+            "unknownEntry": "Unnamed entry",
+            "noRecentCreate": "No recent creations",
+            "noRecentUpdate": "No recent updates",
+            "itemType": "Type: {{ value }}",
+            "itemTypeWithId": "Type: {{ type }} (ID: {{ id }})",
+            "itemId": "ID: {{ value }}"
+        },
+        "status": {
+            "noRecent": "No recent items available."
+        },
+        "errors": {
+            "loadFailed": "Unable to load dashboard data ({{ status }}): {{ message }}",
+            "noStatus": "no status",
+            "generic": "Unexpected error"
+        },
+        "totals": {
+            "entries": "Total entries",
+            "collections": "Collections",
+            "users": "Users"
+        },
+        "activity": {
+            "last24Hours": "Changes in the last 24 hours",
+            "last7Days": "Changes in the last 7 days",
+            "last30Days": "Changes in the last 30 days"
+        }
+    },
+    "entryDetail": {
+        "status": {
+            "loadingRelations": "Loading related items...",
+            "noRelations": "No related entries found."
+        }
+    },
+    "entryList": {
+        "title": "All {{ type }}",
+        "actions": {
+            "back": "Back to dashboard",
+            "create": "New entry",
+            "refresh": "Refresh",
+            "refreshing": "Refreshing...",
+            "view": "Open entry"
+        },
+        "filters": {
+            "searchLabel": "Search",
+            "searchPlaceholder": "Type to filter entries...",
+            "pageSizeLabel": "Page size"
+        },
+        "meta": {
+            "total": "{{ value }} entries",
+            "lastUpdated": "Last updated {{ value }}"
+        },
+        "table": {
+            "actions": "Actions"
+        },
+        "status": {
+            "loading": "Loading entries...",
+            "empty": "No entries found."
+        },
+        "pagination": {
+            "previous": "Previous",
+            "next": "Next",
+            "page": "Page {{ page }} - {{ pageSize }} per page"
+        },
+        "errors": {
+            "missingType": "Entry type missing.",
+            "loadFailed": "Unable to load entries: {{ message }}",
+            "unknown": "Unknown error"
+        },
+        "types": {
+            "persons": "Persons",
+            "profiles": "Profiles",
+            "activities": "Activities",
+            "vehicles": "Vehicles",
+            "notes": "Notes",
+            "platforms": "Platforms",
+            "collections": "Collections",
+            "users": "Users"
+        }
+    },
+    "entryCreate": {
+        "title": "Create {{ type }}",
+        "subtitle": "Fill out the required fields and submit to create a new {{ type }} record.",
+        "actions": {
+            "back": "Back to list",
+            "submit": "Create entry",
+            "cancel": "Cancel"
+        },
+        "form": {
+            "booleanTrue": "Set value",
+            "rawPayloadTitle": "Additional payload (JSON)",
+            "rawPayloadHint": "Optional JSON that will be merged into the request body after the fields above."
+        },
+        "status": {
+            "submitting": "Creating...",
+            "created": "Entry created successfully.",
+            "noSchema": "No schema configured for this type yet.",
+            "schemaHelp": "Update src/app/features/entry-create/entry-create.schemas.ts to describe the fields for this entry type."
+        },
+        "errors": {
+            "missingType": "Entry type missing.",
+            "invalidPayload": "Payload invalid: {{ message }}",
+            "emptyPayload": "Add at least one field or raw payload value before submitting.",
+            "createFailed": "Unable to create entry: {{ message }}",
+            "invalidRawJson": "Raw payload must be valid JSON.",
+            "invalidJsonField": "JSON fields must contain valid JSON.",
+            "invalidDate": "Date fields require a valid ISO date/time value.",
+            "requireOneOf": "Provide at least one of: {{ fields }}.",
+            "requiredField": "This field is required.",
+            "unknown": "Unknown error"
+        }
+    },
+    "apiExplorer": {
+        "title": "DB API Explorer",
+        "baseUrl": "Base URL:",
+        "intro": "Configure the path and optional payload to talk to your Railway API.",
+        "form": {
+            "methodLabel": "HTTP Method",
+            "endpointLabel": "Endpoint",
+            "endpointHint": "Path relative to the base URL.",
+            "endpointPlaceholder": "/",
+            "bodyLabel": "Request Body (JSON)",
+            "bodyPlaceholder": "{\n  \"example\": true\n}",
+            "headersLabel": "Headers (JSON)",
+            "headersPlaceholder": "{\n  \"Authorization\": \"Bearer ...\"\n}",
+            "submit": "Send Request"
+        },
+        "status": {
+            "loading": "Sending request...",
+            "errorTitle": "Error",
+            "successTitle": "Response"
+        },
+        "errors": {
+            "invalidJson": "{{field}} must contain valid JSON.",
+            "unknown": "Unknown error",
+            "status": " (Status {{status}})",
+            "http": "{{message}}{{status}}"
+        }
+    }
 }
-
-
-

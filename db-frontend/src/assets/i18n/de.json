@@ -67,10 +67,12 @@
     }
   },
   "entryDetail": {
-    "title": "Eintrag {{ id }}",
+    "title": " {{ value }}",
     "labels": {
       "unknownId": "Unbekannter Eintrag",
-      "type": "Typ: {{ type }}"
+      "type": "Typ: {{ type }}",
+      "relationships": "Verknüpfte Daten",
+      "connectedItems": "Verbundene Profile, Notizen und Aktivitäten"
     },
     "actions": {
       "back": "Zurueck zum Dashboard",
@@ -85,10 +87,18 @@
       "saved": "Aenderungen gespeichert.",
       "deleted": "Eintrag geloescht.",
       "noChanges": "Keine Aenderungen erkannt.",
-      "empty": "Keine Daten fuer diesen Eintrag verfuegbar."
+      "empty": "Keine Daten fuer diesen Eintrag verfuegbar.",
+      "loadingRelations": "Verknüpfungen werden geladen...",
+      "noRelations": "Keine verknüpften Einträge gefunden."
     },
     "sections": {
       "raw": "Rohdaten"
+    },
+    "relations": {
+      "profiles": "Profile",
+      "notes": "Notizen",
+      "activities": "Aktivitäten",
+      "viewAll": "Alle anzeigen"
     },
     "errors": {
       "missingParams": "Eintragsparameter fehlen.",
@@ -205,6 +215,3 @@
     }
   }
 }
-
-
-

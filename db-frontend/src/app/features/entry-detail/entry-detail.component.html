@@ -29,28 +29,115 @@
     <p>{{ success }}</p>
   </section>
 
-  <form
-    id="entryDetailForm"
-    class="entry-detail__form"
-    [formGroup]="form"
-    (ngSubmit)="save()"
-    *ngIf="entry() as record"
-  >
-    <div class="entry-detail__grid">
-      <div *ngFor="let field of fields(); trackBy: trackByKey" class="entry-detail__field" [class.entry-detail__field--readonly]="field.readOnly">
-        <label [attr.for]="field.key">{{ field.label }}</label>
-        <textarea
-          *ngIf="field.multiline; else singleLine"
-          [id]="field.key"
-          [formControlName]="field.key"
-          rows="4"
-        ></textarea>
-        <ng-template #singleLine>
-          <input type="text" [id]="field.key" [formControlName]="field.key" />
-        </ng-template>
+  <div class="entry-detail__content" *ngIf="entry() as record">
+    <form
+      id="entryDetailForm"
+      class="entry-detail__form"
+      [formGroup]="form"
+      (ngSubmit)="save()"
+    >
+      <div class="entry-detail__grid">
+        <div *ngFor="let field of fields(); trackBy: trackByKey" class="entry-detail__field" [class.entry-detail__field--readonly]="field.readOnly">
+          <label [attr.for]="field.key">{{ field.label }}</label>
+          <textarea
+            *ngIf="field.multiline; else singleLine"
+            [id]="field.key"
+            [formControlName]="field.key"
+            rows="4"
+          ></textarea>
+          <ng-template #singleLine>
+            <input type="text" [id]="field.key" [formControlName]="field.key" />
+          </ng-template>
+        </div>
       </div>
-    </div>
-  </form>
+    </form>
+
+    <aside class="entry-detail__relations" *ngIf="showPersonRelations()">
+      <header>
+        <h2>{{ entryTitle() ?? ('entryDetail.labels.relationships' | translate) }}</h2>
+        <p>{{ 'entryDetail.labels.connectedItems' | translate }}</p>
+      </header>
+
+      <section *ngIf="relationsError() as relError" class="entry-detail__alert entry-detail__alert--error">
+        <p>{{ relError }}</p>
+      </section>
+
+      <section *ngIf="isRelationsLoading()" class="entry-detail__relations-state">
+        <p>{{ 'entryDetail.status.loadingRelations' | translate }}</p>
+      </section>
+
+      <section *ngIf="!isRelationsLoading() && !hasRelations()" class="entry-detail__relations-state">
+        <p>{{ 'entryDetail.status.noRelations' | translate }}</p>
+      </section>
+
+      <section *ngIf="relatedProfiles().length > 0" class="entry-detail__relations-group">
+        <div class="entry-detail__relations-heading">
+          <h3>{{ 'entryDetail.relations.profiles' | translate }}</h3>
+          <a [routerLink]="relationListLink('profiles')">{{ 'entryDetail.relations.viewAll' | translate }}</a>
+        </div>
+        <ul>
+          <li *ngFor="let profile of relatedProfiles(); trackBy: trackByRelation">
+            <a *ngIf="profile.routerLink; else profileStatic" [routerLink]="profile.routerLink">
+              <strong>{{ profile.label }}</strong>
+              <span>{{ profile.description }}</span>
+            </a>
+            <ng-template #profileStatic>
+              <div>
+                <strong>{{ profile.label }}</strong>
+                <span>{{ profile.description }}</span>
+              </div>
+            </ng-template>
+          </li>
+        </ul>
+      </section>
+
+      <section *ngIf="relatedNotes().length > 0" class="entry-detail__relations-group">
+        <div class="entry-detail__relations-heading">
+          <h3>{{ 'entryDetail.relations.notes' | translate }}</h3>
+          <a [routerLink]="relationListLink('notes')">{{ 'entryDetail.relations.viewAll' | translate }}</a>
+        </div>
+        <ul>
+          <li *ngFor="let note of relatedNotes(); trackBy: trackByRelation">
+            <a *ngIf="note.routerLink; else noteStatic" [routerLink]="note.routerLink">
+              <strong>{{ note.label }}</strong>
+              <span>{{ note.description }}</span>
+              <small *ngIf="note.timestamp">{{ note.timestamp | date:'short' }}</small>
+            </a>
+            <ng-template #noteStatic>
+              <div>
+                <strong>{{ note.label }}</strong>
+                <span>{{ note.description }}</span>
+                <small *ngIf="note.timestamp">{{ note.timestamp | date:'short' }}</small>
+              </div>
+            </ng-template>
+          </li>
+        </ul>
+      </section>
+
+      <section *ngIf="relatedActivities().length > 0" class="entry-detail__relations-group">
+        <div class="entry-detail__relations-heading">
+          <h3>{{ 'entryDetail.relations.activities' | translate }}</h3>
+          <a [routerLink]="relationListLink('activities')">{{ 'entryDetail.relations.viewAll' | translate }}</a>
+        </div>
+        <ul>
+          <li *ngFor="let activity of relatedActivities(); trackBy: trackByRelation">
+            <a *ngIf="activity.routerLink; else activityStatic" [routerLink]="activity.routerLink">
+              <strong>{{ activity.label }}</strong>
+              <span>{{ activity.description }}</span>
+              <small *ngIf="activity.timestamp">{{ activity.timestamp | date:'short' }}</small>
+            </a>
+            <ng-template #activityStatic>
+              <div>
+                <strong>{{ activity.label }}</strong>
+                <span>{{ activity.description }}</span>
+                <small *ngIf="activity.timestamp">{{ activity.timestamp | date:'short' }}</small>
+              </div>
+            </ng-template>
+          </li>
+        </ul>
+      </section>
+    </aside>
+  </div>
 
   <section *ngIf="!entry() && !isLoading()" class="entry-detail__state">
     <p>{{ 'entryDetail.status.empty' | translate }}</p>

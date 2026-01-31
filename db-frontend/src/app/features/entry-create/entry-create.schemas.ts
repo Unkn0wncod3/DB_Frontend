@@ -51,7 +51,7 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
       { key: 'status', label: 'Status', type: 'text', defaultValue: 'active' },
       { key: 'nationality', label: 'Nationality', type: 'text' },
       { key: 'occupation', label: 'Occupation', type: 'text' },
-      { key: 'risk_level', label: 'Risk level', type: 'text', defaultValue: 'None' },
+      { key: 'risk_level', label: 'Risk level', type: 'text', defaultValue: 'N/A' },
       {
         key: 'tags',
         label: 'Tags (JSON array)',

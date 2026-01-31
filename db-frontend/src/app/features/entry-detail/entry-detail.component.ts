@@ -1,5 +1,5 @@
-import { JsonPipe, NgFor, NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, WritableSignal } from '@angular/core';
+import { DatePipe, JsonPipe, NgFor, NgIf } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal, WritableSignal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -7,6 +7,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
 
 import { EntryService } from '../../core/services/entry.service';
+import { ApiService } from '../../core/services/api.service';
 
 interface EntryFieldConfig {
   key: string;
@@ -15,10 +16,19 @@ interface EntryFieldConfig {
   readOnly: boolean;
 }
 
+interface RelatedEntryItem {
+  id?: string;
+  label: string;
+  description?: string;
+  timestamp?: string;
+  routerLink?: string[];
+  type: string;
+}
+
 @Component({
   selector: 'app-entry-detail',
   standalone: true,
-  imports: [NgIf, NgFor, ReactiveFormsModule, JsonPipe, TranslateModule, RouterModule],
+  imports: [NgIf, NgFor, ReactiveFormsModule, JsonPipe, TranslateModule, RouterModule, DatePipe],
   templateUrl: './entry-detail.component.html',
   styleUrl: './entry-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -29,6 +39,7 @@ export class EntryDetailComponent {
   private readonly fb = inject(FormBuilder);
   private readonly translate = inject(TranslateService);
   private readonly entryService = inject(EntryService);
+  private readonly api = inject(ApiService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly isLoading = signal(false);
@@ -38,6 +49,13 @@ export class EntryDetailComponent {
   readonly successMessage = signal<string | null>(null);
   readonly entry = signal<Record<string, unknown> | null>(null);
   readonly fields: WritableSignal<EntryFieldConfig[]> = signal([]);
+  readonly entryTitle = signal<string | null>(null);
+  readonly relatedProfiles = signal<RelatedEntryItem[]>([]);
+  readonly relatedNotes = signal<RelatedEntryItem[]>([]);
+  readonly relatedActivities = signal<RelatedEntryItem[]>([]);
+  readonly isRelationsLoading = signal(false);
+  readonly relationsError = signal<string | null>(null);
+  readonly hasRelations = computed(() => this.relatedProfiles().length > 0 || this.relatedNotes().length > 0 || this.relatedActivities().length > 0);
   private readonly readOnlyKeys = new Set(['id', '_id', 'type', 'createdat', 'updatedat', 'created_at', 'updated_at', 'timestamp', 'occurredat', 'occurred_at']);
 
   form: FormGroup = this.fb.group({});
@@ -164,6 +182,12 @@ export class EntryDetailComponent {
       const record = this.ensureRecord(result);
       this.entry.set(record);
       this.rebuildForm(record);
+      this.entryTitle.set(this.resolveEntryTitle(record));
+      if (this.showPersonRelations()) {
+        void this.loadPersonRelations(this.currentId!);
+      } else {
+        this.clearRelations();
+      }
     } catch (error) {
       this.errorMessage.set(this.translate.instant('entryDetail.errors.loadFailed', {
         message: this.describeError(error)
@@ -354,8 +378,173 @@ export class EntryDetailComponent {
     return this.currentId;
   }
 
+  showPersonRelations(): boolean {
+    return (this.currentType ?? '').toLowerCase() === 'persons';
+  }
+
+  relationListLink(type: string): string[] {
+    return ['/entries', type];
+  }
+
+  trackByRelation(_index: number, item: RelatedEntryItem): string {
+    return `${item.type}-${item.id ?? _index}`;
+  }
+
   private clearMessages(): void {
     this.errorMessage.set(null);
     this.successMessage.set(null);
+  }
+
+  private resolveEntryTitle(record: Record<string, unknown>): string | null {
+    const type = (this.currentType ?? '').toLowerCase();
+    if (type === 'persons') {
+      const first = this.extractText(record, ['full_name', 'first_name', 'firstname']);
+      const last = this.extractText(record, ['last_name', 'lastname']);
+      const composed = [first, last].filter(Boolean).join(' ').trim();
+      if (composed.length > 0) {
+        return composed;
+      }
+    }
+
+    const candidates = ['title', 'name', 'label', 'username', 'email'];
+    const fallback = this.extractText(record, candidates);
+    return fallback ?? null;
+  }
+
+  private extractText(record: Record<string, unknown>, keys: string[]): string | undefined {
+    for (const key of keys) {
+      const value = record[key];
+      if (typeof value === 'string' && value.trim().length > 0) {
+        return value.trim();
+      }
+    }
+    return undefined;
+  }
+
+  private async loadPersonRelations(personId: string): Promise<void> {
+    this.isRelationsLoading.set(true);
+    this.relationsError.set(null);
+    try {
+      const [profilesResult, notesResult, activitiesResult] = await Promise.allSettled([
+        firstValueFrom(this.api.request<unknown>('GET', `/persons/${personId}/profiles`)),
+        firstValueFrom(this.api.request<unknown>('GET', `/notes/by-person/${personId}`)),
+        firstValueFrom(this.api.request<unknown>('GET', '/activities', { params: { person_id: personId, limit: 50 } }))
+      ]);
+
+      const errors: string[] = [];
+
+      if (profilesResult.status === 'fulfilled') {
+        this.relatedProfiles.set(this.normalizeProfiles(profilesResult.value));
+      } else {
+        errors.push(this.describeError(profilesResult.reason));
+      }
+
+      if (notesResult.status === 'fulfilled') {
+        this.relatedNotes.set(this.normalizeNotes(notesResult.value));
+      } else {
+        errors.push(this.describeError(notesResult.reason));
+      }
+
+      if (activitiesResult.status === 'fulfilled') {
+        this.relatedActivities.set(this.normalizeActivities(activitiesResult.value));
+      } else {
+        errors.push(this.describeError(activitiesResult.reason));
+      }
+
+      if (errors.length > 0) {
+        this.relationsError.set(errors.join(' | '));
+      }
+    } finally {
+      this.isRelationsLoading.set(false);
+    }
+  }
+
+  private normalizeProfiles(payload: unknown): RelatedEntryItem[] {
+    return this.extractItems(payload).map((item) => {
+      const record = item as Record<string, unknown>;
+      const id = this.extractId(record, ['profile_id', 'id']);
+      const label = this.extractText(record, ['display_name', 'username', 'platform']) ?? 'Profile';
+      const descriptionParts = [record['platform'], record['status']].filter((value) => typeof value === 'string' && value.trim().length > 0) as string[];
+      return {
+        id,
+        label,
+        description: descriptionParts.join(' • '),
+        routerLink: id ? ['/entries', 'profiles', id] : undefined,
+        type: 'profiles'
+      };
+    });
+  }
+
+  private normalizeNotes(payload: unknown): RelatedEntryItem[] {
+    return this.extractItems(payload).map((item) => {
+      const record = item as Record<string, unknown>;
+      const id = this.extractId(record, ['id']);
+      const label = this.extractText(record, ['title']) ?? 'Note';
+      const text = this.extractText(record, ['text']);
+      const snippet = text && text.length > 80 ? `${text.slice(0, 80)}…` : text;
+      return {
+        id,
+        label,
+        description: snippet,
+        timestamp: this.extractText(record, ['created_at', 'updated_at']),
+        routerLink: id ? ['/entries', 'notes', id] : undefined,
+        type: 'notes'
+      };
+    });
+  }
+
+  private normalizeActivities(payload: unknown): RelatedEntryItem[] {
+    return this.extractItems(payload).map((item) => {
+      const record = item as Record<string, unknown>;
+      const id = this.extractId(record, ['id']);
+      const label = this.extractText(record, ['activity_type']) ?? 'Activity';
+      const description = this.extractText(record, ['item', 'notes']);
+      const timestamp = this.extractText(record, ['occurred_at', 'updated_at']);
+      return {
+        id,
+        label,
+        description,
+        timestamp,
+        routerLink: id ? ['/entries', 'activities', id] : undefined,
+        type: 'activities'
+      };
+    });
+  }
+
+  private extractItems(payload: unknown): Record<string, unknown>[] {
+    if (Array.isArray(payload)) {
+      return payload.filter((item) => typeof item === 'object' && item !== null) as Record<string, unknown>[];
+    }
+
+    if (payload && typeof payload === 'object') {
+      const record = payload as Record<string, unknown>;
+      const items = record['items'];
+      if (Array.isArray(items)) {
+        return items.filter((item) => typeof item === 'object' && item !== null) as Record<string, unknown>[];
+      }
+    }
+
+    return [];
+  }
+
+  private extractId(record: Record<string, unknown>, keys: string[]): string | undefined {
+    for (const key of keys) {
+      const value = record[key];
+      if (typeof value === 'string' && value.trim().length > 0) {
+        return value.trim();
+      }
+      if (typeof value === 'number') {
+        return value.toString();
+      }
+    }
+    return undefined;
+  }
+
+  private clearRelations(): void {
+    this.relatedProfiles.set([]);
+    this.relatedNotes.set([]);
+    this.relatedActivities.set([]);
+    this.relationsError.set(null);
+    this.isRelationsLoading.set(false);
   }
 }
