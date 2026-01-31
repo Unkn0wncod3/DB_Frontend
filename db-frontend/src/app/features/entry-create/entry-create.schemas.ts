@@ -25,17 +25,36 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
   persons: {
     type: 'persons',
     title: 'Person',
-    description: 'Basic profile data for a person entity.',
+    description: 'Create an individual with contact data, lifecycle status and optional metadata.',
     fields: [
       { key: 'first_name', label: 'First name', type: 'text', required: true },
       { key: 'last_name', label: 'Last name', type: 'text', required: true },
-      { key: 'email', label: 'Email', type: 'text', placeholder: 'user@example.com' },
+      { key: 'date_of_birth', label: 'Date of birth', type: 'date' },
+      { key: 'gender', label: 'Gender', type: 'text', defaultValue: 'Unspecified' },
+      { key: 'email', label: 'Email', type: 'text', defaultValue: 'not_provided@example.com' },
+      { key: 'phone_number', label: 'Phone number', type: 'text', defaultValue: 'N/A' },
+      { key: 'address_line1', label: 'Address line 1', type: 'text' },
+      { key: 'address_line2', label: 'Address line 2', type: 'text' },
+      { key: 'postal_code', label: 'Postal code', type: 'text' },
+      { key: 'city', label: 'City', type: 'text' },
+      { key: 'region_state', label: 'Region/State', type: 'text' },
+      { key: 'country', label: 'Country', type: 'text' },
       { key: 'status', label: 'Status', type: 'text', defaultValue: 'active' },
+      { key: 'nationality', label: 'Nationality', type: 'text' },
+      { key: 'occupation', label: 'Occupation', type: 'text' },
+      { key: 'risk_level', label: 'Risk level', type: 'text' },
+      {
+        key: 'tags',
+        label: 'Tags (JSON array)',
+        type: 'json',
+        placeholder: '["vip","watchlist"]'
+      },
+      { key: 'notes', label: 'Notes', type: 'textarea' },
       {
         key: 'metadata',
         label: 'Metadata (JSON)',
         type: 'json',
-        placeholder: '{ "notes": "Optional" }',
+        placeholder: '{ "custom": "value" }',
         description: 'Attach any structured data as JSON.'
       }
     ]
@@ -43,33 +62,98 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
   profiles: {
     type: 'profiles',
     title: 'Profile',
-    description: 'Account profile attributes.',
+    description: 'Link to a platform account with usernames, status and metadata.',
     fields: [
+      { key: 'platform_id', label: 'Platform ID', type: 'number', required: true },
       { key: 'username', label: 'Username', type: 'text', required: true },
+      { key: 'external_id', label: 'External ID', type: 'text' },
       { key: 'display_name', label: 'Display name', type: 'text' },
-      { key: 'bio', label: 'Bio', type: 'textarea', placeholder: 'Short bio or description.' },
-      { key: 'avatar_url', label: 'Avatar URL', type: 'text' }
+      { key: 'url', label: 'Profile URL', type: 'text' },
+      { key: 'status', label: 'Status', type: 'text', defaultValue: 'active' },
+      { key: 'language', label: 'Language', type: 'text' },
+      { key: 'region', label: 'Region', type: 'text' },
+      { key: 'is_verified', label: 'Is verified', type: 'boolean' },
+      { key: 'avatar_url', label: 'Avatar URL', type: 'text' },
+      { key: 'bio', label: 'Bio', type: 'textarea' },
+      {
+        key: 'metadata',
+        label: 'Metadata (JSON)',
+        type: 'json',
+        placeholder: '{ "extra": true }'
+      }
+    ]
+  },
+  platforms: {
+    type: 'platforms',
+    title: 'Platform',
+    description: 'Directory entry for social/media platforms used by profiles.',
+    fields: [
+      { key: 'name', label: 'Name', type: 'text', required: true },
+      { key: 'category', label: 'Category', type: 'text', defaultValue: 'social' },
+      { key: 'base_url', label: 'Base URL', type: 'text' },
+      { key: 'api_base_url', label: 'API base URL', type: 'text' },
+      { key: 'is_active', label: 'Is active', type: 'boolean', defaultValue: true }
     ]
   },
   activities: {
     type: 'activities',
     title: 'Activity',
-    description: 'Timeline activity entry.',
+    description: 'Timeline entry describing actions tied to persons, profiles or vehicles.',
     fields: [
-      { key: 'type', label: 'Activity type', type: 'text', required: true },
+      { key: 'person_id', label: 'Person ID', type: 'number', required: true },
+      { key: 'activity_type', label: 'Activity type', type: 'text', required: true },
+      { key: 'occurred_at', label: 'Occurred at', type: 'date' },
+      { key: 'vehicle_id', label: 'Vehicle ID', type: 'number' },
+      { key: 'profile_id', label: 'Profile ID', type: 'number' },
+      { key: 'community_id', label: 'Community ID', type: 'number' },
+      { key: 'item', label: 'Item', type: 'text' },
+      { key: 'notes', label: 'Notes', type: 'textarea' },
       {
-        key: 'occurred_at',
-        label: 'Occurred at',
-        type: 'date',
-        description: 'Defaults to now if left blank.'
-      },
-      { key: 'actor_id', label: 'Actor ID', type: 'text' },
-      {
-        key: 'payload',
-        label: 'Payload (JSON)',
+        key: 'details',
+        label: 'Details (JSON)',
         type: 'json',
-        placeholder: '{ "details": "..." }'
+        placeholder: '{ "context": "..." }'
+      },
+      { key: 'severity', label: 'Severity', type: 'text' },
+      { key: 'source', label: 'Source', type: 'text' },
+      { key: 'ip_address', label: 'IP address', type: 'text' },
+      { key: 'user_agent', label: 'User agent', type: 'text' },
+      { key: 'geo_location', label: 'Geo location', type: 'text' },
+      { key: 'created_by', label: 'Created by', type: 'text' }
+    ]
+  },
+  vehicles: {
+    type: 'vehicles',
+    title: 'Vehicle',
+    description: 'Register vehicles linked to persons or activities.',
+    fields: [
+      { key: 'label', label: 'Label', type: 'text', required: true },
+      { key: 'make', label: 'Make', type: 'text' },
+      { key: 'model', label: 'Model', type: 'text' },
+      { key: 'build_year', label: 'Build year', type: 'number' },
+      { key: 'license_plate', label: 'License plate', type: 'text' },
+      { key: 'vin', label: 'VIN', type: 'text' },
+      { key: 'vehicle_type', label: 'Vehicle type', type: 'text' },
+      { key: 'energy_type', label: 'Energy type', type: 'text' },
+      { key: 'color', label: 'Color', type: 'text' },
+      { key: 'mileage_km', label: 'Mileage (km)', type: 'number' },
+      { key: 'last_service_at', label: 'Last service at', type: 'date' },
+      {
+        key: 'metadata',
+        label: 'Metadata (JSON)',
+        type: 'json',
+        placeholder: '{ "notes": "..." }'
       }
+    ]
+  },
+  notes: {
+    type: 'notes',
+    title: 'Note',
+    description: 'Pinned or free-form note entries.',
+    fields: [
+      { key: 'title', label: 'Title', type: 'text' },
+      { key: 'text', label: 'Text', type: 'textarea', required: true },
+      { key: 'pinned', label: 'Pinned', type: 'boolean', defaultValue: false }
     ]
   }
 };
