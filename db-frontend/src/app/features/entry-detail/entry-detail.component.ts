@@ -338,11 +338,6 @@ export class EntryDetailComponent {
       return trimmed === 'true';
     }
 
-    const numeric = Number(trimmed);
-    if (!Number.isNaN(numeric) && trimmed !== '') {
-      return numeric;
-    }
-
     return trimmed;
   }
 
