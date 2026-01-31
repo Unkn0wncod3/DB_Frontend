@@ -14,6 +14,9 @@
       <a *ngIf="createLink() as create" [routerLink]="create" class="entry-list__create">
         {{ 'entryList.actions.create' | translate }}
       </a>
+      <a *ngIf="isActivitiesList()" [routerLink]="timelineLink()" class="entry-list__timeline">
+        {{ 'entryList.actions.timeline' | translate }}
+      </a>
       <button type="button" (click)="refresh()" [disabled]="isLoading()">
         <span *ngIf="isLoading(); else refreshLabel">{{ 'entryList.actions.refreshing' | translate }}</span>
         <ng-template #refreshLabel>{{ 'entryList.actions.refresh' | translate }}</ng-template>

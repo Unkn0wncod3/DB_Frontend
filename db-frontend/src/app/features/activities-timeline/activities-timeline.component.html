@@ -1,0 +1,76 @@
+<section class="timeline">
+  <header class="timeline__header">
+    <div>
+      <a routerLink="/entries/activities" class="timeline__back">{{ 'entryList.actions.back' | translate }}</a>
+      <h1>{{ 'entryList.timeline.title' | translate }}</h1>
+      <p>{{ 'entryList.timeline.subtitle' | translate }}</p>
+    </div>
+    <div class="timeline__meta" *ngIf="lastUpdatedAt() as updatedAt">
+      {{ 'entryList.meta.lastUpdated' | translate:{ value: (updatedAt | date:'short') } }}
+    </div>
+  </header>
+
+  <section class="timeline__filters">
+    <form [formGroup]="filterForm">
+      <label>
+        <span>{{ 'entryList.timeline.personFilter' | translate }}</span>
+        <input type="text" formControlName="personId" placeholder="123" />
+      </label>
+      <label>
+        <span>{{ 'entryList.timeline.fromDate' | translate }}</span>
+        <input type="date" formControlName="fromDate" />
+      </label>
+      <label>
+        <span>{{ 'entryList.timeline.toDate' | translate }}</span>
+        <input type="date" formControlName="toDate" />
+      </label>
+      <label>
+        <span>{{ 'entryList.filters.pageSizeLabel' | translate }}</span>
+        <select formControlName="limit">
+          <option [value]="50">50</option>
+          <option [value]="100">100</option>
+          <option [value]="200">200</option>
+        </select>
+      </label>
+      <button type="button" (click)="resetFilters()">
+        {{ 'entryList.timeline.reset' | translate }}
+      </button>
+    </form>
+  </section>
+
+  <section *ngIf="errorMessage() as error" class="timeline__alert timeline__alert--error">
+    <p>{{ error }}</p>
+  </section>
+
+  <section *ngIf="isLoading()" class="timeline__state">
+    <p>{{ 'entryList.status.loading' | translate }}</p>
+  </section>
+
+  <section *ngIf="!isLoading() && entries().length === 0" class="timeline__state">
+    <p>{{ 'entryList.status.empty' | translate }}</p>
+  </section>
+
+  <section *ngIf="entries().length > 0" class="timeline__list">
+    <ul>
+      <li *ngFor="let entry of entries(); trackBy: trackByEntry">
+        <div class="timeline__marker"></div>
+        <div class="timeline__card">
+          <div class="timeline__card-header">
+            <span class="timeline__timestamp" *ngIf="entry.occurredAt">{{ entry.occurredAt | date:'medium' }}</span>
+            <span class="timeline__person" *ngIf="entry.personId">{{ 'entryList.timeline.personLabel' | translate:{ value: entry.personId } }}</span>
+          </div>
+          <a *ngIf="entry.routerLink; else cardStatic" [routerLink]="entry.routerLink" class="timeline__card-link">
+            <strong>{{ entry.title }}</strong>
+            <p *ngIf="entry.description">{{ entry.description }}</p>
+          </a>
+          <ng-template #cardStatic>
+            <div>
+              <strong>{{ entry.title }}</strong>
+              <p *ngIf="entry.description">{{ entry.description }}</p>
+            </div>
+          </ng-template>
+        </div>
+      </li>
+    </ul>
+  </section>
+</section>

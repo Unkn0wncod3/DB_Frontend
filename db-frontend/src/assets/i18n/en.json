@@ -115,7 +115,8 @@
       "create": "New entry",
       "refresh": "Refresh",
       "refreshing": "Refreshing...",
-      "view": "Open entry"
+      "view": "Open entry",
+      "timeline": "Open timeline"
     },
     "filters": {
       "searchLabel": "Search",
@@ -152,6 +153,15 @@
       "platforms": "Platforms",
       "collections": "Collections",
       "users": "Users"
+    },
+    "timeline": {
+      "title": "Activity timeline",
+      "subtitle": "Visualise activities chronologically with optional filters.",
+      "personFilter": "Person ID",
+      "fromDate": "From date",
+      "toDate": "To date",
+      "reset": "Reset filters",
+      "personLabel": "Person {{ value }}"
     }
   },
   "entryCreate": {

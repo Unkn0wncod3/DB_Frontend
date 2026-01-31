@@ -116,7 +116,8 @@
       "create": "Neuer Eintrag",
       "refresh": "Aktualisieren",
       "refreshing": "Aktualisiere...",
-      "view": "Eintrag oeffnen"
+      "view": "Eintrag oeffnen",
+      "timeline": "Timeline öffnen"
     },
     "filters": {
       "searchLabel": "Suche",
@@ -153,6 +154,15 @@
       "platforms": "Plattformen",
       "collections": "Sammlungen",
       "users": "Benutzer"
+    },
+    "timeline": {
+      "title": "Aktivitäten-Timeline",
+      "subtitle": "Zeigt Aktivitäten chronologisch mit optionalen Filtern.",
+      "personFilter": "Personen-ID",
+      "fromDate": "Von-Datum",
+      "toDate": "Bis-Datum",
+      "reset": "Filter zurücksetzen",
+      "personLabel": "Person {{ value }}"
     }
   },
   "entryCreate": {

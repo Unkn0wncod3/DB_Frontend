@@ -120,6 +120,22 @@ export class EntryListComponent {
     return ['/entries', this.currentType, 'new'];
   }
 
+  timelineLink(): string[] | null {
+    if (!this.currentType) {
+      return null;
+    }
+
+    if ((this.currentType ?? '').toLowerCase() !== 'activities') {
+      return null;
+    }
+
+    return ['/entries', 'activities', 'timeline'];
+  }
+
+  isActivitiesList(): boolean {
+    return (this.currentType ?? '').toLowerCase() === 'activities';
+  }
+
   hasEntryId(item: Record<string, unknown>): boolean {
     return this.extractId(item) !== null;
   }
