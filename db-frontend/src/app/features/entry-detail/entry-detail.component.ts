@@ -372,7 +372,7 @@ export class EntryDetailComponent {
   }
 
   private detectFieldType(key: string, value: unknown): EntryFieldInputType {
-    if (this.isBooleanValue(value)) {
+    if (this.isBooleanValue(key, value)) {
       return 'boolean';
     }
 
@@ -560,7 +560,11 @@ export class EntryDetailComponent {
       }
       case 'datetime': {
         const formatted = this.formatDateForInput(value, 'datetime');
-        return formatted ? new Date(formatted).toISOString() : '';
+        if (!formatted) {
+          return '';
+        }
+        const iso = new Date(formatted).toISOString();
+        return this.matchOriginalDateFormat(originalValue, iso, formatted);
       }
       case 'json':
         return this.parseJsonValue(value, originalValue);
@@ -582,12 +586,40 @@ export class EntryDetailComponent {
     }
   }
 
-  private isBooleanValue(value: unknown): boolean {
+  private isBooleanValue(key: string, value: unknown): boolean {
     if (typeof value === 'boolean') {
       return true;
     }
 
-    return this.toBoolean(value) !== null;
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      return ['true', 'false', '1', '0', 'yes', 'no', 'on', 'off'].includes(normalized);
+    }
+
+    if (typeof value === 'number' && (value === 0 || value === 1)) {
+      return this.isBooleanKey(key);
+    }
+
+    return false;
+  }
+
+  private isBooleanKey(key: string): boolean {
+    const normalized = key.toLowerCase();
+    if (normalized.startsWith('is_') || normalized.startsWith('has_')) {
+      return true;
+    }
+
+    const suffixPatterns = ['_flag', '_enabled', '_disabled', '_allowed'];
+    if (suffixPatterns.some((suffix) => normalized.endsWith(suffix))) {
+      return true;
+    }
+
+    const exactMatches = new Set(['pinned', 'verified', 'blocked', 'active']);
+    if (exactMatches.has(normalized)) {
+      return true;
+    }
+
+    return false;
   }
 
   private toBoolean(value: unknown): boolean | null {
@@ -629,6 +661,53 @@ export class EntryDetailComponent {
     }
 
     return null;
+  }
+
+  private matchOriginalDateFormat(originalValue: unknown, isoValue: string, formattedValue: string): string {
+    if (typeof originalValue === 'string') {
+      const normalized = originalValue.trim();
+      if (this.isSpaceSeparatedDate(normalized)) {
+        return this.buildDateTimeString(formattedValue, 'space');
+      }
+      if (this.isLocalTSeparatedDate(normalized)) {
+        return this.buildDateTimeString(formattedValue, 't');
+      }
+    }
+
+    if (typeof originalValue === 'number' || originalValue instanceof Date) {
+      return isoValue;
+    }
+
+    return isoValue;
+  }
+
+  private isSpaceSeparatedDate(value: string): boolean {
+    return /^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}/.test(value);
+  }
+
+  private isLocalTSeparatedDate(value: string): boolean {
+    return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?!.*[zZ])/.test(value);
+  }
+
+  private buildDateTimeString(base: string, variant: 'space' | 't'): string {
+    if (!base) {
+      return '';
+    }
+    const normalized = base.includes('T') ? base : base.replace(' ', 'T');
+    const [datePart, timePartRaw] = normalized.split('T');
+    const segments = (timePartRaw ?? '').split(':');
+    const hours = this.normalizeTimeSegment(segments[0]);
+    const minutes = this.normalizeTimeSegment(segments[1]);
+    const seconds = this.normalizeTimeSegment(segments[2] ?? '00');
+    const joiner = variant === 'space' ? ' ' : 'T';
+    return `${datePart}${joiner}${hours}:${minutes}:${seconds}`;
+  }
+
+  private normalizeTimeSegment(value: string | undefined): string {
+    if (!value || value.length === 0) {
+      return '00';
+    }
+    return value.slice(0, 2).padStart(2, '0');
   }
 
   private buildBooleanOptions(): ValueDropdownOption[] {
