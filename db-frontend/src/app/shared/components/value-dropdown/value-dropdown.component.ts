@@ -1,5 +1,5 @@
 import { NgFor, NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, forwardRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges, forwardRef, inject } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 export interface ValueDropdownOption {
@@ -29,17 +29,20 @@ export class ValueDropdownComponent implements ControlValueAccessor, OnChanges {
   selectedIndex = '';
   isDisabled = false;
 
+  private readonly cdr = inject(ChangeDetectorRef);
   private currentValue: ValueDropdownOption['value'] = null;
   private onChange: (value: ValueDropdownOption['value']) => void = () => {};
   private onTouched: () => void = () => {};
 
   ngOnChanges(_changes: SimpleChanges): void {
     this.selectedIndex = this.findSelectedIndex(this.currentValue);
+    this.cdr.markForCheck();
   }
 
   writeValue(value: ValueDropdownOption['value']): void {
     this.currentValue = value;
     this.selectedIndex = this.findSelectedIndex(value);
+    this.cdr.markForCheck();
   }
 
   registerOnChange(fn: (value: ValueDropdownOption['value']) => void): void {
@@ -52,6 +55,7 @@ export class ValueDropdownComponent implements ControlValueAccessor, OnChanges {
 
   setDisabledState(isDisabled: boolean): void {
     this.isDisabled = isDisabled;
+    this.cdr.markForCheck();
   }
 
   handleChange(event: Event): void {
@@ -74,6 +78,7 @@ export class ValueDropdownComponent implements ControlValueAccessor, OnChanges {
     this.selectedIndex = value;
     this.onChange(nextValue);
     this.onTouched();
+    this.cdr.markForCheck();
   }
 
   handleBlur(): void {
