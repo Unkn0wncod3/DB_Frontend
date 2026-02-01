@@ -375,6 +375,10 @@ export class EntryDetailComponent {
   }
 
   private detectFieldType(key: string, value: unknown): EntryFieldInputType {
+    if (key.toLowerCase() === 'external_id') {
+      return 'text';
+    }
+
     if (this.isBooleanValue(key, value)) {
       return 'boolean';
     }
