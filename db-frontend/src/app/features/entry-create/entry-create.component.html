@@ -27,6 +27,11 @@
       <article *ngFor="let item of schemaFields(); trackBy: trackField" class="entry-create__field">
         <label [attr.for]="item.field.key">
           {{ item.field.label }}
+          <ng-container *ngIf="isPersonLookupField(item.field)">
+            <span *ngIf="personIdLabel(item.control) as personId" class="entry-create__person-id">
+              (ID: {{ personId }})
+            </span>
+          </ng-container>
           <span *ngIf="item.field.required" class="entry-create__required">*</span>
         </label>
         <small *ngIf="item.field.description" class="entry-create__hint">

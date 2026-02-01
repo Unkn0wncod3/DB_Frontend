@@ -74,6 +74,24 @@ export class EntryCreateComponent {
     return normalizedKey === 'person_id' || normalizedKey.endsWith('_person_id');
   }
 
+  personIdLabel(control: FormControl<string | boolean | number | null>): string | null {
+    const value = control.value;
+    if (value == null) {
+      return null;
+    }
+
+    if (typeof value === 'number') {
+      return value.toString();
+    }
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      return trimmed.length > 0 ? trimmed : null;
+    }
+
+    return null;
+  }
+
   backLink(): string[] | null {
     if (!this.currentType) {
       return null;
