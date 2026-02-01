@@ -417,7 +417,7 @@ export class EntryDetailComponent {
       return 'date';
     }
 
-    if (key.endsWith('_at') || key.includes('timestamp') || key.includes('time') || key.includes('occurred')) {
+    if (key.endsWith('_at') || key.includes('timestamp') || key.includes('time') || key.includes('last_seen') || key.includes('occurred')) {
       return 'datetime';
     }
 

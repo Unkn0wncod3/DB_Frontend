@@ -82,6 +82,7 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
       { key: 'language', label: 'Language', type: 'text' },
       { key: 'region', label: 'Region', type: 'text' },
       { key: 'is_verified', label: 'Is verified', type: 'boolean' , defaultValue: false},
+      { key: 'last_seen_at', label: 'Last seen at', type: 'date', dateVariant: 'datetime' },
       { key: 'avatar_url', label: 'Avatar URL', type: 'text' },
       { key: 'bio', label: 'Bio', type: 'textarea' },
       {

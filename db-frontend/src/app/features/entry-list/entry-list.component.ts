@@ -36,7 +36,7 @@ export class EntryListComponent {
     default: ['id'],
     persons: ['first_name', 'last_name', 'email','status'],
     notes: ['title', 'created_at', 'text'],
-    profiles: ['username', 'platform_id', 'status', 'region'],
+    profiles: ['username', 'platform_id', 'status', 'last_seen_at', 'region'],
     activities: ['activity_type', 'item', 'person_id', 'occurred_at', 'notes'],
     vehicles: ['label', 'model', 'vehicle_type', 'license_plate'],
     platforms: ['name', 'is_active', 'base_url']
