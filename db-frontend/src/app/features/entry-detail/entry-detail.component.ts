@@ -215,6 +215,9 @@ export class EntryDetailComponent {
 
   private isReadOnlyKey(key: string): boolean {
     const normalized = key.toLowerCase();
+    if (normalized === 'external_id') {
+      return false;
+    }
     if (this.readOnlyKeys.has(normalized)) {
       return true;
     }
