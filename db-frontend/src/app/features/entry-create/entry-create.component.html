@@ -33,9 +33,15 @@
           {{ item.field.description }}
         </small>
 
-        <ng-container *ngIf="isPlatformLookupField(item.field); else regularField">
-          <app-platform-lookup [formControl]="item.control"></app-platform-lookup>
+        <ng-container *ngIf="isPersonLookupField(item.field); else platformField">
+          <app-person-lookup [formControl]="item.control"></app-person-lookup>
         </ng-container>
+
+        <ng-template #platformField>
+          <ng-container *ngIf="isPlatformLookupField(item.field); else regularField">
+            <app-platform-lookup [formControl]="item.control"></app-platform-lookup>
+          </ng-container>
+        </ng-template>
 
         <ng-template #regularField>
           <ng-container [ngSwitch]="item.field.type">

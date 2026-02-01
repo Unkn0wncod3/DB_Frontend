@@ -9,6 +9,7 @@ import { firstValueFrom } from 'rxjs';
 import { EntryService } from '../../core/services/entry.service';
 import { EntrySchema, EntrySchemaField, EntryFieldType, getEntrySchema } from './entry-create.schemas';
 import { PlatformLookupComponent } from '../platform-lookup/platform-lookup.component';
+import { PersonLookupComponent } from '../person-lookup/person-lookup.component';
 
 interface SchemaFieldControl {
   field: EntrySchemaField;
@@ -18,7 +19,7 @@ interface SchemaFieldControl {
 @Component({
   selector: 'app-entry-create',
   standalone: true,
-  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterLink, TranslateModule, PlatformLookupComponent],
+  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterLink, TranslateModule, PlatformLookupComponent, PersonLookupComponent],
   templateUrl: './entry-create.component.html',
   styleUrl: './entry-create.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -66,6 +67,11 @@ export class EntryCreateComponent {
 
   isPlatformLookupField(field: EntrySchemaField): boolean {
     return (this.currentType ?? '').toLowerCase() === 'profiles' && field.key === 'platform_id';
+  }
+
+  isPersonLookupField(field: EntrySchemaField): boolean {
+    const normalizedKey = field.key.toLowerCase();
+    return normalizedKey === 'person_id' || normalizedKey.endsWith('_person_id');
   }
 
   backLink(): string[] | null {
@@ -205,6 +211,11 @@ export class EntryCreateComponent {
       return this.fb.nonNullable.control<string>(defaultValue, validators);
     }
 
+    if (this.isPersonLookupField(field)) {
+      const defaultValue = field.defaultValue != null ? String(field.defaultValue) : '';
+      return this.fb.nonNullable.control<string>(defaultValue, validators);
+    }
+
     switch (field.type) {
       case 'boolean':
         return this.fb.nonNullable.control<boolean>(Boolean(field.defaultValue), validators);
@@ -257,7 +268,13 @@ export class EntryCreateComponent {
     }
 
     if (field.type === 'number') {
-      return value === null || value === undefined;
+      if (value === null || value === undefined) {
+        return true;
+      }
+      if (typeof value === 'string') {
+        return value.trim().length === 0;
+      }
+      return false;
     }
 
     const stringValue = typeof value === 'string' ? value.trim() : '';
