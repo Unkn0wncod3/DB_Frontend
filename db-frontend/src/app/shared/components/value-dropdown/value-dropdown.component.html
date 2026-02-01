@@ -1,0 +1,15 @@
+<div class="value-dropdown" [class.value-dropdown--disabled]="isDisabled">
+  <select
+    class="value-dropdown__select"
+    [disabled]="isDisabled"
+    [value]="selectedIndex"
+    (change)="handleChange($event)"
+    (blur)="handleBlur()"
+  >
+    <option value="" *ngIf="placeholder">{{ placeholder }}</option>
+    <option *ngFor="let option of options; let idx = index" [value]="idx">
+      {{ option.label }}
+    </option>
+  </select>
+  <span class="value-dropdown__chevron" aria-hidden="true">▾</span>
+</div>

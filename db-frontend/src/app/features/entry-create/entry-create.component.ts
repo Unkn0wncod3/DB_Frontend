@@ -10,6 +10,7 @@ import { EntryService } from '../../core/services/entry.service';
 import { EntrySchema, EntrySchemaField, EntryFieldType, getEntrySchema } from './entry-create.schemas';
 import { PlatformLookupComponent } from '../platform-lookup/platform-lookup.component';
 import { PersonLookupComponent } from '../person-lookup/person-lookup.component';
+import { ValueDropdownComponent, ValueDropdownOption } from '../../shared/components/value-dropdown/value-dropdown.component';
 
 interface SchemaFieldControl {
   field: EntrySchemaField;
@@ -19,7 +20,7 @@ interface SchemaFieldControl {
 @Component({
   selector: 'app-entry-create',
   standalone: true,
-  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterLink, TranslateModule, PlatformLookupComponent, PersonLookupComponent],
+  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterLink, TranslateModule, PlatformLookupComponent, PersonLookupComponent, ValueDropdownComponent],
   templateUrl: './entry-create.component.html',
   styleUrl: './entry-create.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -40,6 +41,7 @@ export class EntryCreateComponent {
   readonly typeLabel = signal('');
   readonly hasSchema = computed(() => this.schemaFields().length > 0);
   readonly rawPayloadControl = this.fb.nonNullable.control<string>('');
+  readonly booleanOptions = signal<ValueDropdownOption[]>([]);
 
   form: FormGroup = this.fb.group({});
   private currentType: string | null = null;
@@ -58,6 +60,11 @@ export class EntryCreateComponent {
 
       this.currentType = type;
       this.loadSchema(type);
+    });
+
+    this.booleanOptions.set(this.buildBooleanOptions());
+    this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.booleanOptions.set(this.buildBooleanOptions());
     });
   }
 
@@ -92,31 +99,11 @@ export class EntryCreateComponent {
     return null;
   }
 
-  isBooleanChecked(control: FormControl<string | boolean | number | null>): boolean {
-    const value = control.value;
-    if (typeof value === 'boolean') {
-      return value;
-    }
-    if (typeof value === 'string') {
-      const normalized = value.trim().toLowerCase();
-      if (normalized === 'true') {
-        return true;
-      }
-      if (normalized === 'false') {
-        return false;
-      }
-    }
-    if (typeof value === 'number') {
-      return value !== 0;
-    }
-    return Boolean(value);
-  }
-
-  toggleBoolean(control: FormControl<string | boolean | number | null>): void {
-    const current = this.isBooleanChecked(control);
-    control.setValue(!current);
-    control.markAsDirty();
-    control.markAsTouched();
+  private buildBooleanOptions(): ValueDropdownOption[] {
+    return [
+      { label: this.translate.instant('entryCreate.form.booleanTrue'), value: true },
+      { label: this.translate.instant('entryCreate.form.booleanFalse'), value: false }
+    ];
   }
 
   backLink(): string[] | null {

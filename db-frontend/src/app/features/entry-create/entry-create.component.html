@@ -82,37 +82,12 @@
               [placeholder]="item.field.placeholder || ''"
             />
 
-            <div *ngSwitchCase="'boolean'" class="entry-create__checkbox">
-              <input
-                type="checkbox"
-                class="entry-create__checkbox-input"
-                [formControl]="item.control"
-                tabindex="-1"
-                aria-hidden="true"
-              />
-              <button
-                type="button"
-                class="entry-create__checkbox-toggle"
-                [class.entry-create__checkbox-toggle--checked]="isBooleanChecked(item.control)"
-                (click)="toggleBoolean(item.control)"
-                [attr.aria-pressed]="isBooleanChecked(item.control)"
-              >
-                <span
-                  class="entry-create__checkbox-icon"
-                  [class.entry-create__checkbox-icon--checked]="isBooleanChecked(item.control)"
-                  aria-hidden="true"
-                >
-                  ✓
-                </span>
-                <span class="entry-create__checkbox-label">
-                  {{
-                    isBooleanChecked(item.control)
-                      ? ('entryCreate.form.booleanTrue' | translate)
-                      : ('entryCreate.form.booleanFalse' | translate)
-                  }}
-                </span>
-              </button>
-            </div>
+            <app-value-dropdown
+              *ngSwitchCase="'boolean'"
+              [options]="booleanOptions()"
+              [placeholder]="'entryCreate.form.booleanPlaceholder' | translate"
+              [formControl]="item.control"
+            ></app-value-dropdown>
 
             <input
               *ngSwitchDefault
