@@ -193,6 +193,7 @@
     },
     "form": {
       "booleanTrue": "Wert setzen",
+      "booleanFalse": "Wert entfernen",
       "rawPayloadTitle": "Zusaetzliche Daten (JSON)",
       "rawPayloadHint": "Optionales JSON, das nach den Feldern in den Request uebernommen wird."
     },

@@ -92,6 +92,33 @@ export class EntryCreateComponent {
     return null;
   }
 
+  isBooleanChecked(control: FormControl<string | boolean | number | null>): boolean {
+    const value = control.value;
+    if (typeof value === 'boolean') {
+      return value;
+    }
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      if (normalized === 'true') {
+        return true;
+      }
+      if (normalized === 'false') {
+        return false;
+      }
+    }
+    if (typeof value === 'number') {
+      return value !== 0;
+    }
+    return Boolean(value);
+  }
+
+  toggleBoolean(control: FormControl<string | boolean | number | null>): void {
+    const current = this.isBooleanChecked(control);
+    control.setValue(!current);
+    control.markAsDirty();
+    control.markAsTouched();
+  }
+
   backLink(): string[] | null {
     if (!this.currentType) {
       return null;

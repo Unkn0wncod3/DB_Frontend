@@ -216,6 +216,7 @@
     },
     "form": {
       "booleanTrue": "Set value",
+      "booleanFalse": "Clear value",
       "rawPayloadTitle": "Additional payload (JSON)",
       "rawPayloadHint": "Optional JSON that will be merged into the request body after the fields above."
     },
