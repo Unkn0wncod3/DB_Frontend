@@ -563,8 +563,7 @@ export class EntryDetailComponent {
         if (!formatted) {
           return '';
         }
-        const iso = new Date(formatted).toISOString();
-        return this.matchOriginalDateFormat(originalValue, iso, formatted);
+        return new Date(formatted).toISOString();
       }
       case 'json':
         return this.parseJsonValue(value, originalValue);
@@ -661,53 +660,6 @@ export class EntryDetailComponent {
     }
 
     return null;
-  }
-
-  private matchOriginalDateFormat(originalValue: unknown, isoValue: string, formattedValue: string): string {
-    if (typeof originalValue === 'string') {
-      const normalized = originalValue.trim();
-      if (this.isSpaceSeparatedDate(normalized)) {
-        return this.buildDateTimeString(formattedValue, 'space');
-      }
-      if (this.isLocalTSeparatedDate(normalized)) {
-        return this.buildDateTimeString(formattedValue, 't');
-      }
-    }
-
-    if (typeof originalValue === 'number' || originalValue instanceof Date) {
-      return isoValue;
-    }
-
-    return isoValue;
-  }
-
-  private isSpaceSeparatedDate(value: string): boolean {
-    return /^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}/.test(value);
-  }
-
-  private isLocalTSeparatedDate(value: string): boolean {
-    return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?!.*[zZ])/.test(value);
-  }
-
-  private buildDateTimeString(base: string, variant: 'space' | 't'): string {
-    if (!base) {
-      return '';
-    }
-    const normalized = base.includes('T') ? base : base.replace(' ', 'T');
-    const [datePart, timePartRaw] = normalized.split('T');
-    const segments = (timePartRaw ?? '').split(':');
-    const hours = this.normalizeTimeSegment(segments[0]);
-    const minutes = this.normalizeTimeSegment(segments[1]);
-    const seconds = this.normalizeTimeSegment(segments[2] ?? '00');
-    const joiner = variant === 'space' ? ' ' : 'T';
-    return `${datePart}${joiner}${hours}:${minutes}:${seconds}`;
-  }
-
-  private normalizeTimeSegment(value: string | undefined): string {
-    if (!value || value.length === 0) {
-      return '00';
-    }
-    return value.slice(0, 2).padStart(2, '0');
   }
 
   private buildBooleanOptions(): ValueDropdownOption[] {
