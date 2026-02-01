@@ -1,4 +1,4 @@
-import { DatePipe, JsonPipe, NgFor, NgIf } from '@angular/common';
+import { DatePipe, JsonPipe, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal, WritableSignal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -33,7 +33,7 @@ type EntryFieldInputType = 'text' | 'textarea' | 'number' | 'boolean' | 'date' |
 @Component({
   selector: 'app-entry-detail',
   standalone: true,
-  imports: [NgIf, NgFor, ReactiveFormsModule, JsonPipe, TranslateModule, RouterModule, DatePipe, ValueDropdownComponent],
+  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, JsonPipe, TranslateModule, RouterModule, DatePipe, ValueDropdownComponent],
   templateUrl: './entry-detail.component.html',
   styleUrls: ['./entry-detail.component.scss', './entry-detail-modal.component.scss', './entry-detail-relations.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
