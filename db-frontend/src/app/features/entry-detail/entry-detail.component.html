@@ -39,15 +39,56 @@
       <div class="entry-detail__grid">
         <div *ngFor="let field of fields(); trackBy: trackByKey" class="entry-detail__field" [class.entry-detail__field--readonly]="field.readOnly">
           <label [attr.for]="field.key">{{ field.label }}</label>
-          <textarea
-            *ngIf="field.multiline; else singleLine"
-            [id]="field.key"
-            [formControlName]="field.key"
-            rows="4"
-          ></textarea>
-          <ng-template #singleLine>
-            <input type="text" [id]="field.key" [formControlName]="field.key" />
-          </ng-template>
+          <ng-container [ngSwitch]="field.inputType">
+            <textarea
+              *ngSwitchCase="'textarea'"
+              [id]="field.key"
+              [formControlName]="field.key"
+              rows="4"
+            ></textarea>
+
+            <textarea
+              *ngSwitchCase="'json'"
+              [id]="field.key"
+              [formControlName]="field.key"
+              rows="6"
+            ></textarea>
+
+            <input
+              *ngSwitchCase="'number'"
+              type="number"
+              [id]="field.key"
+              [formControlName]="field.key"
+            />
+
+            <input
+              *ngSwitchCase="'date'"
+              type="date"
+              [id]="field.key"
+              [formControlName]="field.key"
+            />
+
+            <input
+              *ngSwitchCase="'datetime'"
+              type="datetime-local"
+              [id]="field.key"
+              [formControlName]="field.key"
+            />
+
+            <app-value-dropdown
+              *ngSwitchCase="'boolean'"
+              [formControlName]="field.key"
+              [options]="booleanOptions()"
+              [placeholder]="'entryCreate.form.booleanPlaceholder' | translate"
+            ></app-value-dropdown>
+
+            <input
+              *ngSwitchDefault
+              type="text"
+              [id]="field.key"
+              [formControlName]="field.key"
+            />
+          </ng-container>
         </div>
       </div>
     </form>

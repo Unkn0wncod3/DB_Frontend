@@ -8,12 +8,15 @@ import { firstValueFrom } from 'rxjs';
 
 import { EntryService } from '../../core/services/entry.service';
 import { ApiService } from '../../core/services/api.service';
+import { ValueDropdownComponent, ValueDropdownOption } from '../../shared/components/value-dropdown/value-dropdown.component';
 
 interface EntryFieldConfig {
   key: string;
   label: string;
   multiline: boolean;
   readOnly: boolean;
+  inputType: EntryFieldInputType;
+  dateVariant?: 'date' | 'datetime';
 }
 
 interface RelatedEntryItem {
@@ -25,10 +28,12 @@ interface RelatedEntryItem {
   type: string;
 }
 
+type EntryFieldInputType = 'text' | 'textarea' | 'number' | 'boolean' | 'date' | 'datetime' | 'json';
+
 @Component({
   selector: 'app-entry-detail',
   standalone: true,
-  imports: [NgIf, NgFor, ReactiveFormsModule, JsonPipe, TranslateModule, RouterModule, DatePipe],
+  imports: [NgIf, NgFor, ReactiveFormsModule, JsonPipe, TranslateModule, RouterModule, DatePipe, ValueDropdownComponent],
   templateUrl: './entry-detail.component.html',
   styleUrls: ['./entry-detail.component.scss', './entry-detail-modal.component.scss', './entry-detail-relations.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -56,6 +61,7 @@ export class EntryDetailComponent {
   readonly isRelationsLoading = signal(false);
   readonly relationsError = signal<string | null>(null);
   readonly hasRelations = computed(() => this.relatedProfiles().length > 0 || this.relatedNotes().length > 0 || this.relatedActivities().length > 0);
+  readonly booleanOptions = signal<ValueDropdownOption[]>([]);
   private readonly readOnlyKeys = new Set(['id', '_id', 'type', 'createdat', 'updatedat', 'created_at', 'updated_at', 'timestamp', 'occurredat', 'occurred_at']);
   readonly deleteSecurityKey = 'del1';
   readonly isDeleteDialogOpen = signal(false);
@@ -72,6 +78,7 @@ export class EntryDetailComponent {
 
   private currentType: string | null = null;
   private currentId: string | null = null;
+  private fieldConfigMap = new Map<string, EntryFieldConfig>();
 
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
@@ -90,6 +97,11 @@ export class EntryDetailComponent {
       this.currentType = type;
       this.currentId = id;
       void this.loadEntry();
+    });
+
+    this.booleanOptions.set(this.buildBooleanOptions());
+    this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.booleanOptions.set(this.buildBooleanOptions());
     });
   }
 
@@ -247,29 +259,36 @@ export class EntryDetailComponent {
   }
 
   private rebuildForm(record: Record<string, unknown>): void {
-    const controls: Record<string, FormControl<string>> = {};
+    const controls: Record<string, FormControl<string | number | boolean | null>> = {};
     const fieldConfigs: EntryFieldConfig[] = [];
 
     for (const [key, value] of Object.entries(record)) {
-      const stringValue = this.stringifyValue(value);
-      const control = this.fb.nonNullable.control(stringValue);
+      const inputType = this.detectFieldType(key, value);
       const readOnly = this.isReadOnlyKey(key);
+      const controlValue = this.prepareControlValue(value, inputType);
+      const control = this.fb.control<string | number | boolean | null>(controlValue);
 
       if (readOnly) {
         control.disable({ emitEvent: false });
       }
 
       controls[key] = control;
+      const stringValue = typeof controlValue === 'string' ? controlValue : this.stringifyValue(controlValue);
+      const dateVariant = inputType === 'date' || inputType === 'datetime' ? inputType : undefined;
+
       fieldConfigs.push({
         key,
         label: this.humanizeKey(key),
-        multiline: this.shouldUseTextarea(stringValue),
-        readOnly
+        multiline: inputType === 'textarea' || inputType === 'json',
+        readOnly,
+        inputType,
+        dateVariant
       });
     }
 
     this.form = this.fb.nonNullable.group(controls);
     this.fields.set(fieldConfigs);
+    this.fieldConfigMap = new Map(fieldConfigs.map((config) => [config.key, config]));
     this.form.markAsPristine();
   }
 
@@ -281,79 +300,46 @@ export class EntryDetailComponent {
       return payload;
     }
 
-    const controls = this.form.controls as Record<string, FormControl<string>>;
+    const controls = this.form.controls as Record<string, FormControl<string | number | boolean | null>>;
 
     for (const [key, control] of Object.entries(controls)) {
       if (control.disabled) {
         continue;
       }
 
-      const rawValue = control.value ?? '';
+      const config = this.fieldConfigMap.get(key);
+      const rawValue = control.value;
       const originalValue = original[key];
-      const originalString = this.stringifyValue(originalValue);
 
-      if (originalString === rawValue) {
+      if (!config) {
         continue;
       }
 
-      payload[key] = this.parseValue(rawValue, originalValue);
+      const normalizedCurrent = this.normalizeValueForComparison(rawValue, config);
+      const normalizedOriginal = this.normalizeValueForComparison(originalValue, config);
+
+      if (this.valuesEqual(normalizedCurrent, normalizedOriginal, config)) {
+        continue;
+      }
+
+      payload[key] = this.prepareValueForPayload(rawValue, config, originalValue);
     }
 
     return payload;
   }
 
-  private parseValue(value: string, originalValue: unknown): unknown {
-    const trimmed = value.trim();
-
-    if (trimmed.length === 0) {
-      return '';
-    }
-
-    if (trimmed.toLowerCase() === 'null') {
-      return null;
-    }
-
-    if (originalValue instanceof Date) {
-      const timestamp = Date.parse(trimmed);
-      return Number.isNaN(timestamp) ? trimmed : new Date(timestamp).toISOString();
-    }
-
-    if (typeof originalValue === 'number') {
-      const numeric = Number(trimmed);
-      return Number.isFinite(numeric) ? numeric : trimmed;
-    }
-
-    if (typeof originalValue === 'boolean') {
-      if (trimmed.toLowerCase() === 'true') {
-        return true;
-      }
-      if (trimmed.toLowerCase() === 'false') {
-        return false;
-      }
-    }
-
-    if (this.looksLikeJson(trimmed)) {
-      try {
-        return JSON.parse(trimmed);
-      } catch {
-        // Fall back to raw trimmed string if parsing fails.
-      }
-    }
-
-    if (trimmed === 'true' || trimmed === 'false') {
-      return trimmed === 'true';
-    }
-
-    return trimmed;
-  }
-
   private looksLikeJson(value: string): boolean {
-    if (value.length < 2) {
+    if (!value) {
       return false;
     }
 
-    const first = value[0];
-    const last = value[value.length - 1];
+    const trimmed = value.trim();
+    if (trimmed.length < 2) {
+      return false;
+    }
+
+    const first = trimmed[0];
+    const last = trimmed[trimmed.length - 1];
     return (
       (first === '{' && last === '}') ||
       (first === '[' && last === ']') ||
@@ -383,6 +369,273 @@ export class EntryDetailComponent {
 
   private shouldUseTextarea(value: string): boolean {
     return value.includes('\n') || value.length > 80;
+  }
+
+  private detectFieldType(key: string, value: unknown): EntryFieldInputType {
+    if (this.isBooleanValue(value)) {
+      return 'boolean';
+    }
+
+    if (typeof value === 'number') {
+      return 'number';
+    }
+
+    const dateVariant = this.detectDateVariant(key, value);
+    if (dateVariant) {
+      return dateVariant;
+    }
+
+    const stringValue = this.stringifyValue(value);
+    if (this.looksLikeJson(stringValue)) {
+      return 'json';
+    }
+
+    return this.shouldUseTextarea(stringValue) ? 'textarea' : 'text';
+  }
+
+  private detectDateVariant(key: string, value: unknown): 'date' | 'datetime' | null {
+    const normalizedKey = key.toLowerCase();
+    const keyHint = this.dateVariantFromKey(normalizedKey);
+
+    if (keyHint) {
+      return keyHint;
+    }
+
+    if (typeof value === 'string') {
+      return this.dateVariantFromString(value);
+    }
+
+    if (value instanceof Date) {
+      return 'datetime';
+    }
+
+    return null;
+  }
+
+  private dateVariantFromKey(key: string): 'date' | 'datetime' | null {
+    if (key.endsWith('_date') || key.includes('date_of') || key.endsWith('dob')) {
+      return 'date';
+    }
+
+    if (key.endsWith('_at') || key.includes('timestamp') || key.includes('time') || key.includes('last_seen') || key.includes('occurred')) {
+      return 'datetime';
+    }
+
+    return null;
+  }
+
+  private dateVariantFromString(value: string): 'date' | 'datetime' | null {
+    const trimmed = value.trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+      return 'date';
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?/.test(trimmed)) {
+      return 'datetime';
+    }
+
+    const parsed = Date.parse(trimmed);
+    return Number.isNaN(parsed) ? null : 'datetime';
+  }
+
+  private prepareControlValue(value: unknown, inputType: EntryFieldInputType): string | number | boolean | null {
+    switch (inputType) {
+      case 'boolean':
+        return this.toBoolean(value) ?? false;
+      case 'number':
+        return this.stringifyValue(this.toNumber(value));
+      case 'date':
+        return this.formatDateForInput(value, 'date');
+      case 'datetime':
+        return this.formatDateForInput(value, 'datetime');
+      default:
+        return this.stringifyValue(value);
+    }
+  }
+
+  private formatDateForInput(value: unknown, variant: 'date' | 'datetime'): string {
+    if (!value) {
+      return '';
+    }
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (variant === 'date' && /^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+        return trimmed;
+      }
+      if (variant === 'datetime' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(trimmed)) {
+        return trimmed;
+      }
+      const parsed = Date.parse(trimmed);
+      if (!Number.isNaN(parsed)) {
+        return this.formatDateFromTimestamp(parsed, variant);
+      }
+      return '';
+    }
+
+    if (value instanceof Date) {
+      return this.formatDateFromTimestamp(value.getTime(), variant);
+    }
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return this.formatDateFromTimestamp(value, variant);
+    }
+
+    return '';
+  }
+
+  private formatDateFromTimestamp(timestamp: number, variant: 'date' | 'datetime'): string {
+    const date = new Date(timestamp);
+    const pad = (num: number) => String(num).padStart(2, '0');
+    const datePart = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    if (variant === 'date') {
+      return datePart;
+    }
+    return `${datePart}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  private normalizeValueForComparison(value: unknown, config: EntryFieldConfig): unknown {
+    switch (config.inputType) {
+      case 'boolean':
+        return this.toBoolean(value);
+      case 'number':
+        return this.stringifyValue(this.toNumber(value));
+      case 'date':
+        return this.formatDateForInput(value, 'date') || null;
+      case 'datetime':
+        return this.formatDateForInput(value, 'datetime') || null;
+      case 'json':
+        return this.stringifyValue(value).trim();
+      default:
+        return this.stringifyValue(value).trim();
+    }
+  }
+
+  private valuesEqual(current: unknown, original: unknown, config: EntryFieldConfig): boolean {
+    if (current === original) {
+      return true;
+    }
+
+    if (config.inputType === 'json') {
+      return this.normalizeJsonString(String(current ?? '')) === this.normalizeJsonString(String(original ?? ''));
+    }
+
+    if (typeof current === 'boolean' || typeof original === 'boolean') {
+      return Boolean(current) === Boolean(original);
+    }
+
+    if (typeof current === 'number' || typeof original === 'number') {
+      return Number(current) === Number(original);
+    }
+
+    return String(current ?? '') === String(original ?? '');
+  }
+
+  private normalizeJsonString(value: string): string {
+    if (!value) {
+      return '';
+    }
+
+    try {
+      return JSON.stringify(JSON.parse(value));
+    } catch {
+      return value.trim();
+    }
+  }
+
+  private prepareValueForPayload(value: unknown, config: EntryFieldConfig, originalValue: unknown): unknown {
+    switch (config.inputType) {
+      case 'boolean':
+        return this.toBoolean(value);
+      case 'number': {
+        const numeric = this.toNumber(value);
+        if (numeric === null) {
+          return typeof value === 'string' ? value.trim() : '';
+        }
+        return numeric;
+      }
+      case 'date': {
+        const formatted = this.formatDateForInput(value, 'date');
+        return formatted || '';
+      }
+      case 'datetime': {
+        const formatted = this.formatDateForInput(value, 'datetime');
+        return formatted ? new Date(formatted).toISOString() : '';
+      }
+      case 'json':
+        return this.parseJsonValue(value, originalValue);
+      default:
+        return typeof value === 'string' ? value.trim() : this.stringifyValue(value).trim();
+    }
+  }
+
+  private parseJsonValue(value: unknown, fallback: unknown): unknown {
+    const text = this.stringifyValue(value).trim();
+    if (!text) {
+      return '';
+    }
+
+    try {
+      return JSON.parse(text);
+    } catch {
+      return fallback ?? text;
+    }
+  }
+
+  private isBooleanValue(value: unknown): boolean {
+    if (typeof value === 'boolean') {
+      return true;
+    }
+
+    return this.toBoolean(value) !== null;
+  }
+
+  private toBoolean(value: unknown): boolean | null {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    if (typeof value === 'number') {
+      if (value === 1) {
+        return true;
+      }
+      if (value === 0) {
+        return false;
+      }
+      return null;
+    }
+
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      if (['true', '1', 'yes', 'on'].includes(normalized)) {
+        return true;
+      }
+      if (['false', '0', 'no', 'off'].includes(normalized)) {
+        return false;
+      }
+    }
+
+    return null;
+  }
+
+  private toNumber(value: unknown): number | null {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string' && value.trim().length > 0) {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    return null;
+  }
+
+  private buildBooleanOptions(): ValueDropdownOption[] {
+    return [
+      { label: this.translate.instant('entryCreate.form.booleanTrue'), value: true },
+      { label: this.translate.instant('entryCreate.form.booleanFalse'), value: false }
+    ];
   }
 
   private humanizeKey(key: string): string {
