@@ -2,12 +2,17 @@
   <select
     class="value-dropdown__select"
     [disabled]="isDisabled"
-    [value]="selectedIndex"
     (change)="handleChange($event)"
     (blur)="handleBlur()"
   >
-    <option value="" *ngIf="placeholder">{{ placeholder }}</option>
-    <option *ngFor="let option of options; let idx = index" [value]="idx">
+    <option value="" *ngIf="placeholder" [selected]="selectedIndex === ''">
+      {{ placeholder }}
+    </option>
+    <option
+      *ngFor="let option of options; let idx = index"
+      [value]="idx"
+      [selected]="selectedIndex === idx.toString()"
+    >
       {{ option.label }}
     </option>
   </select>
