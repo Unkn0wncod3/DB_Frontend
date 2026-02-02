@@ -7,6 +7,7 @@ import { TranslateModule } from '@ngx-translate/core';
   standalone: true,
   imports: [NgIf, JsonPipe, TranslateModule],
   templateUrl: './entry-detail-raw-view.component.html',
+  styleUrls: ['./entry-detail-raw-view.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EntryDetailRawViewComponent {

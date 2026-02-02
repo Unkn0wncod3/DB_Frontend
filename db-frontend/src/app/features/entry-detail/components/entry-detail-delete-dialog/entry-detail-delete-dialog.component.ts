@@ -7,6 +7,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   standalone: true,
   imports: [NgIf, TranslateModule],
   templateUrl: './entry-detail-delete-dialog.component.html',
+  styleUrls: ['./entry-detail-delete-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EntryDetailDeleteDialogComponent implements OnChanges {

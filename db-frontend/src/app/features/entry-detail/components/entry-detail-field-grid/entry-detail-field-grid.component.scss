@@ -1,0 +1,39 @@
+.entry-detail__grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.entry-detail__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.entry-detail__field label {
+  font-weight: 600;
+}
+
+.entry-detail__field input,
+.entry-detail__field textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.entry-detail__field textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.entry-detail__field--readonly {
+  opacity: 0.7;
+}
+
+.entry-detail__field--readonly input,
+.entry-detail__field--readonly textarea {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}

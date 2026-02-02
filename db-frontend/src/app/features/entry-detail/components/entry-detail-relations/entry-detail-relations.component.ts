@@ -13,6 +13,7 @@ import { RelatedEntryItem } from '../../entry-detail.types';
   standalone: true,
   imports: [NgIf, NgFor, ReactiveFormsModule, RouterModule, TranslateModule, DatePipe],
   templateUrl: './entry-detail-relations.component.html',
+  styleUrls: ['./entry-detail-relations.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EntryDetailRelationsComponent implements OnChanges {

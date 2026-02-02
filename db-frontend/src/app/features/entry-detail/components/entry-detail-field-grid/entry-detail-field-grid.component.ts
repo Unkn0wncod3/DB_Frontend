@@ -20,6 +20,7 @@ import { ValueDropdownComponent, ValueDropdownOption } from '../../../../shared/
     ValueDropdownComponent
   ],
   templateUrl: './entry-detail-field-grid.component.html',
+  styleUrls: ['./entry-detail-field-grid.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EntryDetailFieldGridComponent {

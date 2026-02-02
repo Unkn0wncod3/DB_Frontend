@@ -1,0 +1,17 @@
+.entry-detail__raw {
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  overflow: auto;
+}
+
+.entry-detail__raw h2 {
+  margin-top: 0;
+}
+
+.entry-detail__raw pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}

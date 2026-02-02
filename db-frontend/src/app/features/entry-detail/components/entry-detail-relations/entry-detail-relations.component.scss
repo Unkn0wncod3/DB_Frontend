@@ -1,16 +1,3 @@
-.entry-detail__content {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 1.5rem;
-}
-
-@media (min-width: 1024px) {
-  .entry-detail__content {
-    grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
-    align-items: start;
-  }
-}
-
 .entry-detail__relations {
   background: #fff;
   border-radius: 0.75rem;

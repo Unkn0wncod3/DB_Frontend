@@ -35,7 +35,7 @@ import { EntryDetailRawViewComponent } from './components/entry-detail-raw-view/
     EntryDetailRawViewComponent
   ],
   templateUrl: './entry-detail.component.html',
-  styleUrls: ['./entry-detail.component.scss', './entry-detail-modal.component.scss', './entry-detail-relations.component.scss'],
+  styleUrls: ['./entry-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EntryDetailComponent {
