@@ -40,13 +40,23 @@ export class EntryService {
   }
 
   createEntry(type: string, payload: Record<string, unknown>): Observable<Record<string, unknown>> {
+    const normalizedType = type?.trim().toLowerCase();
+    if (normalizedType === 'notes' && payload && 'person_id' in payload) {
+      const personId = this.extractPersonId(payload['person_id']);
+      if (!personId) {
+        throw new Error('Person ID is required');
+      }
+      const { person_id: _omit, ...notePayload } = payload;
+      return this.createNoteForPerson(personId, notePayload);
+    }
+
     return this.api.request<Record<string, unknown>>('POST', this.buildCollectionEndpoint(type), {
       body: payload
     });
   }
 
   createNoteForPerson(personId: string, payload: Record<string, unknown>): Observable<Record<string, unknown>> {
-    const sanitizedId = personId?.toString().trim();
+    const sanitizedId = this.extractPersonId(personId);
     if (!sanitizedId) {
       throw new Error('Person ID is required');
     }
@@ -56,6 +66,17 @@ export class EntryService {
       `/notes/by-person/${encodeURIComponent(sanitizedId)}`,
       { body: payload }
     );
+  }
+
+  private extractPersonId(value: unknown): string | null {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value.toString();
+    }
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      return trimmed.length > 0 ? trimmed : null;
+    }
+    return null;
   }
 
   updateEntry(type: string, id: string, payload: Record<string, unknown>): Observable<Record<string, unknown>> {
