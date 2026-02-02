@@ -1,37 +1,36 @@
 import { NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, forwardRef, inject, signal } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+
+import { EntryService } from '../../../core/services/entry.service';
 import { firstValueFrom } from 'rxjs';
 
-import { EntryService } from '../../core/services/entry.service';
-
-interface PlatformOption {
+interface PersonOption {
   id: string;
   label: string;
-  baseUrl?: string;
-  category?: string;
-  isActive?: boolean;
+  email?: string;
+  status?: string;
 }
 
 @Component({
-  selector: 'app-platform-lookup',
+  selector: 'app-person-lookup',
   standalone: true,
   imports: [ReactiveFormsModule, NgIf, NgFor, TranslateModule],
-  templateUrl: './platform-lookup.component.html',
-  styleUrl: './platform-lookup.component.scss',
+  templateUrl: './person-lookup.component.html',
+  styleUrl: './person-lookup.component.scss',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => PlatformLookupComponent),
+      useExisting: forwardRef(() => PersonLookupComponent),
       multi: true
     }
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PlatformLookupComponent implements ControlValueAccessor {
+export class PersonLookupComponent implements ControlValueAccessor {
   private readonly fb = inject(FormBuilder);
   private readonly entryService = inject(EntryService);
   private readonly translate = inject(TranslateService);
@@ -39,7 +38,7 @@ export class PlatformLookupComponent implements ControlValueAccessor {
   private readonly host = inject(ElementRef<HTMLElement>);
 
   readonly searchControl = this.fb.nonNullable.control('');
-  readonly results = signal<PlatformOption[]>([]);
+  readonly results = signal<PersonOption[]>([]);
   readonly isOpen = signal(false);
   readonly isLoading = signal(false);
   readonly selectedId = signal<string | null>(null);
@@ -51,7 +50,20 @@ export class PlatformLookupComponent implements ControlValueAccessor {
   constructor() {
     this.searchControl.valueChanges
       .pipe(debounceTime(200), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
-      .subscribe((value) => this.handleInputChange(value ?? ''));
+      .subscribe((value) => {
+        this.handleInputChange(value ?? '');
+      });
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.isOpen()) {
+      return;
+    }
+    const target = event.target as Node | null;
+    if (target && !this.host.nativeElement.contains(target)) {
+      this.closeSearch();
+    }
   }
 
   writeValue(value: string | number | null): void {
@@ -60,6 +72,7 @@ export class PlatformLookupComponent implements ControlValueAccessor {
       this.searchControl.setValue('', { emitEvent: false });
       return;
     }
+
     void this.hydrateSelection(value);
   }
 
@@ -93,34 +106,42 @@ export class PlatformLookupComponent implements ControlValueAccessor {
     this.results.set([]);
   }
 
-  selectOption(option: PlatformOption): void {
-    this.selectedId.set(option.id);
+  selectOption(option: PersonOption): void {
     this.searchControl.setValue(option.label, { emitEvent: false });
+    this.selectedId.set(option.id || null);
     this.onChange(option.id);
     this.closeSearch();
   }
 
   clearSelection(): void {
-    this.selectedId.set(null);
     this.searchControl.setValue('', { emitEvent: false });
+    this.selectedId.set(null);
     this.onChange(null);
     this.onTouched();
     this.results.set([]);
   }
 
-  trackByOption(_index: number, option: PlatformOption): string {
-    return option.id || option.label;
+  async performSearch(term: string): Promise<void> {
+    this.isLoading.set(true);
+    try {
+      const params = {
+        search: term,
+        page: 1,
+        pageSize: 8
+      };
+      const result = await firstValueFrom(this.entryService.listEntries('persons', params));
+      const options = (result.items ?? []).map((item) => this.toOption(item));
+      this.results.set(options);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : this.translate.instant('entryList.errors.unknown');
+      this.results.set([{ id: '', label: message }]);
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    if (!this.isOpen()) {
-      return;
-    }
-    const target = event.target as Node | null;
-    if (target && !this.host.nativeElement.contains(target)) {
-      this.closeSearch();
-    }
+  trackByOption(_index: number, option: PersonOption): string {
+    return option.id || option.label;
   }
 
   private handleInputChange(rawValue: string): void {
@@ -138,6 +159,7 @@ export class PlatformLookupComponent implements ControlValueAccessor {
     if (/^\d+$/.test(value)) {
       this.selectedId.set(value);
       this.onChange(value);
+      this.closeSearch();
       return;
     }
 
@@ -148,38 +170,23 @@ export class PlatformLookupComponent implements ControlValueAccessor {
     }
   }
 
-  private async performSearch(term: string): Promise<void> {
-    this.isLoading.set(true);
-    try {
-      const params = {
-        search: term,
-        page: 1,
-        pageSize: 8
-      };
-      const result = await firstValueFrom(this.entryService.listEntries('platforms', params));
-      const options = (result.items ?? []).map((item) => this.toOption(item));
-      this.results.set(options);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : this.translate.instant('platformLookup.error');
-      this.results.set([{ id: '', label: message }]);
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
-
-  private toOption(record: Record<string, unknown>): PlatformOption {
+  private toOption(record: Record<string, unknown>): PersonOption {
     const id = this.extractId(record);
-    const name = typeof record['name'] === 'string' ? record['name'] : id ?? '';
-    const baseUrl = typeof record['base_url'] === 'string' ? record['base_url'] : undefined;
-    const category = typeof record['category'] === 'string' ? record['category'] : undefined;
-    const isActive = typeof record['is_active'] === 'boolean' ? record['is_active'] : undefined;
+    const name = this.composeName(record);
+    const email = typeof record['email'] === 'string' ? record['email'] : undefined;
+    const status = typeof record['status'] === 'string' ? record['status'] : undefined;
     return {
       id: id ?? '',
-      label: name || baseUrl || id || this.translate.instant('platformLookup.unknown'),
-      baseUrl,
-      category,
-      isActive
+      label: name || email || id || this.translate.instant('personLookup.unknown'),
+      email,
+      status
     };
+  }
+
+  private composeName(record: Record<string, unknown>): string {
+    const first = typeof record['first_name'] === 'string' ? record['first_name'] : '';
+    const last = typeof record['last_name'] === 'string' ? record['last_name'] : '';
+    return [first, last].filter((value) => value.length > 0).join(' ').trim();
   }
 
   private extractId(record: Record<string, unknown>): string | undefined {
@@ -195,14 +202,14 @@ export class PlatformLookupComponent implements ControlValueAccessor {
 
   private async hydrateSelection(value: string | number): Promise<void> {
     try {
-      const result = await firstValueFrom(this.entryService.getEntry('platforms', value.toString()));
+      const result = await firstValueFrom(this.entryService.getEntry('persons', value.toString()));
       const option = this.toOption(result as Record<string, unknown>);
       this.selectedId.set(option.id || null);
       this.searchControl.setValue(option.label, { emitEvent: false });
     } catch {
       const fallback = value.toString();
       this.selectedId.set(fallback);
-      this.searchControl.setValue(fallback, { emitEvent: false });
+      this.searchControl.setValue(value.toString(), { emitEvent: false });
     }
   }
 }

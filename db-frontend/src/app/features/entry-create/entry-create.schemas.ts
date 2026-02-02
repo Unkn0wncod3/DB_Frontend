@@ -164,7 +164,8 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
     title: 'Note',
     description: 'Pinned or free-form note entries.',
     fields: [
-      { key: 'title', label: 'Title', type: 'text' },
+      { key: 'person_id', label: 'Person ID', type: 'number', required: true },
+      { key: 'title', label: 'Title', type: 'text', required: true },
       { key: 'text', label: 'Text', type: 'textarea', required: true },
       { key: 'pinned', label: 'Pinned', type: 'boolean', defaultValue: false }
     ]

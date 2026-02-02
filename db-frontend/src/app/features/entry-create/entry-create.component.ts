@@ -8,8 +8,8 @@ import { firstValueFrom } from 'rxjs';
 
 import { EntryService } from '../../core/services/entry.service';
 import { EntrySchema, EntrySchemaField, EntryFieldType, getEntrySchema } from './entry-create.schemas';
-import { PlatformLookupComponent } from '../platform-lookup/platform-lookup.component';
-import { PersonLookupComponent } from '../person-lookup/person-lookup.component';
+import { PlatformLookupComponent } from '../../shared/components/platform-lookup/platform-lookup.component';
+import { PersonLookupComponent } from '../../shared/components/person-lookup/person-lookup.component';
 import { ValueDropdownComponent, ValueDropdownOption } from '../../shared/components/value-dropdown/value-dropdown.component';
 
 interface SchemaFieldControl {

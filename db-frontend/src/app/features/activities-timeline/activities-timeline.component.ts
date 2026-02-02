@@ -6,7 +6,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { EntryListParams, EntryService } from '../../core/services/entry.service';
-import { PersonLookupComponent } from '../person-lookup/person-lookup.component';
+import { PersonLookupComponent } from '../../shared/components/person-lookup/person-lookup.component';
 
 interface TimelineEntry {
   id?: string;
