@@ -8,32 +8,14 @@ import { firstValueFrom } from 'rxjs';
 
 import { EntryService } from '../../core/services/entry.service';
 import { ApiService } from '../../core/services/api.service';
-import { ValueDropdownComponent, ValueDropdownOption } from '../../shared/components/value-dropdown/value-dropdown.component';
-
-interface EntryFieldConfig {
-  key: string;
-  label: string;
-  multiline: boolean;
-  readOnly: boolean;
-  inputType: EntryFieldInputType;
-  dateVariant?: 'date' | 'datetime';
-}
-
-interface RelatedEntryItem {
-  id?: string;
-  label: string;
-  description?: string;
-  timestamp?: string;
-  routerLink?: string[];
-  type: string;
-}
-
-type EntryFieldInputType = 'text' | 'textarea' | 'number' | 'boolean' | 'date' | 'datetime' | 'json';
+import { ValueDropdownOption } from '../../shared/components/value-dropdown/value-dropdown.component';
+import { EntryFieldConfig, EntryFieldInputType, RelatedEntryItem } from './entry-detail.types';
+import { EntryDetailFieldGridComponent } from './components/entry-detail-field-grid/entry-detail-field-grid.component';
 
 @Component({
   selector: 'app-entry-detail',
   standalone: true,
-  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, JsonPipe, TranslateModule, RouterModule, DatePipe, ValueDropdownComponent],
+  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, JsonPipe, TranslateModule, RouterModule, DatePipe, EntryDetailFieldGridComponent],
   templateUrl: './entry-detail.component.html',
   styleUrls: ['./entry-detail.component.scss', './entry-detail-modal.component.scss', './entry-detail-relations.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -203,10 +185,6 @@ export class EntryDetailComponent {
     } finally {
       this.isDeleting.set(false);
     }
-  }
-
-  trackByKey(_index: number, field: EntryFieldConfig): string {
-    return field.key;
   }
 
   hasChanges(): boolean {

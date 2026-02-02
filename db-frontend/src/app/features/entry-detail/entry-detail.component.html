@@ -40,61 +40,11 @@
       [formGroup]="form"
       (ngSubmit)="save()"
     >
-      <div class="entry-detail__grid">
-        <div *ngFor="let field of fields(); trackBy: trackByKey" class="entry-detail__field" [class.entry-detail__field--readonly]="field.readOnly">
-          <label [attr.for]="field.key">{{ field.label }}</label>
-          <ng-container [ngSwitch]="field.inputType">
-            <textarea
-              *ngSwitchCase="'textarea'"
-              [id]="field.key"
-              [formControlName]="field.key"
-              rows="4"
-            ></textarea>
-
-            <textarea
-              *ngSwitchCase="'json'"
-              [id]="field.key"
-              [formControlName]="field.key"
-              rows="6"
-            ></textarea>
-
-            <input
-              *ngSwitchCase="'number'"
-              type="number"
-              [id]="field.key"
-              [formControlName]="field.key"
-            />
-
-            <input
-              *ngSwitchCase="'date'"
-              type="date"
-              [id]="field.key"
-              [formControlName]="field.key"
-            />
-
-            <input
-              *ngSwitchCase="'datetime'"
-              type="datetime-local"
-              [id]="field.key"
-              [formControlName]="field.key"
-            />
-
-            <app-value-dropdown
-              *ngSwitchCase="'boolean'"
-              [formControlName]="field.key"
-              [options]="booleanOptions()"
-              [placeholder]="'entryCreate.form.booleanPlaceholder' | translate"
-            ></app-value-dropdown>
-
-            <input
-              *ngSwitchDefault
-              type="text"
-              [id]="field.key"
-              [formControlName]="field.key"
-            />
-          </ng-container>
-        </div>
-      </div>
+      <app-entry-detail-field-grid
+        [form]="form"
+        [fields]="fields()"
+        [booleanOptions]="booleanOptions()"
+      ></app-entry-detail-field-grid>
     </form>
 
     <aside class="entry-detail__relations" *ngIf="showPersonRelations()">
