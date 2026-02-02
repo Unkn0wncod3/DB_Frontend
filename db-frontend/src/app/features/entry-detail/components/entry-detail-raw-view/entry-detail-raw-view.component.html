@@ -1,0 +1,4 @@
+<section class="entry-detail__raw" *ngIf="activated && record">
+  <h2>{{ 'entryDetail.sections.raw' | translate }}</h2>
+  <pre>{{ record | json }}</pre>
+</section>

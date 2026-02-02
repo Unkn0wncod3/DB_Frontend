@@ -1,0 +1,27 @@
+<div class="entry-detail__modal-backdrop" *ngIf="isOpen">
+  <div class="entry-detail__modal">
+    <h2>{{ 'entryDetail.delete.dialogTitle' | translate }}</h2>
+    <p>{{ 'entryDetail.delete.confirm' | translate }}</p>
+    <label class="entry-detail__modal-field">
+      <span>{{ 'entryDetail.delete.passcodeLabel' | translate }}</span>
+      <input
+        #deletePasscodeInput
+        type="password"
+        [value]="deletePasscode()"
+        (input)="onPasscodeInput(deletePasscodeInput.value)"
+        [placeholder]="'entryDetail.delete.passcodePlaceholder' | translate"
+        [disabled]="isDeleting"
+      />
+    </label>
+    <p class="entry-detail__modal-error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+    <div class="entry-detail__modal-actions">
+      <button type="button" class="entry-detail__delete" (click)="attemptConfirm()" [disabled]="!canConfirm()">
+        <span *ngIf="isDeleting; else modalDeleteLabel">{{ 'entryDetail.status.deleting' | translate }}</span>
+        <ng-template #modalDeleteLabel>{{ 'entryDetail.delete.confirmButton' | translate }}</ng-template>
+      </button>
+      <button type="button" class="entry-detail__modal-cancel" (click)="requestClose()" [disabled]="isDeleting">
+        {{ 'entryDetail.delete.cancelButton' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

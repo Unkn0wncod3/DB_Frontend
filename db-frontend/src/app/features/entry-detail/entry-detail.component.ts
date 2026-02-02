@@ -1,6 +1,6 @@
 import { DatePipe, JsonPipe, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal, WritableSignal } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, WritableSignal } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -9,13 +9,31 @@ import { firstValueFrom } from 'rxjs';
 import { EntryService } from '../../core/services/entry.service';
 import { ApiService } from '../../core/services/api.service';
 import { ValueDropdownOption } from '../../shared/components/value-dropdown/value-dropdown.component';
-import { EntryFieldConfig, EntryFieldInputType, RelatedEntryItem } from './entry-detail.types';
+import { EntryFieldConfig, EntryFieldInputType } from './entry-detail.types';
 import { EntryDetailFieldGridComponent } from './components/entry-detail-field-grid/entry-detail-field-grid.component';
+import { EntryDetailRelationsComponent } from './components/entry-detail-relations/entry-detail-relations.component';
+import { EntryDetailDeleteDialogComponent } from './components/entry-detail-delete-dialog/entry-detail-delete-dialog.component';
+import { EntryDetailRawViewComponent } from './components/entry-detail-raw-view/entry-detail-raw-view.component';
 
 @Component({
   selector: 'app-entry-detail',
   standalone: true,
-  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, JsonPipe, TranslateModule, RouterModule, DatePipe, EntryDetailFieldGridComponent],
+  imports: [
+    NgIf,
+    NgFor,
+    NgSwitch,
+    NgSwitchCase,
+    NgSwitchDefault,
+    ReactiveFormsModule,
+    JsonPipe,
+    TranslateModule,
+    RouterModule,
+    DatePipe,
+    EntryDetailFieldGridComponent,
+    EntryDetailRelationsComponent,
+    EntryDetailDeleteDialogComponent,
+    EntryDetailRawViewComponent
+  ],
   templateUrl: './entry-detail.component.html',
   styleUrls: ['./entry-detail.component.scss', './entry-detail-modal.component.scss', './entry-detail-relations.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -37,24 +55,10 @@ export class EntryDetailComponent {
   readonly entry = signal<Record<string, unknown> | null>(null);
   readonly fields: WritableSignal<EntryFieldConfig[]> = signal([]);
   readonly entryTitle = signal<string | null>(null);
-  readonly relatedProfiles = signal<RelatedEntryItem[]>([]);
-  readonly relatedNotes = signal<RelatedEntryItem[]>([]);
-  readonly relatedActivities = signal<RelatedEntryItem[]>([]);
-  readonly isRelationsLoading = signal(false);
-  readonly relationsError = signal<string | null>(null);
-  readonly hasRelations = computed(() => this.relatedProfiles().length > 0 || this.relatedNotes().length > 0 || this.relatedActivities().length > 0);
   readonly booleanOptions = signal<ValueDropdownOption[]>([]);
   private readonly readOnlyKeys = new Set(['id', '_id', 'type', 'createdat', 'updatedat', 'created_at', 'updated_at', 'timestamp', 'occurredat', 'occurred_at']);
   readonly deleteSecurityKey = 'del1';
   readonly isDeleteDialogOpen = signal(false);
-  readonly deletePasscode = signal('');
-  readonly deleteDialogError = signal<string | null>(null);
-  readonly isManagingProfileLinks = signal(false);
-  readonly profileLinkError = signal<string | null>(null);
-  readonly profileLinkForm = this.fb.nonNullable.group({
-    profileId: ['', [Validators.required]],
-    note: ['']
-  });
 
   form: FormGroup = this.fb.group({});
 
@@ -91,8 +95,6 @@ export class EntryDetailComponent {
     if (!this.currentType || !this.currentId) {
       return;
     }
-    this.deletePasscode.set('');
-    this.deleteDialogError.set(null);
     this.isDeleteDialogOpen.set(true);
   }
 
@@ -101,27 +103,9 @@ export class EntryDetailComponent {
       return;
     }
     this.isDeleteDialogOpen.set(false);
-    this.deletePasscode.set('');
-    this.deleteDialogError.set(null);
   }
 
-  onDeletePasscodeChange(value: string): void {
-    this.deletePasscode.set(value);
-    if (this.deleteDialogError()) {
-      this.deleteDialogError.set(null);
-    }
-  }
-
-  canConfirmDelete(): boolean {
-    return this.deletePasscode().trim() === this.deleteSecurityKey && !this.isDeleting();
-  }
-
-  async confirmDelete(): Promise<void> {
-    if (!this.canConfirmDelete()) {
-      this.deleteDialogError.set(this.translate.instant('entryDetail.delete.passcodeInvalid'));
-      return;
-    }
-
+  async handleDeleteConfirmed(): Promise<void> {
     await this.performDelete();
     this.closeDeleteDialog();
   }
@@ -225,11 +209,6 @@ export class EntryDetailComponent {
       this.entry.set(record);
       this.rebuildForm(record);
       this.entryTitle.set(this.resolveEntryTitle(record));
-      if (this.showPersonRelations()) {
-        void this.loadPersonRelations(this.currentId!);
-      } else {
-        this.clearRelations();
-      }
     } catch (error) {
       this.errorMessage.set(this.translate.instant('entryDetail.errors.loadFailed', {
         message: this.describeError(error)
@@ -722,76 +701,6 @@ export class EntryDetailComponent {
     return (this.currentType ?? '').toLowerCase() === 'persons';
   }
 
-  relationListLink(type: string): string[] {
-    return ['/entries', type];
-  }
-
-  trackByRelation(_index: number, item: RelatedEntryItem): string {
-    return `${item.type}-${item.id ?? _index}`;
-  }
-
-  async linkProfile(): Promise<void> {
-    if (!this.showPersonRelations() || !this.currentId) {
-      return;
-    }
-
-    this.profileLinkForm.markAllAsTouched();
-    if (this.profileLinkForm.invalid) {
-      this.profileLinkError.set(this.translate.instant('entryDetail.relations.profileLinkInvalid'));
-      return;
-    }
-
-    const raw = this.profileLinkForm.getRawValue();
-    const parsedId = Number(raw.profileId);
-    if (!Number.isFinite(parsedId) || parsedId <= 0) {
-      this.profileLinkError.set(this.translate.instant('entryDetail.relations.profileLinkInvalid'));
-      return;
-    }
-
-    this.profileLinkError.set(null);
-    this.isManagingProfileLinks.set(true);
-    try {
-      await firstValueFrom(
-        this.api.request('POST', `/persons/${this.currentId}/profiles`, {
-          body: {
-            profile_id: parsedId,
-            note: raw.note?.trim().length ? raw.note.trim() : null
-          }
-        })
-      );
-      this.profileLinkForm.reset({ profileId: '', note: '' });
-      this.successMessage.set(this.translate.instant('entryDetail.relations.profileLinked'));
-      await this.loadPersonRelations(this.currentId);
-    } catch (error) {
-      this.profileLinkError.set(this.describeError(error));
-    } finally {
-      this.isManagingProfileLinks.set(false);
-    }
-  }
-
-  async unlinkProfile(profileId?: string): Promise<void> {
-    if (!this.showPersonRelations() || !this.currentId || !profileId) {
-      return;
-    }
-
-    const parsedId = Number(profileId);
-    if (!Number.isFinite(parsedId)) {
-      return;
-    }
-
-    this.isManagingProfileLinks.set(true);
-    this.profileLinkError.set(null);
-    try {
-      await firstValueFrom(this.api.request('DELETE', `/persons/${this.currentId}/profiles/${parsedId}`));
-      this.successMessage.set(this.translate.instant('entryDetail.relations.profileUnlinked'));
-      await this.loadPersonRelations(this.currentId);
-    } catch (error) {
-      this.profileLinkError.set(this.describeError(error));
-    } finally {
-      this.isManagingProfileLinks.set(false);
-    }
-  }
-
   private clearMessages(): void {
     this.errorMessage.set(null);
     this.successMessage.set(null);
@@ -821,132 +730,5 @@ export class EntryDetailComponent {
       }
     }
     return undefined;
-  }
-
-  private async loadPersonRelations(personId: string): Promise<void> {
-    this.isRelationsLoading.set(true);
-    this.relationsError.set(null);
-    try {
-      const [profilesResult, notesResult, activitiesResult] = await Promise.allSettled([
-        firstValueFrom(this.api.request<unknown>('GET', `/persons/${personId}/profiles`)),
-        firstValueFrom(this.api.request<unknown>('GET', `/notes/by-person/${personId}`)),
-        firstValueFrom(this.api.request<unknown>('GET', '/activities', { params: { person_id: personId, limit: 50 } }))
-      ]);
-
-      const errors: string[] = [];
-
-      if (profilesResult.status === 'fulfilled') {
-        this.relatedProfiles.set(this.normalizeProfiles(profilesResult.value));
-      } else {
-        errors.push(this.describeError(profilesResult.reason));
-      }
-
-      if (notesResult.status === 'fulfilled') {
-        this.relatedNotes.set(this.normalizeNotes(notesResult.value));
-      } else {
-        errors.push(this.describeError(notesResult.reason));
-      }
-
-      if (activitiesResult.status === 'fulfilled') {
-        this.relatedActivities.set(this.normalizeActivities(activitiesResult.value));
-      } else {
-        errors.push(this.describeError(activitiesResult.reason));
-      }
-
-      if (errors.length > 0) {
-        this.relationsError.set(errors.join(' | '));
-      }
-    } finally {
-      this.isRelationsLoading.set(false);
-    }
-  }
-
-  private normalizeProfiles(payload: unknown): RelatedEntryItem[] {
-    return this.extractItems(payload).map((item) => {
-      const record = item as Record<string, unknown>;
-      const id = this.extractId(record, ['profile_id', 'id']);
-      const label = this.extractText(record, ['display_name', 'username', 'platform']) ?? 'Profile';
-      const descriptionParts = [record['platform'], record['status']].filter((value) => typeof value === 'string' && value.trim().length > 0) as string[];
-      return {
-        id,
-        label,
-        description: descriptionParts.join(' • '),
-        routerLink: id ? ['/entries', 'profiles', id] : undefined,
-        type: 'profiles'
-      };
-    });
-  }
-
-  private normalizeNotes(payload: unknown): RelatedEntryItem[] {
-    return this.extractItems(payload).map((item) => {
-      const record = item as Record<string, unknown>;
-      const id = this.extractId(record, ['id']);
-      const label = this.extractText(record, ['title']) ?? 'Note';
-      const text = this.extractText(record, ['text']);
-      const snippet = text && text.length > 80 ? `${text.slice(0, 80)}…` : text;
-      return {
-        id,
-        label,
-        description: snippet,
-        timestamp: this.extractText(record, ['created_at', 'updated_at']),
-        routerLink: id ? ['/entries', 'notes', id] : undefined,
-        type: 'notes'
-      };
-    });
-  }
-
-  private normalizeActivities(payload: unknown): RelatedEntryItem[] {
-    return this.extractItems(payload).map((item) => {
-      const record = item as Record<string, unknown>;
-      const id = this.extractId(record, ['id']);
-      const label = this.extractText(record, ['activity_type']) ?? 'Activity';
-      const description = this.extractText(record, ['item', 'notes']);
-      const timestamp = this.extractText(record, ['occurred_at', 'updated_at']);
-      return {
-        id,
-        label,
-        description,
-        timestamp,
-        routerLink: id ? ['/entries', 'activities', id] : undefined,
-        type: 'activities'
-      };
-    });
-  }
-
-  private extractItems(payload: unknown): Record<string, unknown>[] {
-    if (Array.isArray(payload)) {
-      return payload.filter((item) => typeof item === 'object' && item !== null) as Record<string, unknown>[];
-    }
-
-    if (payload && typeof payload === 'object') {
-      const record = payload as Record<string, unknown>;
-      const items = record['items'];
-      if (Array.isArray(items)) {
-        return items.filter((item) => typeof item === 'object' && item !== null) as Record<string, unknown>[];
-      }
-    }
-
-    return [];
-  }
-
-  private extractId(record: Record<string, unknown>, keys: string[]): string | undefined {
-    for (const key of keys) {
-      const value = record[key];
-      if (typeof value === 'string' && value.trim().length > 0) {
-        return value.trim();
-      }
-      if (typeof value === 'number') {
-        return value.toString();
-      }
-    }
-    return undefined;
-  }
-
-  private clearRelations(): void {
-    this.relatedProfiles.set([]);
-    this.relatedNotes.set([]);
-    this.relatedActivities.set([]);
-    this.relationsError.set(null);
-    this.isRelationsLoading.set(false);
   }
 }

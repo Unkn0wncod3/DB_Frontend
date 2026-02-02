@@ -1,0 +1,114 @@
+<aside class="entry-detail__relations">
+  <header>
+    <h2>{{ entryTitle ?? ('entryDetail.labels.relationships' | translate) }}</h2>
+    <p>{{ 'entryDetail.labels.connectedItems' | translate }}</p>
+  </header>
+
+  <section *ngIf="relationsError() as relError" class="entry-detail__alert entry-detail__alert--error">
+    <p>{{ relError }}</p>
+  </section>
+
+  <section *ngIf="isRelationsLoading()" class="entry-detail__relations-state">
+    <p>{{ 'entryDetail.status.loadingRelations' | translate }}</p>
+  </section>
+
+  <section *ngIf="!isRelationsLoading() && !hasRelations()" class="entry-detail__relations-state">
+    <p>{{ 'entryDetail.status.noRelations' | translate }}</p>
+  </section>
+
+  <section class="entry-detail__relations-group">
+    <div class="entry-detail__relations-heading">
+      <h3>{{ 'entryDetail.relations.profiles' | translate }}</h3>
+      <a [routerLink]="relationListLink('profiles')">{{ 'entryDetail.relations.viewAll' | translate }}</a>
+    </div>
+    <form class="entry-detail__profile-link" [formGroup]="profileLinkForm" (ngSubmit)="linkProfile()">
+      <label>
+        <span>{{ 'entryDetail.relations.profileIdLabel' | translate }}</span>
+        <input type="number" formControlName="profileId" placeholder="42" />
+      </label>
+      <label>
+        <span>{{ 'entryDetail.relations.profileNoteLabel' | translate }}</span>
+        <input type="text" formControlName="note" [placeholder]="'entryDetail.relations.profileNotePlaceholder' | translate" />
+      </label>
+      <div class="entry-detail__profile-link-actions">
+        <p *ngIf="profileLinkError() as linkError" class="entry-detail__profile-link-error">{{ linkError }}</p>
+        <button type="submit" [disabled]="isManagingProfileLinks()">
+          {{ 'entryDetail.relations.linkProfile' | translate }}
+        </button>
+      </div>
+    </form>
+    <ul *ngIf="relatedProfiles().length > 0; else noProfiles">
+      <li *ngFor="let profile of relatedProfiles(); trackBy: trackByRelation">
+        <a *ngIf="profile.routerLink; else profileStatic" [routerLink]="profile.routerLink">
+          <strong>{{ profile.label }}</strong>
+          <span>{{ profile.description }}</span>
+        </a>
+        <ng-template #profileStatic>
+          <div>
+            <strong>{{ profile.label }}</strong>
+            <span>{{ profile.description }}</span>
+          </div>
+        </ng-template>
+        <button
+          type="button"
+          class="entry-detail__relation-unlink"
+          (click)="unlinkProfile(profile.id)"
+          [disabled]="isManagingProfileLinks()"
+        >
+          {{ 'entryDetail.relations.unlinkProfile' | translate }}
+        </button>
+      </li>
+    </ul>
+    <ng-template #noProfiles>
+      <p class="entry-detail__relations-state">
+        {{ 'entryDetail.status.noRelations' | translate }}
+      </p>
+    </ng-template>
+  </section>
+
+  <section *ngIf="relatedNotes().length > 0" class="entry-detail__relations-group">
+    <div class="entry-detail__relations-heading">
+      <h3>{{ 'entryDetail.relations.notes' | translate }}</h3>
+      <a [routerLink]="relationListLink('notes')">{{ 'entryDetail.relations.viewAll' | translate }}</a>
+    </div>
+    <ul>
+      <li *ngFor="let note of relatedNotes(); trackBy: trackByRelation">
+        <a *ngIf="note.routerLink; else noteStatic" [routerLink]="note.routerLink">
+          <strong>{{ note.label }}</strong>
+          <span>{{ note.description }}</span>
+          <small *ngIf="note.timestamp">{{ note.timestamp | date:'dd/MM/yyyy, HH:mm' }}</small>
+        </a>
+        <ng-template #noteStatic>
+          <div>
+            <strong>{{ note.label }}</strong>
+            <span>{{ note.description }}</span>
+            <small *ngIf="note.timestamp">{{ note.timestamp | date:'dd/MM/yyyy, HH:mm' }}</small>
+          </div>
+        </ng-template>
+      </li>
+    </ul>
+  </section>
+
+  <section *ngIf="relatedActivities().length > 0" class="entry-detail__relations-group">
+    <div class="entry-detail__relations-heading">
+      <h3>{{ 'entryDetail.relations.activities' | translate }}</h3>
+      <a [routerLink]="relationListLink('activities')">{{ 'entryDetail.relations.viewAll' | translate }}</a>
+    </div>
+    <ul>
+      <li *ngFor="let activity of relatedActivities(); trackBy: trackByRelation">
+        <a *ngIf="activity.routerLink; else activityStatic" [routerLink]="activity.routerLink">
+          <strong>{{ activity.label }}</strong>
+          <span>{{ activity.description }}</span>
+          <small *ngIf="activity.timestamp">{{ activity.timestamp | date:'dd/MM/yyyy, HH:mm' }}</small>
+        </a>
+        <ng-template #activityStatic>
+          <div>
+            <strong>{{ activity.label }}</strong>
+            <span>{{ activity.description }}</span>
+            <small *ngIf="activity.timestamp">{{ activity.timestamp | date:'dd/MM/yyyy, HH:mm' }}</small>
+          </div>
+        </ng-template>
+      </li>
+    </ul>
+  </section>
+</aside>
