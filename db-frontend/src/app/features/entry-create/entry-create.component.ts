@@ -1,4 +1,4 @@
-import { NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { JsonPipe, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -20,7 +20,7 @@ interface SchemaFieldControl {
 @Component({
   selector: 'app-entry-create',
   standalone: true,
-  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterLink, TranslateModule, PlatformLookupComponent, PersonLookupComponent, ValueDropdownComponent],
+  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, JsonPipe, ReactiveFormsModule, RouterLink, TranslateModule, PlatformLookupComponent, PersonLookupComponent, ValueDropdownComponent],
   templateUrl: './entry-create.component.html',
   styleUrl: './entry-create.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
