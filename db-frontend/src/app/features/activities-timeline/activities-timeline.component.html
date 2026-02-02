@@ -6,7 +6,7 @@
       <p>{{ 'entryList.timeline.subtitle' | translate }}</p>
     </div>
     <div class="timeline__meta" *ngIf="lastUpdatedAt() as updatedAt">
-      {{ 'entryList.meta.lastUpdated' | translate:{ value: (updatedAt | date:'short') } }}
+      {{ 'entryList.meta.lastUpdated' | translate:{ value: (updatedAt | date:'dd/MM/yyyy, HH:mm') } }}
     </div>
   </header>
 
@@ -61,7 +61,7 @@
         <div class="timeline__marker"></div>
         <div class="timeline__card">
           <div class="timeline__card-header">
-            <span class="timeline__timestamp" *ngIf="entry.occurredAt">{{ entry.occurredAt | date:'medium' }}</span>
+            <span class="timeline__timestamp" *ngIf="entry.occurredAt">{{ entry.occurredAt | date:'dd/MM/yyyy, HH:mm' }}</span>
             <span class="timeline__person" *ngIf="entry.personId">{{ 'entryList.timeline.personLabel' | translate:{ value: entry.personId } }}</span>
           </div>
           <a *ngIf="entry.routerLink; else cardStatic" [routerLink]="entry.routerLink" class="timeline__card-link">

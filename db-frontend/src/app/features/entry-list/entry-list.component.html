@@ -7,7 +7,7 @@
         {{ 'entryList.meta.total' | translate:{ value: totalCount } }}
       </p>
       <p *ngIf="lastUpdatedAt() as timestamp" class="entry-list__meta">
-        {{ 'entryList.meta.lastUpdated' | translate:{ value: (timestamp | date:'short') } }}
+        {{ 'entryList.meta.lastUpdated' | translate:{ value: (timestamp | date:'dd/MM/yyyy, HH:mm') } }}
       </p>
     </div>
     <div class="entry-list__actions">

@@ -175,13 +175,13 @@
             <a *ngIf="note.routerLink; else noteStatic" [routerLink]="note.routerLink">
               <strong>{{ note.label }}</strong>
               <span>{{ note.description }}</span>
-              <small *ngIf="note.timestamp">{{ note.timestamp | date:'short' }}</small>
+              <small *ngIf="note.timestamp">{{ note.timestamp | date:'dd/MM/yyyy, HH:mm' }}</small>
             </a>
             <ng-template #noteStatic>
               <div>
                 <strong>{{ note.label }}</strong>
                 <span>{{ note.description }}</span>
-                <small *ngIf="note.timestamp">{{ note.timestamp | date:'short' }}</small>
+                <small *ngIf="note.timestamp">{{ note.timestamp | date:'dd/MM/yyyy, HH:mm' }}</small>
               </div>
             </ng-template>
           </li>
@@ -198,13 +198,13 @@
             <a *ngIf="activity.routerLink; else activityStatic" [routerLink]="activity.routerLink">
               <strong>{{ activity.label }}</strong>
               <span>{{ activity.description }}</span>
-              <small *ngIf="activity.timestamp">{{ activity.timestamp | date:'short' }}</small>
+              <small *ngIf="activity.timestamp">{{ activity.timestamp | date:'dd/MM/yyyy, HH:mm' }}</small>
             </a>
             <ng-template #activityStatic>
               <div>
                 <strong>{{ activity.label }}</strong>
                 <span>{{ activity.description }}</span>
-                <small *ngIf="activity.timestamp">{{ activity.timestamp | date:'short' }}</small>
+                <small *ngIf="activity.timestamp">{{ activity.timestamp | date:'dd/MM/yyyy, HH:mm' }}</small>
               </div>
             </ng-template>
           </li>

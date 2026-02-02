@@ -10,7 +10,7 @@
         <ng-template #idleState>{{ 'dashboard.actions.refresh' | translate }}</ng-template>
       </button>
       <span class="dashboard__meta" *ngIf="lastUpdated() as timestamp">
-        {{ 'dashboard.meta.lastUpdated' | translate:{ value: (timestamp | date:'short') } }}
+        {{ 'dashboard.meta.lastUpdated' | translate:{ value: (timestamp | date:'dd/MM/yyyy, HH:mm') } }}
       </span>
     </div>
   </header>
@@ -133,7 +133,7 @@
         {{ recordType }}
       </p>
       <p *ngIf="formatRecordTimestampFor(record, kind) as ts" class="dashboard__recent-meta">
-        {{ tsKey | translate:{ value: (ts | date:'short') } }}
+        {{ tsKey | translate:{ value: (ts | date:'dd/MM/yyyy, HH:mm') } }}
       </p>
     </ng-template>
   </section>
@@ -167,7 +167,7 @@
           {{ itemMeta }}
         </p>
       </div>
-      <time *ngIf="formatRecordTimestamp(record) as ts">{{ ts | date:'short' }}</time>
+      <time *ngIf="formatRecordTimestamp(record) as ts">{{ ts | date:'dd/MM/yyyy, HH:mm' }}</time>
     </ng-template>
   </section>
   <ng-template #noRecent>
