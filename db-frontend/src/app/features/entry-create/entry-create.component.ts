@@ -42,6 +42,7 @@ export class EntryCreateComponent {
   readonly hasSchema = computed(() => this.schemaFields().length > 0);
   readonly rawPayloadControl = this.fb.nonNullable.control<string>('');
   readonly booleanOptions = signal<ValueDropdownOption[]>([]);
+  readonly lastRequestInfo = signal<{ endpoint: string; payload: Record<string, unknown> } | null>(null);
 
   form: FormGroup = this.fb.group({});
   private currentType: string | null = null;
@@ -164,9 +165,11 @@ export class EntryCreateComponent {
     this.successMessage.set(null);
 
     try {
-      const request$ = this.buildCreateRequest(payload);
+      const { request$, endpoint } = this.buildCreateRequest(payload);
+      this.lastRequestInfo.set({ endpoint, payload });
       const result = await firstValueFrom(request$);
       this.successMessage.set(this.translate.instant('entryCreate.status.created'));
+      this.lastRequestInfo.set(null);
 
       const entryId = this.extractId(result);
       if (entryId) {
@@ -227,7 +230,7 @@ export class EntryCreateComponent {
     return true;
   }
 
-  private buildCreateRequest(payload: Record<string, unknown>): Observable<Record<string, unknown>> {
+  private buildCreateRequest(payload: Record<string, unknown>): { request$: Observable<Record<string, unknown>>; endpoint: string } {
     if (!this.currentType) {
       throw new Error('Missing entry type');
     }
@@ -238,10 +241,19 @@ export class EntryCreateComponent {
         throw new Error('Person ID is required for notes.');
       }
       const { person_id: _omit, ...notePayload } = payload;
-      return this.entryService.createNoteForPerson(personId, notePayload);
+      const endpoint = `/notes/by-person/${encodeURIComponent(personId)}`;
+      return {
+        request$: this.entryService.createNoteForPerson(personId, notePayload),
+        endpoint
+      };
     }
 
-    return this.entryService.createEntry(this.currentType, payload);
+    const normalized = this.currentType.trim().replace(/^\//, '');
+    const endpoint = `/${normalized}`;
+    return {
+      request$: this.entryService.createEntry(this.currentType, payload),
+      endpoint
+    };
   }
 
   private loadSchema(type: string): void {

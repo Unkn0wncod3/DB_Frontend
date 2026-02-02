@@ -142,3 +142,16 @@
   margin: 0.5rem 0 0;
   font-size: 0.9rem;
 }
+.entry-create__debug {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.entry-create__debug pre {
+  margin: 0.5rem 0 0;
+  white-space: pre-wrap;
+}

@@ -16,6 +16,10 @@
 
   <section *ngIf="errorMessage() as error" class="entry-create__alert entry-create__alert--error">
     <p>{{ error }}</p>
+    <div class="entry-create__debug" *ngIf="lastRequestInfo() as requestInfo">
+      <p><strong>Endpoint:</strong> {{ requestInfo.endpoint }}</p>
+      <pre>{{ requestInfo.payload | json }}</pre>
+    </div>
   </section>
 
   <section *ngIf="successMessage() as success" class="entry-create__alert entry-create__alert--success">
