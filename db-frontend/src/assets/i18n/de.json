@@ -71,6 +71,7 @@
     "labels": {
       "unknownId": "Unbekannter Eintrag",
       "type": "Typ: {{ type }}",
+      "id": "ID: {{ id }}",
       "relationships": "Verkn\u00fcpfte Daten",
       "connectedItems": "Verbundene Profile, Notizen und Aktivit\u00e4ten"
     },

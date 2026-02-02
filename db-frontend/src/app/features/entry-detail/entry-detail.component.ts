@@ -266,6 +266,10 @@ export class EntryDetailComponent {
     const fieldConfigs: EntryFieldConfig[] = [];
 
     for (const [key, value] of Object.entries(record)) {
+      if (this.shouldHideField(key)) {
+        continue;
+      }
+
       const inputType = this.detectFieldType(key, value);
       const readOnly = this.isReadOnlyKey(key);
       const controlValue = this.prepareControlValue(value, inputType);
@@ -293,6 +297,11 @@ export class EntryDetailComponent {
     this.fields.set(fieldConfigs);
     this.fieldConfigMap = new Map(fieldConfigs.map((config) => [config.key, config]));
     this.form.markAsPristine();
+  }
+
+  private shouldHideField(key: string): boolean {
+    const normalized = key.toLowerCase();
+    return normalized === 'id' || normalized === '_id';
   }
 
   private buildPayload(): Record<string, unknown> {

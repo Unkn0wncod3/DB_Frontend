@@ -70,6 +70,7 @@
     "labels": {
       "unknownId": "Unknown entry",
       "type": "Type: {{ type }}",
+      "id": "ID: {{ id }}",
       "relationships": "Related items",
       "connectedItems": "Profiles, notes and activities linked to this person"
     },

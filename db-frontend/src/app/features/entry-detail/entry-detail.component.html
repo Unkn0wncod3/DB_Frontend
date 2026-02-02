@@ -3,7 +3,11 @@
     <div class="entry-detail__title">
       <a routerLink="/" class="entry-detail__back">{{ 'entryDetail.actions.back' | translate }}</a>
       <h1>{{ 'entryDetail.title' | translate:{ value: entryTitle() ?? (entryId ?? ('entryDetail.labels.unknownId' | translate)) } }}</h1>
-      <p *ngIf="entryType">{{ 'entryDetail.labels.type' | translate:{ type: entryType } }}</p>
+      <p *ngIf="entryType || entryId">
+        <span *ngIf="entryType">{{ 'entryDetail.labels.type' | translate:{ type: entryType } }}</span>
+        <span *ngIf="entryType && entryId" aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <span *ngIf="entryId">{{ 'entryDetail.labels.id' | translate:{ id: entryId } }}</span>
+      </p>
     </div>
     <div class="entry-detail__actions">
       <button type="button" class="entry-detail__refresh" (click)="refresh()" [disabled]="isLoading() || isSaving()">
