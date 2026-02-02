@@ -384,8 +384,15 @@ export class EntryDetailComponent {
   }
 
   private detectFieldType(key: string, value: unknown): EntryFieldInputType {
-    if (key.toLowerCase() === 'external_id') {
+    const normalizedKey = key.toLowerCase();
+
+    if (normalizedKey === 'external_id') {
       return 'text';
+    }
+
+    if (this.shouldForceTextInput(normalizedKey)) {
+      const stringValue = this.stringifyValue(value);
+      return this.shouldUseTextarea(stringValue) ? 'textarea' : 'text';
     }
 
     if (this.isBooleanValue(key, value)) {
@@ -616,6 +623,17 @@ export class EntryDetailComponent {
     }
 
     return false;
+  }
+
+  private shouldForceTextInput(normalizedKey: string): boolean {
+    return (
+      normalizedKey.includes('address') ||
+      normalizedKey.includes('street') ||
+      normalizedKey.includes('postal') ||
+      normalizedKey.includes('zipcode') ||
+      normalizedKey.includes('zip_code') ||
+      normalizedKey.includes('zip')
+    );
   }
 
   private isBooleanKey(key: string): boolean {
