@@ -45,6 +45,19 @@ export class EntryService {
     });
   }
 
+  createNoteForPerson(personId: string, payload: Record<string, unknown>): Observable<Record<string, unknown>> {
+    const sanitizedId = personId?.toString().trim();
+    if (!sanitizedId) {
+      throw new Error('Person ID is required');
+    }
+
+    return this.api.request<Record<string, unknown>>(
+      'POST',
+      `/notes/by-person/${encodeURIComponent(sanitizedId)}`,
+      { body: payload }
+    );
+  }
+
   updateEntry(type: string, id: string, payload: Record<string, unknown>): Observable<Record<string, unknown>> {
     return this.api.request<Record<string, unknown>>('PATCH', this.buildItemEndpoint(type, id), {
       body: payload

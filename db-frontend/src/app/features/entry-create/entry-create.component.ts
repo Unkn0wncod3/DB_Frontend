@@ -4,7 +4,7 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 
 import { EntryService } from '../../core/services/entry.service';
 import { EntrySchema, EntrySchemaField, EntryFieldType, getEntrySchema } from './entry-create.schemas';
@@ -81,6 +81,22 @@ export class EntryCreateComponent {
     return normalizedKey === 'person_id' || normalizedKey.endsWith('_person_id');
   }
 
+  private isNotesType(): boolean {
+    return (this.currentType ?? '').toLowerCase() === 'notes';
+  }
+
+  private extractPersonId(payload: Record<string, unknown>): string | null {
+    const candidate = payload['person_id'];
+    if (typeof candidate === 'number' && Number.isFinite(candidate)) {
+      return candidate.toString();
+    }
+    if (typeof candidate === 'string') {
+      const trimmed = candidate.trim();
+      return trimmed.length > 0 ? trimmed : null;
+    }
+    return null;
+  }
+
   personIdLabel(control: FormControl<string | boolean | number | null>): string | null {
     const value = control.value;
     if (value == null) {
@@ -148,7 +164,8 @@ export class EntryCreateComponent {
     this.successMessage.set(null);
 
     try {
-      const result = await firstValueFrom(this.entryService.createEntry(this.currentType, payload));
+      const request$ = this.buildCreateRequest(payload);
+      const result = await firstValueFrom(request$);
       this.successMessage.set(this.translate.instant('entryCreate.status.created'));
 
       const entryId = this.extractId(result);
@@ -208,6 +225,23 @@ export class EntryCreateComponent {
     }
 
     return true;
+  }
+
+  private buildCreateRequest(payload: Record<string, unknown>): Observable<Record<string, unknown>> {
+    if (!this.currentType) {
+      throw new Error('Missing entry type');
+    }
+
+    if (this.isNotesType()) {
+      const personId = this.extractPersonId(payload);
+      if (!personId) {
+        throw new Error('Person ID is required for notes.');
+      }
+      const { person_id: _omit, ...notePayload } = payload;
+      return this.entryService.createNoteForPerson(personId, notePayload);
+    }
+
+    return this.entryService.createEntry(this.currentType, payload);
   }
 
   private loadSchema(type: string): void {
