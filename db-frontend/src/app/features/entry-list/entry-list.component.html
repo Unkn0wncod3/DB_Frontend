@@ -60,10 +60,10 @@
       </thead>
       <tbody>
         <tr *ngFor="let item of items(); trackBy: trackByIndex">
-          <td *ngFor="let column of columns(); trackBy: trackByColumn">
+          <td *ngFor="let column of columns(); trackBy: trackByColumn" [attr.data-label]="column.label">
             {{ formatValue(item[column.key]) }}
           </td>
-          <td class="entry-list__table-actions">
+          <td class="entry-list__table-actions" [attr.data-label]="'entryList.table.actions' | translate">
             <button type="button" (click)="navigateToEntry(item)" [disabled]="!hasEntryId(item)">
               {{ 'entryList.actions.view' | translate }}
             </button>

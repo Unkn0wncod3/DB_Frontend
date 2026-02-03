@@ -198,3 +198,81 @@
 }
 
 
+
+
+@media (max-width: 768px) {
+  .entry-list {
+    padding: 1rem;
+  }
+
+  .entry-list__header,
+  .entry-list__actions,
+  .entry-list__controls,
+  .entry-list__pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .entry-list__actions,
+  .entry-list__pagination {
+    gap: 0.5rem;
+  }
+
+  .entry-list__controls label,
+  .entry-list__person app-person-lookup,
+  .entry-list__search input,
+  .entry-list__page-size select {
+    width: 100%;
+  }
+
+  .entry-list__content {
+    border-radius: 0.5rem;
+  }
+
+  .entry-list__table {
+    min-width: 0;
+    border: none;
+  }
+
+  .entry-list__table thead {
+    display: none;
+  }
+
+  .entry-list__table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .entry-list__table tr {
+    display: block;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 0.75rem;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  }
+
+  .entry-list__table td {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.65rem 0.85rem;
+    border: none;
+    font-size: 0.9rem;
+  }
+
+  .entry-list__table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #475569;
+    flex: 1;
+  }
+
+  .entry-list__table-actions {
+    text-align: left;
+  }
+
+  .entry-list__table-actions button {
+    width: 100%;
+  }
+}
