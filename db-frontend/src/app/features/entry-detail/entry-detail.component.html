@@ -15,9 +15,6 @@
         *ngIf="showPersonRelations() && entryId"
         role="group"
         [attr.aria-label]="'entryDetail.relations.layoutLabel' | translate">
-        <span class="entry-detail__layout-toggle-label">
-          {{ 'entryDetail.relations.layoutLabel' | translate }}
-        </span>
         <label class="entry-detail__layout-option">
           <input
             type="radio"
@@ -28,7 +25,7 @@
           />
           <span class="entry-detail__layout-body">
             <span class="entry-detail__layout-icon entry-detail__layout-icon--side" aria-hidden="true"></span>
-            <span class="entry-detail__layout-text">
+            <span class="sr-only">
               {{ 'entryDetail.relations.layoutOptionSide' | translate }}
             </span>
           </span>
@@ -43,7 +40,7 @@
           />
           <span class="entry-detail__layout-body">
             <span class="entry-detail__layout-icon entry-detail__layout-icon--stacked" aria-hidden="true"></span>
-            <span class="entry-detail__layout-text">
+            <span class="sr-only">
               {{ 'entryDetail.relations.layoutOptionStacked' | translate }}
             </span>
           </span>
