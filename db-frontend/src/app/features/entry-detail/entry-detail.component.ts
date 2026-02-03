@@ -414,6 +414,11 @@ export class EntryDetailComponent {
       return 'datetime';
     }
 
+    // Purely numeric strings (e.g., IDs or counts) should not be interpreted as dates.
+    if (/^[+-]?\d+(\.\d+)?$/.test(trimmed)) {
+      return null;
+    }
+
     const parsed = Date.parse(trimmed);
     return Number.isNaN(parsed) ? null : 'datetime';
   }
