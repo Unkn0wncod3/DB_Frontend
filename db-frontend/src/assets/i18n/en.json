@@ -106,7 +106,10 @@
       "profileNotePlaceholder": "Optional note about this link",
       "profileLinked": "Profile linked to this person.",
       "profileUnlinked": "Profile unlinked.",
-      "profileLinkInvalid": "Enter a valid profile ID before linking."
+      "profileLinkInvalid": "Enter a valid profile ID before linking.",
+      "layoutLabel": "Relations layout",
+      "layoutOptionSide": "Side by side",
+      "layoutOptionStacked": "Below form"
     },
     "delete": {
       "dialogTitle": "Confirm deletion",

@@ -72,6 +72,8 @@ export class EntryDetailComponent {
     ['updatedat', 'datetime'],
     ['timestamp', 'datetime']
   ]);
+  private readonly relationsLayoutStorageKey = 'entryDetailRelationsLayout';
+  readonly relationsLayout = signal<'side' | 'stacked'>(this.loadRelationsLayout());
   readonly deleteSecurityKey = 'del1';
   readonly isDeleteDialogOpen = signal(false);
 
@@ -701,6 +703,51 @@ export class EntryDetailComponent {
 
   showPersonRelations(): boolean {
     return (this.currentType ?? '').toLowerCase() === 'persons';
+  }
+
+  onRelationsLayoutChange(value: string): void {
+    const layout = value === 'stacked' ? 'stacked' : 'side';
+    this.setRelationsLayout(layout);
+  }
+
+  private setRelationsLayout(layout: 'side' | 'stacked'): void {
+    this.relationsLayout.set(layout);
+    this.persistRelationsLayout(layout);
+  }
+
+  private loadRelationsLayout(): 'side' | 'stacked' {
+    const storage = this.getPreferenceStorage();
+    if (!storage) {
+      return 'side';
+    }
+
+    const stored = storage.getItem(this.relationsLayoutStorageKey);
+    return stored === 'stacked' ? 'stacked' : 'side';
+  }
+
+  private persistRelationsLayout(layout: 'side' | 'stacked'): void {
+    const storage = this.getPreferenceStorage();
+    if (!storage) {
+      return;
+    }
+
+    try {
+      storage.setItem(this.relationsLayoutStorageKey, layout);
+    } catch {
+      // ignore persistence errors
+    }
+  }
+
+  private getPreferenceStorage(): Storage | null {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return null;
+    }
+
+    try {
+      return window.localStorage;
+    } catch {
+      return null;
+    }
   }
 
   private clearMessages(): void {

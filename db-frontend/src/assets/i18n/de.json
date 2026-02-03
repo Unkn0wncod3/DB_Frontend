@@ -17,7 +17,7 @@
     "actions": {
       "refresh": "Jetzt aktualisieren",
       "refreshing": "Aktualisiere...",
-      "createLabel": "Neuen Eintrag erstellen f\u00c3\u00bcr",
+      "createLabel": "Neuen Eintrag erstellen fÃ¼r",
       "createButton": "Eintrag erstellen"
     },
     "meta": {
@@ -72,8 +72,8 @@
       "unknownId": "Unbekannter Eintrag",
       "type": "Typ: {{ type }}",
       "id": "ID: {{ id }}",
-      "relationships": "Verkn\u00fcpfte Daten",
-      "connectedItems": "Verbundene Profile, Notizen und Aktivit\u00e4ten"
+      "relationships": "Verknüpfte Daten",
+      "connectedItems": "Verbundene Profile, Notizen und Aktivitäten"
     },
     "actions": {
       "back": "Zurueck zum Dashboard",
@@ -107,7 +107,10 @@
       "profileNotePlaceholder": "Optionale Notiz zu dieser Verknuepfung",
       "profileLinked": "Profil wurde mit dieser Person verknuepft.",
       "profileUnlinked": "Verknuepfung entfernt.",
-      "profileLinkInvalid": "Bitte eine gueltige Profil-ID angeben."
+      "profileLinkInvalid": "Bitte eine gueltige Profil-ID angeben.",
+      "layoutLabel": "Position der Beziehungen",
+      "layoutOptionSide": "Rechts daneben",
+      "layoutOptionStacked": "Unter dem Formular"
     },
     "delete": {
       "dialogTitle": "Loeschen bestaetigen",
@@ -135,7 +138,7 @@
       "refresh": "Aktualisieren",
       "refreshing": "Aktualisiere...",
       "view": "Eintrag oeffnen",
-      "timeline": "Timeline \u00f6ffnen"
+      "timeline": "Timeline öffnen"
     },
     "filters": {
       "searchLabel": "Suche",
@@ -174,13 +177,13 @@
       "users": "Benutzer"
     },
     "timeline": {
-      "title": "Aktivit\u00e4ten-Timeline",
-      "subtitle": "Zeigt Aktivit\u00e4ten chronologisch mit optionalen Filtern.",
+      "title": "Aktivitäten-Timeline",
+      "subtitle": "Zeigt Aktivitäten chronologisch mit optionalen Filtern.",
       "personFilter": "Name",
       "personFilterId": "ID: {{ value }}",
       "fromDate": "Von-Datum",
       "toDate": "Bis-Datum",
-      "reset": "Filter zur\u00fccksetzen",
+      "reset": "Filter zurücksetzen",
       "personLabel": "Person {{ value }}"
     }
   },

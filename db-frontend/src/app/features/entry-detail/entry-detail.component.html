@@ -33,7 +33,25 @@
     <p>{{ success }}</p>
   </section>
 
-  <div class="entry-detail__content" *ngIf="entry() as record">
+  <section
+    class="entry-detail__layout-control"
+    *ngIf="showPersonRelations() && entryId">
+    <label for="relationsLayoutSelect">
+      <span>{{ "entryDetail.relations.layoutLabel" | translate }}</span>
+      <select
+        id="relationsLayoutSelect"
+        [value]="relationsLayout()"
+        (change)="onRelationsLayoutChange((.target as HTMLSelectElement).value)">
+        <option value="side">{{ "entryDetail.relations.layoutOptionSide" | translate }}</option>
+        <option value="stacked">{{ "entryDetail.relations.layoutOptionStacked" | translate }}</option>
+      </select>
+    </label>
+  </section>
+
+  <div
+    class="entry-detail__content"
+    [class.entry-detail__content--stacked]="relationsLayout() === 'stacked'"
+    *ngIf="entry() as record">
     <form
       id="entryDetailForm"
       class="entry-detail__form"
