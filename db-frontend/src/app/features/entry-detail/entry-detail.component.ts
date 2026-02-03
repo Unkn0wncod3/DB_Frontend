@@ -57,6 +57,21 @@ export class EntryDetailComponent {
   readonly entryTitle = signal<string | null>(null);
   readonly booleanOptions = signal<ValueDropdownOption[]>([]);
   private readonly readOnlyKeys = new Set(['id', '_id', 'type', 'createdat', 'updatedat', 'created_at', 'updated_at', 'timestamp', 'occurredat', 'occurred_at']);
+  private readonly dateFieldHints = new Map<string, 'date' | 'datetime'>([
+    ['date_of_birth', 'date'],
+    ['dob', 'date'],
+    ['birthdate', 'date'],
+    ['last_seen_at', 'datetime'],
+    ['last_seen', 'datetime'],
+    ['last_service_at', 'datetime'],
+    ['occurred_at', 'datetime'],
+    ['occurredat', 'datetime'],
+    ['created_at', 'datetime'],
+    ['createdat', 'datetime'],
+    ['updated_at', 'datetime'],
+    ['updatedat', 'datetime'],
+    ['timestamp', 'datetime']
+  ]);
   readonly deleteSecurityKey = 'del1';
   readonly isDeleteDialogOpen = signal(false);
 
@@ -381,10 +396,6 @@ export class EntryDetailComponent {
       return keyHint;
     }
 
-    if (typeof value === 'string') {
-      return this.dateVariantFromString(value);
-    }
-
     if (value instanceof Date) {
       return 'datetime';
     }
@@ -393,34 +404,20 @@ export class EntryDetailComponent {
   }
 
   private dateVariantFromKey(key: string): 'date' | 'datetime' | null {
+    const hint = this.dateFieldHints.get(key);
+    if (hint) {
+      return hint;
+    }
+
     if (key.endsWith('_date') || key.includes('date_of') || key.endsWith('dob')) {
       return 'date';
     }
 
-    if (key.endsWith('_at') || key.includes('timestamp') || key.includes('time') || key.includes('last_seen') || key.includes('occurred')) {
+    if (key.endsWith('_at') || key.endsWith('_timestamp') || key.endsWith('timestamp') || key.endsWith('_time') || key.includes('last_seen') || key.includes('occurred')) {
       return 'datetime';
     }
 
     return null;
-  }
-
-  private dateVariantFromString(value: string): 'date' | 'datetime' | null {
-    const trimmed = value.trim();
-    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
-      return 'date';
-    }
-
-    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?/.test(trimmed)) {
-      return 'datetime';
-    }
-
-    // Purely numeric strings (e.g., IDs or counts) should not be interpreted as dates.
-    if (/^[+-]?\d+(\.\d+)?$/.test(trimmed)) {
-      return null;
-    }
-
-    const parsed = Date.parse(trimmed);
-    return Number.isNaN(parsed) ? null : 'datetime';
   }
 
   private prepareControlValue(value: unknown, inputType: EntryFieldInputType): string | number | boolean | null {
