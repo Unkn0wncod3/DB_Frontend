@@ -39,9 +39,10 @@
     <label for="relationsLayoutSelect">
       <span>{{ "entryDetail.relations.layoutLabel" | translate }}</span>
       <select
+        #relationsLayoutSelect
         id="relationsLayoutSelect"
         [value]="relationsLayout()"
-        (change)="onRelationsLayoutChange((.target as HTMLSelectElement).value)">
+        (change)="onRelationsLayoutChange(relationsLayoutSelect.value)">
         <option value="side">{{ "entryDetail.relations.layoutOptionSide" | translate }}</option>
         <option value="stacked">{{ "entryDetail.relations.layoutOptionStacked" | translate }}</option>
       </select>
