@@ -1,0 +1,24 @@
+.info-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.info-card {
+  padding: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.75rem;
+  background: #f8fafc;
+}
+
+.info-card h2 {
+  margin-top: 0;
+}
+
+.info-page a {
+  color: #2563eb;
+}

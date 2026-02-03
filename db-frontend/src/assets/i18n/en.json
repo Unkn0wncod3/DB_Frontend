@@ -275,5 +275,54 @@
       "status": " (Status {{status}})",
       "http": "{{message}}{{status}}"
     }
+  },
+  "footer": {
+    "github": "GitHub",
+    "contact": "Contact",
+    "imprint": "Imprint",
+    "refresh": "Refresh status",
+    "refreshing": "Checking...",
+    "neverChecked": "Not checked yet",
+    "checkedAt": "Checked {{ value }}",
+    "status": {
+      "online": "API online",
+      "offline": "API offline",
+      "unknown": "Status unknown"
+    }
+  },
+  "contact": {
+    "title": "Contact the Dev Team",
+    "intro": "Reach out to the engineering team using any of the channels below.",
+    "email": {
+      "title": "Email",
+      "value": "team@example.com"
+    },
+    "hours": {
+      "title": "Support hours",
+      "value": "Weekdays 09:00 - 18:00 CET"
+    },
+    "slack": {
+      "title": "Internal chat",
+      "value": "#db-frontend-support"
+    }
+  },
+  "imprint": {
+    "title": "Imprint",
+    "company": {
+      "title": "Operator",
+      "value": "DB Frontend Labs GmbH"
+    },
+    "address": {
+      "title": "Address",
+      "value": "Example Street 123\n12345 Sample City"
+    },
+    "contact": {
+      "title": "Contact",
+      "value": "Phone: +49 123 456 789\nEmail: info@example.com"
+    },
+    "role": {
+      "title": "Managing director",
+      "value": "Alex Example"
+    }
   }
 }

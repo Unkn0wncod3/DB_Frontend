@@ -22,4 +22,29 @@
   <main class="app-shell__content">
     <router-outlet />
   </main>
+
+  <footer class="app-shell__footer">
+    <div class="app-shell__footer-links">
+      <a [href]="githubUrl" target="_blank" rel="noopener">{{ 'footer.github' | translate }}</a>
+      <a routerLink="/contact">{{ 'footer.contact' | translate }}</a>
+      <a routerLink="/imprint">{{ 'footer.imprint' | translate }}</a>
+    </div>
+    <div class="app-shell__footer-status">
+      <span class="status-chip"
+            [class.status-chip--online]="apiStatus.status() === 'online'"
+            [class.status-chip--offline]="apiStatus.status() === 'offline'">
+        {{ ('footer.status.' + apiStatus.status()) | translate }}
+      </span>
+      <span class="footer-last-checked">
+        <ng-container *ngIf="apiStatus.lastChecked() as timestamp; else noStatus">
+          {{ 'footer.checkedAt' | translate:{ value: (timestamp | date:'HH:mm:ss') } }}
+        </ng-container>
+        <ng-template #noStatus>{{ 'footer.neverChecked' | translate }}</ng-template>
+      </span>
+      <button type="button" (click)="refreshApiStatus()" [disabled]="apiStatus.isChecking()">
+        <span *ngIf="apiStatus.isChecking(); else apiRefreshLabel">{{ 'footer.refreshing' | translate }}</span>
+        <ng-template #apiRefreshLabel>{{ 'footer.refresh' | translate }}</ng-template>
+      </button>
+    </div>
+  </footer>
 </div>

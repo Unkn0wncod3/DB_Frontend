@@ -1,21 +1,26 @@
-import { Component } from '@angular/core';
-import { NgFor } from '@angular/common';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { DatePipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { interval, Subscription } from 'rxjs';
+
+import { ApiStatusService } from './core/services/api-status.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslateModule, NgFor, FormsModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslateModule, NgFor, NgIf, FormsModule, DatePipe],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy {
   readonly languages = ['en', 'de'];
   currentLang: string;
+  readonly githubUrl = 'https://github.com/placeholder/repo';
+  private statusIntervalSub?: Subscription;
 
-  constructor(private readonly translate: TranslateService) {
+  constructor(private readonly translate: TranslateService, readonly apiStatus: ApiStatusService) {
     translate.addLangs(this.languages);
     translate.setDefaultLang('en');
 
@@ -39,5 +44,18 @@ export class AppComponent {
 
     this.translate.use(lang);
     this.currentLang = lang;
+  }
+
+  ngOnInit(): void {
+    this.apiStatus.refreshStatus();
+    this.statusIntervalSub = interval(60000).subscribe(() => this.apiStatus.refreshStatus());
+  }
+
+  ngOnDestroy(): void {
+    this.statusIntervalSub?.unsubscribe();
+  }
+
+  refreshApiStatus(): void {
+    this.apiStatus.refreshStatus();
   }
 }

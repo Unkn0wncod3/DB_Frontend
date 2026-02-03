@@ -276,5 +276,54 @@
     "inactive": "Inaktiv",
     "unknown": "Unbekannte Plattform",
     "error": "Plattformen konnten nicht geladen werden"
+  },
+  "footer": {
+    "github": "GitHub",
+    "contact": "Kontakt",
+    "imprint": "Impressum",
+    "refresh": "Status aktualisieren",
+    "refreshing": "Pruefe...",
+    "neverChecked": "Noch nicht geprueft",
+    "checkedAt": "Geprueft um {{ value }}",
+    "status": {
+      "online": "API online",
+      "offline": "API offline",
+      "unknown": "Status unbekannt"
+    }
+  },
+  "contact": {
+    "title": "Kontakt zum Dev-Team",
+    "intro": "Ueber diese Kanaele erreichst du das Entwicklerteam.",
+    "email": {
+      "title": "E-Mail",
+      "value": "team@example.com"
+    },
+    "hours": {
+      "title": "Support-Zeiten",
+      "value": "Werktags 09:00 - 18:00 Uhr CET"
+    },
+    "slack": {
+      "title": "Interner Chat",
+      "value": "#db-frontend-support"
+    }
+  },
+  "imprint": {
+    "title": "Impressum",
+    "company": {
+      "title": "Betreiber",
+      "value": "DB Frontend Labs GmbH"
+    },
+    "address": {
+      "title": "Adresse",
+      "value": "Beispielstrasse 123\n12345 Musterstadt"
+    },
+    "contact": {
+      "title": "Kontakt",
+      "value": "Telefon: +49 123 456 789\nE-Mail: info@example.com"
+    },
+    "role": {
+      "title": "Geschaeftsfuehrung",
+      "value": "Alex Beispiel"
+    }
   }
 }
