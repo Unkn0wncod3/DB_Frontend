@@ -10,6 +10,45 @@
       </p>
     </div>
     <div class="entry-detail__actions">
+      <div
+        class="entry-detail__layout-toggle"
+        *ngIf="showPersonRelations() && entryId"
+        role="group"
+        [attr.aria-label]="'entryDetail.relations.layoutLabel' | translate">
+        <span class="entry-detail__layout-toggle-label">
+          {{ 'entryDetail.relations.layoutLabel' | translate }}
+        </span>
+        <label class="entry-detail__layout-option">
+          <input
+            type="radio"
+            name="relationsLayout"
+            value="side"
+            [checked]="relationsLayout() === 'side'"
+            (change)="onRelationsLayoutChange('side')"
+          />
+          <span class="entry-detail__layout-body">
+            <span class="entry-detail__layout-icon entry-detail__layout-icon--side" aria-hidden="true"></span>
+            <span class="entry-detail__layout-text">
+              {{ 'entryDetail.relations.layoutOptionSide' | translate }}
+            </span>
+          </span>
+        </label>
+        <label class="entry-detail__layout-option">
+          <input
+            type="radio"
+            name="relationsLayout"
+            value="stacked"
+            [checked]="relationsLayout() === 'stacked'"
+            (change)="onRelationsLayoutChange('stacked')"
+          />
+          <span class="entry-detail__layout-body">
+            <span class="entry-detail__layout-icon entry-detail__layout-icon--stacked" aria-hidden="true"></span>
+            <span class="entry-detail__layout-text">
+              {{ 'entryDetail.relations.layoutOptionStacked' | translate }}
+            </span>
+          </span>
+        </label>
+      </div>
       <button type="button" class="entry-detail__refresh" (click)="refresh()" [disabled]="isLoading() || isSaving()">
         <span *ngIf="isLoading(); else refreshLabel">{{ 'entryDetail.status.loading' | translate }}</span>
         <ng-template #refreshLabel>{{ 'entryDetail.actions.refresh' | translate }}</ng-template>
@@ -31,22 +70,6 @@
 
   <section *ngIf="successMessage() as success" class="entry-detail__alert entry-detail__alert--success">
     <p>{{ success }}</p>
-  </section>
-
-  <section
-    class="entry-detail__layout-control"
-    *ngIf="showPersonRelations() && entryId">
-    <label for="relationsLayoutSelect">
-      <span>{{ "entryDetail.relations.layoutLabel" | translate }}</span>
-      <select
-        #relationsLayoutSelect
-        id="relationsLayoutSelect"
-        [value]="relationsLayout()"
-        (change)="onRelationsLayoutChange(relationsLayoutSelect.value)">
-        <option value="side">{{ "entryDetail.relations.layoutOptionSide" | translate }}</option>
-        <option value="stacked">{{ "entryDetail.relations.layoutOptionStacked" | translate }}</option>
-      </select>
-    </label>
   </section>
 
   <div

@@ -45,6 +45,111 @@
   gap: 0.5rem;
 }
 
+.entry-detail__layout-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(226, 232, 240, 0.6);
+  border: 1px solid rgba(203, 213, 225, 0.8);
+}
+
+.entry-detail__layout-toggle-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  margin-right: 0.25rem;
+}
+
+.entry-detail__layout-option {
+  position: relative;
+  display: flex;
+}
+
+.entry-detail__layout-option input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.entry-detail__layout-body {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid #cbd5f5;
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1f2937;
+  background: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.entry-detail__layout-option input:checked + .entry-detail__layout-body {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+  box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
+}
+
+.entry-detail__layout-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.entry-detail__layout-icon--side {
+  background-image: url('../../../assets/icons/side_icon_24px.png');
+}
+
+.entry-detail__layout-icon--stacked {
+  background-image: url('../../../assets/icons/stacked_icon_24px.png');
+}
+
+.entry-detail__layout-icon::after,
+.entry-detail__layout-icon::before {
+  content: '';
+  position: absolute;
+  border-radius: 0.1rem;
+  background: currentColor;
+  opacity: 0.8;
+}
+
+.entry-detail__layout-icon--side::before {
+  width: 35%;
+  height: 70%;
+  top: 15%;
+  left: 15%;
+}
+
+.entry-detail__layout-icon--side::after {
+  width: 35%;
+  height: 70%;
+  top: 15%;
+  right: 15%;
+}
+
+.entry-detail__layout-icon--stacked::before {
+  width: 70%;
+  height: 30%;
+  left: 15%;
+  top: 18%;
+}
+
+.entry-detail__layout-icon--stacked::after {
+  width: 70%;
+  height: 30%;
+  left: 15%;
+  bottom: 18%;
+}
+
 .entry-detail__actions button {
   border: none;
   border-radius: 0.375rem;
@@ -93,26 +198,6 @@
   border-radius: 0.75rem;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
   padding: 1.5rem;
-}
-
-.entry-detail__layout-control {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  max-width: 320px;
-}
-
-.entry-detail__layout-control span {
-  font-weight: 600;
-  color: #334155;
-}
-
-.entry-detail__layout-control select {
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  padding: 0.5rem;
-  font-size: 0.95rem;
-  background: #fff;
 }
 
 .entry-detail__content {
