@@ -74,6 +74,8 @@ export class EntryDetailComponent {
   ]);
   private readonly relationsLayoutStorageKey = 'entryDetailRelationsLayout';
   readonly relationsLayout = signal<'side' | 'stacked'>(this.loadRelationsLayout());
+  private readonly rawViewStorageKey = 'entryDetailRawView';
+  readonly showRawView = signal(this.loadRawViewPreference());
   readonly deleteSecurityKey = 'del1';
   readonly isDeleteDialogOpen = signal(false);
 
@@ -710,6 +712,12 @@ export class EntryDetailComponent {
     this.setRelationsLayout(layout);
   }
 
+  toggleRawView(): void {
+    const next = !this.showRawView();
+    this.showRawView.set(next);
+    this.persistRawViewPreference(next);
+  }
+
   private setRelationsLayout(layout: 'side' | 'stacked'): void {
     this.relationsLayout.set(layout);
     this.persistRelationsLayout(layout);
@@ -733,6 +741,35 @@ export class EntryDetailComponent {
 
     try {
       storage.setItem(this.relationsLayoutStorageKey, layout);
+    } catch {
+      // ignore persistence errors
+    }
+  }
+
+  private loadRawViewPreference(): boolean {
+    const storage = this.getPreferenceStorage();
+    if (!storage) {
+      return true;
+    }
+
+    const stored = storage.getItem(this.rawViewStorageKey);
+    if (stored === 'hidden') {
+      return false;
+    }
+    if (stored === 'visible') {
+      return true;
+    }
+    return true;
+  }
+
+  private persistRawViewPreference(visible: boolean): void {
+    const storage = this.getPreferenceStorage();
+    if (!storage) {
+      return;
+    }
+
+    try {
+      storage.setItem(this.rawViewStorageKey, visible ? 'visible' : 'hidden');
     } catch {
       // ignore persistence errors
     }

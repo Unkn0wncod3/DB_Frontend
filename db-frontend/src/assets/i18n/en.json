@@ -127,6 +127,11 @@
       "deleteFailed": "Unable to delete entry: {{ message }}",
       "invalidPayload": "The API returned an unexpected response.",
       "unknown": "Unknown error"
+    },
+    "rawView": {
+      "label": "Raw data",
+      "show": "Show raw data",
+      "hide": "Hide raw data"
     }
   },
   "entryList": {

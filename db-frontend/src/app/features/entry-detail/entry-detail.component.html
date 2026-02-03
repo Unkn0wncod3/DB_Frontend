@@ -46,6 +46,17 @@
           </span>
         </label>
       </div>
+      <button
+        type="button"
+        class="entry-detail__raw-toggle"
+        (click)="toggleRawView()"
+        [attr.aria-pressed]="showRawView()"
+        [attr.aria-label]="(showRawView() ? 'entryDetail.rawView.hide' : 'entryDetail.rawView.show') | translate">
+        <span class="entry-detail__raw-toggle-track" aria-hidden="true">
+          <span class="entry-detail__raw-toggle-thumb" [class.entry-detail__raw-toggle-thumb--active]="showRawView()"></span>
+        </span>
+        <span class="entry-detail__raw-toggle-label">{{ 'entryDetail.rawView.label' | translate }}</span>
+      </button>
       <button type="button" class="entry-detail__refresh" (click)="refresh()" [disabled]="isLoading() || isSaving()">
         <span *ngIf="isLoading(); else refreshLabel">{{ 'entryDetail.status.loading' | translate }}</span>
         <ng-template #refreshLabel>{{ 'entryDetail.actions.refresh' | translate }}</ng-template>
@@ -98,7 +109,7 @@
     <p>{{ 'entryDetail.status.empty' | translate }}</p>
   </section>
 
-  <app-entry-detail-raw-view [record]="entry()"></app-entry-detail-raw-view>
+  <app-entry-detail-raw-view [record]="entry()" [activated]="showRawView()"></app-entry-detail-raw-view>
 
   <app-entry-detail-delete-dialog
     [isOpen]="isDeleteDialogOpen()"

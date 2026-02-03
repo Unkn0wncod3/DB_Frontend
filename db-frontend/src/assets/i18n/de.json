@@ -128,6 +128,11 @@
       "deleteFailed": "Eintrag konnte nicht geloescht werden: {{ message }}",
       "invalidPayload": "Die API hat eine unerwartete Antwort geliefert.",
       "unknown": "Unbekannter Fehler"
+    },
+    "rawView": {
+      "label": "Rohdaten",
+      "show": "Rohdaten anzeigen",
+      "hide": "Rohdaten ausblenden"
     }
   },
   "entryList": {
