@@ -1,21 +1,20 @@
-<section class="info-page">
-  <h1>{{ 'contact.title' | translate }}</h1>
-  <p>{{ 'contact.intro' | translate }}</p>
+<section class="contact-page">
+  <div class="contact-card contact-card--hero">
+    <p class="contact-card__eyebrow">{{ 'contact.email.label' | translate }}</p>
+    <h1>{{ 'contact.title' | translate }}</h1>
+    <p class="contact-card__lead">{{ 'contact.intro' | translate }}</p>
 
-  <div class="info-card">
-    <h2>{{ 'contact.email.title' | translate }}</h2>
-    <p>
-      <a href="mailto:team@example.com">{{ 'contact.email.value' | translate }}</a>
-    </p>
-  </div>
+    <a class="contact-card__address"
+       [href]="'mailto:' + ('contact.email.address' | translate)">
+      {{ 'contact.email.address' | translate }}
+    </a>
 
-  <div class="info-card">
-    <h2>{{ 'contact.hours.title' | translate }}</h2>
-    <p>{{ 'contact.hours.value' | translate }}</p>
-  </div>
+    <a class="contact-card__button"
+       [href]="'mailto:' + ('contact.email.address' | translate)">
+      {{ 'contact.email.button' | translate }}
+    </a>
 
-  <div class="info-card">
-    <h2>{{ 'contact.slack.title' | translate }}</h2>
-    <p>{{ 'contact.slack.value' | translate }}</p>
+    <p class="contact-card__response">{{ 'contact.email.response' | translate }}</p>
+    <p class="contact-card__note">{{ 'contact.availability' | translate }}</p>
   </div>
 </section>

@@ -292,20 +292,15 @@
     }
   },
   "contact": {
-    "title": "Contact the Dev Team",
-    "intro": "Reach out to the engineering team using any of the channels below.",
+    "title": "Get in touch with the DB project",
+    "intro": "I build and run the entire DB project on my own. Email is the only support channel and it comes straight to me.",
     "email": {
-      "title": "Email",
-      "value": "team@example.com"
+      "label": "Email",
+      "address": "team@example.com",
+      "button": "Write me an email",
+      "response": "I usually reply within a couple of days."
     },
-    "hours": {
-      "title": "Support hours",
-      "value": "Weekdays 09:00 - 18:00 CET"
-    },
-    "slack": {
-      "title": "Internal chat",
-      "value": "#db-frontend-support"
-    }
+    "availability": "Email only for now. Mark urgent topics in the subject line so I can prioritise them."
   },
   "imprint": {
     "title": "Imprint",
