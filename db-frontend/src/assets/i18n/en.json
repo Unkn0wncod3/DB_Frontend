@@ -47,7 +47,8 @@
       "itemId": "ID: {{ value }}"
     },
     "status": {
-      "noRecent": "No recent items available."
+      "noRecent": "No recent items available.",
+      "emptyState": "No structured statistics detected. Raw data below (if available)."
     },
     "errors": {
       "loadFailed": "Unable to load dashboard data ({{ status }}): {{ message }}",
