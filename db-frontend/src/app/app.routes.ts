@@ -19,7 +19,7 @@ export const routes: Routes = [
   { path: 'entries/:type', component: EntryListComponent, canActivate: [authGuard] },
   { path: 'entries/:type/:id', component: EntryDetailComponent, canActivate: [authGuard] },
   { path: 'explorer', component: ApiExplorerComponent, canActivate: [authGuard] },
-  { path: 'contact', component: ContactComponent, canActivate: [authGuard] },
-  { path: 'imprint', component: ImprintComponent, canActivate: [authGuard] },
+  { path: 'contact', component: ContactComponent },
+  { path: 'imprint', component: ImprintComponent },
   { path: '**', redirectTo: '' }
 ];
