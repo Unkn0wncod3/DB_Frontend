@@ -24,6 +24,7 @@ export interface AuthLoginResponse {
 interface StoredAuthState {
   token: string;
   user?: AuthenticatedUser | null;
+  expiresAt: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -32,22 +33,36 @@ export class AuthService {
   private readonly router = inject(Router);
   private readonly apiBaseUrl = inject(API_BASE_URL);
   private readonly storageKey = 'dbFrontendAuth';
+  private readonly sessionDurationMs = 60 * 60 * 1000;
   private redirectUrl: string | null = null;
 
   private tokenValue: string | null;
   private userValue: AuthenticatedUser | null;
+  private expiresAtValue: number | null;
 
   constructor() {
     const stored = this.readStoredState();
-    this.tokenValue = stored?.token ?? null;
-    this.userValue = stored?.user ?? null;
+
+    if (stored && this.isStateValid(stored)) {
+      this.tokenValue = stored.token;
+      this.userValue = stored.user ?? null;
+      this.expiresAtValue = stored.expiresAt;
+    } else {
+      this.tokenValue = null;
+      this.userValue = null;
+      this.expiresAtValue = null;
+      if (stored) {
+        this.clearStoredState();
+      }
+    }
   }
 
   login(payload: AuthLoginRequest): Observable<AuthLoginResponse> {
     const url = this.normalizeUrl('/auth/login');
     return this.http.post<AuthLoginResponse>(url, payload).pipe(
       tap((response) => {
-        this.persistState({ token: response.access_token, user: response.user });
+        const expiresAt = Date.now() + this.sessionDurationMs;
+        this.persistState({ token: response.access_token, user: response.user, expiresAt });
       })
     );
   }
@@ -58,15 +73,15 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return Boolean(this.tokenValue);
+    return this.ensureActiveSession();
   }
 
   token(): string | null {
-    return this.tokenValue;
+    return this.ensureActiveSession() ? this.tokenValue : null;
   }
 
   user(): AuthenticatedUser | null {
-    return this.userValue;
+    return this.ensureActiveSession() ? this.userValue : null;
   }
 
   setRedirectUrl(url: string | null): void {
@@ -88,6 +103,7 @@ export class AuthService {
   private persistState(state: StoredAuthState | null): void {
     this.tokenValue = state?.token ?? null;
     this.userValue = state?.user ?? null;
+    this.expiresAtValue = state?.expiresAt ?? null;
 
     if (state?.token) {
       this.writeStoredState(state);
@@ -108,6 +124,21 @@ export class AuthService {
     }
   }
 
+  private isStateValid(state: StoredAuthState): boolean {
+    return typeof state.expiresAt === 'number' && state.expiresAt > Date.now();
+  }
+
+  private ensureActiveSession(): boolean {
+    if (!this.tokenValue) {
+      return false;
+    }
+    if (!this.expiresAtValue || Date.now() >= this.expiresAtValue) {
+      this.logout();
+      return false;
+    }
+    return true;
+  }
+
   private writeStoredState(state: StoredAuthState): void {
     try {
       window.localStorage.setItem(this.storageKey, JSON.stringify(state));
@@ -124,3 +155,5 @@ export class AuthService {
     }
   }
 }
+
+
