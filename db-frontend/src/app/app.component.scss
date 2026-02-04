@@ -112,13 +112,33 @@
 
 @media (max-width: 600px) {
   .app-shell {
-    padding: 2rem 1rem;
+    padding: 1rem 0.75rem 2.5rem;
   }
 
   .app-shell__header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 0.75rem;
+    position: static;
+    box-shadow: none;
+  }
+
+  .app-shell__nav {
+    margin: 0;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .app-shell__user-controls {
+    width: 100%;
+    justify-content: space-between;
+    margin-left: 0;
+  }
+
+  .app-shell__footer {
+    position: static;
+    box-shadow: none;
+    border-radius: 1rem;
   }
 }
 
