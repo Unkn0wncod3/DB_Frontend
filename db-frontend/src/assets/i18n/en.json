@@ -324,5 +324,19 @@
       "title": "Managing director",
       "value": "Alex Example"
     }
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Enter your credentials to access the dashboard.",
+      "username": "Username",
+      "password": "Password",
+      "submit": "Sign in",
+      "loading": "Signing in..."
+    },
+    "errors": {
+      "invalidCredentials": "Invalid username or password."
+    },
+    "logout": "Log out"
   }
 }

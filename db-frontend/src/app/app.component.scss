@@ -166,3 +166,31 @@
 .footer-last-checked {
   color: #94a3b8;
 }
+.app-shell__auth {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-shell__auth button {
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  border-radius: 999px;
+  background: transparent;
+  padding: 0.35rem 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.app-shell__login {
+  border: 1px solid #2563eb;
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.app-shell__user {
+  font-weight: 600;
+  color: #475569;
+}

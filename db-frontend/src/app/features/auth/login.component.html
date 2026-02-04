@@ -1,0 +1,27 @@
+<section class="login">
+  <div class="login__card">
+    <h1>{{ 'auth.login.title' | translate }}</h1>
+    <p class="login__subtitle">{{ 'auth.login.subtitle' | translate }}</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <label>
+        <span>{{ 'auth.login.username' | translate }}</span>
+        <input type="text" formControlName="username" autocomplete="username" />
+      </label>
+
+      <label>
+        <span>{{ 'auth.login.password' | translate }}</span>
+        <input type="password" formControlName="password" autocomplete="current-password" />
+      </label>
+
+      <div class="login__error" *ngIf="errorMessage() as errorKey">
+        {{ errorKey | translate }}
+      </div>
+
+      <button type="submit" [disabled]="form.invalid || isSubmitting()">
+        <span *ngIf="isSubmitting(); else loginLabel">{{ 'auth.login.loading' | translate }}</span>
+        <ng-template #loginLabel>{{ 'auth.login.submit' | translate }}</ng-template>
+      </button>
+    </form>
+  </div>
+</section>

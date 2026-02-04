@@ -325,5 +325,19 @@
       "title": "Geschaeftsfuehrung",
       "value": "Alex Beispiel"
     }
+  },
+  "auth": {
+    "login": {
+      "title": "Anmelden",
+      "subtitle": "Bitte Zugangsdaten eingeben, um fortzufahren.",
+      "username": "Benutzername",
+      "password": "Passwort",
+      "submit": "Anmelden",
+      "loading": "Melde an..."
+    },
+    "errors": {
+      "invalidCredentials": "Benutzername oder Passwort falsch."
+    },
+    "logout": "Abmelden"
   }
 }

@@ -6,6 +6,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { interval, Subscription } from 'rxjs';
 
 import { ApiStatusService } from './core/services/api-status.service';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +21,11 @@ export class AppComponent implements OnInit, OnDestroy {
   readonly githubUrl = 'https://github.com/placeholder/repo';
   private statusIntervalSub?: Subscription;
 
-  constructor(private readonly translate: TranslateService, readonly apiStatus: ApiStatusService) {
+  constructor(
+    private readonly translate: TranslateService,
+    readonly apiStatus: ApiStatusService,
+    public readonly auth: AuthService
+  ) {
     translate.addLangs(this.languages);
     translate.setDefaultLang('en');
 
@@ -57,5 +62,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   refreshApiStatus(): void {
     this.apiStatus.refreshStatus();
+  }
+
+  logout(): void {
+    this.auth.logout();
   }
 }
