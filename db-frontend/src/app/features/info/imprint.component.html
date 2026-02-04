@@ -1,19 +1,44 @@
-<section class="info-page">
-  <h1>{{ 'imprint.title' | translate }}</h1>
-  <div class="info-card">
-    <h2>{{ 'imprint.company.title' | translate }}</h2>
-    <p>{{ 'imprint.company.value' | translate }}</p>
-  </div>
-  <div class="info-card">
-    <h2>{{ 'imprint.address.title' | translate }}</h2>
-    <p>{{ 'imprint.address.value' | translate }}</p>
-  </div>
-  <div class="info-card">
-    <h2>{{ 'imprint.contact.title' | translate }}</h2>
-    <p>{{ 'imprint.contact.value' | translate }}</p>
-  </div>
-  <div class="info-card">
-    <h2>{{ 'imprint.role.title' | translate }}</h2>
-    <p>{{ 'imprint.role.value' | translate }}</p>
+<section class="imprint-page">
+  <header class="imprint-hero">
+    <p class="imprint-hero__eyebrow">{{ 'imprint.company.title' | translate }}</p>
+    <h1>{{ 'imprint.title' | translate }}</h1>
+    <p class="imprint-hero__subtitle">{{ 'imprint.company.value' | translate }}</p>
+  </header>
+
+  <div class="imprint-grid">
+    <article class="imprint-card">
+      <span class="imprint-card__label">{{ 'imprint.address.title' | translate }}</span>
+      <p class="imprint-card__value">{{ 'imprint.address.value' | translate }}</p>
+    </article>
+
+    <article class="imprint-card imprint-card--highlight">
+      <span class="imprint-card__label">{{ 'imprint.contact.title' | translate }}</span>
+      <p class="imprint-card__value">{{ 'imprint.contact.value' | translate }}</p>
+    </article>
+
+    <article class="imprint-card">
+      <span class="imprint-card__label">{{ 'imprint.registration.title' | translate }}</span>
+      <p class="imprint-card__value">{{ 'imprint.registration.value' | translate }}</p>
+    </article>
+
+    <article class="imprint-card">
+      <span class="imprint-card__label">{{ 'imprint.vat.title' | translate }}</span>
+      <p class="imprint-card__value">{{ 'imprint.vat.value' | translate }}</p>
+    </article>
+
+    <article class="imprint-card">
+      <span class="imprint-card__label">{{ 'imprint.role.title' | translate }}</span>
+      <p class="imprint-card__value">{{ 'imprint.role.value' | translate }}</p>
+    </article>
+
+    <article class="imprint-card imprint-card--full">
+      <span class="imprint-card__label">{{ 'imprint.supervisory.title' | translate }}</span>
+      <p class="imprint-card__value">{{ 'imprint.supervisory.value' | translate }}</p>
+    </article>
+
+    <article class="imprint-card imprint-card--full imprint-card--muted">
+      <span class="imprint-card__label">{{ 'imprint.liability.title' | translate }}</span>
+      <p class="imprint-card__value">{{ 'imprint.liability.value' | translate }}</p>
+    </article>
   </div>
 </section>

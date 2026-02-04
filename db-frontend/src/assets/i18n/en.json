@@ -319,6 +319,22 @@
     "role": {
       "title": "Managing director",
       "value": "Alex Example"
+    },
+    "registration": {
+      "title": "Commercial register",
+      "value": "Register court: Amtsgericht Musterstadt\nRegistration no.: HRB 123456"
+    },
+    "vat": {
+      "title": "VAT ID",
+      "value": "DE123456789"
+    },
+    "supervisory": {
+      "title": "Supervisory authority",
+      "value": "Sample Data Protection Authority\nCompliance Street 12\n12345 Sample City"
+    },
+    "liability": {
+      "title": "Liability note",
+      "value": "Content checked with care; external links remain the responsibility of their operators."
     }
   },
   "auth": {

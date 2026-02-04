@@ -318,7 +318,23 @@
     },
     "role": {
       "title": "Geschaeftsfuehrung",
-      "value": "Alex Beispiel"
+      "value": "Mas Mustermann"
+    },
+    "registration": {
+      "title": "Handelsregister",
+      "value": "Registergericht: Amtsgericht Musterstadt\nRegisternummer: HRB 123456"
+    },
+    "vat": {
+      "title": "USt-IdNr.",
+      "value": "DE123456789"
+    },
+    "supervisory": {
+      "title": "Aufsichtsbehoerde",
+      "value": "Muster Datenschutzbehoerde\nCompliance-Strasse 12\n12345 Musterstadt"
+    },
+    "liability": {
+      "title": "Haftungshinweis",
+      "value": "Inhalte werden sorgfaeltig geprueft, fuer externe Links sind die jeweiligen Betreiber verantwortlich."
     }
   },
   "auth": {
