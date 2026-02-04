@@ -9,22 +9,23 @@
         {{ 'layout.nav.explorer' | translate }}
       </a>
     </nav>
-    <div class="app-shell__language">
-      <label class="app-shell__language-label" for="language-select">{{ 'layout.language' | translate }}</label>
-      <select id="language-select" [(ngModel)]="currentLang" (ngModelChange)="changeLanguage($event)">
-        <option *ngFor="let lang of languages" [value]="lang">
-          {{ ('layout.languages.' + lang) | translate }}
-        </option>
-      </select>
-    </div>
-    <div class="app-shell__auth">
-      <ng-container *ngIf="auth.isAuthenticated(); else loginLink">
-        <span class="app-shell__user" *ngIf="auth.user() as user">{{ user.username }}</span>
-        <button type="button" (click)="logout()">{{ 'auth.logout' | translate }}</button>
-      </ng-container>
-      <ng-template #loginLink>
-        <a routerLink="/login" class="app-shell__login">{{ 'auth.login.title' | translate }}</a>
-      </ng-template>
+    <div class="app-shell__user-controls">
+      <div class="app-shell__language">
+        <label class="app-shell__language-label" for="language-select">{{ 'layout.language' | translate }}</label>
+        <select id="language-select" [(ngModel)]="currentLang" (ngModelChange)="changeLanguage($event)">
+          <option *ngFor="let lang of languages" [value]="lang">
+            {{ ('layout.languages.' + lang) | translate }}
+          </option>
+        </select>
+      </div>
+      <div class="app-shell__auth">
+        <ng-container *ngIf="auth.isAuthenticated(); else loginLink">
+          <button type="button" (click)="logout()">{{ 'auth.logout' | translate }}</button>
+        </ng-container>
+        <ng-template #loginLink>
+          <a routerLink="/login" class="app-shell__login">{{ 'auth.login.title' | translate }}</a>
+        </ng-template>
+      </div>
     </div>
   </header>
 
