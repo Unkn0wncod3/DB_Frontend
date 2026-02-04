@@ -53,7 +53,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.apiStatus.refreshStatus();
-    this.statusIntervalSub = interval(60000).subscribe(() => this.apiStatus.refreshStatus());
+    this.statusIntervalSub = interval(3600000).subscribe(() => this.apiStatus.refreshStatus());
   }
 
   ngOnDestroy(): void {
