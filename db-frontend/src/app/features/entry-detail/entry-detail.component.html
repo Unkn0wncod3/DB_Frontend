@@ -65,11 +65,14 @@
         <span *ngIf="isSaving(); else saveLabel">{{ 'entryDetail.status.saving' | translate }}</span>
         <ng-template #saveLabel>{{ 'entryDetail.actions.save' | translate }}</ng-template>
       </button>
-      <button type="button" class="entry-detail__delete" (click)="openDeleteDialog()" [disabled]="isDeleting()">
+      <button *ngIf="canEditEntries()" type="button" class="entry-detail__delete" (click)="openDeleteDialog()" [disabled]="isDeleting()">
         <span *ngIf="isDeleting(); else deleteLabel">{{ 'entryDetail.status.deleting' | translate }}</span>
         <ng-template #deleteLabel>{{ 'entryDetail.actions.delete' | translate }}</ng-template>
       </button>
     </div>
+    <p class="entry-detail__readonly" *ngIf="!canEditEntries()">
+      {{ 'entryDetail.status.readOnly' | translate }}
+    </p>
   </header>
 
   <section *ngIf="errorMessage() as error" class="entry-detail__alert entry-detail__alert--error">

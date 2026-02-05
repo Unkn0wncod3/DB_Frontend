@@ -1,0 +1,77 @@
+<section class="user-management">
+  <header class="user-management__hero">
+    <p class="user-management__eyebrow">{{ 'userManagement.eyebrow' | translate }}</p>
+    <h1>{{ 'userManagement.title' | translate }}</h1>
+    <p class="user-management__intro">{{ 'userManagement.subtitle' | translate }}</p>
+  </header>
+
+  <section *ngIf="errorMessage() as error" class="user-management__alert user-management__alert--error">
+    <p>{{ error }}</p>
+  </section>
+  <section *ngIf="successMessage() as success" class="user-management__alert user-management__alert--success">
+    <p>{{ success }}</p>
+  </section>
+
+  <form class="user-management__form" [formGroup]="createForm" (ngSubmit)="createUser()">
+    <div>
+      <label>{{ 'userManagement.form.username' | translate }}</label>
+      <input type="text" formControlName="username" autocomplete="off" />
+    </div>
+    <div>
+      <label>{{ 'userManagement.form.password' | translate }}</label>
+      <input type="password" formControlName="password" autocomplete="new-password" />
+    </div>
+    <div>
+      <label>{{ 'userManagement.form.role' | translate }}</label>
+      <select formControlName="role">
+        <option value="user">{{ 'userManagement.roles.user' | translate }}</option>
+        <option value="admin">{{ 'userManagement.roles.admin' | translate }}</option>
+      </select>
+    </div>
+    <button type="submit" [disabled]="createForm.invalid || isCreating()">
+      <span *ngIf="isCreating(); else createLabel">{{ 'userManagement.actions.creating' | translate }}</span>
+      <ng-template #createLabel>{{ 'userManagement.actions.create' | translate }}</ng-template>
+    </button>
+  </form>
+
+  <section class="user-management__list">
+    <div class="user-management__list-header">
+      <h2>{{ 'userManagement.list.title' | translate }}</h2>
+      <button type="button" (click)="refresh()" [disabled]="isLoading()">
+        <span *ngIf="isLoading(); else refreshLabel">{{ 'userManagement.actions.refreshing' | translate }}</span>
+        <ng-template #refreshLabel>{{ 'userManagement.actions.refresh' | translate }}</ng-template>
+      </button>
+    </div>
+    <table *ngIf="users().length > 0; else emptyState">
+      <thead>
+        <tr>
+          <th>{{ 'userManagement.table.username' | translate }}</th>
+          <th>{{ 'userManagement.table.role' | translate }}</th>
+          <th>{{ 'userManagement.table.status' | translate }}</th>
+          <th>{{ 'userManagement.table.created' | translate }}</th>
+          <th class="user-management__table-actions">{{ 'userManagement.table.actions' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users(); trackBy: trackByUser">
+          <td>{{ user.username }}</td>
+          <td>{{ roleLabel(user.role) }}</td>
+          <td>
+            <span class="user-management__badge" [class.user-management__badge--inactive]="!user.is_active">
+              {{ user.is_active ? ('userManagement.status.active' | translate) : ('userManagement.status.inactive' | translate) }}
+            </span>
+          </td>
+          <td>{{ user.created_at ? (user.created_at | date:'dd/MM/yyyy, HH:mm') : '\u2013' }}</td>
+          <td class="user-management__table-actions">
+            <button type="button" class="danger" (click)="deleteUser(user)">
+              {{ 'userManagement.actions.delete' | translate }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #emptyState>
+      <p class="user-management__empty">{{ isLoading() ? ('userManagement.list.loading' | translate) : ('userManagement.list.empty' | translate) }}</p>
+    </ng-template>
+  </section>
+</section>

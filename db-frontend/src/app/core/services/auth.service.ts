@@ -6,14 +6,20 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
+const AUTH_TOKEN_TTL_MS = 4 * 60 * 60 * 1000;
+
 export interface AuthLoginRequest {
   username: string;
   password: string;
 }
 
+export type AuthRole = 'admin' | 'user';
+
 export interface AuthenticatedUser {
+  id: string | number;
   username: string;
-  role?: string;
+  role: AuthRole;
+  is_active: boolean;
 }
 
 export interface AuthLoginResponse {
@@ -33,7 +39,7 @@ export class AuthService {
   private readonly router = inject(Router);
   private readonly apiBaseUrl = inject(API_BASE_URL);
   private readonly storageKey = 'dbFrontendAuth';
-  private readonly sessionDurationMs = 60 * 60 * 1000;
+  private readonly sessionDurationMs = AUTH_TOKEN_TTL_MS;
   private redirectUrl: string | null = null;
 
   private tokenValue: string | null;
@@ -84,6 +90,19 @@ export class AuthService {
     return this.ensureActiveSession() ? this.userValue : null;
   }
 
+  hasRole(role: AuthRole): boolean {
+    const user = this.user();
+    return !!user && user.role === role;
+  }
+
+  canWrite(): boolean {
+    return this.hasRole('admin');
+  }
+
+  isAdmin(): boolean {
+    return this.hasRole('admin');
+  }
+
   setRedirectUrl(url: string | null): void {
     this.redirectUrl = url;
   }
@@ -92,6 +111,14 @@ export class AuthService {
     const url = this.redirectUrl;
     this.redirectUrl = null;
     return url;
+  }
+
+  handleUnauthorized(): void {
+    const currentUrl = this.router.url;
+    if (currentUrl && !currentUrl.startsWith('/login')) {
+      this.setRedirectUrl(currentUrl);
+    }
+    this.logout();
   }
 
   private normalizeUrl(endpoint: string): string {

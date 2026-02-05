@@ -21,7 +21,7 @@
       <h3>{{ 'entryDetail.relations.profiles' | translate }}</h3>
       <a [routerLink]="relationListLink('profiles')">{{ 'entryDetail.relations.viewAll' | translate }}</a>
     </div>
-    <form class="entry-detail__profile-link" [formGroup]="profileLinkForm" (ngSubmit)="linkProfile()">
+    <form *ngIf="canManageRelations()" class="entry-detail__profile-link" [formGroup]="profileLinkForm" (ngSubmit)="linkProfile()">
       <label>
         <span>{{ 'entryDetail.relations.profileIdLabel' | translate }}</span>
         <input type="number" formControlName="profileId" placeholder="42" />
@@ -50,6 +50,7 @@
           </div>
         </ng-template>
         <button
+          *ngIf="canManageRelations()"
           type="button"
           class="entry-detail__relation-unlink"
           (click)="unlinkProfile(profile.id)"

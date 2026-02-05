@@ -8,6 +8,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { EntryService } from '../../core/services/entry.service';
 import { ApiService } from '../../core/services/api.service';
+import { AuthService } from '../../core/services/auth.service';
 import { ValueDropdownOption } from '../../shared/components/value-dropdown/value-dropdown.component';
 import { EntryFieldConfig, EntryFieldInputType } from './entry-detail.types';
 import { EntryDetailFieldGridComponent } from './components/entry-detail-field-grid/entry-detail-field-grid.component';
@@ -45,6 +46,7 @@ export class EntryDetailComponent {
   private readonly translate = inject(TranslateService);
   private readonly entryService = inject(EntryService);
   private readonly api = inject(ApiService);
+  private readonly auth = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly isLoading = signal(false);
@@ -111,7 +113,7 @@ export class EntryDetailComponent {
   }
 
   openDeleteDialog(): void {
-    if (!this.currentType || !this.currentId) {
+    if (!this.canEditEntries() || !this.currentType || !this.currentId) {
       return;
     }
     this.isDeleteDialogOpen.set(true);
@@ -134,7 +136,7 @@ export class EntryDetailComponent {
   }
 
   async save(): Promise<void> {
-    if (!this.currentType || !this.currentId || this.form.invalid) {
+    if (!this.canEditEntries() || !this.currentType || !this.currentId || this.form.invalid) {
       return;
     }
 
@@ -170,7 +172,7 @@ export class EntryDetailComponent {
   }
 
   private async performDelete(): Promise<void> {
-    if (!this.currentType || !this.currentId || this.isDeleting()) {
+    if (!this.canEditEntries() || !this.currentType || !this.currentId || this.isDeleting()) {
       return;
     }
 
@@ -270,6 +272,9 @@ export class EntryDetailComponent {
     }
 
     this.form = this.fb.nonNullable.group(controls);
+    if (!this.canEditEntries()) {
+      this.form.disable({ emitEvent: false });
+    }
     this.fields.set(fieldConfigs);
     this.fieldConfigMap = new Map(fieldConfigs.map((config) => [config.key, config]));
     this.form.markAsPristine();
@@ -701,6 +706,10 @@ export class EntryDetailComponent {
 
   get entryId(): string | null {
     return this.currentId;
+  }
+
+  canEditEntries(): boolean {
+    return this.auth.canWrite();
   }
 
   showPersonRelations(): boolean {

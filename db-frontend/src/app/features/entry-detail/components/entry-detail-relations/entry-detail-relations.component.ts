@@ -6,6 +6,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
 import { ApiService } from '../../../../core/services/api.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { RelatedEntryItem } from '../../entry-detail.types';
 
 @Component({
@@ -20,6 +21,7 @@ export class EntryDetailRelationsComponent implements OnChanges {
   private readonly api = inject(ApiService);
   private readonly translate = inject(TranslateService);
   private readonly fb = inject(FormBuilder);
+  private readonly auth = inject(AuthService);
 
   @Input({ required: true }) personId: string | null = null;
   @Input() entryTitle: string | null = null;
@@ -56,6 +58,10 @@ export class EntryDetailRelationsComponent implements OnChanges {
 
   relationListLink(type: string): string[] {
     return ['/entries', type];
+  }
+
+  canManageRelations(): boolean {
+    return this.auth.canWrite();
   }
 
   trackByRelation(_index: number, item: RelatedEntryItem): string {

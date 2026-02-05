@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -42,10 +43,22 @@ export class LoginComponent {
           const redirect = this.auth.consumeRedirectUrl() ?? '/';
           void this.router.navigateByUrl(redirect);
         },
-        error: () => {
+        error: (err: unknown) => {
           this.isSubmitting.set(false);
-          this.errorMessage.set('auth.errors.invalidCredentials');
+          this.errorMessage.set(this.mapErrorToTranslation(err));
         }
       });
+  }
+
+  private mapErrorToTranslation(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      if (error.status === 401) {
+        return 'auth.errors.invalidCredentials';
+      }
+      if (error.status === 422) {
+        return 'auth.errors.validation';
+      }
+    }
+    return 'auth.errors.generic';
   }
 }

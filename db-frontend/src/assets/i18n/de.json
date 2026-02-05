@@ -3,12 +3,17 @@
     "brand": "DB Frontend",
     "nav": {
       "dashboard": "Dashboard",
-      "explorer": "Explorer"
+      "explorer": "Explorer",
+      "users": "Benutzer"
     },
     "language": "Sprache",
     "languages": {
       "en": "Englisch",
       "de": "Deutsch"
+    },
+    "roles": {
+      "admin": "Admin",
+      "user": "User"
     }
   },
   "dashboard": {
@@ -90,7 +95,8 @@
       "noChanges": "Keine Aenderungen erkannt.",
       "empty": "Keine Daten fuer diesen Eintrag verfuegbar.",
       "loadingRelations": "Verknuepfungen werden geladen...",
-      "noRelations": "Keine verknuepften Eintraege gefunden."
+      "noRelations": "Keine verknuepften Eintraege gefunden.",
+      "readOnly": "Nur-Lesen: Dieser Zugang kann Daten ansehen, aber nichts aendern."
     },
     "sections": {
       "raw": "Rohdaten"
@@ -347,8 +353,52 @@
       "loading": "Melde an..."
     },
     "errors": {
-      "invalidCredentials": "Benutzername oder Passwort falsch."
+      "invalidCredentials": "Benutzername oder Passwort falsch.",
+      "validation": "Bitte Eingaben pruefen.",
+      "generic": "Anmeldung fehlgeschlagen. Bitte erneut versuchen."
     },
     "logout": "Abmelden"
+  },
+  "userManagement": {
+    "eyebrow": "Admin-Werkzeuge",
+    "title": "Benutzerverwaltung",
+    "subtitle": "Konten anlegen oder entfernen. Aenderungen sind nur fuer Admins moeglich.",
+    "form": {
+      "username": "Benutzername",
+      "password": "Passwort",
+      "role": "Rolle"
+    },
+    "actions": {
+      "create": "Benutzer erstellen",
+      "creating": "Erstelle...",
+      "refresh": "Liste aktualisieren",
+      "refreshing": "Aktualisiere...",
+      "delete": "Loeschen",
+      "confirmDelete": "{{username}} wirklich entfernen?",
+      "close": "Schliessen"
+    },
+    "list": {
+      "title": "Vorhandene Benutzer",
+      "empty": "Noch keine Benutzer vorhanden.",
+      "loading": "Benutzer werden geladen..."
+    },
+    "table": {
+      "username": "Benutzername",
+      "role": "Rolle",
+      "status": "Status",
+      "created": "Angelegt am",
+      "actions": "Aktionen"
+    },
+    "status": {
+      "created": "Benutzer erfolgreich angelegt.",
+      "deleted": "{{username}} wurde entfernt.",
+      "genericError": "Aktion fehlgeschlagen. Bitte spaeter erneut versuchen.",
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "roles": {
+      "admin": "Admin",
+      "user": "User"
+    }
   }
 }

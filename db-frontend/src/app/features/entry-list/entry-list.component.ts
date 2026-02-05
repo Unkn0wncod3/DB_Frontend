@@ -8,6 +8,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { EntryListParams, EntryService } from '../../core/services/entry.service';
 import { PersonLookupComponent } from '../../shared/components/person-lookup/person-lookup.component';
+import { AuthService } from '../../core/services/auth.service';
 
 interface DisplayColumn {
   key: string;
@@ -29,6 +30,7 @@ export class EntryListComponent {
   private readonly entryService = inject(EntryService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly translate = inject(TranslateService);
+  private readonly auth = inject(AuthService);
 
   private readonly defaultPageSize = 25;
   private readonly pageSizeOptions = [10, 25, 50, 100];
@@ -121,7 +123,7 @@ export class EntryListComponent {
   }
 
   createLink(): string[] | null {
-    if (!this.currentType) {
+    if (!this.currentType || !this.auth.canWrite()) {
       return null;
     }
 

@@ -8,6 +8,9 @@
       <a routerLink="/explorer" routerLinkActive="is-active">
         {{ 'layout.nav.explorer' | translate }}
       </a>
+      <a *ngIf="auth.isAdmin()" routerLink="/admin/users" routerLinkActive="is-active">
+        {{ 'layout.nav.users' | translate }}
+      </a>
     </nav>
     <div class="app-shell__user-controls">
       <div class="app-shell__language">
@@ -20,6 +23,10 @@
       </div>
       <div class="app-shell__auth">
         <ng-container *ngIf="auth.isAuthenticated(); else loginLink">
+          <div class="app-shell__user-meta" *ngIf="auth.user() as currentUser">
+            <span class="app-shell__user-name">{{ currentUser.username }}</span>
+            <span class="app-shell__user-role">{{ ('layout.roles.' + currentUser.role) | translate }}</span>
+          </div>
           <button type="button" (click)="logout()">{{ 'auth.logout' | translate }}</button>
         </ng-container>
         <ng-template #loginLink>

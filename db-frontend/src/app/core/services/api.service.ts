@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { API_BASE_URL } from '../tokens/api-base-url.token';
+import { AuthService } from './auth.service';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
@@ -16,8 +17,13 @@ export interface RequestOptions {
 export class ApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = inject(API_BASE_URL);
+  private readonly auth = inject(AuthService);
 
   request<T>(method: HttpMethod, endpoint: string, options: RequestOptions = {}): Observable<T> {
+    if (method !== 'GET' && !this.auth.canWrite()) {
+      throw new Error('Insufficient permissions for this operation.');
+    }
+
     const url = this.buildUrl(endpoint);
     const { body, headers, params } = options;
     return this.http.request<T>(method, url, { body, headers, params });

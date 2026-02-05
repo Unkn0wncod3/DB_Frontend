@@ -3,12 +3,17 @@
     "brand": "DB Frontend",
     "nav": {
       "dashboard": "Dashboard",
-      "explorer": "Explorer"
+      "explorer": "Explorer",
+      "users": "Users"
     },
     "language": "Language",
     "languages": {
       "en": "English",
       "de": "German"
+    },
+    "roles": {
+      "admin": "Admin",
+      "user": "User"
     }
   },
   "dashboard": {
@@ -90,7 +95,8 @@
       "noChanges": "No changes detected.",
       "empty": "No data available for this entry.",
       "loadingRelations": "Loading related items...",
-      "noRelations": "No related entries found."
+      "noRelations": "No related entries found.",
+      "readOnly": "Read-only account: you can browse data but changes are disabled."
     },
     "sections": {
       "raw": "Raw payload"
@@ -347,8 +353,52 @@
       "loading": "Signing in..."
     },
     "errors": {
-      "invalidCredentials": "Invalid username or password."
+      "invalidCredentials": "Invalid username or password.",
+      "validation": "Please check the input fields.",
+      "generic": "Sign in failed. Please try again."
     },
     "logout": "Log out"
+  },
+  "userManagement": {
+    "eyebrow": "Admin tools",
+    "title": "User management",
+    "subtitle": "Create, remove or review internal accounts. Only admins can perform changes.",
+    "form": {
+      "username": "Username",
+      "password": "Password",
+      "role": "Role"
+    },
+    "actions": {
+      "create": "Create user",
+      "creating": "Creating...",
+      "refresh": "Refresh list",
+      "refreshing": "Refreshing...",
+      "delete": "Delete",
+      "confirmDelete": "Remove {{username}}?",
+      "close": "Close"
+    },
+    "list": {
+      "title": "Existing users",
+      "empty": "No users found yet.",
+      "loading": "Loading users..."
+    },
+    "table": {
+      "username": "Username",
+      "role": "Role",
+      "status": "Status",
+      "created": "Created at",
+      "actions": "Actions"
+    },
+    "status": {
+      "created": "User created successfully.",
+      "deleted": "Removed {{username}}.",
+      "genericError": "Action failed. Try again later.",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "roles": {
+      "admin": "Admin",
+      "user": "User"
+    }
   }
 }

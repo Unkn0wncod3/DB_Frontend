@@ -9,16 +9,19 @@ import { ActivitiesTimelineComponent } from './features/activities-timeline/acti
 import { ContactComponent } from './features/info/contact.component';
 import { ImprintComponent } from './features/info/imprint.component';
 import { LoginComponent } from './features/auth/login.component';
+import { UserManagementComponent } from './features/users/user-management.component';
 import { authGuard } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: '', component: DashboardComponent, canActivate: [authGuard] },
-  { path: 'entries/:type/new', component: EntryCreateComponent, canActivate: [authGuard] },
+  { path: 'entries/:type/new', component: EntryCreateComponent, canActivate: [authGuard, adminGuard] },
   { path: 'entries/activities/timeline', component: ActivitiesTimelineComponent, canActivate: [authGuard] },
   { path: 'entries/:type', component: EntryListComponent, canActivate: [authGuard] },
   { path: 'entries/:type/:id', component: EntryDetailComponent, canActivate: [authGuard] },
-  { path: 'explorer', component: ApiExplorerComponent, canActivate: [authGuard] },
+  { path: 'explorer', component: ApiExplorerComponent, canActivate: [authGuard, adminGuard] },
+  { path: 'admin/users', component: UserManagementComponent, canActivate: [authGuard, adminGuard] },
   { path: 'contact', component: ContactComponent },
   { path: 'imprint', component: ImprintComponent },
   { path: '**', redirectTo: '' }

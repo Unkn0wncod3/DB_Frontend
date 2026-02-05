@@ -1,0 +1,141 @@
+.user-management {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 3rem;
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 55px rgba(15, 23, 42, 0.08);
+}
+
+.user-management__hero h1 {
+  margin-bottom: 0.5rem;
+}
+
+.user-management__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.user-management__intro {
+  margin: 0;
+  color: #475569;
+}
+
+.user-management__alert {
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+}
+
+.user-management__alert--error {
+  background: rgba(248, 113, 113, 0.15);
+  color: #b91c1c;
+}
+
+.user-management__alert--success {
+  background: rgba(34, 197, 94, 0.15);
+  color: #15803d;
+}
+
+.user-management__form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+.user-management__form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.user-management__form input,
+.user-management__form select {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+}
+
+.user-management__form button {
+  padding: 0.85rem 1.5rem;
+  border-radius: 0.75rem;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+}
+
+.user-management__list {
+  background: #f8fafc;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.user-management__list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.user-management__list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.user-management__list th,
+.user-management__list td {
+  text-align: left;
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.user-management__table-actions {
+  text-align: right;
+}
+
+.user-management__table-actions button {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #b91c1c;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.user-management__badge {
+  display: inline-flex;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.15);
+  color: #15803d;
+  font-size: 0.85rem;
+}
+
+.user-management__badge--inactive {
+  background: rgba(248, 113, 113, 0.15);
+  color: #b91c1c;
+}
+
+.user-management__empty {
+  text-align: center;
+  color: #94a3b8;
+  margin: 1.5rem 0 0;
+}
+
+@media (max-width: 640px) {
+  .user-management {
+    padding: 2rem;
+  }
+
+  .user-management__list-header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
