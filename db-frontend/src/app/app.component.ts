@@ -67,4 +67,11 @@ export class AppComponent implements OnInit, OnDestroy {
   logout(): void {
     this.auth.logout();
   }
+
+
+  scrollToTop(): void {
+    if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
 }
