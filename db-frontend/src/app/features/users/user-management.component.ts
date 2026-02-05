@@ -22,8 +22,11 @@ export class UserManagementComponent {
   readonly users = signal<UserAccount[]>([]);
   readonly isLoading = signal(false);
   readonly isCreating = signal(false);
+  readonly isDeleting = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
+  readonly pendingDeletion = signal<UserAccount | null>(null);
+  readonly protectedUsername = 'core_admin_01';
 
   readonly createForm = this.fb.nonNullable.group({
     username: ['', [Validators.required, Validators.minLength(3)]],
@@ -69,21 +72,35 @@ export class UserManagementComponent {
     }
   }
 
-  async deleteUser(account: UserAccount): Promise<void> {
-    const confirmed = window.confirm(
-      this.translate.instant('userManagement.actions.confirmDelete', { username: account.username })
-    );
-    if (!confirmed) {
+  requestDeletion(account: UserAccount): void {
+    if (this.isProtectedAccount(account)) {
+      return;
+    }
+    this.pendingDeletion.set(account);
+    this.errorMessage.set(null);
+  }
+
+  async confirmDeletion(): Promise<void> {
+    const account = this.pendingDeletion();
+    if (!account) {
       return;
     }
 
+    this.isDeleting.set(true);
     try {
       await firstValueFrom(this.userService.deleteUser(account.id));
       this.successMessage.set(this.translate.instant('userManagement.status.deleted', { username: account.username }));
       await this.refresh();
+      this.pendingDeletion.set(null);
     } catch (error) {
       this.errorMessage.set(this.describeError(error));
+    } finally {
+      this.isDeleting.set(false);
     }
+  }
+
+  cancelDeletion(): void {
+    this.pendingDeletion.set(null);
   }
 
   trackByUser(_index: number, user: UserAccount): string | number {
@@ -92,6 +109,10 @@ export class UserManagementComponent {
 
   roleLabel(role: AuthRole): string {
     return this.translate.instant(`userManagement.roles.${role}`);
+  }
+
+  isProtectedAccount(account: UserAccount): boolean {
+    return account.username === this.protectedUsername;
   }
 
   private describeError(error: unknown): string {

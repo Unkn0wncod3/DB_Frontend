@@ -77,8 +77,8 @@
       "unknownId": "Unbekannter Eintrag",
       "type": "Typ: {{ type }}",
       "id": "ID: {{ id }}",
-      "relationships": "Verkn\u00fcpfte Daten",
-      "connectedItems": "Verbundene Profile, Notizen und Aktivit\u00e4ten"
+      "relationships": "Verknüpfte Daten",
+      "connectedItems": "Verbundene Profile, Notizen und Aktivitäten"
     },
     "actions": {
       "back": "Zurueck zum Dashboard",
@@ -149,7 +149,7 @@
       "refresh": "Aktualisieren",
       "refreshing": "Aktualisiere...",
       "view": "Eintrag oeffnen",
-      "timeline": "Timeline \u00f6ffnen"
+      "timeline": "Timeline öffnen"
     },
     "filters": {
       "searchLabel": "Suche",
@@ -188,8 +188,8 @@
       "users": "Benutzer"
     },
     "timeline": {
-      "title": "Aktivit\u00e4ten-Timeline",
-      "subtitle": "Zeigt Aktivit\u00e4ten chronologisch mit optionalen Filtern.",
+      "title": "Aktivitäten-Timeline",
+      "subtitle": "Zeigt Aktivitäten chronologisch mit optionalen Filtern.",
       "personFilter": "Name",
       "personFilterId": "ID: {{ value }}",
       "fromDate": "Von-Datum",
@@ -209,7 +209,7 @@
     "form": {
       "booleanTrue": "Wahr",
       "booleanFalse": "Falsch",
-      "booleanPlaceholder": "Bitte ausw\u00e4hlen",
+      "booleanPlaceholder": "Bitte auswählen",
       "rawPayloadTitle": "Zusaetzliche Daten (JSON)",
       "rawPayloadHint": "Optionales JSON, das nach den Feldern in den Request uebernommen wird."
     },
@@ -366,7 +366,10 @@
     "form": {
       "username": "Benutzername",
       "password": "Passwort",
-      "role": "Rolle"
+      "role": "Rolle",
+      "passwordPolicyTitle": "Passwortrichtlinien",
+      "passwordPolicyCopy": "Mindestens 8 Zeichen sowie eine Mischung aus Buchstaben und Zahlen fuer interne Accounts.",
+      "validationHint": "Benutzername, Passwort (>=8 Zeichen) und Rolle auswaehlen, dann wird der Button aktiv."
     },
     "actions": {
       "create": "Benutzer erstellen",
@@ -375,12 +378,17 @@
       "refreshing": "Aktualisiere...",
       "delete": "Loeschen",
       "confirmDelete": "{{username}} wirklich entfernen?",
-      "close": "Schliessen"
+      "close": "Schliessen",
+      "locked": "Geschuetzt",
+      "cancel": "Abbrechen",
+      "confirmDeleteCta": "Benutzer entfernen",
+      "deleting": "Loesche..."
     },
     "list": {
       "title": "Vorhandene Benutzer",
       "empty": "Noch keine Benutzer vorhanden.",
-      "loading": "Benutzer werden geladen..."
+      "loading": "Benutzer werden geladen...",
+      "protectedHint": "Der Kern-Account {{username}} bleibt fuer Notfaelle erhalten und kann nicht geloescht werden."
     },
     "table": {
       "username": "Benutzername",
@@ -399,6 +407,10 @@
     "roles": {
       "admin": "Admin",
       "user": "User"
+    },
+    "modal": {
+      "title": "Account loeschen?",
+      "body": "Moechten Sie {{username}} wirklich entfernen? Diese Aktion kann nicht rueckgaengig gemacht werden."
     }
   }
 }

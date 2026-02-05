@@ -366,7 +366,10 @@
     "form": {
       "username": "Username",
       "password": "Password",
-      "role": "Role"
+      "role": "Role",
+      "passwordPolicyTitle": "Password requirements",
+      "passwordPolicyCopy": "Use at least 8 characters and mix letters plus numbers for every internal account.",
+      "validationHint": "Fill username, password (>=8 chars) and pick a role to enable the Create button."
     },
     "actions": {
       "create": "Create user",
@@ -375,12 +378,17 @@
       "refreshing": "Refreshing...",
       "delete": "Delete",
       "confirmDelete": "Remove {{username}}?",
-      "close": "Close"
+      "close": "Close",
+      "locked": "Locked",
+      "cancel": "Cancel",
+      "confirmDeleteCta": "Delete user",
+      "deleting": "Deleting..."
     },
     "list": {
       "title": "Existing users",
       "empty": "No users found yet.",
-      "loading": "Loading users..."
+      "loading": "Loading users...",
+      "protectedHint": "Core account {{username}} stays available for recovery and cannot be deleted."
     },
     "table": {
       "username": "Username",
@@ -399,6 +407,10 @@
     "roles": {
       "admin": "Admin",
       "user": "User"
+    },
+    "modal": {
+      "title": "Delete account?",
+      "body": "Do you really want to remove {{username}}? This action cannot be undone."
     }
   }
 }
