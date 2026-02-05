@@ -223,7 +223,8 @@
   gap: 1.5rem;
 }
 
-.entry-detail__content--stacked {
+.entry-detail__content--stacked,
+.entry-detail__content--full {
   grid-template-columns: minmax(0, 1fr);
 }
 
@@ -233,7 +234,8 @@
     align-items: start;
   }
 
-  .entry-detail__content.entry-detail__content--stacked {
+  .entry-detail__content.entry-detail__content--stacked,
+  .entry-detail__content.entry-detail__content--full {
     grid-template-columns: minmax(0, 1fr);
   }
 }

@@ -47,6 +47,7 @@
         </label>
       </div>
       <button
+        *ngIf="canEditEntries()"
         type="button"
         class="entry-detail__raw-toggle"
         (click)="toggleRawView()"
@@ -61,7 +62,7 @@
         <span *ngIf="isLoading(); else refreshLabel">{{ 'entryDetail.status.loading' | translate }}</span>
         <ng-template #refreshLabel>{{ 'entryDetail.actions.refresh' | translate }}</ng-template>
       </button>
-      <button type="submit" form="entryDetailForm" class="entry-detail__save" [disabled]="!hasChanges() || isSaving()">
+      <button *ngIf="canEditEntries()" type="submit" form="entryDetailForm" class="entry-detail__save" [disabled]="!hasChanges() || isSaving()">
         <span *ngIf="isSaving(); else saveLabel">{{ 'entryDetail.status.saving' | translate }}</span>
         <ng-template #saveLabel>{{ 'entryDetail.actions.save' | translate }}</ng-template>
       </button>
@@ -86,6 +87,7 @@
   <div
     class="entry-detail__content"
     [class.entry-detail__content--stacked]="relationsLayout() === 'stacked'"
+    [class.entry-detail__content--full]="!(showPersonRelations() && entryId)"
     *ngIf="entry() as record">
     <form
       id="entryDetailForm"
@@ -112,7 +114,7 @@
     <p>{{ 'entryDetail.status.empty' | translate }}</p>
   </section>
 
-  <app-entry-detail-raw-view [record]="entry()" [activated]="showRawView()"></app-entry-detail-raw-view>
+  <app-entry-detail-raw-view *ngIf="canEditEntries()" [record]="entry()" [activated]="showRawView()"></app-entry-detail-raw-view>
 
   <app-entry-detail-delete-dialog
     [isOpen]="isDeleteDialogOpen()"
