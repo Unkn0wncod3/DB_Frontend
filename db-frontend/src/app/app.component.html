@@ -5,7 +5,7 @@
       <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
         {{ 'layout.nav.dashboard' | translate }}
       </a>
-      <a routerLink="/explorer" routerLinkActive="is-active">
+      <a *ngIf="auth.isAdmin()" routerLink="/explorer" routerLinkActive="is-active">
         {{ 'layout.nav.explorer' | translate }}
       </a>
       <a *ngIf="auth.isAdmin()" routerLink="/admin/users" routerLinkActive="is-active">

@@ -4,6 +4,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { StatsOverviewRecord, StatsService } from '../../core/services/stats.service';
+import { AuthService } from '../../core/services/auth.service';
 import { ENTRY_SCHEMAS } from '../entry-create/entry-create.schemas';
 
 interface DisplayCard {
@@ -29,6 +30,7 @@ export class DashboardComponent implements OnInit {
   private readonly statsService = inject(StatsService);
   private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
+  readonly auth = inject(AuthService);
 
   readonly overview = this.statsService.overview;
   readonly isLoading = this.statsService.isLoading;
@@ -56,11 +58,13 @@ export class DashboardComponent implements OnInit {
       return [];
     }
 
-    return Object.entries(totals).map(([key, value]) => ({
-      key,
-      label: this.getTransLabel(`dashboard.totals.${key}`, key),
-      value
-    }));
+    return Object.entries(totals)
+      .filter(([key]) => !this.shouldHideCollection(key))
+      .map(([key, value]) => ({
+        key,
+        label: this.getTransLabel(`dashboard.totals.${key}`, key),
+        value
+      }));
   });
 
   readonly activityCards = computed<DisplayCard[]>(() => {
@@ -111,7 +115,7 @@ export class DashboardComponent implements OnInit {
 
   collectionLink(typeKey: string): string[] | null {
     const normalized = (typeKey ?? '').toString().trim();
-    if (!normalized) {
+    if (!normalized || this.shouldHideCollection(normalized)) {
       return null;
     }
 
@@ -270,6 +274,10 @@ export class DashboardComponent implements OnInit {
     }
 
     return this.humanizeKey(fallbackKey);
+  }
+
+  private shouldHideCollection(key: string): boolean {
+    return key.trim().toLowerCase() === 'users';
   }
 
   private getTypeSpecificLabel(record: StatsOverviewRecord): string | undefined {

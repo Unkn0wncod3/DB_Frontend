@@ -15,7 +15,7 @@
     </div>
   </header>
 
-  <section *ngIf="hasCreateOptions" class="dashboard__quick-create">
+  <section *ngIf="hasCreateOptions && auth.canWrite()" class="dashboard__quick-create">
     <label for="create-type-select">
       {{ 'dashboard.actions.createLabel' | translate }}
     </label>
