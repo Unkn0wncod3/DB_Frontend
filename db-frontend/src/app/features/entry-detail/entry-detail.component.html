@@ -19,7 +19,7 @@
           <strong>{{ updatedAt | date:'dd/MM/yyyy, HH:mm' }}</strong>
         </span>
       </p>
-      <div class="entry-detail__visibility" *ngIf="entry()">
+      <div class="entry-detail__visibility" *ngIf="entry() && canEditVisibility()">
         <div class="entry-detail__visibility-info">
           <span [ngClass]="visibilityBadgeClasses()">
             {{ visibilityBadgeLabelKey() | translate }}
@@ -27,7 +27,6 @@
           <small>{{ 'entryVisibility.helper' | translate }}</small>
         </div>
         <app-value-dropdown
-          *ngIf="canEditVisibility()"
           class="entry-detail__visibility-control"
           [formControl]="visibilityControl"
           [options]="visibilityOptions()"
