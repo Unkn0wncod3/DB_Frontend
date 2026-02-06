@@ -45,6 +45,8 @@ export class EntryListComponent {
     platforms: ['name', 'is_active', 'base_url']
   };
   private readonly visibilityColumnKey = 'visibility_level';
+  private readonly noteTextColumnKey = 'text';
+  private readonly noteTextMaxLength = 80;
 
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -148,6 +150,10 @@ export class EntryListComponent {
     return (this.currentType ?? '').toLowerCase() === 'activities';
   }
 
+  isNotesList(): boolean {
+    return (this.currentType ?? '').toLowerCase() === 'notes';
+  }
+
   selectedPersonId(): string | null {
     const value = (this.personFilterControl.value ?? '').toString().trim();
     return value.length > 0 ? value : null;
@@ -175,6 +181,22 @@ export class EntryListComponent {
     } catch {
       return String(value);
     }
+  }
+
+  formatColumnValue(columnKey: string, value: unknown): string {
+    const formatted = this.formatValue(value);
+    if (!this.shouldTruncateNoteText(columnKey)) {
+      return formatted;
+    }
+    return this.truncateNoteText(formatted);
+  }
+
+  columnValueTitle(columnKey: string, value: unknown): string | null {
+    if (!this.shouldTruncateNoteText(columnKey)) {
+      return null;
+    }
+    const formatted = this.formatValue(value);
+    return formatted.length > this.noteTextMaxLength ? formatted : null;
   }
 
   navigateToEntry(item: Record<string, unknown>): void {
@@ -406,6 +428,18 @@ export class EntryListComponent {
 
   private shouldShowVisibilityColumn(): boolean {
     return this.auth.isAdmin();
+  }
+
+  private shouldTruncateNoteText(columnKey: string): boolean {
+    return this.isNotesList() && columnKey === this.noteTextColumnKey;
+  }
+
+  private truncateNoteText(value: string): string {
+    if (value.length <= this.noteTextMaxLength) {
+      return value;
+    }
+    const sliceLength = Math.max(this.noteTextMaxLength - 3, 0);
+    return `${value.slice(0, sliceLength).trimEnd()}...`;
   }
 
   private isDisplayable(value: unknown): boolean {

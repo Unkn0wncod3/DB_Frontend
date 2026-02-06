@@ -69,7 +69,11 @@
                 {{ visibilityLabel(item[column.key]) }}
               </span>
               <ng-container *ngSwitchDefault>
-                {{ formatValue(item[column.key]) }}
+                <span
+                  [attr.title]="columnValueTitle(column.key, item[column.key])"
+                >
+                  {{ formatColumnValue(column.key, item[column.key]) }}
+                </span>
               </ng-container>
             </ng-container>
           </td>
