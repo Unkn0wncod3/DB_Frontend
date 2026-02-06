@@ -8,6 +8,36 @@
   gap: 1rem;
 }
 
+.entry-detail__relations-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.entry-detail__relations--stacked .entry-detail__relations-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.entry-detail__relations--stacked .entry-detail__relations-group {
+  height: 100%;
+}
+
+.entry-detail__relations--stacked .entry-detail__profile-link {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.entry-detail__relations--stacked .entry-detail__profile-link-actions {
+  align-self: flex-start;
+}
+
+@media (max-width: 720px) {
+  .entry-detail__relations--stacked .entry-detail__relations-groups {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .entry-detail__relations header {
   display: flex;
   flex-direction: column;

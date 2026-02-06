@@ -25,6 +25,7 @@ export class EntryDetailRelationsComponent implements OnChanges {
 
   @Input({ required: true }) personId: string | null = null;
   @Input() entryTitle: string | null = null;
+  @Input() layout: 'side' | 'stacked' = 'side';
 
   @Output() statusMessage = new EventEmitter<string>();
 

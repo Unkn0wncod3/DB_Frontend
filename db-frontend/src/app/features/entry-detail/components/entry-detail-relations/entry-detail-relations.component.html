@@ -1,4 +1,4 @@
-<aside class="entry-detail__relations">
+<aside class="entry-detail__relations" [class.entry-detail__relations--stacked]="layout === 'stacked'">
   <header>
     <h2>{{ entryTitle ?? ('entryDetail.labels.relationships' | translate) }}</h2>
     <p>{{ 'entryDetail.labels.connectedItems' | translate }}</p>
@@ -16,6 +16,7 @@
     <p>{{ 'entryDetail.status.noRelations' | translate }}</p>
   </section>
 
+  <div class="entry-detail__relations-groups">
   <section class="entry-detail__relations-group">
     <div class="entry-detail__relations-heading">
       <h3>{{ 'entryDetail.relations.profiles' | translate }}</h3>
@@ -112,4 +113,5 @@
       </li>
     </ul>
   </section>
+  </div>
 </aside>

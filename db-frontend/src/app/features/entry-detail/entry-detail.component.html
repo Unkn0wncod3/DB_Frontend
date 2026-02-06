@@ -131,6 +131,7 @@
       *ngIf="showPersonRelations() && entryId"
       [personId]="entryId"
       [entryTitle]="entryTitle()"
+      [layout]="relationsLayout()"
       (statusMessage)="successMessage.set($event)"
     ></app-entry-detail-relations>
   </div>
