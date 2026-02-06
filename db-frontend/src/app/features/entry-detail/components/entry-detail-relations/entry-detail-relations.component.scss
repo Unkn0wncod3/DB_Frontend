@@ -68,6 +68,8 @@
   gap: 0.75rem;
   height: 100%;
   max-height: 620px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
 }
 
 .entry-detail__relations-group a,
