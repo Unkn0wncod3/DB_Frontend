@@ -59,7 +59,11 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let item of items(); trackBy: trackByIndex">
+        <tr
+          *ngFor="let item of items(); trackBy: trackByIndex"
+          (click)="handleRowClick(item)"
+          [class.entry-list__row--clickable]="hasEntryId(item)"
+        >
           <td *ngFor="let column of columns(); trackBy: trackByColumn" [attr.data-label]="column.label">
             <ng-container [ngSwitch]="isVisibilityColumn(column.key)">
               <span
@@ -78,7 +82,7 @@
             </ng-container>
           </td>
           <td class="entry-list__table-actions" [attr.data-label]="'entryList.table.actions' | translate">
-            <button type="button" (click)="navigateToEntry(item)" [disabled]="!hasEntryId(item)">
+            <button type="button" (click)="handleOpenEntryButtonClick($event, item)" [disabled]="!hasEntryId(item)">
               {{ 'entryList.actions.view' | translate }}
             </button>
           </td>

@@ -144,6 +144,10 @@
   background: rgba(248, 250, 252, 0.6);
 }
 
+.entry-list__row--clickable {
+  cursor: pointer;
+}
+
 .entry-list__table-actions {
   text-align: right;
   white-space: nowrap;

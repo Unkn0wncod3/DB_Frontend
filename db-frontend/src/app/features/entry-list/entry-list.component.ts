@@ -163,6 +163,18 @@ export class EntryListComponent {
     return this.extractId(item) !== null;
   }
 
+  handleRowClick(item: Record<string, unknown>): void {
+    if (!this.hasEntryId(item)) {
+      return;
+    }
+    this.navigateToEntry(item);
+  }
+
+  handleOpenEntryButtonClick(event: MouseEvent, item: Record<string, unknown>): void {
+    event.stopPropagation();
+    this.navigateToEntry(item);
+  }
+
   formatValue(value: unknown): string {
     if (value == null) {
       return '';
