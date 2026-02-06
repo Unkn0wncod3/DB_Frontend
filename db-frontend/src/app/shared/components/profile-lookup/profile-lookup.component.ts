@@ -173,7 +173,7 @@ export class ProfileLookupComponent implements ControlValueAccessor {
       (typeof record['display_name'] === 'string' && record['display_name']) ||
       (typeof record['username'] === 'string' && record['username']) ||
       this.translate.instant('profileLookup.unknown');
-    const platform = typeof record['platform'] === 'string' ? record['platform'] : undefined;
+    const platform = this.extractPlatform(record);
     const status = typeof record['status'] === 'string' ? record['status'] : undefined;
     return {
       id: id ?? '',
@@ -205,5 +205,35 @@ export class ProfileLookupComponent implements ControlValueAccessor {
       this.selectedId.set(fallback);
       this.searchControl.setValue(fallback, { emitEvent: false });
     }
+  }
+
+  private extractPlatform(record: Record<string, unknown>): string | undefined {
+    const direct = record['platform'];
+    if (typeof direct === 'string' && direct.trim().length > 0) {
+      return direct.trim();
+    }
+
+    if (direct && typeof direct === 'object') {
+      for (const key of ['name', 'label', 'title']) {
+        const value = (direct as Record<string, unknown>)[key];
+        if (typeof value === 'string' && value.trim().length > 0) {
+          return value.trim();
+        }
+      }
+    }
+
+    for (const key of ['platform_name', 'platform_label', 'platformTitle']) {
+      const value = record[key];
+      if (typeof value === 'string' && value.trim().length > 0) {
+        return value.trim();
+      }
+    }
+
+    const id = record['platform_id'];
+    if (typeof id === 'number' || (typeof id === 'string' && id.trim().length > 0)) {
+      return this.translate.instant('profileLookup.platformId', { value: id });
+    }
+
+    return undefined;
   }
 }

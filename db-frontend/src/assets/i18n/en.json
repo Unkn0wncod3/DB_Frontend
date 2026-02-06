@@ -267,7 +267,9 @@
     "noResults": "No matching profiles",
     "close": "Close list",
     "optionId": "ID {{ value }}",
-    "unknown": "Unknown profile"
+    "platformId": "Platform {{ value }}",
+    "unknown": "Unknown profile",
+    "unknownPlatform": "Unknown platform"
   },
   "platformLookup": {
     "accessibleLabel": "Platform lookup field",

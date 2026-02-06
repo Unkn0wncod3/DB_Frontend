@@ -25,7 +25,7 @@
       <li *ngFor="let option of results(); trackBy: trackByOption" (click)="selectOption(option)">
         <strong>{{ option.label }}</strong>
         <span class="profile-lookup__id" *ngIf="option.id">{{ 'profileLookup.optionId' | translate:{ value: option.id } }}</span>
-        <span *ngIf="option.platform">{{ option.platform }}</span>
+        <span class="profile-lookup__platform">{{ option.platform || ('profileLookup.unknownPlatform' | translate) }}</span>
         <span *ngIf="option.status" class="profile-lookup__status">{{ option.status }}</span>
       </li>
       <li *ngIf="results().length === 0" class="profile-lookup__state">

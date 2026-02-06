@@ -329,7 +329,9 @@
     "noResults": "Keine passenden Profile",
     "close": "Liste schliessen",
     "optionId": "ID {{ value }}",
-    "unknown": "Unbekanntes Profil"
+    "platformId": "Plattform {{ value }}",
+    "unknown": "Unbekanntes Profil",
+    "unknownPlatform": "Unbekannte Plattform"
   },
   "platformLookup": {
     "accessibleLabel": "Plattformsuche",

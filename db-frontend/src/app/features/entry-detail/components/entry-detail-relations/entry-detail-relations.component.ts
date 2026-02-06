@@ -212,7 +212,9 @@ export class EntryDetailRelationsComponent implements OnChanges {
   }
 
   private normalizeActivities(payload: unknown): RelatedEntryItem[] {
-    return this.extractItems(payload).map((item) => {
+    return this.extractItems(payload)
+      .slice(0, 25)
+      .map((item) => {
       const record = item as Record<string, unknown>;
       const id = this.extractId(record, ['id']);
       const label = this.extractText(record, ['activity_type']) ?? 'Activity';
