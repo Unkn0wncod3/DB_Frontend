@@ -78,7 +78,9 @@
       "type": "Type: {{ type }}",
       "id": "ID: {{ id }}",
       "relationships": "Related items",
-      "connectedItems": "Profiles, notes and activities linked to this person"
+      "connectedItems": "Profiles, notes and activities linked to this person",
+      "createdAt": "Created",
+      "updatedAt": "Updated"
     },
     "actions": {
       "back": "Back to dashboard",

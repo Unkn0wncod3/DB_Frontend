@@ -19,6 +19,18 @@
   gap: 0.25rem;
 }
 
+.entry-detail__meta {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #475569;
+
+  strong {
+    font-weight: 600;
+    color: #0f172a;
+    margin-left: 0.25rem;
+  }
+}
+
 .entry-detail__title h1 {
   margin: 0;
   font-size: 1.5rem;

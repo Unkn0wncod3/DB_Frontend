@@ -8,6 +8,17 @@
         <span *ngIf="entryType && entryId" aria-hidden="true">&nbsp;&middot;&nbsp;</span>
         <span *ngIf="entryId">{{ 'entryDetail.labels.id' | translate:{ id: entryId } }}</span>
       </p>
+      <p class="entry-detail__meta" *ngIf="entry()">
+        <span *ngIf="createdTimestamp as createdAt">
+          {{ 'entryDetail.labels.createdAt' | translate }}
+          <strong>{{ createdAt | date:'dd/MM/yyyy, HH:mm' }}</strong>
+        </span>
+        <span *ngIf="createdTimestamp && updatedTimestamp" aria-hidden="true">&nbsp;&middot;&nbsp;</span>
+        <span *ngIf="updatedTimestamp as updatedAt">
+          {{ 'entryDetail.labels.updatedAt' | translate }}
+          <strong>{{ updatedAt | date:'dd/MM/yyyy, HH:mm' }}</strong>
+        </span>
+      </p>
       <div class="entry-detail__visibility" *ngIf="entry()">
         <div class="entry-detail__visibility-info">
           <span [ngClass]="visibilityBadgeClasses()">

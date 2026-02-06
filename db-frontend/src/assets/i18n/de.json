@@ -78,7 +78,9 @@
       "type": "Typ: {{ type }}",
       "id": "ID: {{ id }}",
       "relationships": "Verknüpfte Daten",
-      "connectedItems": "Verbundene Profile, Notizen und Aktivitäten"
+      "connectedItems": "Verbundene Profile, Notizen und Aktivitäten",
+      "createdAt": "Erstellt",
+      "updatedAt": "Zuletzt geändert"
     },
     "actions": {
       "back": "Zurueck zum Dashboard",

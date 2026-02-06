@@ -301,9 +301,19 @@ export class EntryDetailComponent {
 
   private shouldHideField(key: string): boolean {
     const normalized = key.toLowerCase();
+
     if (normalized === 'id' || normalized === '_id') {
       return true;
     }
+
+    if (normalized === 'metadata' || normalized === 'tags') {
+      return true;
+    }
+
+    if (normalized === 'created_at' || normalized === 'updated_at') {
+      return true;
+    }
+
     return this.isVisibilityKey(normalized);
   }
 
@@ -792,6 +802,24 @@ export class EntryDetailComponent {
 
   get entryId(): string | null {
     return this.currentId;
+  }
+
+  get createdTimestamp(): string | number | Date | null {
+    return this.normalizeTimestamp(this.entry()?.['created_at']);
+  }
+
+  get updatedTimestamp(): string | number | Date | null {
+    return this.normalizeTimestamp(this.entry()?.['updated_at']);
+  }
+
+  private normalizeTimestamp(value: unknown): string | number | Date | null {
+    if (value instanceof Date) {
+      return value;
+    }
+    if (typeof value === 'string' || typeof value === 'number') {
+      return value;
+    }
+    return null;
   }
 
   canEditEntries(): boolean {
