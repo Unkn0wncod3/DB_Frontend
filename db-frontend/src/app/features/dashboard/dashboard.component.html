@@ -144,7 +144,7 @@
     </header>
     <ul class="dashboard__recent-list">
       <li
-        *ngFor="let item of overview()?.recent ?? []; trackBy: trackByRecord"
+        *ngFor="let item of recentItems(); trackBy: trackByRecord"
         class="dashboard__recent-item"
         [class.dashboard__recent-item--link]="!!entryLink(item)"
       >

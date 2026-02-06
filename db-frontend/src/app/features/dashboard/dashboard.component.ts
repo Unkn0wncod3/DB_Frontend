@@ -38,6 +38,13 @@ export class DashboardComponent implements OnInit {
   readonly createTypeOptions = this.buildCreateOptions();
   readonly selectedCreateType = signal(this.createTypeOptions[0]?.type ?? '');
   readonly hasCreateOptions = this.createTypeOptions.length > 0;
+  readonly recentItems = computed<StatsOverviewRecord[]>(() => {
+    const recent = this.overview()?.recent;
+    if (!Array.isArray(recent) || recent.length === 0) {
+      return [];
+    }
+    return recent.filter((record) => !this.shouldHideRecentRecord(record));
+  });
 
   readonly errorMessage = computed(() => {
     const error = this.statsService.error();
@@ -253,8 +260,7 @@ export class DashboardComponent implements OnInit {
   }
 
   hasRecentItems(): boolean {
-    const recent = this.overview()?.recent;
-    return Array.isArray(recent) && recent.length > 0;
+    return this.recentItems().length > 0;
   }
 
   private buildCreateOptions(): CreateOption[] {
@@ -278,6 +284,14 @@ export class DashboardComponent implements OnInit {
 
   private shouldHideCollection(key: string): boolean {
     return key.trim().toLowerCase() === 'users';
+  }
+
+  private shouldHideRecentRecord(record: StatsOverviewRecord | undefined): boolean {
+    if (!record) {
+      return false;
+    }
+    const type = (record.type ?? '').toString().trim().toLowerCase();
+    return type === 'user' || type === 'users';
   }
 
   private getTypeSpecificLabel(record: StatsOverviewRecord): string | undefined {
