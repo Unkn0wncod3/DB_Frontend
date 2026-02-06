@@ -259,6 +259,16 @@
     "optionId": "ID {{ value }}",
     "unknown": "Unknown person"
   },
+  "profileLookup": {
+    "accessibleLabel": "Profile lookup field",
+    "placeholder": "Search by username or ID",
+    "clear": "Clear selection",
+    "loading": "Loading profiles...",
+    "noResults": "No matching profiles",
+    "close": "Close list",
+    "optionId": "ID {{ value }}",
+    "unknown": "Unknown profile"
+  },
   "platformLookup": {
     "accessibleLabel": "Platform lookup field",
     "placeholder": "Search by platform name or enter an ID",

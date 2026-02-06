@@ -17,6 +17,7 @@ export interface RelatedEntryItem {
   timestamp?: string;
   routerLink?: string[];
   type: string;
+  note?: string;
 }
 
 export type EntryFieldInputType = 'text' | 'textarea' | 'number' | 'boolean' | 'date' | 'datetime' | 'json' | 'select';

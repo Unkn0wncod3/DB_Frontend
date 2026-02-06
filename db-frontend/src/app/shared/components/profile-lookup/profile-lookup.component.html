@@ -1,0 +1,37 @@
+<div class="profile-lookup" [class.profile-lookup--open]="isOpen()">
+  <div class="profile-lookup__control">
+    <input
+      type="text"
+      [formControl]="searchControl"
+      (focus)="openSearch()"
+      [attr.aria-label]="'profileLookup.accessibleLabel' | translate"
+      [placeholder]="'profileLookup.placeholder' | translate"
+      autocomplete="off"
+    />
+    <button
+      type="button"
+      (click)="clearSelection()"
+      *ngIf="(searchControl.value || '').length > 0"
+      class="profile-lookup__clear"
+      [attr.aria-label]="'profileLookup.clear' | translate"
+    >
+      &times;
+    </button>
+  </div>
+
+  <div class="profile-lookup__dropdown" *ngIf="isOpen()">
+    <p *ngIf="isLoading()" class="profile-lookup__state">{{ 'profileLookup.loading' | translate }}</p>
+    <ul *ngIf="!isLoading()">
+      <li *ngFor="let option of results(); trackBy: trackByOption" (click)="selectOption(option)">
+        <strong>{{ option.label }}</strong>
+        <span class="profile-lookup__id" *ngIf="option.id">{{ 'profileLookup.optionId' | translate:{ value: option.id } }}</span>
+        <span *ngIf="option.platform">{{ option.platform }}</span>
+        <span *ngIf="option.status" class="profile-lookup__status">{{ option.status }}</span>
+      </li>
+      <li *ngIf="results().length === 0" class="profile-lookup__state">
+        {{ 'profileLookup.noResults' | translate }}
+      </li>
+    </ul>
+    <button type="button" class="profile-lookup__close" (click)="closeSearch()">{{ 'profileLookup.close' | translate }}</button>
+  </div>
+</div>

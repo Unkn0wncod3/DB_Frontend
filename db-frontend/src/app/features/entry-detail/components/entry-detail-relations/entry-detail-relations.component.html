@@ -25,11 +25,11 @@
     <form *ngIf="canManageRelations()" class="entry-detail__profile-link" [formGroup]="profileLinkForm" (ngSubmit)="linkProfile()">
       <label>
         <span>{{ 'entryDetail.relations.profileIdLabel' | translate }}</span>
-        <input type="number" formControlName="profileId" placeholder="42" />
+        <app-profile-lookup formControlName="profileId"></app-profile-lookup>
       </label>
-      <label>
+      <label class="entry-detail__profile-note">
         <span>{{ 'entryDetail.relations.profileNoteLabel' | translate }}</span>
-        <input type="text" formControlName="note" [placeholder]="'entryDetail.relations.profileNotePlaceholder' | translate" />
+        <textarea rows="2" formControlName="note" [placeholder]="'entryDetail.relations.profileNotePlaceholder' | translate"></textarea>
       </label>
       <div class="entry-detail__profile-link-actions">
         <p *ngIf="profileLinkError() as linkError" class="entry-detail__profile-link-error">{{ linkError }}</p>
@@ -39,17 +39,20 @@
       </div>
     </form>
     <ul *ngIf="relatedProfiles().length > 0; else noProfiles">
-      <li *ngFor="let profile of relatedProfiles(); trackBy: trackByRelation">
-        <a *ngIf="profile.routerLink; else profileStatic" [routerLink]="profile.routerLink">
-          <strong>{{ profile.label }}</strong>
-          <span>{{ profile.description }}</span>
-        </a>
-        <ng-template #profileStatic>
-          <div>
+      <li *ngFor="let profile of relatedProfiles(); trackBy: trackByRelation" class="entry-detail__relation-card">
+        <div class="entry-detail__relation-card-body">
+          <a *ngIf="profile.routerLink; else profileStatic" [routerLink]="profile.routerLink">
             <strong>{{ profile.label }}</strong>
             <span>{{ profile.description }}</span>
-          </div>
-        </ng-template>
+          </a>
+          <ng-template #profileStatic>
+            <div>
+              <strong>{{ profile.label }}</strong>
+              <span>{{ profile.description }}</span>
+            </div>
+          </ng-template>
+          <p *ngIf="profile.note" class="entry-detail__relation-note">{{ profile.note }}</p>
+        </div>
         <button
           *ngIf="canManageRelations()"
           type="button"
@@ -74,7 +77,7 @@
       <a [routerLink]="relationListLink('notes')">{{ 'entryDetail.relations.viewAll' | translate }}</a>
     </div>
     <ul>
-      <li *ngFor="let note of relatedNotes(); trackBy: trackByRelation">
+      <li *ngFor="let note of relatedNotes(); trackBy: trackByRelation" class="entry-detail__relation-card">
         <a *ngIf="note.routerLink; else noteStatic" [routerLink]="note.routerLink">
           <strong>{{ note.label }}</strong>
           <span>{{ note.description }}</span>
@@ -97,7 +100,7 @@
       <a [routerLink]="relationListLink('activities')">{{ 'entryDetail.relations.viewAll' | translate }}</a>
     </div>
     <ul>
-      <li *ngFor="let activity of relatedActivities(); trackBy: trackByRelation">
+      <li *ngFor="let activity of relatedActivities(); trackBy: trackByRelation" class="entry-detail__relation-card">
         <a *ngIf="activity.routerLink; else activityStatic" [routerLink]="activity.routerLink">
           <strong>{{ activity.label }}</strong>
           <span>{{ activity.description }}</span>

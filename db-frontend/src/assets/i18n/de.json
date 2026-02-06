@@ -320,6 +320,17 @@
     "optionId": "ID {{ value }}",
     "unknown": "Unbekannte Person"
   },
+
+  "profileLookup": {
+    "accessibleLabel": "Profilsuche",
+    "placeholder": "Profilnamen tippen oder ID eingeben",
+    "clear": "Auswahl loeschen",
+    "loading": "Profile werden geladen...",
+    "noResults": "Keine passenden Profile",
+    "close": "Liste schliessen",
+    "optionId": "ID {{ value }}",
+    "unknown": "Unbekanntes Profil"
+  },
   "platformLookup": {
     "accessibleLabel": "Plattformsuche",
     "placeholder": "Plattformnamen tippen oder ID eingeben",

@@ -8,11 +8,12 @@ import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../../../../core/services/api.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { RelatedEntryItem } from '../../entry-detail.types';
+import { ProfileLookupComponent } from '../../../../shared/components/profile-lookup/profile-lookup.component';
 
 @Component({
   selector: 'app-entry-detail-relations',
   standalone: true,
-  imports: [NgIf, NgFor, ReactiveFormsModule, RouterModule, TranslateModule, DatePipe],
+  imports: [NgIf, NgFor, ReactiveFormsModule, RouterModule, TranslateModule, DatePipe, ProfileLookupComponent],
   templateUrl: './entry-detail-relations.component.html',
   styleUrls: ['./entry-detail-relations.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -180,12 +181,14 @@ export class EntryDetailRelationsComponent implements OnChanges {
       const label = this.extractText(record, ['display_name', 'username', 'platform']) ?? 'Profile';
       const descriptionParts = [record['platform'], record['status']]
         .filter((value) => typeof value === 'string' && value.trim().length > 0) as string[];
+      const note = this.extractText(record, ['note', 'relation_note', 'profile_note']);
       return {
         id,
         label,
         description: descriptionParts.join(' - '),
         routerLink: id ? ['/entries', 'profiles', id] : undefined,
-        type: 'profiles'
+        type: 'profiles',
+        note
       };
     });
   }
