@@ -67,6 +67,7 @@
   flex-direction: column;
   gap: 0.75rem;
   height: 100%;
+  max-height: 620px;
 }
 
 .entry-detail__relations-group a,
@@ -183,12 +184,15 @@
   flex-direction: column;
   gap: 0.75rem;
   height: 100%;
+  max-height: 180px;
+  overflow: hidden;
 }
 
 .entry-detail__relation-card-body {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  overflow: hidden;
 }
 
 .entry-detail__relation-card-body strong {
@@ -198,6 +202,12 @@
 .entry-detail__relation-card-body span,
 .entry-detail__relation-card-body small {
   color: var(--color-text-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 .entry-detail__relation-note {
