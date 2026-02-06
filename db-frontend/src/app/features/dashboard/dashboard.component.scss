@@ -17,7 +17,7 @@
 
   p {
     margin: 0.25rem 0 0;
-    color: #475569;
+    color: var(--color-text-soft);
   }
 }
 
@@ -33,8 +33,8 @@
   border: none;
   border-radius: 999px;
   padding: 0.5rem 1.5rem;
-  background: linear-gradient(135deg, #2563eb, #9333ea);
-  color: #f8fafc;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-alt));
+  color: var(--color-primary-contrast);
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -52,15 +52,15 @@
 
 .dashboard__meta {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
 .dashboard__error {
   padding: 1.25rem 1.5rem;
   border-radius: 12px;
-  background: #fee2e2;
-  border: 1px solid #fca5a5;
-  color: #7f1d1d;
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-text);
+  color: var(--color-error-text);
 }
 
 .dashboard__grid {
@@ -72,11 +72,11 @@
 .dashboard__card {
   padding: 1.5rem;
   border-radius: 16px;
-  background: #ffffff;
+  background: var(--color-panel);
   h2 {
     margin: 0;
     font-size: 0.95rem;
-    color: #475569;
+    color: var(--color-text-soft);
   }
 
   &--highlight {
@@ -102,14 +102,14 @@
   margin: 0.5rem 0 0;
   font-size: clamp(1.8rem, 3vw, 2.4rem);
   font-weight: 700;
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 .dashboard__panel {
   padding: 1.5rem;
   border-radius: 16px;
-  background: #ffffff;
-  box-shadow: 0 16px 40px -32px rgba(15, 23, 42, 0.4);
+  background: var(--color-panel);
+  box-shadow: var(--shadow-strong);
 
   header {
     margin-bottom: 1rem;
@@ -134,23 +134,23 @@
     align-items: center;
     gap: 1rem;
     font-weight: 500;
-    color: #1f2937;
+    color: var(--color-text);
 
     span {
-      color: #475569;
+      color: var(--color-text-soft);
       font-weight: 500;
     }
 
     strong {
       font-size: 1rem;
-      color: #111827;
+      color: var(--color-text);
     }
   }
 }
 
 .dashboard__panel--empty {
   text-align: center;
-  color: #475569;
+  color: var(--color-text-soft);
 }
 
 .dashboard__latest {
@@ -161,14 +161,14 @@
 
 .dashboard__latest-item {
   padding: 1rem;
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
-  background: rgba(248, 250, 252, 0.6);
+  background: var(--color-panel-muted);
 
   h3 {
     margin: 0 0 0.5rem;
     font-size: 1rem;
-    color: #0f172a;
+    color: var(--color-text);
   }
 }
 
@@ -190,14 +190,14 @@
 }
 .dashboard__latest-name {
   font-weight: 600;
-  color: #0f172a;
+  color: var(--color-text);
   margin: 0;
 }
 
 .dashboard__latest-empty {
   margin: 0.35rem 0 0;
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
 .dashboard__recent-list {
@@ -212,8 +212,8 @@
   gap: 1rem;
   padding: 1rem;
   border-radius: 12px;
-  background: rgba(241, 245, 249, 0.6);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: var(--color-note-bg);
+  border: 1px solid var(--color-border);
 
   strong {
     display: block;
@@ -223,7 +223,7 @@
   time {
     white-space: nowrap;
     font-size: 0.85rem;
-    color: #64748b;
+    color: var(--color-text-muted);
   }
 }
 .dashboard__recent-item--link {
@@ -258,7 +258,7 @@
 .dashboard__recent-meta {
   margin: 0;
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
 @media (max-width: 720px) {
@@ -280,7 +280,7 @@
 .dashboard__raw {
   margin-top: 1rem;
   padding: 1rem;
-  background: rgba(15, 23, 42, 0.05);
+  background: var(--color-muted-bg);
   border-radius: 8px;
   font-family: 'Fira Code', 'Source Code Pro', Menlo, Monaco, Consolas, monospace;
   font-size: 0.85rem;

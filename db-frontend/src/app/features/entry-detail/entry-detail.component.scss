@@ -22,11 +22,11 @@
 .entry-detail__meta {
   margin: 0;
   font-size: 0.9rem;
-  color: #475569;
+  color: var(--color-text-soft);
 
   strong {
     font-weight: 600;
-    color: #0f172a;
+    color: var(--color-text);
     margin-left: 0.25rem;
   }
 }
@@ -38,11 +38,11 @@
 
 .entry-detail__title p {
   margin: 0;
-  color: #555;
+  color: var(--color-text-soft);
 }
 
 .entry-detail__back {
-  color: #0067c3;
+  color: var(--color-link);
   text-decoration: none;
   font-size: 0.875rem;
 }
@@ -62,19 +62,19 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  border: 1px solid rgba(148, 163, 184, 0.5);
-  background: #fff;
+  border: 1px solid var(--color-border);
+  background: var(--color-panel);
   border-radius: 999px;
   padding: 0.35rem 0.85rem 0.35rem 0.4rem;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--color-text);
   cursor: pointer;
   transition: color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .entry-detail__raw-toggle:focus-visible {
-  outline: 2px solid #2563eb;
+  outline: 2px solid var(--color-primary);
   outline-offset: 3px;
 }
 
@@ -82,7 +82,7 @@
   width: 2.6rem;
   height: 1.35rem;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.45);
+  background: var(--color-border);
   position: relative;
   flex-shrink: 0;
   transition: background 0.2s ease;
@@ -95,8 +95,8 @@
   width: 1.05rem;
   height: 1.05rem;
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 4px 8px rgba(15, 23, 42, 0.2);
+  background: var(--color-panel);
+  box-shadow: var(--shadow-elevated);
   transition: transform 0.2s ease;
 }
 
@@ -105,9 +105,9 @@
 }
 
 .entry-detail__raw-toggle[aria-pressed='true'] {
-  color: #2563eb;
-  border-color: rgba(37, 99, 235, 0.6);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
 }
 
 .entry-detail__raw-toggle[aria-pressed='true'] .entry-detail__raw-toggle-track {
@@ -124,8 +124,8 @@
   gap: 0.25rem;
   padding: 0.2rem;
   border-radius: 999px;
-  background: rgba(226, 232, 240, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.5);
+  background: var(--color-panel-muted);
+  border: 1px solid var(--color-border);
 }
 
 .entry-detail__layout-option {
@@ -151,7 +151,7 @@
 }
 
 .entry-detail__layout-option input:checked + .entry-detail__layout-body {
-  background: #2563eb;
+  background: var(--color-primary);
   box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
   transform: translateY(-1px);
 }
@@ -188,18 +188,18 @@
 }
 
 .entry-detail__refresh {
-  background-color: #eef2f8;
-  color: #1f2937;
+  background-color: var(--color-panel-muted);
+  color: var(--color-text);
 }
 
 .entry-detail__save {
-  background-color: #2563eb;
-  color: #fff;
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
 }
 
 .entry-detail__delete {
-  background-color: #f87171;
-  color: #fff;
+  background-color: var(--color-danger);
+  color: var(--color-danger-contrast);
 }
 
 .entry-detail__actions button:disabled {
@@ -213,19 +213,19 @@
 }
 
 .entry-detail__alert--error {
-  background-color: #fee2e2;
-  color: #991b1b;
+  background-color: var(--color-error-bg);
+  color: var(--color-error-text);
 }
 
 .entry-detail__alert--success {
-  background-color: #dcfce7;
-  color: #166534;
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
 }
 
 .entry-detail__form {
-  background: #fff;
+  background: var(--color-panel);
   border-radius: 0.75rem;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-elevated);
   padding: 1.5rem;
 }
 
@@ -255,9 +255,9 @@
 .entry-detail__state {
   padding: 1rem;
   border-radius: 0.5rem;
-  background-color: #f3f4f6;
+  background-color: var(--color-panel-muted);
   text-align: center;
-  color: #4b5563;
+  color: var(--color-text-soft);
 }
 
 .sr-only {
@@ -275,6 +275,6 @@
 .entry-detail__readonly {
   margin-top: 0.5rem;
   font-weight: 600;
-  color: #f97316;
+  color: var(--color-warning-text);
 }
 

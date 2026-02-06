@@ -11,6 +11,10 @@
       "en": "Englisch",
       "de": "Deutsch"
     },
+    "theme": {
+      "dark": "Dunkelmodus",
+      "light": "Hellmodus"
+    },
     "roles": {
       "admin": "Admin",
       "user": "User"

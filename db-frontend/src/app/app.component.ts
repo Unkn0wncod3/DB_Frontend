@@ -7,6 +7,7 @@ import { interval, Subscription } from 'rxjs';
 
 import { ApiStatusService } from './core/services/api-status.service';
 import { AuthService } from './core/services/auth.service';
+import { ThemeService } from './core/services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -24,7 +25,8 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private readonly translate: TranslateService,
     readonly apiStatus: ApiStatusService,
-    public readonly auth: AuthService
+    public readonly auth: AuthService,
+    public readonly theme: ThemeService
   ) {
     translate.addLangs(this.languages);
     translate.setDefaultLang('en');
@@ -68,6 +70,13 @@ export class AppComponent implements OnInit, OnDestroy {
     this.auth.logout();
   }
 
+  toggleTheme(): void {
+    this.theme.toggleTheme();
+  }
+
+  themeToggleLabelKey(): string {
+    return this.theme.isDarkTheme() ? 'layout.theme.light' : 'layout.theme.dark';
+  }
 
   scrollToTop(): void {
     if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {

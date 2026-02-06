@@ -11,6 +11,10 @@
       "en": "English",
       "de": "German"
     },
+    "theme": {
+      "dark": "Dark mode",
+      "light": "Light mode"
+    },
     "roles": {
       "admin": "Admin",
       "user": "User"

@@ -1,8 +1,9 @@
 :host {
   display: block;
   min-height: 100vh;
-  background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
-  color: #0f172a;
+  background: linear-gradient(180deg, var(--color-bg-gradient-start) 0%, var(--color-bg-gradient-end) 100%);
+  color: var(--color-text);
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 .app-shell {
@@ -23,11 +24,11 @@
   position: sticky;
   top: 0;
   z-index: 15;
-  background: rgba(241, 245, 249, 0.9);
+  background: var(--color-panel-strong);
   backdrop-filter: blur(6px);
   padding: 1rem 1.5rem;
   border-radius: 1rem;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-elevated);
 }
 
 .app-shell__brand {
@@ -46,7 +47,7 @@
   a {
     position: relative;
     font-weight: 600;
-    color: #334155;
+    color: var(--color-text-soft);
     text-decoration: none;
     padding: 0.25rem 0;
 
@@ -57,7 +58,7 @@
       bottom: -6px;
       width: 100%;
       height: 2px;
-      background: linear-gradient(135deg, #2563eb, #9333ea);
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-alt));
       transform: scaleX(0);
       transform-origin: left;
       transition: transform 0.2s ease;
@@ -86,22 +87,22 @@
 
   label {
     font-size: 0.9rem;
-    color: #475569;
+    color: var(--color-text-soft);
   }
 
   select {
-    border: 1px solid #cbd5f5;
+    border: 1px solid var(--color-input-border);
     border-radius: 6px;
     padding: 0.35rem 0.75rem;
-    background: #fff;
-    color: #0f172a;
+    background: var(--color-input-bg);
+    color: var(--color-text);
     font: inherit;
     cursor: pointer;
 
     &:focus {
-      border-color: #2563eb;
+      border-color: var(--color-primary);
       outline: none;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+      box-shadow: 0 0 0 3px var(--color-focus-ring);
     }
   }
 }
@@ -147,20 +148,20 @@
 .app-shell__footer {
   margin-top: 2rem;
   padding: 1rem 1.5rem;
-  border-top: 1px solid rgba(148, 163, 184, 0.4);
+  border-top: 1px solid var(--color-border);
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 1rem;
   font-size: 0.9rem;
-  color: #475569;
+  color: var(--color-text-soft);
   position: sticky;
   bottom: 0;
   z-index: 15;
-  background: rgba(241, 245, 249, 0.9);
+  background: var(--color-panel-strong);
   backdrop-filter: blur(6px);
   border-radius: 1rem;
-  box-shadow: 0 -8px 18px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-footer);
 }
 
 .app-shell__footer-links {
@@ -170,7 +171,7 @@
 }
 
 .app-shell__footer-links a {
-  color: #2563eb;
+  color: var(--color-link);
   font-weight: 600;
   text-decoration: none;
 }
@@ -185,27 +186,28 @@
 .status-chip {
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.2);
+  background: var(--badge-neutral-bg);
   font-weight: 600;
 }
 
 .status-chip--online {
-  background: rgba(34, 197, 94, 0.2);
-  color: #15803d;
+  background: var(--chip-online-bg);
+  color: var(--chip-online-text);
 }
 
 .status-chip--offline {
-  background: rgba(248, 113, 113, 0.2);
-  color: #b91c1c;
+  background: var(--chip-offline-bg);
+  color: var(--chip-offline-text);
 }
 
 .app-shell__footer-status button {
-  border: 1px solid rgba(148, 163, 184, 0.6);
+  border: 1px solid var(--color-border-strong);
   border-radius: 999px;
   padding: 0.35rem 0.9rem;
-  background: #fff;
+  background: var(--color-input-bg);
   font-weight: 600;
   cursor: pointer;
+  color: var(--color-text);
 }
 
 .app-shell__footer-status button:disabled {
@@ -214,7 +216,7 @@
 }
 
 .footer-last-checked {
-  color: #94a3b8;
+  color: var(--color-text-muted);
 }
 .app-shell__auth {
   display: flex;
@@ -223,19 +225,20 @@
 }
 
 .app-shell__auth button {
-  border: 1px solid rgba(148, 163, 184, 0.7);
+  border: 1px solid var(--color-border-strong);
   border-radius: 999px;
   background: transparent;
   padding: 0.35rem 0.85rem;
   font-weight: 600;
   cursor: pointer;
+  color: var(--color-text);
 }
 
 .app-shell__login {
-  border: 1px solid #2563eb;
+  border: 1px solid var(--color-primary);
   border-radius: 999px;
   padding: 0.35rem 0.85rem;
-  color: #2563eb;
+  color: var(--color-primary);
   font-weight: 600;
   text-decoration: none;
 }
@@ -246,7 +249,7 @@
   align-items: flex-end;
   margin-right: 1rem;
   font-size: 0.85rem;
-  color: #0f172a;
+  color: var(--color-text);
 }
 
 .app-shell__user-name {
@@ -256,6 +259,33 @@
 .app-shell__user-role {
   font-size: 0.7rem;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: var(--color-text-muted);
+}
+
+.app-shell__theme-toggle {
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text);
+  padding: 0.35rem 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: border-color 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+}
+
+.app-shell__theme-icon {
+  line-height: 1;
+}
+
+.app-shell__theme-label {
+  font-size: 0.85rem;
 }
 

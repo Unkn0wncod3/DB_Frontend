@@ -26,12 +26,12 @@
 
 .entry-list__meta {
   margin: 0;
-  color: #64748b;
+  color: var(--color-text-muted);
   font-size: 0.9rem;
 }
 
 .entry-list__back {
-  color: #2563eb;
+  color: var(--color-link);
   text-decoration: none;
   font-size: 0.85rem;
 }
@@ -47,20 +47,20 @@
 }
 
 .entry-list__create {
-  border: 1px solid #2563eb;
+  border: 1px solid var(--color-primary);
   border-radius: 0.375rem;
   padding: 0.45rem 0.9rem;
   font-weight: 600;
-  color: #2563eb;
+  color: var(--color-primary);
   text-decoration: none;
 }
 
 .entry-list__timeline {
-  border: 1px solid #0ea5e9;
+  border: 1px solid var(--color-primary-alt);
   border-radius: 0.375rem;
   padding: 0.45rem 0.9rem;
   font-weight: 600;
-  color: #0ea5e9;
+  color: var(--color-primary-alt);
   text-decoration: none;
 }
 
@@ -70,8 +70,8 @@
   padding: 0.5rem 1rem;
   cursor: pointer;
   font-weight: 600;
-  background: #2563eb;
-  color: #fff;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
 }
 
 .entry-list__actions button:disabled {
@@ -85,8 +85,8 @@
 }
 
 .entry-list__alert--error {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--color-error-bg);
+  color: var(--color-error-text);
 }
 
 .entry-list__controls {
@@ -101,7 +101,7 @@
   flex-direction: column;
   gap: 0.25rem;
   font-weight: 600;
-  color: #334155;
+  color: var(--color-text-soft);
 }
 
 .entry-list__person app-person-lookup {
@@ -110,16 +110,19 @@
 
 .entry-list__controls input,
 .entry-list__controls select {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border);
   border-radius: 0.375rem;
   padding: 0.5rem;
   font-size: 0.95rem;
+  background: var(--color-input-bg);
+  color: var(--color-text);
 }
 
 .entry-list__content {
-  background: #fff;
+  background: var(--color-panel);
   border-radius: 0.75rem;
   overflow-x: auto;
+  box-shadow: var(--shadow-elevated);
 }
 
 .entry-list__table {
@@ -129,19 +132,20 @@
 }
 
 .entry-list__table thead {
-  background: rgba(248, 250, 252, 0.7);
+  background: var(--color-panel-muted);
 }
 
 .entry-list__table th,
 .entry-list__table td {
   text-align: left;
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+  border-bottom: 1px solid var(--color-border);
   font-size: 0.95rem;
+  color: var(--color-text);
 }
 
 .entry-list__table tbody tr:hover {
-  background: rgba(248, 250, 252, 0.6);
+  background: var(--color-table-row-hover);
 }
 
 .entry-list__row--clickable {
@@ -154,10 +158,10 @@
 }
 
 .entry-list__table-actions button {
-  border: 1px solid #2563eb;
+  border: 1px solid var(--color-primary);
   border-radius: 0.375rem;
   background: transparent;
-  color: #2563eb;
+  color: var(--color-primary);
   padding: 0.4rem 0.75rem;
   font-weight: 600;
   cursor: pointer;
@@ -172,7 +176,7 @@
 .entry-list__loading {
   text-align: center;
   padding: 2rem 1rem;
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
 .entry-list__pagination {
@@ -185,8 +189,8 @@
   border: none;
   border-radius: 0.375rem;
   padding: 0.5rem 1rem;
-  background: #eef2f8;
-  color: #1f2937;
+  background: var(--color-panel-muted);
+  color: var(--color-text);
   font-weight: 600;
   cursor: pointer;
 }
@@ -197,7 +201,7 @@
 }
 
 .entry-list__pagination-info {
-  color: #475569;
+  color: var(--color-text-soft);
   font-size: 0.9rem;
 }
 
@@ -250,10 +254,10 @@
 
   .entry-list__table tr {
     display: block;
-    border: 1px solid rgba(226, 232, 240, 0.8);
+    border: 1px solid var(--color-border);
     border-radius: 0.75rem;
-    background: #fff;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    background: var(--color-panel);
+    box-shadow: var(--shadow-elevated);
   }
 
   .entry-list__table td {
@@ -268,7 +272,7 @@
   .entry-list__table td::before {
     content: attr(data-label);
     font-weight: 600;
-    color: #475569;
+    color: var(--color-text-soft);
     flex: 1;
   }
 

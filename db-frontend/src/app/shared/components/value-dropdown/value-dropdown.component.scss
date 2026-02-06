@@ -7,25 +7,25 @@
 .value-dropdown__select {
   width: 100%;
   appearance: none;
-  border: 1px solid #c7c7c7;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 0.55rem 2.2rem 0.55rem 0.85rem;
   font-size: 0.95rem;
-  background: #fff;
-  color: #222;
+  background: var(--color-input-bg);
+  color: var(--color-text);
   cursor: pointer;
   transition: border-color 0.2s ease;
 }
 
 .value-dropdown__select:focus {
   outline: none;
-  border-color: #4a67ff;
-  box-shadow: 0 0 0 2px rgba(74, 103, 255, 0.15);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-focus-ring);
 }
 
 .value-dropdown--disabled .value-dropdown__select {
   cursor: not-allowed;
-  background: #f5f5f5;
+  background: var(--color-panel-muted);
 }
 
 .value-dropdown__chevron {
@@ -34,6 +34,6 @@
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-  color: #777;
+  color: var(--color-text-muted);
   font-size: 0.85rem;
 }

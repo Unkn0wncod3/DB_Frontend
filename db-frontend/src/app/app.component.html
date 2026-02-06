@@ -13,15 +13,29 @@
       </a>
     </nav>
     <div class="app-shell__user-controls">
-      <div class="app-shell__language">
-        <label class="app-shell__language-label" for="language-select">{{ 'layout.language' | translate }}</label>
-        <select id="language-select" [(ngModel)]="currentLang" (ngModelChange)="changeLanguage($event)">
-          <option *ngFor="let lang of languages" [value]="lang">
-            {{ ('layout.languages.' + lang) | translate }}
-          </option>
-        </select>
-      </div>
-      <div class="app-shell__auth">
+    <div class="app-shell__language">
+      <label class="app-shell__language-label" for="language-select">{{ 'layout.language' | translate }}</label>
+      <select id="language-select" [(ngModel)]="currentLang" (ngModelChange)="changeLanguage($event)">
+        <option *ngFor="let lang of languages" [value]="lang">
+          {{ ('layout.languages.' + lang) | translate }}
+        </option>
+      </select>
+    </div>
+    <button
+      type="button"
+      class="app-shell__theme-toggle"
+      (click)="toggleTheme()"
+      [attr.aria-label]="themeToggleLabelKey() | translate"
+    >
+      <span class="app-shell__theme-icon" aria-hidden="true">
+        <span *ngIf="theme.isDarkTheme(); else moonIcon">☀️</span>
+        <ng-template #moonIcon>🌙</ng-template>
+      </span>
+      <span class="app-shell__theme-label">
+        {{ themeToggleLabelKey() | translate }}
+      </span>
+    </button>
+    <div class="app-shell__auth">
         <ng-container *ngIf="auth.isAuthenticated(); else loginLink">
           <div class="app-shell__user-meta" *ngIf="auth.user() as currentUser">
             <span class="app-shell__user-name">{{ currentUser.username }}</span>
