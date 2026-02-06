@@ -1,6 +1,6 @@
 <aside class="entry-detail__relations" [class.entry-detail__relations--stacked]="layout === 'stacked'">
   <header class="entry-detail__relations-header">
-    <h2>{{ entryTitle ?? ('entryDetail.labels.relationships' | translate) }}</h2>
+    <h2 class="entry-detail__relations-title">{{ entryTitle ?? ('entryDetail.labels.relationships' | translate) }}</h2>
     <div class="entry-detail__info">
       <span class="entry-detail__info-icon" tabindex="0" [attr.aria-label]="'entryDetail.labels.connectedItems' | translate">i</span>
       <div class="entry-detail__info-tooltip">
