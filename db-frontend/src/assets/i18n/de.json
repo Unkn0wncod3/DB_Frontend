@@ -17,21 +17,21 @@
     }
   },
   "dashboard": {
-    "title": "Datenbank-Uebersicht",
-    "subtitle": "Wichtige Kennzahlen und Aktivitaeten der DB_API.",
+    "title": "Datenbank-Übersicht",
+    "subtitle": "Wichtige Kennzahlen und Aktivitäten der DB_API.",
     "actions": {
       "refresh": "Jetzt aktualisieren",
       "refreshing": "Aktualisiere...",
-      "createLabel": "Neuen Eintrag erstellen fuer",
+      "createLabel": "Neuen Eintrag erstellen für",
       "createButton": "Eintrag erstellen"
     },
     "meta": {
       "lastUpdated": "Zuletzt aktualisiert am {{ value }}"
     },
     "sections": {
-      "activity": "Aktivitaet",
-      "latest": "Neueste Aenderungen",
-      "recent": "Aktuelle Eintraege"
+      "activity": "Aktivität",
+      "latest": "Neueste Änderungen",
+      "recent": "Aktuelle Einträge"
     },
     "latest": {
       "created": {
@@ -52,7 +52,7 @@
       "itemId": "ID: {{ value }}"
     },
     "status": {
-      "noRecent": "Keine aktuellen Eintraege vorhanden.",
+      "noRecent": "Keine aktuellen Einträge vorhanden.",
       "emptyState": "Keine strukturierten Statistiken erkannt. Rohdaten siehe unten (falls vorhanden)."
     },
     "errors": {
@@ -61,14 +61,14 @@
       "generic": "Unerwarteter Fehler"
     },
     "totals": {
-      "entries": "Gesamtanzahl Eintraege",
+      "entries": "Gesamtanzahl Einträge",
       "collections": "Sammlungen",
       "users": "Benutzer"
     },
     "activity": {
-      "last24Hours": "Aenderungen in den letzten 24 Stunden",
-      "last7Days": "Aenderungen in den letzten 7 Tagen",
-      "last30Days": "Aenderungen in den letzten 30 Tagen"
+      "last24Hours": "Änderungen in den letzten 24 Stunden",
+      "last7Days": "Änderungen in den letzten 7 Tagen",
+      "last30Days": "Änderungen in den letzten 30 Tagen"
     }
   },
   "entryDetail": {
@@ -83,22 +83,22 @@
       "updatedAt": "Zuletzt geändert"
     },
     "actions": {
-      "back": "Zurueck zum Dashboard",
+      "back": "Zurück zum Dashboard",
       "refresh": "Neu laden",
       "save": "Speichern",
-      "delete": "Loeschen"
+      "delete": "Löschen"
     },
     "status": {
       "loading": "Lade...",
       "saving": "Speichere...",
-      "deleting": "Loesche...",
-      "saved": "Aenderungen gespeichert.",
-      "deleted": "Eintrag geloescht.",
-      "noChanges": "Keine Aenderungen erkannt.",
-      "empty": "Keine Daten fuer diesen Eintrag verfuegbar.",
-      "loadingRelations": "Verknuepfungen werden geladen...",
-      "noRelations": "Keine verknuepften Eintraege gefunden.",
-      "readOnly": "Nur-Lesen: Dieser Zugang kann Daten ansehen, aber nichts aendern."
+      "deleting": "Lösche...",
+      "saved": "Änderungen gespeichert.",
+      "deleted": "Eintrag gelöscht.",
+      "noChanges": "Keine Änderungen erkannt.",
+      "empty": "Keine Daten für diesen Eintrag verfügbar.",
+      "loadingRelations": "Verknüpfungen werden geladen...",
+      "noRelations": "Keine verknüpften Einträge gefunden.",
+      "readOnly": "Nur-Lesen: Dieser Zugang kann Daten ansehen, aber nichts ändern."
     },
     "sections": {
       "raw": "Rohdaten"
@@ -106,37 +106,37 @@
     "relations": {
       "profiles": "Profile",
       "notes": "Notizen",
-      "activities": "Aktivitaeten",
+      "activities": "Aktivitäten",
       "viewAll": "Alle anzeigen",
-      "linkProfile": "Profil verknuepfen",
-      "unlinkProfile": "Verknuepfung loesen",
+      "linkProfile": "Profil verknüpfen",
+      "unlinkProfile": "Verknüpfung lösen",
       "profileIdLabel": "Profil-ID",
       "profileNoteLabel": "Notiz",
-      "profileNotePlaceholder": "Optionale Notiz zu dieser Verknuepfung",
-      "profileLinked": "Profil wurde mit dieser Person verknuepft.",
-      "profileUnlinked": "Verknuepfung entfernt.",
-      "profileLinkInvalid": "Bitte eine gueltige Profil-ID angeben.",
+      "profileNotePlaceholder": "Optionale Notiz zu dieser Verknüpfung",
+      "profileLinked": "Profil wurde mit dieser Person verknüpft.",
+      "profileUnlinked": "Verknüpfung entfernt.",
+      "profileLinkInvalid": "Bitte eine gültige Profil-ID angeben.",
       "layoutLabel": "Position der Beziehungen",
       "layoutOptionSide": "Rechts daneben",
       "layoutOptionStacked": "Unter dem Formular"
     },
     "delete": {
-      "dialogTitle": "Loeschen bestaetigen",
-      "confirm": "Bist du sicher, dass du diesen Eintrag loeschen moechtest? Das kann nicht rueckgaengig gemacht werden.",
-      "passcodeLabel": "Sicherheitsschluessel",
-      "passcodePlaceholder": "Schluessel eingeben",
-      "confirmButton": "Eintrag loeschen",
+      "dialogTitle": "Löschen bestätigen",
+      "confirm": "Bist du sicher, dass du diesen Eintrag löschen möchtest? Das kann nicht rückgängig gemacht werden.",
+      "passcodeLabel": "Sicherheitsschlüssel",
+      "passcodePlaceholder": "Schlüssel eingeben",
+      "confirmButton": "Eintrag löschen",
       "cancelButton": "Abbrechen",
-      "passcodeInvalid": "Sicherheitsschluessel stimmt nicht. Eintrag wurde nicht geloescht."
+      "passcodeInvalid": "Sicherheitsschlüssel stimmt nicht. Eintrag wurde nicht gelöscht."
     },
     "errors": {
       "missingParams": "Eintragsparameter fehlen.",
       "loadFailed": "Eintrag konnte nicht geladen werden: {{ message }}",
       "saveFailed": "Eintrag konnte nicht gespeichert werden: {{ message }}",
-      "deleteFailed": "Eintrag konnte nicht geloescht werden: {{ message }}",
+      "deleteFailed": "Eintrag konnte nicht gelöscht werden: {{ message }}",
       "invalidPayload": "Die API hat eine unerwartete Antwort geliefert.",
       "unknown": "Unbekannter Fehler",
-      "hiddenFromUser": "Dieser Eintrag ist nur f?r Administratoren sichtbar."
+      "hiddenFromUser": "Dieser Eintrag ist nur für Administratoren sichtbar."
     },
     "rawView": {
       "label": "Rohdaten",
@@ -147,43 +147,43 @@
   "entryList": {
     "title": "Alle {{ type }}",
     "actions": {
-      "back": "Zurueck zum Dashboard",
+      "back": "Zurück zum Dashboard",
       "create": "Neuer Eintrag",
       "refresh": "Aktualisieren",
       "refreshing": "Aktualisiere...",
-      "view": "Eintrag oeffnen",
+      "view": "Eintrag öffnen",
       "timeline": "Timeline öffnen"
     },
     "filters": {
       "searchLabel": "Suche",
       "searchPlaceholder": "Suchbegriff eingeben...",
-      "pageSizeLabel": "Seitengroesse"
+      "pageSizeLabel": "Seitengröße"
     },
     "meta": {
-      "total": "{{ value }} Eintraege",
+      "total": "{{ value }} Einträge",
       "lastUpdated": "Zuletzt aktualisiert {{ value }}"
     },
     "table": {
       "actions": "Aktionen"
     },
     "status": {
-      "loading": "Eintraege werden geladen...",
-      "empty": "Keine Eintraege gefunden."
+      "loading": "Einträge werden geladen...",
+      "empty": "Keine Einträge gefunden."
     },
     "pagination": {
-      "previous": "Zurueck",
+      "previous": "Zurück",
       "next": "Weiter",
       "page": "Seite {{ page }} - {{ pageSize }} pro Seite"
     },
     "errors": {
       "missingType": "Eintragstyp fehlt.",
-      "loadFailed": "Eintraege konnten nicht geladen werden: {{ message }}",
+      "loadFailed": "Einträge konnten nicht geladen werden: {{ message }}",
       "unknown": "Unbekannter Fehler"
     },
     "types": {
       "persons": "Personen",
       "profiles": "Profile",
-      "activities": "Aktivitaeten",
+      "activities": "Aktivitäten",
       "vehicles": "Fahrzeuge",
       "notes": "Notizen",
       "platforms": "Plattformen",
@@ -197,15 +197,15 @@
       "personFilterId": "ID: {{ value }}",
       "fromDate": "Von-Datum",
       "toDate": "Bis-Datum",
-      "reset": "Filter zuruecksetzen",
+      "reset": "Filter zurücksetzen",
       "personLabel": "Person {{ value }}"
     }
   },
   "entryCreate": {
     "title": "Neuen {{ type }} anlegen",
-    "subtitle": "Pflichtfelder ausfuellen und absenden, um einen neuen {{ type }}-Datensatz zu erstellen.",
+    "subtitle": "Pflichtfelder ausfüllen und absenden, um einen neuen {{ type }}-Datensatz zu erstellen.",
     "actions": {
-      "back": "Zurueck zur Liste",
+      "back": "Zurück zur Liste",
       "submit": "Eintrag erstellen",
       "cancel": "Abbrechen"
     },
@@ -213,24 +213,24 @@
       "booleanTrue": "Wahr",
       "booleanFalse": "Falsch",
       "booleanPlaceholder": "Bitte auswählen",
-      "rawPayloadTitle": "Zusaetzliche Daten (JSON)",
-      "rawPayloadHint": "Optionales JSON, das nach den Feldern in den Request uebernommen wird."
+      "rawPayloadTitle": "Zusätzliche Daten (JSON)",
+      "rawPayloadHint": "Optionales JSON, das nach den Feldern in den Request übernommen wird."
     },
     "status": {
       "submitting": "Erstelle...",
       "created": "Eintrag erfolgreich erstellt.",
-      "noSchema": "Fuer diesen Typ ist noch kein Schema hinterlegt.",
-      "schemaHelp": "Passe src/app/features/entry-create/entry-create.schemas.ts an, um die Felder fuer diesen Typ zu definieren."
+      "noSchema": "Für diesen Typ ist noch kein Schema hinterlegt.",
+      "schemaHelp": "Passe src/app/features/entry-create/entry-create.schemas.ts an, um die Felder für diesen Typ zu definieren."
     },
     "errors": {
       "missingType": "Eintragstyp fehlt.",
-      "invalidPayload": "Payload ungueltig: {{ message }}",
+      "invalidPayload": "Payload ungültig: {{ message }}",
       "emptyPayload": "Bitte mindestens ein Feld oder ein JSON angeben.",
       "createFailed": "Eintrag konnte nicht erstellt werden: {{ message }}",
-      "invalidRawJson": "Zusaetzliche Daten muessen gueltiges JSON sein.",
-      "invalidJsonField": "JSON-Felder muessen gueltiges JSON enthalten.",
-      "invalidDate": "Datum benoetigt einen gueltigen ISO-Zeitstempel.",
-      "requireOneOf": "Bitte mindestens eines der folgenden Felder ausfuellen: {{ fields }}.",
+      "invalidRawJson": "Zusätzliche Daten müssen gültiges JSON sein.",
+      "invalidJsonField": "JSON-Felder müssen gültiges JSON enthalten.",
+      "invalidDate": "Datum benötigt einen gültigen ISO-Zeitstempel.",
+      "requireOneOf": "Bitte mindestens eines der folgenden Felder ausfüllen: {{ fields }}.",
       "requiredField": "Dieses Feld ist erforderlich.",
       "unknown": "Unbekannter Fehler"
     }
@@ -256,7 +256,7 @@
       "successTitle": "Antwort"
     },
     "errors": {
-      "invalidJson": "{{field}} muss gueltiges JSON enthalten.",
+      "invalidJson": "{{field}} muss gültiges JSON enthalten.",
       "unknown": "Unbekannter Fehler",
       "status": " (Status {{status}})",
       "http": "{{message}}{{status}}"
@@ -265,8 +265,8 @@
   "personLookup": {
     "accessibleLabel": "Personensuche",
     "placeholder": "Name tippen oder ID eingeben",
-    "clear": "Auswahl loeschen",
-    "selectedId": "Ausgewaehlte ID: {{ value }}",
+    "clear": "Auswahl löschen",
+    "selectedId": "Ausgewählte ID: {{ value }}",
     "loading": "Suche...",
     "noResults": "Keine passenden Personen",
     "close": "Liste schliessen",
@@ -276,8 +276,8 @@
   "platformLookup": {
     "accessibleLabel": "Plattformsuche",
     "placeholder": "Plattformnamen tippen oder ID eingeben",
-    "clear": "Auswahl loeschen",
-    "selectedId": "Ausgewaehlte Plattform-ID: {{ value }}",
+    "clear": "Auswahl löschen",
+    "selectedId": "Ausgewählte Plattform-ID: {{ value }}",
     "loading": "Suche...",
     "noResults": "Keine passenden Plattformen",
     "close": "Liste schliessen",
@@ -291,9 +291,9 @@
     "contact": "Kontakt",
     "imprint": "Impressum",
     "refresh": "Status aktualisieren",
-    "refreshing": "Pruefe...",
-    "neverChecked": "Noch nicht geprueft",
-    "checkedAt": "Geprueft um {{ value }}",
+    "refreshing": "Prüfe...",
+    "neverChecked": "Noch nicht geprüft",
+    "checkedAt": "Geprüft um {{ value }}",
     "status": {
       "online": "API online",
       "offline": "API offline",
@@ -319,14 +319,14 @@
     },
     "address": {
       "title": "Adresse",
-      "value": "Beispielstrasse 123\n12345 Musterstadt"
+      "value": "Beispielstraße 123\n12345 Musterstadt"
     },
     "contact": {
       "title": "Kontakt",
       "value": "Telefon: +49 123 456 789\nE-Mail: info@example.com"
     },
     "role": {
-      "title": "Geschaeftsfuehrung",
+      "title": "Geschäftsführung",
       "value": "Mas Mustermann"
     },
     "registration": {
@@ -338,12 +338,12 @@
       "value": "DE123456789"
     },
     "supervisory": {
-      "title": "Aufsichtsbehoerde",
-      "value": "Muster Datenschutzbehoerde\nCompliance-Strasse 12\n12345 Musterstadt"
+      "title": "Aufsichtsbehörde",
+      "value": "Muster Datenschutzbehörde\nCompliance-Straße 12\n12345 Musterstadt"
     },
     "liability": {
       "title": "Haftungshinweis",
-      "value": "Inhalte werden sorgfaeltig geprueft, fuer externe Links sind die jeweiligen Betreiber verantwortlich."
+      "value": "Inhalte werden sorgfältig geprüft, für externe Links sind die jeweiligen Betreiber verantwortlich."
     }
   },
   "auth": {
@@ -357,7 +357,7 @@
     },
     "errors": {
       "invalidCredentials": "Benutzername oder Passwort falsch.",
-      "validation": "Bitte Eingaben pruefen.",
+      "validation": "Bitte Eingaben prüfen.",
       "generic": "Anmeldung fehlgeschlagen. Bitte erneut versuchen."
     },
     "logout": "Abmelden"
@@ -365,33 +365,33 @@
   "userManagement": {
     "eyebrow": "Admin-Werkzeuge",
     "title": "Benutzerverwaltung",
-    "subtitle": "Konten anlegen oder entfernen. Aenderungen sind nur fuer Admins moeglich.",
+    "subtitle": "Konten anlegen oder entfernen. Änderungen sind nur für Admins möglich.",
     "form": {
       "username": "Benutzername",
       "password": "Passwort",
       "role": "Rolle",
       "passwordPolicyTitle": "Passwortrichtlinien",
-      "passwordPolicyCopy": "Mindestens 8 Zeichen sowie eine Mischung aus Buchstaben und Zahlen fuer interne Accounts.",
-      "validationHint": "Benutzername, Passwort (>=8 Zeichen) und Rolle auswaehlen, dann wird der Button aktiv."
+      "passwordPolicyCopy": "Mindestens 8 Zeichen sowie eine Mischung aus Buchstaben und Zahlen für interne Accounts.",
+      "validationHint": "Benutzername, Passwort (>=8 Zeichen) und Rolle auswählen, dann wird der Button aktiv."
     },
     "actions": {
       "create": "Benutzer erstellen",
       "creating": "Erstelle...",
       "refresh": "Liste aktualisieren",
       "refreshing": "Aktualisiere...",
-      "delete": "Loeschen",
+      "delete": "Löschen",
       "confirmDelete": "{{username}} wirklich entfernen?",
       "close": "Schliessen",
-      "locked": "Geschuetzt",
+      "locked": "Geschützt",
       "cancel": "Abbrechen",
       "confirmDeleteCta": "Benutzer entfernen",
-      "deleting": "Loesche..."
+      "deleting": "Lösche..."
     },
     "list": {
       "title": "Vorhandene Benutzer",
       "empty": "Noch keine Benutzer vorhanden.",
       "loading": "Benutzer werden geladen...",
-      "protectedHint": "Der Kern-Account {{username}} bleibt fuer Notfaelle erhalten und kann nicht geloescht werden."
+      "protectedHint": "Der Kern-Account {{username}} bleibt für Notfälle erhalten und kann nicht gelöscht werden."
     },
     "table": {
       "username": "Benutzername",
@@ -403,7 +403,7 @@
     "status": {
       "created": "Benutzer erfolgreich angelegt.",
       "deleted": "{{username}} wurde entfernt.",
-      "genericError": "Aktion fehlgeschlagen. Bitte spaeter erneut versuchen.",
+      "genericError": "Aktion fehlgeschlagen. Bitte später erneut versuchen.",
       "active": "Aktiv",
       "inactive": "Inaktiv"
     },
@@ -412,14 +412,14 @@
       "user": "User"
     },
     "modal": {
-      "title": "Account loeschen?",
-      "body": "Moechten Sie {{username}} wirklich entfernen? Diese Aktion kann nicht rueckgaengig gemacht werden."
+      "title": "Account löschen?",
+      "body": "Möchten Sie {{username}} wirklich entfernen? Diese Aktion kann nicht rückgängig gemacht werden."
     }
   },
   "entryVisibility": {
     "columnLabel": "Sichtbarkeit",
-    "placeholder": "Sichtbarkeit w?hlen",
-    "helper": "Steuert, wer diesen Eintrag in der Oberfl?che sehen darf.",
+    "placeholder": "Sichtbarkeit wählen",
+    "helper": "Steuert, wer diesen Eintrag in der Oberfläche sehen darf.",
     "options": {
       "user": "Alle Nutzer",
       "admin": "Nur Admins"
