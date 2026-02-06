@@ -1,7 +1,15 @@
 <aside class="entry-detail__relations" [class.entry-detail__relations--stacked]="layout === 'stacked'">
-  <header>
-    <h2>{{ entryTitle ?? ('entryDetail.labels.relationships' | translate) }}</h2>
-    <p>{{ 'entryDetail.labels.connectedItems' | translate }}</p>
+  <header class="entry-detail__relations-header">
+    <div>
+      <h2>{{ entryTitle ?? ('entryDetail.labels.relationships' | translate) }}</h2>
+      <p class="sr-only">{{ 'entryDetail.labels.connectedItems' | translate }}</p>
+    </div>
+    <div class="entry-detail__info">
+      <span class="entry-detail__info-icon" tabindex="0" [attr.aria-label]="'entryDetail.labels.connectedItems' | translate">i</span>
+      <div class="entry-detail__info-tooltip">
+        {{ 'entryDetail.labels.connectedItems' | translate }}
+      </div>
+    </div>
   </header>
 
   <section *ngIf="relationsError() as relError" class="entry-detail__alert entry-detail__alert--error">
@@ -39,19 +47,23 @@
       </div>
     </form>
     <ul *ngIf="relatedProfiles().length > 0; else noProfiles">
-      <li *ngFor="let profile of relatedProfiles(); trackBy: trackByRelation" class="entry-detail__relation-card">
-        <div class="entry-detail__relation-card-body">
-          <a *ngIf="profile.routerLink; else profileStatic" [routerLink]="profile.routerLink">
-            <strong>{{ profile.label }}</strong>
-            <span>{{ profile.description }}</span>
-          </a>
-          <ng-template #profileStatic>
-            <div>
+      <li *ngFor="let profile of relatedProfiles(); trackBy: trackByRelation" class="entry-detail__relation-card entry-detail__relation-card--profile">
+        <div class="entry-detail__relation-card-body entry-detail__relation-card-body--split">
+          <div>
+            <a *ngIf="profile.routerLink; else profileStatic" [routerLink]="profile.routerLink">
               <strong>{{ profile.label }}</strong>
               <span>{{ profile.description }}</span>
-            </div>
-          </ng-template>
-          <p *ngIf="profile.note" class="entry-detail__relation-note">{{ profile.note }}</p>
+            </a>
+            <ng-template #profileStatic>
+              <div>
+                <strong>{{ profile.label }}</strong>
+                <span>{{ profile.description }}</span>
+              </div>
+            </ng-template>
+          </div>
+          <p class="entry-detail__relation-note entry-detail__relation-note--inline" *ngIf="profile.note">
+            {{ profile.note }}
+          </p>
         </div>
         <button
           *ngIf="canManageRelations()"

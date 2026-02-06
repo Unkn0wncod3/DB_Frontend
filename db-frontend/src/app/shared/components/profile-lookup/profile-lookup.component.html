@@ -24,9 +24,6 @@
     <ul *ngIf="!isLoading()">
       <li *ngFor="let option of results(); trackBy: trackByOption" (click)="selectOption(option)">
         <strong>{{ option.label }}</strong>
-        <span class="profile-lookup__platform">
-          {{ option.platform || ('profileLookup.unknownPlatform' | translate) }}
-        </span>
         <span class="profile-lookup__id" *ngIf="option.id">{{ 'profileLookup.optionId' | translate:{ value: option.id } }}</span>
       </li>
       <li *ngIf="results().length === 0" class="profile-lookup__state">
