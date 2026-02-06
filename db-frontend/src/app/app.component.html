@@ -60,7 +60,7 @@
       <a routerLink="/contact">{{ 'footer.contact' | translate }}</a>
       <a routerLink="/imprint">{{ 'footer.imprint' | translate }}</a>
     </div>
-    <div class="app-shell__footer-status">
+    <div class="app-shell__footer-status" *ngIf="auth.isAdmin()">
       <span class="status-chip"
             [class.status-chip--online]="apiStatus.status() === 'online'"
             [class.status-chip--offline]="apiStatus.status() === 'offline'">
