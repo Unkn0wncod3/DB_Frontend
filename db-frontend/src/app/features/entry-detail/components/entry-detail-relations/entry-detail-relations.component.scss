@@ -1,7 +1,7 @@
 .entry-detail__relations {
-  background: #fff;
+  background: var(--color-panel);
   border-radius: 0.75rem;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-elevated);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -24,9 +24,10 @@
 }
 
 .entry-detail__relations-group li {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   border-radius: 0.5rem;
   padding: 0.75rem 1rem;
+  background: var(--color-panel);
 }
 
 .entry-detail__relations-group a,
@@ -40,7 +41,7 @@
 
 .entry-detail__relations-group a:hover {
   text-decoration: none;
-  background: #f8fafc;
+  background: var(--color-panel-muted);
 }
 
 .entry-detail__relations-heading {
@@ -52,13 +53,13 @@
 
 .entry-detail__relations-heading a {
   font-size: 0.85rem;
-  color: #2563eb;
+  color: var(--color-link);
   text-decoration: none;
 }
 
 .entry-detail__relations-state {
   padding: 0.5rem 0;
-  color: #475569;
+  color: var(--color-text-soft);
   font-size: 0.9rem;
 }
 
@@ -78,10 +79,12 @@
 }
 
 .entry-detail__profile-link input {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border);
   border-radius: 0.375rem;
   padding: 0.45rem;
   font-size: 0.95rem;
+  background: var(--color-input-bg);
+  color: var(--color-text);
 }
 
 .entry-detail__profile-link-actions {
@@ -95,8 +98,8 @@
   border: none;
   border-radius: 0.375rem;
   padding: 0.5rem 1rem;
-  background: #2563eb;
-  color: #fff;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
   font-weight: 600;
   cursor: pointer;
 }
@@ -107,7 +110,7 @@
 }
 
 .entry-detail__profile-link-error {
-  color: #b91c1c;
+  color: var(--color-error-text);
   margin: 0;
   font-size: 0.85rem;
 }
@@ -118,8 +121,8 @@
   border: none;
   border-radius: 0.375rem;
   padding: 0.3rem 0.75rem;
-  background: #e11d48;
-  color: #fff;
+  background: var(--color-danger);
+  color: var(--color-danger-contrast);
   font-weight: 600;
   cursor: pointer;
 }

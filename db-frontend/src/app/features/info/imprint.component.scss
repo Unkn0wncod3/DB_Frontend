@@ -2,9 +2,9 @@
   max-width: 900px;
   margin: 0 auto;
   padding: 3rem;
-  background: #ffffff;
+  background: var(--color-panel);
   border-radius: 1.5rem;
-  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-strong);
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -20,13 +20,13 @@
   text-transform: uppercase;
   letter-spacing: 0.2em;
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
 .imprint-hero__subtitle {
   font-size: 1.15rem;
-  color: #475569;
+  color: var(--color-text-soft);
   margin: 0;
 }
 
@@ -37,19 +37,19 @@
 }
 
 .imprint-card {
-  border: 1px solid rgba(148, 163, 184, 0.4);
+  border: 1px solid var(--color-border);
   border-radius: 1rem;
   padding: 1.5rem;
-  background: #f8fafc;
+  background: var(--color-panel-muted);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  box-shadow: 0 15px 40px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--shadow-elevated);
 }
 
 .imprint-card--highlight {
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
-  color: #fff;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-alt));
+  color: var(--color-primary-contrast);
   border: none;
 }
 
@@ -58,8 +58,8 @@
 }
 
 .imprint-card--muted {
-  background: #0f172a;
-  color: #e2e8f0;
+  background: var(--color-muted-bg);
+  color: var(--color-text);
   border: none;
 }
 

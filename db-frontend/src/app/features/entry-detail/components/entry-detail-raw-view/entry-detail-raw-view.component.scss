@@ -1,6 +1,6 @@
 .entry-detail__raw {
-  background: #0f172a;
-  color: #e2e8f0;
+  background: var(--color-muted-bg);
+  color: var(--color-text);
   padding: 1rem;
   border-radius: 0.75rem;
   overflow: auto;

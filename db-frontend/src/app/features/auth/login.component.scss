@@ -9,8 +9,8 @@
   width: min(360px, 100%);
   padding: 2rem;
   border-radius: 1rem;
-  background: #fff;
-  box-shadow: 0 15px 40px rgba(15, 23, 42, 0.12);
+  background: var(--color-panel);
+  box-shadow: var(--shadow-elevated);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -18,7 +18,7 @@
 
 .login__subtitle {
   margin: 0;
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
 form {
@@ -32,18 +32,20 @@ label {
   flex-direction: column;
   gap: 0.35rem;
   font-weight: 600;
-  color: #334155;
+  color: var(--color-text-soft);
 }
 
 input {
-  border: 1px solid #cbd5f5;
+  border: 1px solid var(--color-input-border);
   border-radius: 0.5rem;
   padding: 0.65rem 0.85rem;
   font: inherit;
+  background: var(--color-input-bg);
+  color: var(--color-text);
 }
 
 .login__error {
-  color: #b91c1c;
+  color: var(--color-error-text);
   font-weight: 600;
 }
 
@@ -51,8 +53,8 @@ button[type='submit'] {
   border: none;
   border-radius: 0.75rem;
   padding: 0.75rem 1rem;
-  background: linear-gradient(135deg, #2563eb, #9333ea);
-  color: #fff;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-alt));
+  color: var(--color-primary-contrast);
   font-weight: 700;
   cursor: pointer;
 }
