@@ -142,6 +142,49 @@
       "label": "Rohdaten",
       "show": "Rohdaten anzeigen",
       "hide": "Rohdaten ausblenden"
+    },
+    "form": {
+      "selectPlaceholder": "Wert auswählen"
+    },
+    "selectOptions": {
+      "gender": {
+        "unspecified": "Nicht festgelegt",
+        "female": "Weiblich",
+        "male": "Männlich",
+        "nonBinary": "Nicht-binär",
+        "other": "Sonstige"
+      },
+      "status": {
+        "active": "Aktiv",
+        "inactive": "Inaktiv",
+        "suspended": "Gesperrt",
+        "archived": "Archiviert",
+        "pending": "Ausstehend"
+      },
+      "risk": {
+        "low": "Niedrig",
+        "medium": "Mittel",
+        "high": "Hoch",
+        "critical": "Kritisch",
+        "unknown": "Nicht angegeben"
+      },
+      "energy": {
+        "gasoline": "Benzin",
+        "diesel": "Diesel",
+        "hybrid": "Hybrid",
+        "electric": "Elektrisch",
+        "hydrogen": "Wasserstoff",
+        "other": "Sonstige"
+      },
+      "vehicleType": {
+        "sedan": "Limousine",
+        "suv": "SUV",
+        "truck": "Lkw",
+        "motorcycle": "Motorrad",
+        "van": "Transporter",
+        "bus": "Bus",
+        "other": "Sonstige"
+      }
     }
   },
   "entryList": {

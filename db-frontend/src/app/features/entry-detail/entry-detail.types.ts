@@ -1,3 +1,5 @@
+import { ValueDropdownOption } from '../../shared/components/value-dropdown/value-dropdown.component';
+
 export interface EntryFieldConfig {
   key: string;
   label: string;
@@ -5,6 +7,7 @@ export interface EntryFieldConfig {
   readOnly: boolean;
   inputType: EntryFieldInputType;
   dateVariant?: 'date' | 'datetime';
+  options?: ValueDropdownOption[];
 }
 
 export interface RelatedEntryItem {
@@ -16,4 +19,4 @@ export interface RelatedEntryItem {
   type: string;
 }
 
-export type EntryFieldInputType = 'text' | 'textarea' | 'number' | 'boolean' | 'date' | 'datetime' | 'json';
+export type EntryFieldInputType = 'text' | 'textarea' | 'number' | 'boolean' | 'date' | 'datetime' | 'json' | 'select';

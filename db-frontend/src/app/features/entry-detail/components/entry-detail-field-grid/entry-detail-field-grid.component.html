@@ -48,6 +48,13 @@
         [placeholder]="booleanPlaceholderKey | translate"
       ></app-value-dropdown>
 
+      <app-value-dropdown
+        *ngSwitchCase="'select'"
+        [formControlName]="field.key"
+        [options]="field.options ?? []"
+        [placeholder]="'entryDetail.form.selectPlaceholder' | translate"
+      ></app-value-dropdown>
+
       <input
         *ngSwitchDefault
         type="text"

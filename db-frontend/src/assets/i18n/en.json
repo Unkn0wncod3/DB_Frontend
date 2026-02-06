@@ -142,6 +142,49 @@
       "label": "Raw data",
       "show": "Show raw data",
       "hide": "Hide raw data"
+    },
+    "form": {
+      "selectPlaceholder": "Choose a value"
+    },
+    "selectOptions": {
+      "gender": {
+        "unspecified": "Unspecified",
+        "female": "Female",
+        "male": "Male",
+        "nonBinary": "Non-binary",
+        "other": "Other"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "suspended": "Suspended",
+        "archived": "Archived",
+        "pending": "Pending"
+      },
+      "risk": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "critical": "Critical",
+        "unknown": "N/A"
+      },
+      "energy": {
+        "gasoline": "Gasoline",
+        "diesel": "Diesel",
+        "hybrid": "Hybrid",
+        "electric": "Electric",
+        "hydrogen": "Hydrogen",
+        "other": "Other"
+      },
+      "vehicleType": {
+        "sedan": "Sedan",
+        "suv": "SUV",
+        "truck": "Truck",
+        "motorcycle": "Motorcycle",
+        "van": "Van",
+        "bus": "Bus",
+        "other": "Other"
+      }
     }
   },
   "entryList": {

@@ -93,6 +93,7 @@ export class EntryDetailComponent {
   private currentId: string | null = null;
   private fieldConfigMap = new Map<string, EntryFieldConfig>();
   private currentVisibilityLevel: VisibilityLevel = DEFAULT_VISIBILITY_LEVEL;
+  private readonly selectFieldKeys = new Set(['gender', 'status', 'risk_level', 'energy_type', 'vehicle_type']);
 
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
@@ -118,6 +119,7 @@ export class EntryDetailComponent {
     this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.booleanOptions.set(this.buildBooleanOptions());
       this.visibilityOptions.set(this.buildVisibilityOptions());
+      this.refreshSelectFieldOptions();
     });
 
     this.updateVisibilityControlState(DEFAULT_VISIBILITY_LEVEL);
@@ -268,6 +270,7 @@ export class EntryDetailComponent {
       }
 
       const inputType = this.detectFieldType(key, value);
+      const selectOptions = inputType === 'select' ? this.buildSelectOptionsForKey(key) : null;
       const readOnly = this.isReadOnlyKey(key);
       const controlValue = this.prepareControlValue(value, inputType);
       const control = this.fb.control<string | number | boolean | null>(controlValue);
@@ -286,7 +289,8 @@ export class EntryDetailComponent {
         multiline: inputType === 'textarea' || inputType === 'json',
         readOnly,
         inputType,
-        dateVariant
+        dateVariant,
+        options: selectOptions ?? undefined
       });
     }
 
@@ -413,6 +417,9 @@ export class EntryDetailComponent {
 
   private detectFieldType(key: string, value: unknown): EntryFieldInputType {
     const normalizedKey = key.toLowerCase();
+    if (this.isSelectFieldKey(normalizedKey)) {
+      return 'select';
+    }
 
     if (normalizedKey === 'external_id') {
       return 'text';
@@ -718,11 +725,94 @@ export class EntryDetailComponent {
     ];
   }
 
+  private refreshSelectFieldOptions(): void {
+    const currentFields = this.fields();
+    if (!currentFields || currentFields.length === 0) {
+      return;
+    }
+
+    const updatedFields = currentFields.map<EntryFieldConfig>((config) => {
+      if (!this.isSelectFieldKey(config.key)) {
+        return config;
+      }
+      return {
+        ...config,
+        inputType: 'select',
+        options: this.buildSelectOptionsForKey(config.key) ?? []
+      };
+    });
+
+    this.fields.set(updatedFields);
+    this.fieldConfigMap = new Map(updatedFields.map((config) => [config.key, config]));
+  }
+
   private buildVisibilityOptions(): ValueDropdownOption[] {
     return [
       { label: this.translate.instant('entryVisibility.options.user'), value: 'user' },
       { label: this.translate.instant('entryVisibility.options.admin'), value: 'admin' }
     ];
+  }
+
+  private buildSelectOptionsForKey(key: string): ValueDropdownOption[] | null {
+    const normalized = key.toLowerCase();
+    switch (normalized) {
+      case 'gender':
+        return [
+          this.selectOption('entryDetail.selectOptions.gender.unspecified', 'Unspecified'),
+          this.selectOption('entryDetail.selectOptions.gender.female', 'Female'),
+          this.selectOption('entryDetail.selectOptions.gender.male', 'Male'),
+          this.selectOption('entryDetail.selectOptions.gender.nonBinary', 'Non-binary'),
+          this.selectOption('entryDetail.selectOptions.gender.other', 'Other')
+        ];
+      case 'status':
+        return [
+          this.selectOption('entryDetail.selectOptions.status.active', 'active'),
+          this.selectOption('entryDetail.selectOptions.status.inactive', 'inactive'),
+          this.selectOption('entryDetail.selectOptions.status.suspended', 'suspended'),
+          this.selectOption('entryDetail.selectOptions.status.archived', 'archived'),
+          this.selectOption('entryDetail.selectOptions.status.pending', 'pending')
+        ];
+      case 'risk_level':
+        return [
+          this.selectOption('entryDetail.selectOptions.risk.low', 'Low'),
+          this.selectOption('entryDetail.selectOptions.risk.medium', 'Medium'),
+          this.selectOption('entryDetail.selectOptions.risk.high', 'High'),
+          this.selectOption('entryDetail.selectOptions.risk.critical', 'Critical'),
+          this.selectOption('entryDetail.selectOptions.risk.unknown', 'N/A')
+        ];
+      case 'energy_type':
+        return [
+          this.selectOption('entryDetail.selectOptions.energy.gasoline', 'gasoline'),
+          this.selectOption('entryDetail.selectOptions.energy.diesel', 'diesel'),
+          this.selectOption('entryDetail.selectOptions.energy.hybrid', 'hybrid'),
+          this.selectOption('entryDetail.selectOptions.energy.electric', 'electric'),
+          this.selectOption('entryDetail.selectOptions.energy.hydrogen', 'hydrogen'),
+          this.selectOption('entryDetail.selectOptions.energy.other', 'other')
+        ];
+      case 'vehicle_type':
+        return [
+          this.selectOption('entryDetail.selectOptions.vehicleType.sedan', 'sedan'),
+          this.selectOption('entryDetail.selectOptions.vehicleType.suv', 'suv'),
+          this.selectOption('entryDetail.selectOptions.vehicleType.truck', 'truck'),
+          this.selectOption('entryDetail.selectOptions.vehicleType.motorcycle', 'motorcycle'),
+          this.selectOption('entryDetail.selectOptions.vehicleType.van', 'van'),
+          this.selectOption('entryDetail.selectOptions.vehicleType.bus', 'bus'),
+          this.selectOption('entryDetail.selectOptions.vehicleType.other', 'other')
+        ];
+      default:
+        return null;
+    }
+  }
+
+  private selectOption(labelKey: string, value: string): ValueDropdownOption {
+    return {
+      label: this.translate.instant(labelKey),
+      value
+    };
+  }
+
+  private isSelectFieldKey(key: string): boolean {
+    return this.selectFieldKeys.has(key.toLowerCase());
   }
 
   private extractVisibility(record: EntryRecord | null): VisibilityLevel {
