@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { ApiService } from './api.service';
+import { VisibilityLevel } from '../../shared/types/visibility-level.type';
 
 export interface EntryListParams {
   page?: number;
@@ -11,8 +12,12 @@ export interface EntryListParams {
   filters?: Record<string, string | number | boolean | null | undefined>;
 }
 
+export interface EntryRecord extends Record<string, unknown> {
+  visibility_level?: VisibilityLevel;
+}
+
 export interface EntryListResult {
-  items: Record<string, unknown>[];
+  items: EntryRecord[];
   total: number | null;
   page: number;
   pageSize: number;
@@ -35,11 +40,11 @@ export class EntryService {
       .pipe(map((payload) => this.normalizeListResponse(payload, page, pageSize)));
   }
 
-  getEntry(type: string, id: string): Observable<Record<string, unknown>> {
-    return this.api.request<Record<string, unknown>>('GET', this.buildItemEndpoint(type, id));
+  getEntry(type: string, id: string): Observable<EntryRecord> {
+    return this.api.request<EntryRecord>('GET', this.buildItemEndpoint(type, id));
   }
 
-  createEntry(type: string, payload: Record<string, unknown>): Observable<Record<string, unknown>> {
+  createEntry(type: string, payload: Record<string, unknown>): Observable<EntryRecord> {
     const normalizedType = type?.trim().toLowerCase();
     if (normalizedType === 'notes' && payload && 'person_id' in payload) {
       const personId = this.extractPersonId(payload['person_id']);
@@ -50,18 +55,18 @@ export class EntryService {
       return this.createNoteForPerson(personId, notePayload);
     }
 
-    return this.api.request<Record<string, unknown>>('POST', this.buildCollectionEndpoint(type), {
+    return this.api.request<EntryRecord>('POST', this.buildCollectionEndpoint(type), {
       body: payload
     });
   }
 
-  createNoteForPerson(personId: string, payload: Record<string, unknown>): Observable<Record<string, unknown>> {
+  createNoteForPerson(personId: string, payload: Record<string, unknown>): Observable<EntryRecord> {
     const sanitizedId = this.extractPersonId(personId);
     if (!sanitizedId) {
       throw new Error('Person ID is required');
     }
 
-    return this.api.request<Record<string, unknown>>(
+    return this.api.request<EntryRecord>(
       'POST',
       `/notes/by-person/${encodeURIComponent(sanitizedId)}`,
       { body: payload }
@@ -79,8 +84,8 @@ export class EntryService {
     return null;
   }
 
-  updateEntry(type: string, id: string, payload: Record<string, unknown>): Observable<Record<string, unknown>> {
-    return this.api.request<Record<string, unknown>>('PATCH', this.buildItemEndpoint(type, id), {
+  updateEntry(type: string, id: string, payload: Record<string, unknown>): Observable<EntryRecord> {
+    return this.api.request<EntryRecord>('PATCH', this.buildItemEndpoint(type, id), {
       body: payload
     });
   }
@@ -251,12 +256,12 @@ export class EntryService {
     return result;
   }
 
-  private toRecordList(source: unknown[]): Record<string, unknown>[] {
+  private toRecordList(source: unknown[]): EntryRecord[] {
     return source.map((item) => {
       if (item && typeof item === 'object' && !Array.isArray(item)) {
-        return item as Record<string, unknown>;
+        return item as EntryRecord;
       }
-      return { value: item } as Record<string, unknown>;
+      return { value: item } as EntryRecord;
     });
   }
 

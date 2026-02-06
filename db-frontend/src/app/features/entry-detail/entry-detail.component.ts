@@ -1,4 +1,5 @@
-import { DatePipe, JsonPipe, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { DatePipe, JsonPipe, NgClass, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, WritableSignal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -6,21 +7,23 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
 
-import { EntryService } from '../../core/services/entry.service';
+import { EntryRecord, EntryService } from '../../core/services/entry.service';
 import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
-import { ValueDropdownOption } from '../../shared/components/value-dropdown/value-dropdown.component';
+import { ValueDropdownComponent, ValueDropdownOption } from '../../shared/components/value-dropdown/value-dropdown.component';
 import { EntryFieldConfig, EntryFieldInputType } from './entry-detail.types';
 import { EntryDetailFieldGridComponent } from './components/entry-detail-field-grid/entry-detail-field-grid.component';
 import { EntryDetailRelationsComponent } from './components/entry-detail-relations/entry-detail-relations.component';
 import { EntryDetailDeleteDialogComponent } from './components/entry-detail-delete-dialog/entry-detail-delete-dialog.component';
 import { EntryDetailRawViewComponent } from './components/entry-detail-raw-view/entry-detail-raw-view.component';
+import { DEFAULT_VISIBILITY_LEVEL, VisibilityLevel, coerceVisibilityLevel } from '../../shared/types/visibility-level.type';
 
 @Component({
   selector: 'app-entry-detail',
   standalone: true,
   imports: [
     NgIf,
+    NgClass,
     NgFor,
     NgSwitch,
     NgSwitchCase,
@@ -33,7 +36,8 @@ import { EntryDetailRawViewComponent } from './components/entry-detail-raw-view/
     EntryDetailFieldGridComponent,
     EntryDetailRelationsComponent,
     EntryDetailDeleteDialogComponent,
-    EntryDetailRawViewComponent
+    EntryDetailRawViewComponent,
+    ValueDropdownComponent
   ],
   templateUrl: './entry-detail.component.html',
   styleUrls: ['./entry-detail.component.scss'],
@@ -54,10 +58,12 @@ export class EntryDetailComponent {
   readonly isDeleting = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
-  readonly entry = signal<Record<string, unknown> | null>(null);
+  readonly entry = signal<EntryRecord | null>(null);
   readonly fields: WritableSignal<EntryFieldConfig[]> = signal([]);
   readonly entryTitle = signal<string | null>(null);
   readonly booleanOptions = signal<ValueDropdownOption[]>([]);
+  readonly visibilityOptions = signal<ValueDropdownOption[]>([]);
+  readonly visibilityControl = this.fb.nonNullable.control<VisibilityLevel>(DEFAULT_VISIBILITY_LEVEL);
   private readonly readOnlyKeys = new Set(['id', '_id', 'type', 'createdat', 'updatedat', 'created_at', 'updated_at', 'timestamp', 'occurredat', 'occurred_at']);
   private readonly dateFieldHints = new Map<string, 'date' | 'datetime'>([
     ['date_of_birth', 'date'],
@@ -86,6 +92,7 @@ export class EntryDetailComponent {
   private currentType: string | null = null;
   private currentId: string | null = null;
   private fieldConfigMap = new Map<string, EntryFieldConfig>();
+  private currentVisibilityLevel: VisibilityLevel = DEFAULT_VISIBILITY_LEVEL;
 
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
@@ -107,9 +114,13 @@ export class EntryDetailComponent {
     });
 
     this.booleanOptions.set(this.buildBooleanOptions());
+    this.visibilityOptions.set(this.buildVisibilityOptions());
     this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.booleanOptions.set(this.buildBooleanOptions());
+      this.visibilityOptions.set(this.buildVisibilityOptions());
     });
+
+    this.updateVisibilityControlState(DEFAULT_VISIBILITY_LEVEL);
   }
 
   openDeleteDialog(): void {
@@ -141,10 +152,12 @@ export class EntryDetailComponent {
     }
 
     const payload = this.buildPayload();
+    this.appendVisibilityToPayload(payload);
 
     if (Object.keys(payload).length === 0) {
       this.successMessage.set(this.translate.instant('entryDetail.status.noChanges'));
       this.form.markAsPristine();
+      this.visibilityControl.markAsPristine();
       return;
     }
 
@@ -157,8 +170,9 @@ export class EntryDetailComponent {
       );
 
       if (updated && typeof updated === 'object') {
-        this.entry.set(updated as Record<string, unknown>);
-        this.rebuildForm(updated as Record<string, unknown>);
+        this.entry.set(updated as EntryRecord);
+        this.rebuildForm(updated as EntryRecord);
+        this.updateVisibilityControlState(this.extractVisibility(updated as EntryRecord));
       }
 
       this.successMessage.set(this.translate.instant('entryDetail.status.saved'));
@@ -193,7 +207,7 @@ export class EntryDetailComponent {
   }
 
   hasChanges(): boolean {
-    return this.form.dirty && !this.isSaving();
+    return (this.form.dirty || this.visibilityControl.dirty) && !this.isSaving();
   }
 
   private isReadOnlyKey(key: string): boolean {
@@ -230,16 +244,21 @@ export class EntryDetailComponent {
       this.entry.set(record);
       this.rebuildForm(record);
       this.entryTitle.set(this.resolveEntryTitle(record));
+      this.updateVisibilityControlState(this.extractVisibility(record));
     } catch (error) {
-      this.errorMessage.set(this.translate.instant('entryDetail.errors.loadFailed', {
-        message: this.describeError(error)
-      }));
+      if (this.isHiddenEntryError(error)) {
+        this.errorMessage.set(this.translate.instant('entryDetail.errors.hiddenFromUser'));
+      } else {
+        this.errorMessage.set(this.translate.instant('entryDetail.errors.loadFailed', {
+          message: this.describeError(error)
+        }));
+      }
     } finally {
       this.isLoading.set(false);
     }
   }
 
-  private rebuildForm(record: Record<string, unknown>): void {
+  private rebuildForm(record: EntryRecord): void {
     const controls: Record<string, FormControl<string | number | boolean | null>> = {};
     const fieldConfigs: EntryFieldConfig[] = [];
 
@@ -282,7 +301,14 @@ export class EntryDetailComponent {
 
   private shouldHideField(key: string): boolean {
     const normalized = key.toLowerCase();
-    return normalized === 'id' || normalized === '_id';
+    if (normalized === 'id' || normalized === '_id') {
+      return true;
+    }
+    return this.isVisibilityKey(normalized);
+  }
+
+  private isVisibilityKey(key: string): boolean {
+    return key === 'visibility_level';
   }
 
   private buildPayload(): Record<string, unknown> {
@@ -319,6 +345,17 @@ export class EntryDetailComponent {
     }
 
     return payload;
+  }
+
+  private appendVisibilityToPayload(payload: Record<string, unknown>): void {
+    if (!this.canEditVisibility()) {
+      return;
+    }
+
+    const desired = this.visibilityControl.getRawValue() ?? DEFAULT_VISIBILITY_LEVEL;
+    if (desired !== this.currentVisibilityLevel) {
+      payload['visibility_level'] = desired;
+    }
   }
 
   private looksLikeJson(value: string): boolean {
@@ -671,6 +708,51 @@ export class EntryDetailComponent {
     ];
   }
 
+  private buildVisibilityOptions(): ValueDropdownOption[] {
+    return [
+      { label: this.translate.instant('entryVisibility.options.user'), value: 'user' },
+      { label: this.translate.instant('entryVisibility.options.admin'), value: 'admin' }
+    ];
+  }
+
+  private extractVisibility(record: EntryRecord | null): VisibilityLevel {
+    if (!record) {
+      return DEFAULT_VISIBILITY_LEVEL;
+    }
+    return coerceVisibilityLevel(record.visibility_level);
+  }
+
+  private updateVisibilityControlState(level: VisibilityLevel): void {
+    this.currentVisibilityLevel = level;
+    this.visibilityControl.setValue(level, { emitEvent: false });
+    if (this.canEditVisibility()) {
+      this.visibilityControl.enable({ emitEvent: false });
+    } else {
+      this.visibilityControl.disable({ emitEvent: false });
+    }
+    this.visibilityControl.markAsPristine();
+  }
+
+  canEditVisibility(): boolean {
+    return this.auth.isAdmin();
+  }
+
+  get visibilityLevel(): VisibilityLevel {
+    return this.currentVisibilityLevel;
+  }
+
+  visibilityBadgeClasses(): Record<string, boolean> {
+    return {
+      'visibility-badge': true,
+      'visibility-badge--admin': this.currentVisibilityLevel === 'admin',
+      'visibility-badge--user': this.currentVisibilityLevel === 'user'
+    };
+  }
+
+  visibilityBadgeLabelKey(): string {
+    return `entryVisibility.badge.${this.currentVisibilityLevel}`;
+  }
+
   private humanizeKey(key: string): string {
     return key
       .replace(/_/g, ' ')
@@ -680,9 +762,9 @@ export class EntryDetailComponent {
       .replace(/\b\w/g, (char) => char.toUpperCase());
   }
 
-  private ensureRecord(payload: unknown): Record<string, unknown> {
+  private ensureRecord(payload: unknown): EntryRecord {
     if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
-      return payload as Record<string, unknown>;
+      return payload as EntryRecord;
     }
 
     throw new Error(this.translate.instant('entryDetail.errors.invalidPayload'));
@@ -698,6 +780,10 @@ export class EntryDetailComponent {
     }
 
     return this.translate.instant('entryDetail.errors.unknown');
+  }
+
+  private isHiddenEntryError(error: unknown): boolean {
+    return !this.auth.isAdmin() && error instanceof HttpErrorResponse && error.status === 404;
   }
 
   get entryType(): string | null {

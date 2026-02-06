@@ -1,4 +1,4 @@
-export type EntryFieldType = 'text' | 'textarea' | 'number' | 'boolean' | 'date' | 'json';
+export type EntryFieldType = 'text' | 'textarea' | 'number' | 'boolean' | 'date' | 'json' | 'visibility';
 
 export type DateFieldVariant = 'date' | 'datetime';
 
@@ -24,6 +24,17 @@ export interface EntrySchema {
   description?: string;
   fields: EntrySchemaField[];
   requireOneOf?: EntrySchemaRequirement;
+}
+
+const VISIBILITY_FIELD_LABEL = 'Visibility';
+
+function visibilityField(): EntrySchemaField {
+  return {
+    key: 'visibility_level',
+    label: VISIBILITY_FIELD_LABEL,
+    type: 'visibility',
+    defaultValue: 'user'
+  };
 }
 
 /**
@@ -65,7 +76,8 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
         type: 'json',
         placeholder: '{ "custom": "value" }',
         description: 'Attach any structured data as JSON.'
-      }
+      },
+      visibilityField()
     ]
   },
   profiles: {
@@ -90,7 +102,8 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
         label: 'Metadata (JSON)',
         type: 'json',
         placeholder: '{ "extra": true }'
-      }
+      },
+      visibilityField()
     ]
   },
   platforms: {
@@ -102,7 +115,8 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
       { key: 'category', label: 'Category', type: 'text', defaultValue: 'social' },
       { key: 'base_url', label: 'Base URL', type: 'text' },
       { key: 'api_base_url', label: 'API base URL', type: 'text' },
-      { key: 'is_active', label: 'Is active', type: 'boolean', defaultValue: true }
+      { key: 'is_active', label: 'Is active', type: 'boolean', defaultValue: true },
+      visibilityField()
     ]
   },
   activities: {
@@ -132,7 +146,8 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
       { key: 'ip_address', label: 'IP address', type: 'text' },
       { key: 'user_agent', label: 'User agent', type: 'text' },
       { key: 'geo_location', label: 'Geo location', type: 'text' },
-      { key: 'created_by', label: 'Created by', type: 'text' }
+      { key: 'created_by', label: 'Created by', type: 'text' },
+      visibilityField()
     ]
   },
   vehicles: {
@@ -156,7 +171,8 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
         label: 'Metadata (JSON)',
         type: 'json',
         placeholder: '{ "notes": "..." }'
-      }
+      },
+      visibilityField()
     ]
   },
   notes: {
@@ -167,7 +183,8 @@ export const ENTRY_SCHEMAS: Record<string, EntrySchema> = {
       { key: 'person_id', label: 'Person ID', type: 'number', required: true },
       { key: 'title', label: 'Title', type: 'text', required: true },
       { key: 'text', label: 'Text', type: 'textarea', required: true },
-      { key: 'pinned', label: 'Pinned', type: 'boolean', defaultValue: false }
+      { key: 'pinned', label: 'Pinned', type: 'boolean', defaultValue: false },
+      visibilityField()
     ]
   }
 };

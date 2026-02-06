@@ -11,6 +11,8 @@ import { EntrySchema, EntrySchemaField, EntryFieldType, getEntrySchema } from '.
 import { PlatformLookupComponent } from '../../shared/components/platform-lookup/platform-lookup.component';
 import { PersonLookupComponent } from '../../shared/components/person-lookup/person-lookup.component';
 import { ValueDropdownComponent, ValueDropdownOption } from '../../shared/components/value-dropdown/value-dropdown.component';
+import { AuthService } from '../../core/services/auth.service';
+import { DEFAULT_VISIBILITY_LEVEL, VisibilityLevel, coerceVisibilityLevel } from '../../shared/types/visibility-level.type';
 
 interface SchemaFieldControl {
   field: EntrySchemaField;
@@ -32,6 +34,7 @@ export class EntryCreateComponent {
   private readonly translate = inject(TranslateService);
   private readonly entryService = inject(EntryService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly auth = inject(AuthService);
 
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -42,6 +45,7 @@ export class EntryCreateComponent {
   readonly hasSchema = computed(() => this.schemaFields().length > 0);
   readonly rawPayloadControl = this.fb.nonNullable.control<string>('');
   readonly booleanOptions = signal<ValueDropdownOption[]>([]);
+  readonly visibilityOptions = signal<ValueDropdownOption[]>([]);
   readonly lastRequestInfo = signal<{ endpoint: string; payload: Record<string, unknown> } | null>(null);
 
   form: FormGroup = this.fb.group({});
@@ -64,8 +68,10 @@ export class EntryCreateComponent {
     });
 
     this.booleanOptions.set(this.buildBooleanOptions());
+    this.visibilityOptions.set(this.buildVisibilityOptions());
     this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.booleanOptions.set(this.buildBooleanOptions());
+      this.visibilityOptions.set(this.buildVisibilityOptions());
     });
   }
 
@@ -80,6 +86,10 @@ export class EntryCreateComponent {
   isPersonLookupField(field: EntrySchemaField): boolean {
     const normalizedKey = field.key.toLowerCase();
     return normalizedKey === 'person_id' || normalizedKey.endsWith('_person_id');
+  }
+
+  isVisibilitySchemaField(field: EntrySchemaField): boolean {
+    return field.type === 'visibility';
   }
 
   private isNotesType(): boolean {
@@ -123,12 +133,23 @@ export class EntryCreateComponent {
     ];
   }
 
+  private buildVisibilityOptions(): ValueDropdownOption[] {
+    return [
+      { label: this.translate.instant('entryVisibility.options.user'), value: 'user' },
+      { label: this.translate.instant('entryVisibility.options.admin'), value: 'admin' }
+    ];
+  }
+
   backLink(): string[] | null {
     if (!this.currentType) {
       return null;
     }
 
     return ['/entries', this.currentType];
+  }
+
+  showVisibilitySelector(): boolean {
+    return this.auth.isAdmin();
   }
 
   async submit(): Promise<void> {
@@ -271,6 +292,9 @@ export class EntryCreateComponent {
 
     if (schema) {
       for (const field of schema.fields) {
+        if (this.isVisibilitySchemaField(field) && !this.showVisibilitySelector()) {
+          continue;
+        }
         const control = this.createControl(field);
         controls[field.key] = control;
         schemaControls.push({ field, control });
@@ -303,6 +327,11 @@ export class EntryCreateComponent {
       }
       case 'date':
         return this.fb.nonNullable.control<string>(typeof field.defaultValue === 'string' ? field.defaultValue : '', validators);
+      case 'visibility': {
+        const defaultValue =
+          typeof field.defaultValue === 'string' ? coerceVisibilityLevel(field.defaultValue) : DEFAULT_VISIBILITY_LEVEL;
+        return this.fb.nonNullable.control<string>(defaultValue, validators);
+      }
       default:
         return this.fb.nonNullable.control<string>(
           field.defaultValue != null ? String(field.defaultValue) : '',
@@ -371,6 +400,8 @@ export class EntryCreateComponent {
         return Number(value);
       case 'date':
         return this.transformDate(field.dateVariant, value);
+      case 'visibility':
+        return typeof value === 'string' ? coerceVisibilityLevel(value) : DEFAULT_VISIBILITY_LEVEL;
       case 'json':
         if (typeof value !== 'string') {
           throw new Error(this.translate.instant('entryCreate.errors.invalidJsonField'));

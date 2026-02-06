@@ -133,7 +133,8 @@
       "saveFailed": "Eintrag konnte nicht gespeichert werden: {{ message }}",
       "deleteFailed": "Eintrag konnte nicht geloescht werden: {{ message }}",
       "invalidPayload": "Die API hat eine unerwartete Antwort geliefert.",
-      "unknown": "Unbekannter Fehler"
+      "unknown": "Unbekannter Fehler",
+      "hiddenFromUser": "Dieser Eintrag ist nur f?r Administratoren sichtbar."
     },
     "rawView": {
       "label": "Rohdaten",
@@ -411,6 +412,19 @@
     "modal": {
       "title": "Account loeschen?",
       "body": "Moechten Sie {{username}} wirklich entfernen? Diese Aktion kann nicht rueckgaengig gemacht werden."
+    }
+  },
+  "entryVisibility": {
+    "columnLabel": "Sichtbarkeit",
+    "placeholder": "Sichtbarkeit w?hlen",
+    "helper": "Steuert, wer diesen Eintrag in der Oberfl?che sehen darf.",
+    "options": {
+      "user": "Alle Nutzer",
+      "admin": "Nur Admins"
+    },
+    "badge": {
+      "user": "Alle Nutzer",
+      "admin": "Nur Admins"
     }
   }
 }

@@ -8,6 +8,21 @@
         <span *ngIf="entryType && entryId" aria-hidden="true">&nbsp;&middot;&nbsp;</span>
         <span *ngIf="entryId">{{ 'entryDetail.labels.id' | translate:{ id: entryId } }}</span>
       </p>
+      <div class="entry-detail__visibility" *ngIf="entry()">
+        <div class="entry-detail__visibility-info">
+          <span [ngClass]="visibilityBadgeClasses()">
+            {{ visibilityBadgeLabelKey() | translate }}
+          </span>
+          <small>{{ 'entryVisibility.helper' | translate }}</small>
+        </div>
+        <app-value-dropdown
+          *ngIf="canEditVisibility()"
+          class="entry-detail__visibility-control"
+          [formControl]="visibilityControl"
+          [options]="visibilityOptions()"
+          [placeholder]="'entryVisibility.placeholder' | translate"
+        ></app-value-dropdown>
+      </div>
     </div>
     <div class="entry-detail__actions">
       <div

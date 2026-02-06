@@ -28,7 +28,7 @@
 
   <form class="entry-create__form" [formGroup]="form" (ngSubmit)="submit()">
     <section *ngIf="hasSchema(); else missingSchema" class="entry-create__fields">
-      <article *ngFor="let item of schemaFields(); trackBy: trackField" class="entry-create__field">
+      <article *ngFor="let item of schemaFields(); trackBy: trackField" class="entry-create__field" [class.entry-create__field--visibility]="isVisibilitySchemaField(item.field)">
         <label [attr.for]="item.field.key">
           {{ item.field.label }}
           <ng-container *ngIf="isPersonLookupField(item.field)">
@@ -40,6 +40,9 @@
         </label>
         <small *ngIf="item.field.description" class="entry-create__hint">
           {{ item.field.description }}
+        </small>
+        <small *ngIf="isVisibilitySchemaField(item.field)" class="entry-create__hint">
+          {{ 'entryVisibility.helper' | translate }}
         </small>
 
         <ng-container *ngIf="isPersonLookupField(item.field); else platformField">
@@ -90,6 +93,13 @@
               *ngSwitchCase="'boolean'"
               [options]="booleanOptions()"
               [placeholder]="'entryCreate.form.booleanPlaceholder' | translate"
+              [formControl]="item.control"
+            ></app-value-dropdown>
+
+            <app-value-dropdown
+              *ngSwitchCase="'visibility'"
+              [options]="visibilityOptions()"
+              [placeholder]="'entryVisibility.placeholder' | translate"
               [formControl]="item.control"
             ></app-value-dropdown>
 

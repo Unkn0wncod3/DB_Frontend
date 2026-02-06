@@ -133,7 +133,8 @@
       "saveFailed": "Unable to save entry: {{ message }}",
       "deleteFailed": "Unable to delete entry: {{ message }}",
       "invalidPayload": "The API returned an unexpected response.",
-      "unknown": "Unknown error"
+      "unknown": "Unknown error",
+      "hiddenFromUser": "This entry is only visible to administrators."
     },
     "rawView": {
       "label": "Raw data",
@@ -411,6 +412,19 @@
     "modal": {
       "title": "Delete account?",
       "body": "Do you really want to remove {{username}}? This action cannot be undone."
+    }
+  },
+  "entryVisibility": {
+    "columnLabel": "Visibility",
+    "placeholder": "Select visibility",
+    "helper": "Controls who can view this entry in the UI.",
+    "options": {
+      "user": "All users",
+      "admin": "Admins only"
+    },
+    "badge": {
+      "user": "All users",
+      "admin": "Admins only"
     }
   }
 }

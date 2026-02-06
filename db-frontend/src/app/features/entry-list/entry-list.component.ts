@@ -1,4 +1,4 @@
-import { AsyncPipe, DatePipe, JsonPipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe, DatePipe, JsonPipe, NgClass, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router, RouterModule } from '@angular/router';
@@ -9,6 +9,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EntryListParams, EntryService } from '../../core/services/entry.service';
 import { PersonLookupComponent } from '../../shared/components/person-lookup/person-lookup.component';
 import { AuthService } from '../../core/services/auth.service';
+import { VisibilityLevel, coerceVisibilityLevel } from '../../shared/types/visibility-level.type';
 
 interface DisplayColumn {
   key: string;
@@ -18,7 +19,7 @@ interface DisplayColumn {
 @Component({
   selector: 'app-entry-list',
   standalone: true,
-  imports: [NgIf, NgFor, NgClass, ReactiveFormsModule, RouterModule, AsyncPipe, JsonPipe, DatePipe, TranslateModule, PersonLookupComponent],
+  imports: [NgIf, NgFor, NgClass, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterModule, AsyncPipe, JsonPipe, DatePipe, TranslateModule, PersonLookupComponent],
   templateUrl: './entry-list.component.html',
   styleUrl: './entry-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -43,6 +44,7 @@ export class EntryListComponent {
     vehicles: ['label', 'model', 'vehicle_type', 'license_plate'],
     platforms: ['name', 'is_active', 'base_url']
   };
+  private readonly visibilityColumnKey = 'visibility_level';
 
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -325,6 +327,10 @@ export class EntryListComponent {
       }
     }
 
+    if (this.shouldShowVisibilityColumn()) {
+      keys.add(this.visibilityColumnKey);
+    }
+
     const priorities = this.getPrioritizedKeys();
     for (const priorityKey of priorities) {
       if (this.itemsContainKey(items, priorityKey)) {
@@ -340,7 +346,7 @@ export class EntryListComponent {
 
     return orderedKeys
       .slice(0, 6)
-      .map((key) => ({ key, label: this.humanizeKey(key) }));
+      .map((key) => ({ key, label: this.resolveColumnLabel(key) }));
   }
 
   private orderColumns(keys: string[]): string[] {
@@ -372,15 +378,34 @@ export class EntryListComponent {
     return result;
   }
 
+  private resolveColumnLabel(key: string): string {
+    if (key === this.visibilityColumnKey) {
+      const label = this.translate.instant('entryVisibility.columnLabel');
+      if (label && label !== 'entryVisibility.columnLabel') {
+        return label;
+      }
+      return 'Visibility';
+    }
+    return this.humanizeKey(key);
+  }
+
   private getPrioritizedKeys(): string[] {
     const normalizedType = (this.currentType ?? '').toLowerCase();
     const typeSpecific = this.columnPriority[normalizedType] ?? [];
     const defaults = this.columnPriority['default'] ?? [];
-    return [...defaults, ...typeSpecific];
+    const priorities = [...defaults, ...typeSpecific];
+    if (this.shouldShowVisibilityColumn()) {
+      return [this.visibilityColumnKey, ...priorities];
+    }
+    return priorities;
   }
 
   private itemsContainKey(items: Record<string, unknown>[], key: string): boolean {
     return items.some((item) => Object.prototype.hasOwnProperty.call(item, key));
+  }
+
+  private shouldShowVisibilityColumn(): boolean {
+    return this.auth.isAdmin();
   }
 
   private isDisplayable(value: unknown): boolean {
@@ -436,5 +461,32 @@ export class EntryListComponent {
       .replace(/\s+/g, ' ')
       .trim()
       .replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
+  isVisibilityColumn(key: string): boolean {
+    return key === this.visibilityColumnKey;
+  }
+
+  visibilityLabel(value: unknown): string {
+    const normalized = this.normalizeVisibilityValue(value);
+    const key = `entryVisibility.badge.${normalized}`;
+    const translated = this.translate.instant(key);
+    if (translated && translated !== key) {
+      return translated;
+    }
+    return normalized === 'admin' ? 'Admins only' : 'All users';
+  }
+
+  visibilityBadgeClassesForValue(value: unknown): Record<string, boolean> {
+    const normalized = this.normalizeVisibilityValue(value);
+    return {
+      'visibility-badge': true,
+      'visibility-badge--admin': normalized === 'admin',
+      'visibility-badge--user': normalized === 'user'
+    };
+  }
+
+  private normalizeVisibilityValue(value: unknown): VisibilityLevel {
+    return coerceVisibilityLevel(value);
   }
 }
