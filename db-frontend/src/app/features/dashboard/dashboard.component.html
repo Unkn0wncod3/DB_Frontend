@@ -15,7 +15,7 @@
     </div>
   </header>
 
-  <section *ngIf="hasCreateOptions && auth.canWrite()" class="dashboard__quick-create">
+  <section *ngIf="hasCreateOptions() && auth.canWrite()" class="dashboard__quick-create">
     <label for="create-type-select">
       {{ 'dashboard.actions.createLabel' | translate }}
     </label>
@@ -26,7 +26,7 @@
         (change)="handleCreateTypeChange($event)"
       >
         <option
-          *ngFor="let option of createTypeOptions"
+          *ngFor="let option of createTypeOptions()"
           [value]="option.type"
           [selected]="selectedCreateType() === option.type"
         >

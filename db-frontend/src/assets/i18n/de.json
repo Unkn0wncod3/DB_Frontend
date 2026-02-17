@@ -134,6 +134,17 @@
       "last24Hours": "Änderungen in den letzten 24 Stunden",
       "last7Days": "Änderungen in den letzten 7 Tagen",
       "last30Days": "Änderungen in den letzten 30 Tagen"
+    },
+    "totalLabels": {
+      "entries": "Einträge",
+      "collections": "Sammlungen",
+      "users": "Benutzer",
+      "persons": "Personen",
+      "profiles": "Profile",
+      "activities": "Aktivitäten",
+      "vehicles": "Fahrzeuge",
+      "platforms": "Plattformen",
+      "notes": "Notizen"
     }
   },
   "entryDetail": {

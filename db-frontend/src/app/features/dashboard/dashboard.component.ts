@@ -1,7 +1,8 @@
 import { AsyncPipe, DatePipe, DecimalPipe, JsonPipe, NgClass, NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { StatsOverviewRecord, StatsService } from '../../core/services/stats.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -30,14 +31,15 @@ export class DashboardComponent implements OnInit {
   private readonly statsService = inject(StatsService);
   private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
   readonly auth = inject(AuthService);
 
   readonly overview = this.statsService.overview;
   readonly isLoading = this.statsService.isLoading;
   readonly lastUpdated = this.statsService.lastUpdated;
-  readonly createTypeOptions = this.buildCreateOptions();
-  readonly selectedCreateType = signal(this.createTypeOptions[0]?.type ?? '');
-  readonly hasCreateOptions = this.createTypeOptions.length > 0;
+  readonly createTypeOptions = signal(this.buildCreateOptions());
+  readonly selectedCreateType = signal(this.createTypeOptions()[0]?.type ?? '');
+  readonly hasCreateOptions = computed(() => this.createTypeOptions().length > 0);
   readonly recentItems = computed<StatsOverviewRecord[]>(() => {
     const recent = this.overview()?.recent;
     if (!Array.isArray(recent) || recent.length === 0) {
@@ -69,7 +71,7 @@ export class DashboardComponent implements OnInit {
       .filter(([key]) => !this.shouldHideCollection(key))
       .map(([key, value]) => ({
         key,
-        label: this.getTransLabel(`dashboard.totals.${key}`, key),
+        label: this.getTransLabel(`dashboard.totalLabels.${key}`, key),
         value
       }));
   });
@@ -87,7 +89,12 @@ export class DashboardComponent implements OnInit {
     }));
   });
 
+  constructor() {
+    this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.refreshCreateOptions());
+  }
+
   ngOnInit(): void {
+    this.refreshCreateOptions();
     void this.statsService.loadOverview();
   }
 
@@ -171,13 +178,14 @@ export class DashboardComponent implements OnInit {
     const id = rawId != null ? String(rawId).trim() : '';
     const hasType = type.length > 0;
     const hasId = id.length > 0;
+    const localizedType = hasType ? this.translateType(type, type) : '';
 
     if (hasType && hasId) {
-      return this.translate.instant('dashboard.labels.itemTypeWithId', { type, id });
+      return this.translate.instant('dashboard.labels.itemTypeWithId', { type: localizedType, id });
     }
 
     if (hasType) {
-      return this.translate.instant('dashboard.labels.itemType', { value: type });
+      return this.translate.instant('dashboard.labels.itemType', { value: localizedType });
     }
 
     if (hasId) {
@@ -267,7 +275,7 @@ export class DashboardComponent implements OnInit {
     return Object.values(ENTRY_SCHEMAS)
       .map((schema) => ({
         type: schema.type,
-        label: schema.title ?? this.humanizeKey(schema.type)
+        label: this.translateType(schema.type, schema.title ?? this.humanizeKey(schema.type))
       }))
       .filter((option) => !!option.type)
       .sort((a, b) => a.label.localeCompare(b.label));
@@ -336,6 +344,28 @@ export class DashboardComponent implements OnInit {
       .replace(/\s+/g, ' ')
       .trim()
       .replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
+  private translateType(type: string, fallback?: string): string {
+    const normalized = (type ?? '').toString().trim().toLowerCase();
+    if (!normalized) {
+      return fallback ?? '';
+    }
+    const key = `entryList.types.${normalized}`;
+    const translated = this.translate.instant(key);
+    if (translated && translated !== key) {
+      return translated;
+    }
+    return fallback ?? this.humanizeKey(type);
+  }
+
+  private refreshCreateOptions(): void {
+    const options = this.buildCreateOptions();
+    const previous = this.selectedCreateType();
+    this.createTypeOptions.set(options);
+    if (!options.some((option) => option.type === previous)) {
+      this.selectedCreateType.set(options[0]?.type ?? '');
+    }
   }
 }
 
