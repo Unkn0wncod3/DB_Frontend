@@ -138,8 +138,8 @@
             <button
               type="button"
               class="danger"
-              [class.danger--disabled]="isProtectedAccount(user)"
-              [disabled]="isProtectedAccount(user)"
+              [class.danger--disabled]="isProtectedAccount(user) || isCurrentUser(user)"
+              [disabled]="isProtectedAccount(user) || isCurrentUser(user)"
               (click)="requestDeletion(user)"
             >
               <ng-container *ngIf="isProtectedAccount(user); else deleteLabel">

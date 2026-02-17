@@ -226,6 +226,10 @@ export class UserManagementComponent {
     return account.username === this.protectedUsername;
   }
 
+  isCurrentUser(account: UserAccount): boolean {
+    return this.currentUser()?.id === account.id;
+  }
+
   canEditUserRole(account: UserAccount): boolean {
     if (this.isProtectedAccount(account)) {
       return false;
@@ -245,6 +249,9 @@ export class UserManagementComponent {
 
   private canEditRoleTarget(account: UserAccount, targetRole: AuthRole): boolean {
     if (this.isProtectedAccount(account)) {
+      return false;
+    }
+    if (this.isCurrentUser(account) && account.role === targetRole) {
       return false;
     }
     if (!this.isCoreAdminUser() && (account.role === 'admin' || targetRole === 'admin')) {
