@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { AuthRole } from '../../core/services/auth.service';
+import { AuthRole, AuthenticatedUser, AuthService } from '../../core/services/auth.service';
 import { CreateUserPayload, UserAccount, UserService } from '../../core/services/user.service';
 
 @Component({
@@ -27,6 +28,9 @@ export class UserManagementComponent {
   readonly successMessage = signal<string | null>(null);
   readonly pendingDeletion = signal<UserAccount | null>(null);
   readonly protectedUsername = 'core_admin_01';
+  readonly viewingPreferences = signal<UserAccount | null>(null);
+  readonly roleUpdatingId = signal<string | number | null>(null);
+  readonly currentUser = signal<AuthenticatedUser | null>(null);
 
   private readonly preferencesValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     const value = (control.value ?? '').toString().trim();
@@ -53,7 +57,15 @@ export class UserManagementComponent {
     preferences: ['', [this.preferencesValidator]]
   });
 
+  private readonly auth = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor() {
+    this.currentUser.set(this.auth.user());
+    this.auth
+      .userChanges()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((user) => this.currentUser.set(user));
     void this.refresh();
   }
 
@@ -150,6 +162,58 @@ export class UserManagementComponent {
     this.pendingDeletion.set(null);
   }
 
+  openPreferences(user: UserAccount): void {
+    this.viewingPreferences.set(user);
+  }
+
+  closePreferences(): void {
+    this.viewingPreferences.set(null);
+  }
+
+  preferencesSummary(user: UserAccount | null): { theme: string; language: string; notifications: { email: boolean; push: boolean } } {
+    const defaults = { theme: 'system', language: 'en', notifications: { email: false, push: false } };
+    if (!user?.preferences || typeof user.preferences !== 'object') {
+      return defaults;
+    }
+    const prefs = user.preferences as Record<string, unknown>;
+    const notifications = prefs['notifications'];
+    return {
+      theme: (prefs['theme'] as string) ?? defaults.theme,
+      language: (prefs['language'] as string) ?? defaults.language,
+      notifications: {
+        email: typeof notifications === 'object' && notifications !== null ? Boolean((notifications as Record<string, unknown>)['email']) : false,
+        push: typeof notifications === 'object' && notifications !== null ? Boolean((notifications as Record<string, unknown>)['push']) : false
+      }
+    };
+  }
+
+  async changeRole(user: UserAccount, newRole: AuthRole): Promise<void> {
+    if (newRole === user.role) {
+      return;
+    }
+    if (!this.canEditRoleTarget(user, newRole)) {
+      this.errorMessage.set(this.translate.instant('userManagement.status.roleRestricted'));
+      return;
+    }
+
+    this.roleUpdatingId.set(user.id);
+    this.errorMessage.set(null);
+    try {
+      await firstValueFrom(this.userService.updateUser(user.id, { role: newRole }));
+      this.successMessage.set(this.translate.instant('userManagement.status.roleUpdated', { username: user.username }));
+      await this.refresh();
+    } catch (error) {
+      this.errorMessage.set(this.describeError(error));
+    } finally {
+      this.roleUpdatingId.set(null);
+    }
+  }
+
+  onRoleChange(user: UserAccount, value: string): void {
+    const newRole = value as AuthRole;
+    void this.changeRole(user, newRole);
+  }
+
   trackByUser(_index: number, user: UserAccount): string | number {
     return user.id;
   }
@@ -160,6 +224,37 @@ export class UserManagementComponent {
 
   isProtectedAccount(account: UserAccount): boolean {
     return account.username === this.protectedUsername;
+  }
+
+  canEditUserRole(account: UserAccount): boolean {
+    if (this.isProtectedAccount(account)) {
+      return false;
+    }
+    if (account.role === 'admin' && !this.isCoreAdminUser()) {
+      return false;
+    }
+    return true;
+  }
+
+  canSelectRoleOption(option: AuthRole): boolean {
+    if (option === 'admin' && !this.isCoreAdminUser()) {
+      return false;
+    }
+    return true;
+  }
+
+  private canEditRoleTarget(account: UserAccount, targetRole: AuthRole): boolean {
+    if (this.isProtectedAccount(account)) {
+      return false;
+    }
+    if (!this.isCoreAdminUser() && (account.role === 'admin' || targetRole === 'admin')) {
+      return false;
+    }
+    return true;
+  }
+
+  private isCoreAdminUser(): boolean {
+    return this.currentUser()?.username === this.protectedUsername;
   }
 
   private describeError(error: unknown): string {

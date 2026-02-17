@@ -108,10 +108,26 @@
             <ng-template #noAvatar>&mdash;</ng-template>
           </td>
           <td class="user-management__preferences-cell">
-            <pre *ngIf="user.preferences; else noPreferences">{{ user.preferences | json }}</pre>
-            <ng-template #noPreferences>&mdash;</ng-template>
+            <button type="button" class="user-management__preferences-button" (click)="openPreferences(user)" [disabled]="!user.preferences">
+              {{ 'userManagement.table.preferencesButton' | translate }}
+            </button>
           </td>
-          <td>{{ roleLabel(user.role) }}</td>
+          <td class="user-management__role-cell">
+            <select
+              #roleSelect
+              [value]="user.role"
+              (change)="onRoleChange(user, roleSelect.value)"
+              [disabled]="!canEditUserRole(user) || roleUpdatingId() === user.id"
+            >
+              <option value="user">{{ 'userManagement.roles.user' | translate }}</option>
+              <option value="admin" [disabled]="!canSelectRoleOption('admin')">
+                {{ 'userManagement.roles.admin' | translate }}
+              </option>
+            </select>
+            <span *ngIf="roleUpdatingId() === user.id" class="user-management__role-spinner">
+              {{ 'userManagement.status.updating' | translate }}
+            </span>
+          </td>
           <td>
             <span class="user-management__badge" [class.user-management__badge--inactive]="!user.is_active">
               {{ user.is_active ? ('userManagement.status.active' | translate) : ('userManagement.status.inactive' | translate) }}
@@ -144,6 +160,41 @@
       {{ 'userManagement.list.protectedHint' | translate:{ username: protectedUsername } }}
     </p>
   </section>
+
+  <div class="user-management__modal" *ngIf="viewingPreferences() as prefUser">
+    <div class="user-management__modal-backdrop" (click)="closePreferences()"></div>
+    <div class="user-management__modal-dialog" role="dialog" aria-modal="true" aria-live="assertive">
+      <ng-container *ngIf="preferencesSummary(prefUser) as prefs">
+        <h3>{{ 'userManagement.preferences.title' | translate:{ username: prefUser.username } }}</h3>
+        <dl class="user-management__preferences-list">
+          <div>
+            <dt>{{ 'profile.preferences.theme.label' | translate }}</dt>
+            <dd>{{ ('profile.preferences.theme.' + prefs.theme) | translate }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'profile.preferences.language.label' | translate }}</dt>
+            <dd>{{ ('profile.preferences.language.' + prefs.language) | translate }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'profile.preferences.notifications.label' | translate }}</dt>
+            <dd>
+              <span class="user-management__pref-chip" [class.user-management__pref-chip--active]="prefs.notifications.email">
+                {{ 'profile.preferences.notifications.email' | translate }}
+              </span>
+              <span class="user-management__pref-chip" [class.user-management__pref-chip--active]="prefs.notifications.push">
+                {{ 'profile.preferences.notifications.push' | translate }}
+              </span>
+            </dd>
+          </div>
+        </dl>
+        <div class="user-management__modal-actions">
+          <button type="button" class="ghost" (click)="closePreferences()">
+            {{ 'userManagement.actions.close' | translate }}
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
 
   <div class="user-management__modal" *ngIf="pendingDeletion() as account">
     <div class="user-management__modal-backdrop" (click)="cancelDeletion()"></div>

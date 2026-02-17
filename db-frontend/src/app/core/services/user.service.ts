@@ -22,6 +22,14 @@ export interface CreateUserPayload {
   profile_picture_url?: string | null;
   preferences?: Record<string, unknown> | null;
 }
+export interface UpdateUserPayload {
+  username?: string;
+  password?: string;
+  role?: AuthRole;
+  is_active?: boolean;
+  profile_picture_url?: string | null;
+  preferences?: Record<string, unknown> | null;
+}
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -33,6 +41,13 @@ export class UserService {
 
   createUser(payload: CreateUserPayload): Observable<UserAccount> {
     return this.api.request<UserAccount>('POST', '/users', { body: payload }).pipe(map(this.normalizeUser));
+  }
+
+  updateUser(id: string | number, payload: UpdateUserPayload): Observable<UserAccount> {
+    const normalized = String(id).trim();
+    return this.api
+      .request<UserAccount>('PATCH', `/users/${encodeURIComponent(normalized)}`, { body: payload })
+      .pipe(map(this.normalizeUser));
   }
 
   deleteUser(id: string | number): Observable<void> {

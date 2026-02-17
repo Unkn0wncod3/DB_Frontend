@@ -517,10 +517,11 @@
       "protectedHint": "Core account {{username}} stays available for recovery and cannot be deleted."
     },
     "table": {
-    "username": "Username",
-    "profilePicture": "Picture",
-    "preferences": "Preferences",
-    "role": "Role",
+      "username": "Username",
+      "profilePicture": "Picture",
+      "preferences": "Preferences",
+      "preferencesButton": "View",
+      "role": "Role",
       "status": "Status",
       "created": "Created at",
       "actions": "Actions"
@@ -528,9 +529,12 @@
     "status": {
       "created": "User created successfully.",
       "deleted": "Removed {{username}}.",
+      "roleUpdated": "Updated role for {{username}}.",
+      "roleRestricted": "Only the core admin can change admin roles.",
       "genericError": "Action failed. Try again later.",
       "active": "Active",
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "updating": "Updating..."
     },
     "roles": {
       "admin": "Admin",
@@ -539,6 +543,9 @@
     "modal": {
       "title": "Delete account?",
       "body": "Do you really want to remove {{username}}? This action cannot be undone."
+    },
+    "preferences": {
+      "title": "{{username}} — Preferences"
     }
   },
   "entryVisibility": {

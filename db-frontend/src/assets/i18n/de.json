@@ -518,10 +518,11 @@
       "protectedHint": "Der Kern-Account {{username}} bleibt für Notfälle erhalten und kann nicht gelöscht werden."
     },
     "table": {
-    "username": "Benutzername",
-    "profilePicture": "Bild",
-    "preferences": "Präferenzen",
-    "role": "Rolle",
+      "username": "Benutzername",
+      "profilePicture": "Bild",
+      "preferences": "Präferenzen",
+      "preferencesButton": "Anzeigen",
+      "role": "Rolle",
       "status": "Status",
       "created": "Angelegt am",
       "actions": "Aktionen"
@@ -529,9 +530,12 @@
     "status": {
       "created": "Benutzer erfolgreich angelegt.",
       "deleted": "{{username}} wurde entfernt.",
+      "roleUpdated": "Rolle für {{username}} aktualisiert.",
+      "roleRestricted": "Nur der Kern-Admin darf Admin-Rollen ändern.",
       "genericError": "Aktion fehlgeschlagen. Bitte später erneut versuchen.",
       "active": "Aktiv",
-      "inactive": "Inaktiv"
+      "inactive": "Inaktiv",
+      "updating": "Aktualisiere..."
     },
     "roles": {
       "admin": "Admin",
@@ -540,6 +544,9 @@
     "modal": {
       "title": "Account löschen?",
       "body": "Möchten Sie {{username}} wirklich entfernen? Diese Aktion kann nicht rückgängig gemacht werden."
+    },
+    "preferences": {
+      "title": "{{username}} – Präferenzen"
     }
   },
   "entryVisibility": {

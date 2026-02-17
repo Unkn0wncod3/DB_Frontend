@@ -179,14 +179,39 @@
   border: 2px solid var(--color-border);
 }
 
-.user-management__preferences-cell pre {
-  margin: 0;
-  max-height: 120px;
-  overflow: auto;
+.user-management__preferences-button {
+  border: 1px solid var(--color-border);
+  background: var(--color-input-bg);
+  color: var(--color-text);
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.user-management__preferences-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.user-management__preferences-button:not(:disabled):hover {
   background: var(--color-muted-bg);
-  padding: 0.4rem;
-  border-radius: 0.4rem;
-  font-size: 0.8rem;
+}
+
+.user-management__role-cell select {
+  padding: 0.35rem 0.65rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-input-bg);
+  color: var(--color-text);
+}
+
+.user-management__role-spinner {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
 }
 
 .user-management__table-actions {
@@ -255,6 +280,38 @@
   max-width: 420px;
   width: calc(100% - 2rem);
   box-shadow: var(--shadow-strong);
+}
+
+.user-management__preferences-list {
+  margin: 1rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.user-management__preferences-list dt {
+  font-weight: 600;
+  color: var(--color-text-soft);
+}
+
+.user-management__preferences-list dd {
+  margin: 0.25rem 0 0;
+}
+
+.user-management__pref-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: var(--color-muted-bg);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  margin-right: 0.5rem;
+}
+
+.user-management__pref-chip--active {
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
 }
 
 .user-management__modal-actions {
