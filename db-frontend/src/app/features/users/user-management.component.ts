@@ -77,24 +77,27 @@ export class UserManagementComponent {
     }
 
     const raw = this.createForm.getRawValue();
-    let parsedPreferences: Record<string, unknown> | null = null;
+    const trimmedUsername = raw.username.trim();
+    const payload: CreateUserPayload = {
+      username: trimmedUsername,
+      password: raw.password,
+      role: raw.role
+    };
+
+    const trimmedPicture = raw.profile_picture_url?.trim();
+    if (trimmedPicture) {
+      payload.profile_picture_url = trimmedPicture;
+    }
+
     const preferencesValue = (raw.preferences ?? '').trim();
     if (preferencesValue) {
       try {
-        parsedPreferences = JSON.parse(preferencesValue) as Record<string, unknown>;
+        payload.preferences = JSON.parse(preferencesValue) as Record<string, unknown>;
       } catch {
         this.errorMessage.set(this.translate.instant('userManagement.form.preferencesInvalid'));
         return;
       }
     }
-
-    const payload: CreateUserPayload = {
-      username: raw.username.trim(),
-      password: raw.password,
-      role: raw.role,
-      profile_picture_url: raw.profile_picture_url?.trim() ? raw.profile_picture_url.trim() : null,
-      preferences: parsedPreferences
-    };
 
     this.isCreating.set(true);
     this.errorMessage.set(null);
