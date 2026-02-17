@@ -28,6 +28,29 @@
         <option value="admin">{{ 'userManagement.roles.admin' | translate }}</option>
       </select>
     </div>
+    <div>
+      <label>{{ 'userManagement.form.profilePictureUrl' | translate }}</label>
+      <input
+        type="url"
+        formControlName="profile_picture_url"
+        [placeholder]="'userManagement.form.profilePicturePlaceholder' | translate"
+      />
+    </div>
+    <div class="user-management__textarea-field">
+      <label for="user-preferences">{{ 'userManagement.form.preferences' | translate }}</label>
+      <textarea
+        id="user-preferences"
+        rows="4"
+        formControlName="preferences"
+        [placeholder]="'userManagement.form.preferencesPlaceholder' | translate"
+      ></textarea>
+      <small
+        class="user-management__helper user-management__helper--visible"
+        *ngIf="createForm.controls.preferences.invalid && createForm.controls.preferences.touched"
+      >
+        {{ 'userManagement.form.preferencesInvalid' | translate }}
+      </small>
+    </div>
     <div class="user-management__form-action">
       <button
         type="submit"
@@ -73,6 +96,8 @@
       <thead>
         <tr>
           <th>{{ 'userManagement.table.username' | translate }}</th>
+          <th>{{ 'userManagement.table.profilePicture' | translate }}</th>
+          <th>{{ 'userManagement.table.preferences' | translate }}</th>
           <th>{{ 'userManagement.table.role' | translate }}</th>
           <th>{{ 'userManagement.table.status' | translate }}</th>
           <th>{{ 'userManagement.table.created' | translate }}</th>
@@ -82,6 +107,14 @@
       <tbody>
         <tr *ngFor="let user of users(); trackBy: trackByUser">
           <td>{{ user.username }}</td>
+          <td class="user-management__avatar-cell">
+            <img *ngIf="user.profile_picture_url; else noAvatar" [src]="user.profile_picture_url" [alt]="user.username" />
+            <ng-template #noAvatar>&mdash;</ng-template>
+          </td>
+          <td class="user-management__preferences-cell">
+            <pre *ngIf="user.preferences; else noPreferences">{{ user.preferences | json }}</pre>
+            <ng-template #noPreferences>&mdash;</ng-template>
+          </td>
           <td>{{ roleLabel(user.role) }}</td>
           <td>
             <span class="user-management__badge" [class.user-management__badge--inactive]="!user.is_active">

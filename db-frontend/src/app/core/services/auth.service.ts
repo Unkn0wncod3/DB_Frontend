@@ -20,6 +20,9 @@ export interface AuthenticatedUser {
   username: string;
   role: AuthRole;
   is_active: boolean;
+  created_at?: string;
+  profile_picture_url?: string | null;
+  preferences?: Record<string, unknown> | null;
 }
 
 export interface AuthLoginResponse {
@@ -111,6 +114,13 @@ export class AuthService {
     const url = this.redirectUrl;
     this.redirectUrl = null;
     return url;
+  }
+
+  updateUser(user: AuthenticatedUser): void {
+    if (!this.tokenValue || !this.expiresAtValue) {
+      return;
+    }
+    this.persistState({ token: this.tokenValue, user, expiresAt: this.expiresAtValue });
   }
 
   handleUnauthorized(): void {

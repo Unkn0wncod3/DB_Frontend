@@ -9,6 +9,7 @@ import { ActivitiesTimelineComponent } from './features/activities-timeline/acti
 import { ContactComponent } from './features/info/contact.component';
 import { ImprintComponent } from './features/info/imprint.component';
 import { LoginComponent } from './features/auth/login.component';
+import { ProfileComponent } from './features/profile/profile.component';
 import { UserManagementComponent } from './features/users/user-management.component';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
@@ -18,6 +19,7 @@ export const routes: Routes = [
   { path: '', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'entries/:type/new', component: EntryCreateComponent, canActivate: [authGuard, adminGuard] },
   { path: 'entries/activities/timeline', component: ActivitiesTimelineComponent, canActivate: [authGuard] },
+  { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'entries/:type', component: EntryListComponent, canActivate: [authGuard] },
   { path: 'entries/:type/:id', component: EntryDetailComponent, canActivate: [authGuard] },
   { path: 'explorer', component: ApiExplorerComponent, canActivate: [authGuard, adminGuard] },

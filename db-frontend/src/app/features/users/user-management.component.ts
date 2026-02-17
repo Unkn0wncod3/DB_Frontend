@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
@@ -28,10 +28,29 @@ export class UserManagementComponent {
   readonly pendingDeletion = signal<UserAccount | null>(null);
   readonly protectedUsername = 'core_admin_01';
 
+  private readonly preferencesValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+    const value = (control.value ?? '').toString().trim();
+    if (!value) {
+      return null;
+    }
+
+    try {
+      const parsed = JSON.parse(value);
+      if (parsed !== null && typeof parsed === 'object') {
+        return null;
+      }
+      return { invalidJson: true };
+    } catch {
+      return { invalidJson: true };
+    }
+  };
+
   readonly createForm = this.fb.nonNullable.group({
     username: ['', [Validators.required, Validators.minLength(3)]],
     password: ['', [Validators.required, Validators.minLength(8)]],
-    role: ['user' as AuthRole, Validators.required]
+    role: ['user' as AuthRole, Validators.required],
+    profile_picture_url: [''],
+    preferences: ['', [this.preferencesValidator]]
   });
 
   constructor() {
@@ -57,13 +76,38 @@ export class UserManagementComponent {
       return;
     }
 
-    const payload = this.createForm.getRawValue() as CreateUserPayload;
+    const raw = this.createForm.getRawValue();
+    let parsedPreferences: Record<string, unknown> | null = null;
+    const preferencesValue = (raw.preferences ?? '').trim();
+    if (preferencesValue) {
+      try {
+        parsedPreferences = JSON.parse(preferencesValue) as Record<string, unknown>;
+      } catch {
+        this.errorMessage.set(this.translate.instant('userManagement.form.preferencesInvalid'));
+        return;
+      }
+    }
+
+    const payload: CreateUserPayload = {
+      username: raw.username.trim(),
+      password: raw.password,
+      role: raw.role,
+      profile_picture_url: raw.profile_picture_url?.trim() ? raw.profile_picture_url.trim() : null,
+      preferences: parsedPreferences
+    };
+
     this.isCreating.set(true);
     this.errorMessage.set(null);
     try {
       await firstValueFrom(this.userService.createUser(payload));
       this.successMessage.set(this.translate.instant('userManagement.status.created'));
-      this.createForm.reset({ username: '', password: '', role: 'user' });
+      this.createForm.reset({
+        username: '',
+        password: '',
+        role: 'user',
+        profile_picture_url: '',
+        preferences: ''
+      });
       await this.refresh();
     } catch (error) {
       this.errorMessage.set(this.describeError(error));

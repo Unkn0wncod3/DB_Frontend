@@ -3,6 +3,7 @@
     "brand": "DB Frontend",
     "nav": {
       "dashboard": "Dashboard",
+      "profile": "Profile",
       "explorer": "Explorer",
       "users": "Users"
     },
@@ -18,6 +19,49 @@
     "roles": {
       "admin": "Admin",
       "user": "User"
+    }
+  },
+  "profile": {
+    "title": "Your Profile",
+    "subtitle": "Review your account info and update your login details.",
+    "fields": {
+      "username": "Username",
+      "password": "New password",
+      "passwordPlaceholder": "Enter a new password",
+      "passwordHint": "Leave empty to keep your current password.",
+      "profilePictureUrl": "Profile picture URL",
+      "profilePicturePlaceholder": "https://example.com/avatar.png",
+      "profilePictureHint": "Provide a direct image URL (optional).",
+      "preferences": "Preferences (JSON)",
+      "preferencesPlaceholder": "{ \"theme\": \"dark\" }",
+      "preferencesHint": "Use JSON object format. Leave blank if you do not need custom preferences."
+    },
+    "actions": {
+      "save": "Save changes",
+      "saving": "Saving...",
+      "clearPassword": "Clear password field"
+    },
+    "status": {
+      "loading": "Loading profile...",
+      "updated": "Profile updated.",
+      "noChanges": "Nothing to update."
+    },
+    "meta": {
+      "title": "Account overview",
+      "username": "Current username",
+      "role": "Role",
+      "id": "Account ID",
+      "createdAt": "Created at",
+      "profilePicture": "Profile picture",
+      "preferences": "Preferences"
+    },
+    "errors": {
+      "usernameRequired": "Username is required.",
+      "unauthorized": "Your session expired. Please log in again.",
+      "validation": "Please check the entered values.",
+      "conflict": "That username is already taken.",
+      "preferencesInvalid": "Preferences must be valid JSON.",
+      "generic": "Unable to update your profile."
     }
   },
   "dashboard": {
@@ -426,13 +470,18 @@
     "title": "User management",
     "subtitle": "Create, remove or review internal accounts. Only admins can perform changes.",
     "form": {
-      "username": "Username",
-      "password": "Password",
-      "role": "Role",
-      "passwordPolicyTitle": "Password requirements",
-      "passwordPolicyCopy": "Use at least 8 characters and mix letters plus numbers for every internal account.",
-      "validationHint": "Fill username, password (>=8 chars) and pick a role to enable the Create button."
-    },
+    "username": "Username",
+    "password": "Password",
+    "role": "Role",
+    "profilePictureUrl": "Profile picture URL",
+    "profilePicturePlaceholder": "https://example.com/avatar.png",
+    "preferences": "Preferences (JSON)",
+    "preferencesPlaceholder": "{\"theme\":\"dark\"}",
+    "preferencesInvalid": "Preferences must be valid JSON object.",
+    "passwordPolicyTitle": "Password requirements",
+    "passwordPolicyCopy": "Use at least 8 characters and mix letters plus numbers for every internal account.",
+    "validationHint": "Fill username, password (>=8 chars) and pick a role to enable the Create button."
+  },
     "actions": {
       "create": "Create user",
       "creating": "Creating...",
@@ -453,8 +502,10 @@
       "protectedHint": "Core account {{username}} stays available for recovery and cannot be deleted."
     },
     "table": {
-      "username": "Username",
-      "role": "Role",
+    "username": "Username",
+    "profilePicture": "Picture",
+    "preferences": "Preferences",
+    "role": "Role",
       "status": "Status",
       "created": "Created at",
       "actions": "Actions"

@@ -1,0 +1,108 @@
+<section class="profile">
+  <header class="profile__header">
+    <h1>{{ 'profile.title' | translate }}</h1>
+    <p>{{ 'profile.subtitle' | translate }}</p>
+  </header>
+
+  <p class="profile__alert profile__alert--success" *ngIf="successMessage() as success">
+    {{ success }}
+  </p>
+  <p class="profile__alert profile__alert--error" *ngIf="errorMessage() as error">
+    {{ error }}
+  </p>
+
+  <div class="profile__body" *ngIf="!isLoading(); else loadingState">
+    <form class="profile__form" [formGroup]="form" (ngSubmit)="saveChanges()">
+      <label class="profile__field">
+        <span>{{ 'profile.fields.username' | translate }}</span>
+        <input type="text" formControlName="username" autocomplete="username" />
+        <small class="profile__error" *ngIf="form.controls.username.invalid && form.controls.username.touched">
+          {{ 'profile.errors.usernameRequired' | translate }}
+        </small>
+      </label>
+
+      <label class="profile__field">
+        <span>{{ 'profile.fields.password' | translate }}</span>
+        <input
+          type="password"
+          formControlName="password"
+          autocomplete="new-password"
+          [placeholder]="'profile.fields.passwordPlaceholder' | translate"
+        />
+        <small class="profile__hint">{{ 'profile.fields.passwordHint' | translate }}</small>
+      </label>
+
+      <label class="profile__field">
+        <span>{{ 'profile.fields.profilePictureUrl' | translate }}</span>
+        <input
+          type="url"
+          formControlName="profile_picture_url"
+          [placeholder]="'profile.fields.profilePicturePlaceholder' | translate"
+          autocomplete="off"
+        />
+        <small class="profile__hint">{{ 'profile.fields.profilePictureHint' | translate }}</small>
+      </label>
+
+      <label class="profile__field">
+        <span>{{ 'profile.fields.preferences' | translate }}</span>
+        <textarea
+          rows="6"
+          formControlName="preferences"
+          [placeholder]="'profile.fields.preferencesPlaceholder' | translate"
+          class="profile__preferences-input"
+        ></textarea>
+        <small class="profile__hint" *ngIf="form.controls.preferences.valid; else preferencesError">
+          {{ 'profile.fields.preferencesHint' | translate }}
+        </small>
+        <ng-template #preferencesError>
+          <small class="profile__error">{{ 'profile.errors.preferencesInvalid' | translate }}</small>
+        </ng-template>
+      </label>
+
+      <div class="profile__actions">
+        <button type="submit" [disabled]="isSaving()">
+          {{ isSaving() ? ('profile.actions.saving' | translate) : ('profile.actions.save' | translate) }}
+        </button>
+        <button type="button" class="profile__clear" (click)="clearPassword()" [disabled]="isSaving() || !form.controls.password.value">
+          {{ 'profile.actions.clearPassword' | translate }}
+        </button>
+      </div>
+    </form>
+
+    <section class="profile__meta" *ngIf="profile() as user">
+      <h2>{{ 'profile.meta.title' | translate }}</h2>
+      <div class="profile__avatar" *ngIf="user.profile_picture_url">
+        <img [src]="user.profile_picture_url" alt="{{ user.username }}" />
+        <p>{{ 'profile.meta.profilePicture' | translate }}</p>
+      </div>
+      <dl>
+        <div>
+          <dt>{{ 'profile.meta.username' | translate }}</dt>
+          <dd>{{ user.username }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'profile.meta.role' | translate }}</dt>
+          <dd>{{ ('layout.roles.' + user.role) | translate }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'profile.meta.id' | translate }}</dt>
+          <dd>{{ user.id }}</dd>
+        </div>
+        <div *ngIf="user.created_at">
+          <dt>{{ 'profile.meta.createdAt' | translate }}</dt>
+          <dd>{{ user.created_at | date: 'medium' }}</dd>
+        </div>
+        <div *ngIf="user.preferences">
+          <dt>{{ 'profile.meta.preferences' | translate }}</dt>
+          <dd>
+            <pre>{{ user.preferences | json }}</pre>
+          </dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+
+  <ng-template #loadingState>
+    <p class="profile__loading">{{ 'profile.status.loading' | translate }}</p>
+  </ng-template>
+</section>

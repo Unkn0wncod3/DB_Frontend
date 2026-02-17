@@ -3,6 +3,7 @@
     "brand": "DB Frontend",
     "nav": {
       "dashboard": "Dashboard",
+      "profile": "Profil",
       "explorer": "Explorer",
       "users": "Benutzer"
     },
@@ -18,6 +19,49 @@
     "roles": {
       "admin": "Admin",
       "user": "User"
+    }
+  },
+  "profile": {
+    "title": "Mein Profil",
+    "subtitle": "Hier kannst du deine Kontodaten und dein Passwort anpassen.",
+    "fields": {
+      "username": "Benutzername",
+      "password": "Neues Passwort",
+      "passwordPlaceholder": "Neues Passwort eingeben",
+      "passwordHint": "Leer lassen, um das aktuelle Passwort zu behalten.",
+      "profilePictureUrl": "Profilbild-URL",
+      "profilePicturePlaceholder": "https://example.com/avatar.png",
+      "profilePictureHint": "Direkte Bild-URL angeben (optional).",
+      "preferences": "Präferenzen (JSON)",
+      "preferencesPlaceholder": "{ \"theme\": \"dark\" }",
+      "preferencesHint": "JSON-Objekte verwenden. Leer lassen, falls keine individuellen Einstellungen nötig sind."
+    },
+    "actions": {
+      "save": "Änderungen speichern",
+      "saving": "Speichere...",
+      "clearPassword": "Passwortfeld leeren"
+    },
+    "status": {
+      "loading": "Profil wird geladen...",
+      "updated": "Profil aktualisiert.",
+      "noChanges": "Keine Änderungen erforderlich."
+    },
+    "meta": {
+      "title": "Kontodetails",
+      "username": "Aktueller Benutzername",
+      "role": "Rolle",
+      "id": "Konto-ID",
+      "createdAt": "Erstellt am",
+      "profilePicture": "Profilbild",
+      "preferences": "Präferenzen"
+    },
+    "errors": {
+      "usernameRequired": "Benutzername ist erforderlich.",
+      "unauthorized": "Deine Sitzung ist abgelaufen. Bitte erneut anmelden.",
+      "validation": "Bitte Eingaben prüfen.",
+      "conflict": "Dieser Benutzername ist bereits vergeben.",
+      "preferencesInvalid": "Präferenzen müssen gültiges JSON sein.",
+      "generic": "Profil konnte nicht aktualisiert werden."
     }
   },
   "dashboard": {
@@ -427,13 +471,18 @@
     "title": "Benutzerverwaltung",
     "subtitle": "Konten anlegen oder entfernen. Änderungen sind nur für Admins möglich.",
     "form": {
-      "username": "Benutzername",
-      "password": "Passwort",
-      "role": "Rolle",
-      "passwordPolicyTitle": "Passwortrichtlinien",
-      "passwordPolicyCopy": "Mindestens 8 Zeichen sowie eine Mischung aus Buchstaben und Zahlen für interne Accounts.",
-      "validationHint": "Benutzername, Passwort (>=8 Zeichen) und Rolle auswählen, dann wird der Button aktiv."
-    },
+    "username": "Benutzername",
+    "password": "Passwort",
+    "role": "Rolle",
+    "profilePictureUrl": "Profilbild-URL",
+    "profilePicturePlaceholder": "https://example.com/avatar.png",
+    "preferences": "Präferenzen (JSON)",
+    "preferencesPlaceholder": "{\"theme\":\"dark\"}",
+    "preferencesInvalid": "Präferenzen müssen gültiges JSON-Objekt sein.",
+    "passwordPolicyTitle": "Passwortrichtlinien",
+    "passwordPolicyCopy": "Mindestens 8 Zeichen sowie eine Mischung aus Buchstaben und Zahlen für interne Accounts.",
+    "validationHint": "Benutzername, Passwort (>=8 Zeichen) und Rolle auswählen, dann wird der Button aktiv."
+  },
     "actions": {
       "create": "Benutzer erstellen",
       "creating": "Erstelle...",
@@ -454,8 +503,10 @@
       "protectedHint": "Der Kern-Account {{username}} bleibt für Notfälle erhalten und kann nicht gelöscht werden."
     },
     "table": {
-      "username": "Benutzername",
-      "role": "Rolle",
+    "username": "Benutzername",
+    "profilePicture": "Bild",
+    "preferences": "Präferenzen",
+    "role": "Rolle",
       "status": "Status",
       "created": "Angelegt am",
       "actions": "Aktionen"

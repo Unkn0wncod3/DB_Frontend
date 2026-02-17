@@ -5,6 +5,9 @@
       <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
         {{ 'layout.nav.dashboard' | translate }}
       </a>
+      <a routerLink="/profile" routerLinkActive="is-active">
+        {{ 'layout.nav.profile' | translate }}
+      </a>
       <a *ngIf="auth.isAdmin()" routerLink="/explorer" routerLinkActive="is-active">
         {{ 'layout.nav.explorer' | translate }}
       </a>
@@ -38,8 +41,16 @@
     <div class="app-shell__auth">
         <ng-container *ngIf="auth.isAuthenticated(); else loginLink">
           <div class="app-shell__user-meta" *ngIf="auth.user() as currentUser">
-            <span class="app-shell__user-name">{{ currentUser.username }}</span>
-            <span class="app-shell__user-role">{{ ('layout.roles.' + currentUser.role) | translate }}</span>
+            <img
+              *ngIf="currentUser.profile_picture_url"
+              class="app-shell__user-avatar"
+              [src]="currentUser.profile_picture_url"
+              [alt]="currentUser.username"
+            />
+            <div class="app-shell__user-text">
+              <span class="app-shell__user-name">{{ currentUser.username }}</span>
+              <span class="app-shell__user-role">{{ ('layout.roles.' + currentUser.role) | translate }}</span>
+            </div>
           </div>
           <button type="button" (click)="logout()">{{ 'auth.logout' | translate }}</button>
         </ng-container>

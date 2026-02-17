@@ -11,12 +11,16 @@ export interface UserAccount {
   role: AuthRole;
   is_active: boolean;
   created_at?: string;
+  profile_picture_url?: string | null;
+  preferences?: Record<string, unknown> | null;
 }
 
 export interface CreateUserPayload {
   username: string;
   password: string;
   role: AuthRole;
+  profile_picture_url?: string | null;
+  preferences?: Record<string, unknown> | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -76,7 +80,9 @@ export class UserService {
       username,
       role,
       is_active: isActive,
-      created_at: typeof record['created_at'] === 'string' ? record['created_at'] : undefined
+      created_at: typeof record['created_at'] === 'string' ? record['created_at'] : undefined,
+      profile_picture_url: typeof record['profile_picture_url'] === 'string' ? record['profile_picture_url'] : null,
+      preferences: typeof record['preferences'] === 'object' && record['preferences'] !== null ? (record['preferences'] as Record<string, unknown>) : null
     };
   };
 }
