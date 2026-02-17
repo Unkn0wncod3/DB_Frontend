@@ -36,21 +36,6 @@
         [placeholder]="'userManagement.form.profilePicturePlaceholder' | translate"
       />
     </div>
-    <div class="user-management__textarea-field">
-      <label for="user-preferences">{{ 'userManagement.form.preferences' | translate }}</label>
-      <textarea
-        id="user-preferences"
-        rows="4"
-        formControlName="preferences"
-        [placeholder]="'userManagement.form.preferencesPlaceholder' | translate"
-      ></textarea>
-      <small
-        class="user-management__helper user-management__helper--visible"
-        *ngIf="createForm.controls.preferences.invalid && createForm.controls.preferences.touched"
-      >
-        {{ 'userManagement.form.preferencesInvalid' | translate }}
-      </small>
-    </div>
     <div class="user-management__form-action">
       <button
         type="submit"

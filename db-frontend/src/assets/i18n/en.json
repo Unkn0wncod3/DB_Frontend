@@ -492,9 +492,6 @@
     "role": "Role",
     "profilePictureUrl": "Profile picture URL",
     "profilePicturePlaceholder": "https://example.com/avatar.png",
-    "preferences": "Preferences (JSON)",
-    "preferencesPlaceholder": "{\"theme\":\"dark\"}",
-    "preferencesInvalid": "Preferences must be valid JSON object.",
     "validationHint": "Fill username, password and pick a role to enable the Create button."
   },
     "actions": {

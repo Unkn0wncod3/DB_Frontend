@@ -493,9 +493,6 @@
     "role": "Rolle",
     "profilePictureUrl": "Profilbild-URL",
     "profilePicturePlaceholder": "https://example.com/avatar.png",
-    "preferences": "Präferenzen (JSON)",
-    "preferencesPlaceholder": "{\"theme\":\"dark\"}",
-    "preferencesInvalid": "Präferenzen müssen gültiges JSON-Objekt sein.",
     "validationHint": "Benutzername, Passwort und Rolle auswählen, dann wird der Button aktiv."
   },
     "actions": {

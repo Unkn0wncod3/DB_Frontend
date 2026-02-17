@@ -32,29 +32,11 @@ export class UserManagementComponent {
   readonly roleUpdatingId = signal<string | number | null>(null);
   readonly currentUser = signal<AuthenticatedUser | null>(null);
 
-  private readonly preferencesValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
-    const value = (control.value ?? '').toString().trim();
-    if (!value) {
-      return null;
-    }
-
-    try {
-      const parsed = JSON.parse(value);
-      if (parsed !== null && typeof parsed === 'object') {
-        return null;
-      }
-      return { invalidJson: true };
-    } catch {
-      return { invalidJson: true };
-    }
-  };
-
   readonly createForm = this.fb.nonNullable.group({
     username: ['', [Validators.required, Validators.minLength(3)]],
     password: ['', [Validators.required]],
     role: ['user' as AuthRole, Validators.required],
-    profile_picture_url: [''],
-    preferences: ['', [this.preferencesValidator]]
+    profile_picture_url: ['']
   });
 
   private readonly auth = inject(AuthService);
@@ -101,16 +83,6 @@ export class UserManagementComponent {
       payload.profile_picture_url = trimmedPicture;
     }
 
-    const preferencesValue = (raw.preferences ?? '').trim();
-    if (preferencesValue) {
-      try {
-        payload.preferences = JSON.parse(preferencesValue) as Record<string, unknown>;
-      } catch {
-        this.errorMessage.set(this.translate.instant('userManagement.form.preferencesInvalid'));
-        return;
-      }
-    }
-
     this.isCreating.set(true);
     this.errorMessage.set(null);
     try {
@@ -120,8 +92,7 @@ export class UserManagementComponent {
         username: '',
         password: '',
         role: 'user',
-        profile_picture_url: '',
-        preferences: ''
+        profile_picture_url: ''
       });
       await this.refresh();
     } catch (error) {
