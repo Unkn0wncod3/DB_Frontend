@@ -43,21 +43,38 @@
         <small class="profile__hint">{{ 'profile.fields.profilePictureHint' | translate }}</small>
       </label>
 
-      <label class="profile__field">
-        <span>{{ 'profile.fields.preferences' | translate }}</span>
-        <textarea
-          rows="6"
-          formControlName="preferences"
-          [placeholder]="'profile.fields.preferencesPlaceholder' | translate"
-          class="profile__preferences-input"
-        ></textarea>
-        <small class="profile__hint" *ngIf="form.controls.preferences.valid; else preferencesError">
-          {{ 'profile.fields.preferencesHint' | translate }}
-        </small>
-        <ng-template #preferencesError>
-          <small class="profile__error">{{ 'profile.errors.preferencesInvalid' | translate }}</small>
-        </ng-template>
-      </label>
+      <fieldset class="profile__preferences">
+        <legend>{{ 'profile.preferences.title' | translate }}</legend>
+        <div class="profile__field">
+          <span>{{ 'profile.preferences.theme.label' | translate }}</span>
+          <select formControlName="theme">
+            <option value="system">{{ 'profile.preferences.theme.system' | translate }}</option>
+            <option value="light">{{ 'profile.preferences.theme.light' | translate }}</option>
+            <option value="dark">{{ 'profile.preferences.theme.dark' | translate }}</option>
+          </select>
+          <small class="profile__hint">{{ 'profile.preferences.theme.hint' | translate }}</small>
+        </div>
+
+        <div class="profile__field">
+          <span>{{ 'profile.preferences.language.label' | translate }}</span>
+          <select formControlName="language">
+            <option value="en">{{ 'profile.preferences.language.en' | translate }}</option>
+            <option value="de">{{ 'profile.preferences.language.de' | translate }}</option>
+          </select>
+        </div>
+
+        <div class="profile__notifications">
+          <span>{{ 'profile.preferences.notifications.label' | translate }}</span>
+          <label>
+            <input type="checkbox" formControlName="email_notifications" />
+            {{ 'profile.preferences.notifications.email' | translate }}
+          </label>
+          <label>
+            <input type="checkbox" formControlName="push_notifications" />
+            {{ 'profile.preferences.notifications.push' | translate }}
+          </label>
+        </div>
+      </fieldset>
 
       <div class="profile__actions">
         <button type="submit" [disabled]="isSaving()">
@@ -70,6 +87,7 @@
     </form>
 
     <section class="profile__meta" *ngIf="profile() as user">
+      <ng-container *ngIf="preferencesDisplay(user) as prefs">
       <h2>{{ 'profile.meta.title' | translate }}</h2>
       <div class="profile__avatar" *ngIf="user.profile_picture_url">
         <img [src]="user.profile_picture_url" alt="{{ user.username }}" />
@@ -92,13 +110,27 @@
           <dt>{{ 'profile.meta.createdAt' | translate }}</dt>
           <dd>{{ user.created_at | date: 'medium' }}</dd>
         </div>
-        <div *ngIf="user.preferences">
-          <dt>{{ 'profile.meta.preferences' | translate }}</dt>
+        <div>
+          <dt>{{ 'profile.meta.theme' | translate }}</dt>
+          <dd>{{ ('profile.preferences.theme.' + prefs.theme) | translate }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'profile.meta.language' | translate }}</dt>
+          <dd>{{ ('profile.preferences.language.' + prefs.language) | translate }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'profile.meta.notifications' | translate }}</dt>
           <dd>
-            <pre>{{ user.preferences | json }}</pre>
+            <span class="profile__meta-chip" [class.profile__meta-chip--active]="prefs.notifications.email">
+              {{ 'profile.preferences.notifications.email' | translate }}
+            </span>
+            <span class="profile__meta-chip" [class.profile__meta-chip--active]="prefs.notifications.push">
+              {{ 'profile.preferences.notifications.push' | translate }}
+            </span>
           </dd>
         </div>
       </dl>
+      </ng-container>
     </section>
   </div>
 

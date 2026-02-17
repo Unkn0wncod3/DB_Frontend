@@ -1,12 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
 import { AccountService, UpdateAccountPayload } from '../../core/services/account.service';
 import { AuthenticatedUser, AuthService } from '../../core/services/auth.service';
+
+type PreferenceTheme = 'system' | 'light' | 'dark';
+
+interface ProfileFormPreferences {
+  theme: PreferenceTheme;
+  language: string;
+  email_notifications: boolean;
+  push_notifications: boolean;
+}
 
 @Component({
   selector: 'app-profile',
@@ -21,28 +30,14 @@ export class ProfileComponent {
   private readonly auth = inject(AuthService);
   private readonly translate = inject(TranslateService);
 
-  private readonly jsonValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
-    const value = (control.value ?? '').toString().trim();
-    if (!value) {
-      return null;
-    }
-
-    try {
-      const parsed = JSON.parse(value);
-      if (parsed !== null && typeof parsed === 'object') {
-        return null;
-      }
-      return { invalidJson: true };
-    } catch {
-      return { invalidJson: true };
-    }
-  };
-
   readonly form = this.fb.nonNullable.group({
     username: ['', [Validators.required]],
     password: [''],
     profile_picture_url: [''],
-    preferences: ['', [this.jsonValidator]]
+    theme: ['system' as PreferenceTheme],
+    language: ['en'],
+    email_notifications: [false],
+    push_notifications: [false]
   });
 
   readonly profile = signal<AuthenticatedUser | null>(null);
@@ -53,6 +48,10 @@ export class ProfileComponent {
 
   constructor() {
     void this.loadProfile();
+  }
+
+  preferencesDisplay(user: AuthenticatedUser | null) {
+    return this.normalizePreferences(user?.preferences);
   }
 
   async loadProfile(): Promise<void> {
@@ -83,11 +82,6 @@ export class ProfileComponent {
     }
 
     const raw = this.form.getRawValue();
-    if (this.form.controls.preferences.invalid) {
-      this.errorMessage.set(this.translate.instant('profile.errors.preferencesInvalid'));
-      return;
-    }
-
     const payload: UpdateAccountPayload = {};
     const currentProfile = this.profile();
     const trimmedUsername = raw.username.trim();
@@ -107,16 +101,12 @@ export class ProfileComponent {
       payload.profile_picture_url = normalizedNewPicture;
     }
 
-    let parsedPreferences: Record<string, unknown> | null = null;
-    try {
-      parsedPreferences = this.parsePreferences(raw.preferences ?? '');
-    } catch {
-      return;
-    }
-    const currentPreferencesJson = JSON.stringify(currentProfile?.preferences ?? null);
-    const newPreferencesJson = JSON.stringify(parsedPreferences);
+    const preferencesPayload = this.buildPreferencesFromForm(raw);
+    const normalizedCurrentPreferences = this.normalizePreferences(currentProfile?.preferences);
+    const currentPreferencesJson = JSON.stringify(normalizedCurrentPreferences);
+    const newPreferencesJson = JSON.stringify(preferencesPayload);
     if (newPreferencesJson !== currentPreferencesJson) {
-      payload.preferences = parsedPreferences;
+      payload.preferences = preferencesPayload;
     }
 
     if (Object.keys(payload).length === 0) {
@@ -149,37 +139,60 @@ export class ProfileComponent {
   }
 
   private resetFormWithProfile(user: AuthenticatedUser): void {
+    const normalizedPreferences = this.normalizePreferences(user.preferences);
+
     this.form.reset({
       username: user.username ?? '',
       password: '',
       profile_picture_url: user.profile_picture_url ?? '',
-      preferences: this.stringifyPreferences(user.preferences ?? null)
+      theme: normalizedPreferences.theme,
+      language: normalizedPreferences.language,
+      email_notifications: normalizedPreferences.notifications.email,
+      push_notifications: normalizedPreferences.notifications.push
     });
   }
 
-  private parsePreferences(value: string): Record<string, unknown> | null {
-    const trimmed = value?.trim();
-    if (!trimmed) {
-      return null;
-    }
-
-    try {
-      return JSON.parse(trimmed) as Record<string, unknown>;
-    } catch {
-      this.errorMessage.set(this.translate.instant('profile.errors.preferencesInvalid'));
-      throw new Error('Invalid preferences JSON');
-    }
+  private buildPreferencesFromForm(formValue: Record<string, any>): Record<string, unknown> {
+    return {
+      theme: formValue['theme'] as PreferenceTheme,
+      language: formValue['language'] as string,
+      notifications: {
+        email: !!formValue['email_notifications'],
+        push: !!formValue['push_notifications']
+      }
+    };
   }
 
-  private stringifyPreferences(preferences: Record<string, unknown> | null): string {
+  private normalizePreferences(preferences: Record<string, unknown> | null | undefined): {
+    theme: PreferenceTheme;
+    language: string;
+    notifications: { email: boolean; push: boolean };
+  } {
+    const defaultPrefs: ProfileFormPreferences = {
+      theme: 'system',
+      language: 'en',
+      email_notifications: false,
+      push_notifications: false
+    };
+
     if (!preferences || typeof preferences !== 'object') {
-      return '';
+      return { theme: defaultPrefs.theme, language: defaultPrefs.language, notifications: { email: false, push: false } };
     }
-    try {
-      return JSON.stringify(preferences, null, 2);
-    } catch {
-      return '';
-    }
+
+    const theme = (preferences['theme'] as PreferenceTheme) ?? defaultPrefs.theme;
+    const language = (preferences['language'] as string) ?? defaultPrefs.language;
+    const notifications = preferences['notifications'];
+    const email = typeof notifications === 'object' && notifications !== null ? Boolean((notifications as Record<string, unknown>)['email']) : false;
+    const push = typeof notifications === 'object' && notifications !== null ? Boolean((notifications as Record<string, unknown>)['push']) : false;
+
+    return {
+      theme,
+      language,
+      notifications: {
+        email,
+        push
+      }
+    };
   }
 
   private describeError(error: unknown): string {

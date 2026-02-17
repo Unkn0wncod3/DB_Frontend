@@ -31,10 +31,27 @@
       "passwordHint": "Leave empty to keep your current password.",
       "profilePictureUrl": "Profile picture URL",
       "profilePicturePlaceholder": "https://example.com/avatar.png",
-      "profilePictureHint": "Provide a direct image URL (optional).",
-      "preferences": "Preferences (JSON)",
-      "preferencesPlaceholder": "{ \"theme\": \"dark\" }",
-      "preferencesHint": "Use JSON object format. Leave blank if you do not need custom preferences."
+      "profilePictureHint": "Provide a direct image URL (optional)."
+    },
+    "preferences": {
+      "title": "Preferences",
+      "theme": {
+        "label": "Theme",
+        "system": "System default",
+        "light": "Light",
+        "dark": "Dark",
+        "hint": "Choose how the interface should look when you sign in."
+      },
+      "language": {
+        "label": "Language",
+        "en": "English",
+        "de": "German"
+      },
+      "notifications": {
+        "label": "Notifications",
+        "email": "Email updates",
+        "push": "Push notifications"
+      }
     },
     "actions": {
       "save": "Save changes",
@@ -53,14 +70,15 @@
       "id": "Account ID",
       "createdAt": "Created at",
       "profilePicture": "Profile picture",
-      "preferences": "Preferences"
+      "theme": "Theme",
+      "language": "Language",
+      "notifications": "Notifications"
     },
     "errors": {
       "usernameRequired": "Username is required.",
       "unauthorized": "Your session expired. Please log in again.",
       "validation": "Please check the entered values.",
       "conflict": "That username is already taken.",
-      "preferencesInvalid": "Preferences must be valid JSON.",
       "generic": "Unable to update your profile."
     }
   },

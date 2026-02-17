@@ -31,10 +31,27 @@
       "passwordHint": "Leer lassen, um das aktuelle Passwort zu behalten.",
       "profilePictureUrl": "Profilbild-URL",
       "profilePicturePlaceholder": "https://example.com/avatar.png",
-      "profilePictureHint": "Direkte Bild-URL angeben (optional).",
-      "preferences": "Präferenzen (JSON)",
-      "preferencesPlaceholder": "{ \"theme\": \"dark\" }",
-      "preferencesHint": "JSON-Objekte verwenden. Leer lassen, falls keine individuellen Einstellungen nötig sind."
+      "profilePictureHint": "Direkte Bild-URL angeben (optional)."
+    },
+    "preferences": {
+      "title": "Einstellungen",
+      "theme": {
+        "label": "Darstellung",
+        "system": "Systemstandard",
+        "light": "Hell",
+        "dark": "Dunkel",
+        "hint": "Bestimme, wie die Oberfläche nach der Anmeldung aussehen soll."
+      },
+      "language": {
+        "label": "Sprache",
+        "en": "Englisch",
+        "de": "Deutsch"
+      },
+      "notifications": {
+        "label": "Benachrichtigungen",
+        "email": "E-Mail-Updates",
+        "push": "Push-Benachrichtigungen"
+      }
     },
     "actions": {
       "save": "Änderungen speichern",
@@ -53,14 +70,15 @@
       "id": "Konto-ID",
       "createdAt": "Erstellt am",
       "profilePicture": "Profilbild",
-      "preferences": "Präferenzen"
+      "theme": "Darstellung",
+      "language": "Sprache",
+      "notifications": "Benachrichtigungen"
     },
     "errors": {
       "usernameRequired": "Benutzername ist erforderlich.",
       "unauthorized": "Deine Sitzung ist abgelaufen. Bitte erneut anmelden.",
       "validation": "Bitte Eingaben prüfen.",
       "conflict": "Dieser Benutzername ist bereits vergeben.",
-      "preferencesInvalid": "Präferenzen müssen gültiges JSON sein.",
       "generic": "Profil konnte nicht aktualisiert werden."
     }
   },
