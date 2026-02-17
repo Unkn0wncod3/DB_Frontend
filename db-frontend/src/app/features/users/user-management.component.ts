@@ -47,7 +47,7 @@ export class UserManagementComponent {
 
   readonly createForm = this.fb.nonNullable.group({
     username: ['', [Validators.required, Validators.minLength(3)]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    password: ['', [Validators.required]],
     role: ['user' as AuthRole, Validators.required],
     profile_picture_url: [''],
     preferences: ['', [this.preferencesValidator]]

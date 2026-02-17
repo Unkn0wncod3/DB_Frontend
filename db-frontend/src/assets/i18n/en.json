@@ -478,9 +478,7 @@
     "preferences": "Preferences (JSON)",
     "preferencesPlaceholder": "{\"theme\":\"dark\"}",
     "preferencesInvalid": "Preferences must be valid JSON object.",
-    "passwordPolicyTitle": "Password requirements",
-    "passwordPolicyCopy": "Use at least 8 characters and mix letters plus numbers for every internal account.",
-    "validationHint": "Fill username, password (>=8 chars) and pick a role to enable the Create button."
+    "validationHint": "Fill username, password and pick a role to enable the Create button."
   },
     "actions": {
       "create": "Create user",

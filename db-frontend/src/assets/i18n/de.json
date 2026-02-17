@@ -479,9 +479,7 @@
     "preferences": "Präferenzen (JSON)",
     "preferencesPlaceholder": "{\"theme\":\"dark\"}",
     "preferencesInvalid": "Präferenzen müssen gültiges JSON-Objekt sein.",
-    "passwordPolicyTitle": "Passwortrichtlinien",
-    "passwordPolicyCopy": "Mindestens 8 Zeichen sowie eine Mischung aus Buchstaben und Zahlen für interne Accounts.",
-    "validationHint": "Benutzername, Passwort (>=8 Zeichen) und Rolle auswählen, dann wird der Button aktiv."
+    "validationHint": "Benutzername, Passwort und Rolle auswählen, dann wird der Button aktiv."
   },
     "actions": {
       "create": "Benutzer erstellen",
