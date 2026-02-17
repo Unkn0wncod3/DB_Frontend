@@ -20,7 +20,7 @@ import { ThemeService } from './core/services/theme.service';
 export class AppComponent implements OnInit, OnDestroy {
   readonly languages = ['en', 'de'];
   currentLang: string;
-  readonly githubUrl = 'https://github.com/placeholder/repo';
+  readonly githubUrl = 'https://github.com/Unkn0wncod3';
   private statusIntervalSub?: Subscription;
 
   constructor(
