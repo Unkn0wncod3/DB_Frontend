@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 
 import { API_BASE_URL } from '../tokens/api-base-url.token';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 const AUTH_TOKEN_TTL_MS = 4 * 60 * 60 * 1000;
@@ -48,6 +48,7 @@ export class AuthService {
   private tokenValue: string | null;
   private userValue: AuthenticatedUser | null;
   private expiresAtValue: number | null;
+  private readonly userSubject = new BehaviorSubject<AuthenticatedUser | null>(null);
 
   constructor() {
     const stored = this.readStoredState();
@@ -64,6 +65,8 @@ export class AuthService {
         this.clearStoredState();
       }
     }
+
+    this.userSubject.next(this.userValue);
   }
 
   login(payload: AuthLoginRequest): Observable<AuthLoginResponse> {
@@ -91,6 +94,10 @@ export class AuthService {
 
   user(): AuthenticatedUser | null {
     return this.ensureActiveSession() ? this.userValue : null;
+  }
+
+  userChanges(): Observable<AuthenticatedUser | null> {
+    return this.userSubject.asObservable();
   }
 
   hasRole(role: AuthRole): boolean {
@@ -141,6 +148,7 @@ export class AuthService {
     this.tokenValue = state?.token ?? null;
     this.userValue = state?.user ?? null;
     this.expiresAtValue = state?.expiresAt ?? null;
+    this.userSubject.next(this.userValue);
 
     if (state?.token) {
       this.writeStoredState(state);

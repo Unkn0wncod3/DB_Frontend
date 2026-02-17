@@ -132,12 +132,6 @@ export class ProfileComponent {
     }
   }
 
-  clearPassword(): void {
-    if (this.form.controls.password.value) {
-      this.form.controls.password.setValue('');
-    }
-  }
-
   private resetFormWithProfile(user: AuthenticatedUser): void {
     const normalizedPreferences = this.normalizePreferences(user.preferences);
 

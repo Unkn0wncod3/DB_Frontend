@@ -1,12 +1,13 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnDestroy, OnInit } from '@angular/core';
 import { DatePipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { interval, Subscription } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ApiStatusService } from './core/services/api-status.service';
-import { AuthService } from './core/services/auth.service';
+import { AuthService, AuthenticatedUser } from './core/services/auth.service';
 import { ThemeService } from './core/services/theme.service';
 
 @Component({
@@ -26,7 +27,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private readonly translate: TranslateService,
     readonly apiStatus: ApiStatusService,
     public readonly auth: AuthService,
-    public readonly theme: ThemeService
+    public readonly theme: ThemeService,
+    private readonly destroyRef: DestroyRef
   ) {
     translate.addLangs(this.languages);
     translate.setDefaultLang('en');
@@ -42,6 +44,11 @@ export class AppComponent implements OnInit, OnDestroy {
     });
 
     translate.use(initialLang);
+
+    this.auth
+      .userChanges()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((user) => this.applyUserPreferences(user));
   }
 
   changeLanguage(lang: string): void {
@@ -81,6 +88,25 @@ export class AppComponent implements OnInit, OnDestroy {
   scrollToTop(): void {
     if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  private applyUserPreferences(user: AuthenticatedUser | null): void {
+    if (!user?.preferences || typeof user.preferences !== 'object') {
+      return;
+    }
+
+    const prefs = user.preferences as Record<string, unknown>;
+    const languagePref = typeof prefs['language'] === 'string' ? (prefs['language'] as string) : null;
+    if (languagePref && this.languages.includes(languagePref) && languagePref !== this.currentLang) {
+      this.changeLanguage(languagePref);
+    }
+
+    const themePref = prefs['theme'];
+    if (themePref === 'light' || themePref === 'dark') {
+      this.theme.setTheme(themePref);
+    } else if (themePref === 'system') {
+      this.theme.applySystemPreference();
     }
   }
 }

@@ -55,8 +55,7 @@
     },
     "actions": {
       "save": "Save changes",
-      "saving": "Saving...",
-      "clearPassword": "Clear password field"
+      "saving": "Saving..."
     },
     "status": {
       "loading": "Loading profile...",

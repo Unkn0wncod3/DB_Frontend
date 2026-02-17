@@ -80,9 +80,6 @@
         <button type="submit" [disabled]="isSaving()">
           {{ isSaving() ? ('profile.actions.saving' | translate) : ('profile.actions.save' | translate) }}
         </button>
-        <button type="button" class="profile__clear" (click)="clearPassword()" [disabled]="isSaving() || !form.controls.password.value">
-          {{ 'profile.actions.clearPassword' | translate }}
-        </button>
       </div>
     </form>
 

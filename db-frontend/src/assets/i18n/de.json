@@ -55,8 +55,7 @@
     },
     "actions": {
       "save": "Änderungen speichern",
-      "saving": "Speichere...",
-      "clearPassword": "Passwortfeld leeren"
+      "saving": "Speichere..."
     },
     "status": {
       "loading": "Profil wird geladen...",

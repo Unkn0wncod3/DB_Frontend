@@ -35,6 +35,17 @@ export class ThemeService {
     this.setTheme(this.isDarkTheme() ? 'light' : 'dark');
   }
 
+  detectSystemTheme(): ThemePreference {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return 'light';
+  }
+
+  applySystemPreference(): void {
+    this.setTheme(this.detectSystemTheme());
+  }
+
   private loadStoredTheme(): ThemePreference {
     if (typeof window === 'undefined') {
       return 'light';
@@ -43,10 +54,7 @@ export class ThemeService {
     if (stored === 'light' || stored === 'dark') {
       return stored;
     }
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
-    return 'light';
+    return this.detectSystemTheme();
   }
 
   private storeTheme(theme: ThemePreference): void {
