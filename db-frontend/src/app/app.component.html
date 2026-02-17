@@ -40,18 +40,20 @@
     </button>
     <div class="app-shell__auth">
         <ng-container *ngIf="auth.isAuthenticated(); else loginLink">
-          <div class="app-shell__user-meta" *ngIf="auth.user() as currentUser">
-            <img
-              *ngIf="currentUser.profile_picture_url"
-              class="app-shell__user-avatar"
-              [src]="currentUser.profile_picture_url"
-              [alt]="currentUser.username"
-            />
-            <div class="app-shell__user-text">
-              <span class="app-shell__user-name">{{ currentUser.username }}</span>
-              <span class="app-shell__user-role">{{ ('layout.roles.' + currentUser.role) | translate }}</span>
+          <a *ngIf="auth.user() as currentUser" class="app-shell__user-link" routerLink="/profile">
+            <div class="app-shell__user-meta">
+              <img
+                *ngIf="currentUser.profile_picture_url"
+                class="app-shell__user-avatar"
+                [src]="currentUser.profile_picture_url"
+                [alt]="currentUser.username"
+              />
+              <div class="app-shell__user-text">
+                <span class="app-shell__user-name">{{ currentUser.username }}</span>
+                <span class="app-shell__user-role">{{ ('layout.roles.' + currentUser.role) | translate }}</span>
+              </div>
             </div>
-          </div>
+          </a>
           <button type="button" (click)="logout()">{{ 'auth.logout' | translate }}</button>
         </ng-container>
         <ng-template #loginLink>

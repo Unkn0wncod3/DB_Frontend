@@ -247,9 +247,20 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  margin-right: 1rem;
   font-size: 0.85rem;
   color: var(--color-text);
+}
+
+.app-shell__user-link {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 1rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.app-shell__user-link:hover .app-shell__user-name {
+  text-decoration: underline;
 }
 
 .app-shell__user-text {
