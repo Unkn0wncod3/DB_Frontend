@@ -4,7 +4,7 @@
     "nav": {
       "dashboard": "Dashboard",
       "profile": "Profile",
-      "explorer": "Explorer",
+      "explorer": "API Explorer",
       "users": "Users"
     },
     "language": "Language",
