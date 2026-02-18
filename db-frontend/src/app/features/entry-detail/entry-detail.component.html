@@ -91,7 +91,7 @@
         <span *ngIf="isSaving(); else saveLabel">{{ 'entryDetail.status.saving' | translate }}</span>
         <ng-template #saveLabel>{{ 'entryDetail.actions.save' | translate }}</ng-template>
       </button>
-      <button *ngIf="canEditEntries()" type="button" class="entry-detail__delete" (click)="openDeleteDialog()" [disabled]="isDeleting()">
+      <button *ngIf="canDeleteEntries()" type="button" class="entry-detail__delete" (click)="openDeleteDialog()" [disabled]="isDeleting()">
         <span *ngIf="isDeleting(); else deleteLabel">{{ 'entryDetail.status.deleting' | translate }}</span>
         <ng-template #deleteLabel>{{ 'entryDetail.actions.delete' | translate }}</ng-template>
       </button>
@@ -143,6 +143,7 @@
   <app-entry-detail-raw-view *ngIf="canEditEntries()" [record]="entry()" [activated]="showRawView()"></app-entry-detail-raw-view>
 
   <app-entry-detail-delete-dialog
+    *ngIf="canDeleteEntries()"
     [isOpen]="isDeleteDialogOpen()"
     [isDeleting]="isDeleting()"
     [securityKey]="deleteSecurityKey"

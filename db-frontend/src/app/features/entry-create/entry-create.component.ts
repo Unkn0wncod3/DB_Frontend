@@ -149,7 +149,7 @@ export class EntryCreateComponent {
   }
 
   showVisibilitySelector(): boolean {
-    return this.auth.isAdmin();
+    return this.auth.canManageVisibility();
   }
 
   async submit(): Promise<void> {

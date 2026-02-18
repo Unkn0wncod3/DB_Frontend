@@ -63,7 +63,7 @@ export class EntryDetailRelationsComponent implements OnChanges {
   }
 
   canManageRelations(): boolean {
-    return this.auth.canWrite();
+    return this.auth.canEditEntries();
   }
 
   trackByRelation(_index: number, item: RelatedEntryItem): string {

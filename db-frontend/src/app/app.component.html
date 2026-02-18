@@ -11,7 +11,7 @@
       <a *ngIf="auth.isAdmin()" routerLink="/explorer" routerLinkActive="is-active">
         {{ 'layout.nav.explorer' | translate }}
       </a>
-      <a *ngIf="auth.isAdmin()" routerLink="/admin/users" routerLinkActive="is-active">
+      <a *ngIf="auth.canManageUsers()" routerLink="/admin/users" routerLinkActive="is-active">
         {{ 'layout.nav.users' | translate }}
       </a>
     </nav>
@@ -73,7 +73,7 @@
       <a routerLink="/contact">{{ 'footer.contact' | translate }}</a>
       <a routerLink="/imprint">{{ 'footer.imprint' | translate }}</a>
     </div>
-    <div class="app-shell__footer-status" *ngIf="auth.isAdmin()">
+    <div class="app-shell__footer-status" *ngIf="auth.canViewAdminVisibility()">
       <span class="status-chip"
             [class.status-chip--online]="apiStatus.status() === 'online'"
             [class.status-chip--offline]="apiStatus.status() === 'offline'">

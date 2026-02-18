@@ -31,6 +31,7 @@ export class UserManagementComponent {
   readonly viewingPreferences = signal<UserAccount | null>(null);
   readonly roleUpdatingId = signal<string | number | null>(null);
   readonly currentUser = signal<AuthenticatedUser | null>(null);
+  readonly roleOptions: AuthRole[] = ['head_admin', 'admin', 'editor', 'user'];
 
   readonly createForm = this.fb.nonNullable.group({
     username: ['', [Validators.required, Validators.minLength(3)]],
@@ -83,6 +84,11 @@ export class UserManagementComponent {
       payload.profile_picture_url = trimmedPicture;
     }
 
+    if (!this.auth.canAssignRole(payload.role)) {
+      this.errorMessage.set(this.translate.instant('userManagement.status.roleRestricted'));
+      return;
+    }
+
     this.isCreating.set(true);
     this.errorMessage.set(null);
     try {
@@ -103,7 +109,7 @@ export class UserManagementComponent {
   }
 
   requestDeletion(account: UserAccount): void {
-    if (this.isProtectedAccount(account)) {
+    if (this.isProtectedAccount(account) || this.isCurrentUser(account)) {
       return;
     }
     this.pendingDeletion.set(account);
@@ -166,6 +172,10 @@ export class UserManagementComponent {
       this.errorMessage.set(this.translate.instant('userManagement.status.roleRestricted'));
       return;
     }
+    if (!this.auth.canAssignRole(newRole)) {
+      this.errorMessage.set(this.translate.instant('userManagement.status.roleRestricted'));
+      return;
+    }
 
     this.roleUpdatingId.set(user.id);
     this.errorMessage.set(null);
@@ -202,37 +212,50 @@ export class UserManagementComponent {
   }
 
   canEditUserRole(account: UserAccount): boolean {
-    if (this.isProtectedAccount(account)) {
+    if (this.isProtectedAccount(account) || this.isCurrentUser(account)) {
       return false;
     }
-    if (account.role === 'admin' && !this.isCoreAdminUser()) {
+    if (!this.auth.canManageUsers()) {
+      return false;
+    }
+    if (!this.isCoreAdminUser() && (account.role === 'admin' || account.role === 'head_admin')) {
       return false;
     }
     return true;
   }
 
   canSelectRoleOption(option: AuthRole): boolean {
-    if (option === 'admin' && !this.isCoreAdminUser()) {
-      return false;
-    }
-    return true;
+    return this.auth.canAssignRole(option);
   }
 
   private canEditRoleTarget(account: UserAccount, targetRole: AuthRole): boolean {
-    if (this.isProtectedAccount(account)) {
+    if (this.isProtectedAccount(account) || this.isCurrentUser(account)) {
       return false;
     }
-    if (this.isCurrentUser(account) && account.role === targetRole) {
+    if (!this.auth.canManageUsers()) {
       return false;
     }
-    if (!this.isCoreAdminUser() && (account.role === 'admin' || targetRole === 'admin')) {
+    if (
+      !this.isCoreAdminUser() &&
+      (account.role === 'admin' ||
+        account.role === 'head_admin' ||
+        targetRole === 'admin' ||
+        targetRole === 'head_admin')
+    ) {
       return false;
     }
     return true;
   }
 
   private isCoreAdminUser(): boolean {
-    return this.currentUser()?.username === this.protectedUsername;
+    const current = this.currentUser();
+    if (!current) {
+      return false;
+    }
+    if (current.role === 'head_admin') {
+      return true;
+    }
+    return current.username === this.protectedUsername;
   }
 
   private describeError(error: unknown): string {

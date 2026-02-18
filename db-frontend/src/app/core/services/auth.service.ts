@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-
-import { API_BASE_URL } from '../tokens/api-base-url.token';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+
+import { API_BASE_URL } from '../tokens/api-base-url.token';
 
 const AUTH_TOKEN_TTL_MS = 4 * 60 * 60 * 1000;
 
@@ -13,7 +13,7 @@ export interface AuthLoginRequest {
   password: string;
 }
 
-export type AuthRole = 'admin' | 'user';
+export type AuthRole = 'head_admin' | 'admin' | 'editor' | 'user';
 
 export interface AuthenticatedUser {
   id: string | number;
@@ -35,6 +35,13 @@ interface StoredAuthState {
   user?: AuthenticatedUser | null;
   expiresAt: number;
 }
+
+const ROLE_PRIORITY: Record<AuthRole, number> = {
+  user: 0,
+  editor: 1,
+  admin: 2,
+  head_admin: 3
+};
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -105,12 +112,76 @@ export class AuthService {
     return !!user && user.role === role;
   }
 
+  hasAnyRole(...roles: AuthRole[]): boolean {
+    if (!roles || roles.length === 0) {
+      return false;
+    }
+    const user = this.user();
+    if (!user) {
+      return false;
+    }
+    return roles.includes(user.role);
+  }
+
+  isAtLeast(role: AuthRole): boolean {
+    const userRole = this.user()?.role;
+    if (!userRole) {
+      return false;
+    }
+    return ROLE_PRIORITY[userRole] >= ROLE_PRIORITY[role];
+  }
+
   canWrite(): boolean {
-    return this.hasRole('admin');
+    return this.canEditEntries();
+  }
+
+  canEditEntries(): boolean {
+    return this.hasAnyRole('editor', 'admin', 'head_admin');
+  }
+
+  canCreateEntries(): boolean {
+    return this.canEditEntries();
+  }
+
+  canDeleteEntries(): boolean {
+    return this.hasAnyRole('admin', 'head_admin');
+  }
+
+  canManageUsers(): boolean {
+    return this.hasAnyRole('admin', 'head_admin');
+  }
+
+  canAssignRole(targetRole: AuthRole): boolean {
+    const currentRole = this.user()?.role;
+    if (!currentRole) {
+      return false;
+    }
+
+    if (currentRole === 'head_admin') {
+      return true;
+    }
+
+    if (currentRole === 'admin') {
+      return targetRole === 'editor' || targetRole === 'user';
+    }
+
+    return false;
+  }
+
+  canViewAdminVisibility(): boolean {
+    return this.hasAnyRole('admin', 'head_admin');
+  }
+
+  canManageVisibility(): boolean {
+    return this.canViewAdminVisibility();
   }
 
   isAdmin(): boolean {
-    return this.hasRole('admin');
+    return this.hasAnyRole('admin', 'head_admin');
+  }
+
+  isHeadAdmin(): boolean {
+    return this.hasRole('head_admin');
   }
 
   setRedirectUrl(url: string | null): void {

@@ -13,11 +13,12 @@ import { ProfileComponent } from './features/profile/profile.component';
 import { UserManagementComponent } from './features/users/user-management.component';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
+import { editorGuard } from './core/guards/editor.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: '', component: DashboardComponent, canActivate: [authGuard] },
-  { path: 'entries/:type/new', component: EntryCreateComponent, canActivate: [authGuard, adminGuard] },
+  { path: 'entries/:type/new', component: EntryCreateComponent, canActivate: [authGuard, editorGuard] },
   { path: 'entries/activities/timeline', component: ActivitiesTimelineComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'entries/:type', component: EntryListComponent, canActivate: [authGuard] },

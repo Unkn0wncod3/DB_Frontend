@@ -17,8 +17,10 @@
       "light": "Hellmodus"
     },
     "roles": {
+      "head_admin": "Head Admin",
       "admin": "Admin",
-      "user": "User"
+      "editor": "Editor",
+      "user": "Nutzer"
     }
   },
   "profile": {
@@ -174,7 +176,7 @@
       "empty": "Keine Daten für diesen Eintrag verfügbar.",
       "loadingRelations": "Verknüpfungen werden geladen...",
       "noRelations": "Keine verknüpften Einträge gefunden.",
-      "readOnly": "Nur-Lesen: Dieser Zugang kann Daten ansehen, aber nichts ändern."
+      "readOnly": "Nur-Lese-Rolle: Du kannst Daten ansehen, aber keine Änderungen speichern."
     },
     "sections": {
       "raw": "Rohdaten"
@@ -212,7 +214,7 @@
       "deleteFailed": "Eintrag konnte nicht gelöscht werden: {{ message }}",
       "invalidPayload": "Die API hat eine unerwartete Antwort geliefert.",
       "unknown": "Unbekannter Fehler",
-      "hiddenFromUser": "Dieser Eintrag ist nur für Administratoren sichtbar."
+      "hiddenFromUser": "Dieser Eintrag ist nur für Admins sichtbar."
     },
     "rawView": {
       "label": "Rohdaten",
@@ -392,7 +394,6 @@
     "optionId": "ID {{ value }}",
     "unknown": "Unbekannte Person"
   },
-
   "profileLookup": {
     "accessibleLabel": "Profilsuche",
     "placeholder": "Profilnamen tippen oder ID eingeben",
@@ -497,15 +498,15 @@
   "userManagement": {
     "eyebrow": "Admin-Werkzeuge",
     "title": "Benutzerverwaltung",
-    "subtitle": "Konten anlegen oder entfernen. Änderungen sind nur für Admins möglich.",
+    "subtitle": "Interne Accounts anlegen oder prüfen. Admin-Rollen verwalten Benutzer; nur Head-Admins dürfen Admin-Rollen vergeben oder entziehen.",
     "form": {
-    "username": "Benutzername",
-    "password": "Passwort",
-    "role": "Rolle",
-    "profilePictureUrl": "Profilbild-URL",
-    "profilePicturePlaceholder": "https://example.com/avatar.png",
-    "validationHint": "Benutzername, Passwort und Rolle auswählen, dann wird der Button aktiv."
-  },
+      "username": "Benutzername",
+      "password": "Passwort",
+      "role": "Rolle",
+      "profilePictureUrl": "Profilbild-URL",
+      "profilePicturePlaceholder": "https://example.com/avatar.png",
+      "validationHint": "Benutzername, Passwort und Rolle auswählen, dann wird der Button aktiv."
+    },
     "actions": {
       "create": "Benutzer erstellen",
       "creating": "Erstelle...",
@@ -539,22 +540,24 @@
       "created": "Benutzer erfolgreich angelegt.",
       "deleted": "{{username}} wurde entfernt.",
       "roleUpdated": "Rolle für {{username}} aktualisiert.",
-      "roleRestricted": "Nur der Kern-Admin darf Admin-Rollen ändern.",
+      "roleRestricted": "Nur Head-Admins dürfen Admin-Rollen ändern.",
       "genericError": "Aktion fehlgeschlagen. Bitte später erneut versuchen.",
       "active": "Aktiv",
       "inactive": "Inaktiv",
       "updating": "Aktualisiere..."
     },
     "roles": {
+      "head_admin": "Head Admin",
       "admin": "Admin",
-      "user": "User"
+      "editor": "Editor",
+      "user": "Nutzer"
     },
     "modal": {
       "title": "Account löschen?",
       "body": "Möchten Sie {{username}} wirklich entfernen? Diese Aktion kann nicht rückgängig gemacht werden."
     },
     "preferences": {
-      "title": "{{username}} – Präferenzen"
+      "title": "{{username}} - Einstellungen"
     }
   },
   "entryVisibility": {

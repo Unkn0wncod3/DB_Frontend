@@ -126,7 +126,7 @@ export class EntryDetailComponent {
   }
 
   openDeleteDialog(): void {
-    if (!this.canEditEntries() || !this.currentType || !this.currentId) {
+    if (!this.canDeleteEntries() || !this.currentType || !this.currentId) {
       return;
     }
     this.isDeleteDialogOpen.set(true);
@@ -188,7 +188,7 @@ export class EntryDetailComponent {
   }
 
   private async performDelete(): Promise<void> {
-    if (!this.canEditEntries() || !this.currentType || !this.currentId || this.isDeleting()) {
+    if (!this.canDeleteEntries() || !this.currentType || !this.currentId || this.isDeleting()) {
       return;
     }
 
@@ -834,7 +834,7 @@ export class EntryDetailComponent {
   }
 
   canEditVisibility(): boolean {
-    return this.auth.isAdmin();
+    return this.auth.canManageVisibility();
   }
 
   get visibilityLevel(): VisibilityLevel {
@@ -883,7 +883,11 @@ export class EntryDetailComponent {
   }
 
   private isHiddenEntryError(error: unknown): boolean {
-    return !this.auth.isAdmin() && error instanceof HttpErrorResponse && error.status === 404;
+    return (
+      !this.auth.canViewAdminVisibility() &&
+      error instanceof HttpErrorResponse &&
+      (error.status === 403 || error.status === 404)
+    );
   }
 
   get entryType(): string | null {
@@ -913,7 +917,11 @@ export class EntryDetailComponent {
   }
 
   canEditEntries(): boolean {
-    return this.auth.canWrite();
+    return this.auth.canEditEntries();
+  }
+
+  canDeleteEntries(): boolean {
+    return this.auth.canDeleteEntries();
   }
 
   showPersonRelations(): boolean {

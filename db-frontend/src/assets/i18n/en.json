@@ -17,7 +17,9 @@
       "light": "Light mode"
     },
     "roles": {
+      "head_admin": "Head admin",
       "admin": "Admin",
+      "editor": "Editor",
       "user": "User"
     }
   },
@@ -174,7 +176,7 @@
       "empty": "No data available for this entry.",
       "loadingRelations": "Loading related items...",
       "noRelations": "No related entries found.",
-      "readOnly": "Read-only account: you can browse data but changes are disabled."
+      "readOnly": "Read-only role: you can browse data but your role cannot save changes."
     },
     "sections": {
       "raw": "Raw payload"
@@ -212,7 +214,7 @@
       "deleteFailed": "Unable to delete entry: {{ message }}",
       "invalidPayload": "The API returned an unexpected response.",
       "unknown": "Unknown error",
-      "hiddenFromUser": "This entry is only visible to administrators."
+      "hiddenFromUser": "This entry is restricted to admin visibility."
     },
     "rawView": {
       "label": "Raw data",
@@ -496,15 +498,15 @@
   "userManagement": {
     "eyebrow": "Admin tools",
     "title": "User management",
-    "subtitle": "Create, remove or review internal accounts. Only admins can perform changes.",
+    "subtitle": "Create, remove or review internal accounts. Admin-level users can manage accounts; only head admins may modify admin roles.",
     "form": {
-    "username": "Username",
-    "password": "Password",
-    "role": "Role",
-    "profilePictureUrl": "Profile picture URL",
-    "profilePicturePlaceholder": "https://example.com/avatar.png",
-    "validationHint": "Fill username, password and pick a role to enable the Create button."
-  },
+      "username": "Username",
+      "password": "Password",
+      "role": "Role",
+      "profilePictureUrl": "Profile picture URL",
+      "profilePicturePlaceholder": "https://example.com/avatar.png",
+      "validationHint": "Fill username, password and pick a role to enable the Create button."
+    },
     "actions": {
       "create": "Create user",
       "creating": "Creating...",
@@ -538,14 +540,16 @@
       "created": "User created successfully.",
       "deleted": "Removed {{username}}.",
       "roleUpdated": "Updated role for {{username}}.",
-      "roleRestricted": "Only the core admin can change admin roles.",
+      "roleRestricted": "Only head admins can change admin-level roles.",
       "genericError": "Action failed. Try again later.",
       "active": "Active",
       "inactive": "Inactive",
       "updating": "Updating..."
     },
     "roles": {
+      "head_admin": "Head admin",
       "admin": "Admin",
+      "editor": "Editor",
       "user": "User"
     },
     "modal": {
@@ -553,7 +557,7 @@
       "body": "Do you really want to remove {{username}}? This action cannot be undone."
     },
     "preferences": {
-      "title": "{{username}} — Preferences"
+      "title": "{{username}} - Preferences"
     }
   },
   "entryVisibility": {

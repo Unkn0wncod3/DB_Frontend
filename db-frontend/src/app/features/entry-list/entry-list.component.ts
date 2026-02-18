@@ -127,7 +127,7 @@ export class EntryListComponent {
   }
 
   createLink(): string[] | null {
-    if (!this.currentType || !this.auth.canWrite()) {
+    if (!this.currentType || !this.auth.canCreateEntries()) {
       return null;
     }
 
@@ -439,7 +439,7 @@ export class EntryListComponent {
   }
 
   private shouldShowVisibilityColumn(): boolean {
-    return this.auth.isAdmin();
+    return this.auth.canViewAdminVisibility();
   }
 
   private shouldTruncateNoteText(columnKey: string): boolean {

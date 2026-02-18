@@ -24,8 +24,13 @@
     <div>
       <label>{{ 'userManagement.form.role' | translate }}</label>
       <select formControlName="role">
-        <option value="user">{{ 'userManagement.roles.user' | translate }}</option>
-        <option value="admin">{{ 'userManagement.roles.admin' | translate }}</option>
+        <option
+          *ngFor="let role of roleOptions"
+          [value]="role"
+          [disabled]="!canSelectRoleOption(role)"
+        >
+          {{ roleLabel(role) }}
+        </option>
       </select>
     </div>
     <div>
@@ -104,9 +109,12 @@
               (change)="onRoleChange(user, roleSelect.value)"
               [disabled]="!canEditUserRole(user) || roleUpdatingId() === user.id"
             >
-              <option value="user">{{ 'userManagement.roles.user' | translate }}</option>
-              <option value="admin" [disabled]="!canSelectRoleOption('admin')">
-                {{ 'userManagement.roles.admin' | translate }}
+              <option
+                *ngFor="let role of roleOptions"
+                [value]="role"
+                [disabled]="!canSelectRoleOption(role)"
+              >
+                {{ roleLabel(role) }}
               </option>
             </select>
             <span *ngIf="roleUpdatingId() === user.id" class="user-management__role-spinner">

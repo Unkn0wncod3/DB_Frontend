@@ -20,13 +20,18 @@ export class ApiService {
   private readonly auth = inject(AuthService);
 
   request<T>(method: HttpMethod, endpoint: string, options: RequestOptions = {}): Observable<T> {
-    if (method !== 'GET' && !this.auth.canWrite()) {
+    const normalizedMethod = method.toUpperCase() as HttpMethod;
+    if (normalizedMethod === 'DELETE' && !this.auth.canDeleteEntries()) {
+      throw new Error('Insufficient permissions for this operation.');
+    }
+
+    if (normalizedMethod !== 'GET' && normalizedMethod !== 'DELETE' && !this.auth.canEditEntries()) {
       throw new Error('Insufficient permissions for this operation.');
     }
 
     const url = this.buildUrl(endpoint);
     const { body, headers, params } = options;
-    return this.http.request<T>(method, url, { body, headers, params });
+    return this.http.request<T>(normalizedMethod, url, { body, headers, params });
   }
 
   private buildUrl(endpoint: string): string {
