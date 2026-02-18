@@ -11,6 +11,6 @@ import { TranslateModule } from '@ngx-translate/core';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EntryDetailRawViewComponent {
-  @Input() record: Record<string, unknown> | null = null;
+  @Input() record: unknown;
   @Input() activated = true;
 }
