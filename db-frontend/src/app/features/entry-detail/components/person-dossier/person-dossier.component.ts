@@ -171,6 +171,37 @@ export class PersonDossierComponent implements OnChanges {
     this.showRawData.set(!this.showRawData());
   }
 
+  relationLabel(section: keyof PersonDossierLimits, item: PersonDossierRelationItem): string {
+    if (section === 'profiles') {
+      const platform = this.extractText(item, ['platform_name', 'platform']);
+      const username = this.extractText(item, ['username', 'display_name', 'label']);
+      const parts = [platform, username].filter((value) => typeof value === 'string' && value.trim().length > 0);
+      if (parts.length > 0) {
+        return parts.join(' — ');
+      }
+    }
+    if (section === 'notes') {
+      return this.extractText(item, ['title', 'label']) ?? this.translate.instant('dossier.meta.unknown');
+    }
+    if (section === 'activities') {
+      return (
+        this.extractText(item, ['activity_type', 'label', 'title']) ??
+        this.translate.instant('dossier.meta.unknown')
+      );
+    }
+    return this.extractText(item, ['label', 'title']) ?? this.translate.instant('dossier.meta.unknown');
+  }
+
+  private extractText(source: PersonDossierRelationItem, keys: string[]): string | null {
+    for (const key of keys) {
+      const value = source[key];
+      if (typeof value === 'string' && value.trim().length > 0) {
+        return value.trim();
+      }
+    }
+    return null;
+  }
+
   private fetchDossier(force = false): void {
     if (!this.personId) {
       return;

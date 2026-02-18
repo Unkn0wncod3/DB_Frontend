@@ -129,7 +129,7 @@
             [ngClass]="{ 'person-dossier__relation-card--admin': hasAdminBadge(item) }"
           >
             <div class="person-dossier__relation-header">
-              <strong>{{ item['label'] || item['title'] || item['activity_type'] || ('dossier.meta.unknown' | translate) }}</strong>
+              <strong>{{ relationLabel(config.key, item) }}</strong>
               <span *ngIf="item['visibility_level']" class="visibility-badge" [ngClass]="{ 'visibility-badge--admin': hasAdminBadge(item) }">
                 {{ visibilityBadgeKey(item) | translate }}
               </span>
