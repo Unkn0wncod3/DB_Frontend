@@ -57,6 +57,31 @@
   gap: 0.5rem;
 }
 
+.entry-detail__view-toggle {
+  display: inline-flex;
+  border-radius: 999px;
+  background: var(--color-panel-muted);
+  border: 1px solid var(--color-border);
+  padding: 0.15rem;
+  gap: 0.15rem;
+
+  button {
+    border: none;
+    background: transparent;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--color-text);
+  }
+
+  button.is-active {
+    background: var(--color-primary);
+    color: var(--color-primary-contrast);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+  }
+}
+
 
 .entry-detail__raw-toggle {
   display: inline-flex;

@@ -1,0 +1,138 @@
+<section class="person-dossier">
+  <header class="person-dossier__header">
+    <div>
+      <h2>{{ 'dossier.title' | translate }}</h2>
+      <p>{{ 'dossier.subtitle' | translate }}</p>
+    </div>
+    <div class="person-dossier__actions">
+      <button type="button" class="ghost" (click)="refresh()" [disabled]="isLoading()">
+        {{ isLoading() ? ('dossier.actions.refreshing' | translate) : ('dossier.actions.refresh' | translate) }}
+      </button>
+      <button
+        type="button"
+        class="primary"
+        (click)="downloadPdf()"
+        [disabled]="!state() || isPdfDownloading()"
+      >
+        {{ isPdfDownloading() ? ('dossier.actions.downloadingPdf' | translate) : ('dossier.actions.downloadPdf' | translate) }}
+      </button>
+    </div>
+  </header>
+
+  <section *ngIf="errorMessage() as error" class="person-dossier__alert person-dossier__alert--error">
+    <p>{{ error }}</p>
+  </section>
+
+  <section *ngIf="isLoading()" class="person-dossier__state">
+    <p>{{ 'dossier.status.loading' | translate }}</p>
+  </section>
+
+  <ng-container *ngIf="!isLoading() && state() as dossier">
+    <section class="person-dossier__meta">
+      <div>
+        <span class="person-dossier__label">{{ 'dossier.meta.person' | translate }}</span>
+        <strong>{{ personName || (dossier.person['full_name'] || dossier.person['first_name'] || dossier.person['id']) }}</strong>
+      </div>
+      <div>
+        <span class="person-dossier__label">{{ 'dossier.meta.visibility' | translate }}</span>
+        <strong>{{ ('entryVisibility.badge.' + (dossier.person['visibility_level'] || 'user')) | translate }}</strong>
+      </div>
+      <div>
+        <span class="person-dossier__label">{{ 'dossier.meta.lastActivity' | translate }}</span>
+        <ng-container *ngIf="dossier.audit?.last_activity as lastActivity; else noActivity">
+          <strong>
+            {{ lastActivity.type || ('dossier.meta.unknown' | translate) }}
+          </strong>
+          <small *ngIf="lastActivity.occurred_at">
+            {{ 'dossier.meta.at' | translate:{ value: (lastActivity.occurred_at | date:'dd/MM/yyyy, HH:mm') } }}
+          </small>
+        </ng-container>
+        <ng-template #noActivity>
+          <strong>{{ 'dossier.meta.none' | translate }}</strong>
+        </ng-template>
+      </div>
+    </section>
+
+    <section class="person-dossier__badges">
+      <span *ngIf="hasAdminVisibility()" class="person-dossier__badge person-dossier__badge--admin">
+        {{ 'dossier.meta.adminVisible' | translate }}
+      </span>
+      <span *ngIf="!hasAdminVisibility()" class="person-dossier__badge person-dossier__badge--muted">
+        {{ 'dossier.meta.userLimited' | translate }}
+      </span>
+    </section>
+
+    <section class="person-dossier__limits">
+      <div *ngFor="let config of sectionConfigs">
+        <label>
+          <span>{{ ('dossier.limits.' + config.key) | translate }}</span>
+          <select
+            [value]="limits()[config.key]"
+            (change)="onLimitChange(config.key, $event)"
+          >
+            <option *ngFor="let option of limitOptions" [value]="option">
+              {{ option }}
+            </option>
+          </select>
+        </label>
+        <small>{{ 'dossier.limits.hint' | translate:{ value: sectionLimit(config.key) } }}</small>
+      </div>
+    </section>
+
+    <section class="person-dossier__stats">
+      <article *ngFor="let config of sectionConfigs">
+        <header>
+          <span>{{ ('dossier.sections.' + config.key) | translate }}</span>
+          <strong>{{ statValue(config.key)?.count ?? 0 }}</strong>
+        </header>
+        <p class="person-dossier__stat-meta" *ngIf="statValue(config.key)?.last_updated_at as updated">
+          {{ 'dossier.stats.updated' | translate:{ value: (updated | date:'dd/MM/yyyy, HH:mm') } }}
+        </p>
+      </article>
+      <article>
+        <header>
+          <span>{{ 'dossier.audit.created' | translate }}</span>
+          <strong>{{ dossier.audit?.created_at ? (dossier.audit?.created_at | date:'dd/MM/yyyy, HH:mm') : ('dossier.meta.unknown' | translate) }}</strong>
+        </header>
+        <p class="person-dossier__stat-meta">
+          {{ 'dossier.audit.updated' | translate:{ value: dossier.audit?.updated_at ? (dossier.audit?.updated_at | date:'dd/MM/yyyy, HH:mm') : ('dossier.meta.unknown' | translate) } }}
+        </p>
+      </article>
+    </section>
+
+    <section class="person-dossier__relations">
+      <article *ngFor="let config of sectionConfigs">
+        <div class="person-dossier__relations-heading">
+          <div>
+            <h3>{{ ('dossier.sections.' + config.key) | translate }}</h3>
+            <p>{{ 'dossier.sections.subtitle' | translate:{ value: sectionLimit(config.key) } }}</p>
+          </div>
+        </div>
+        <ul *ngIf="relationItems(config.key).length > 0; else emptyState">
+          <li
+            *ngFor="let item of relationItems(config.key); trackBy: trackRelation"
+            class="person-dossier__relation-card"
+            [ngClass]="{ 'person-dossier__relation-card--admin': hasAdminBadge(item) }"
+          >
+            <div class="person-dossier__relation-header">
+              <strong>{{ item['label'] || item['title'] || item['activity_type'] || ('dossier.meta.unknown' | translate) }}</strong>
+              <span *ngIf="item['visibility_level']" class="visibility-badge" [ngClass]="{ 'visibility-badge--admin': hasAdminBadge(item) }">
+                {{ visibilityBadgeKey(item) | translate }}
+              </span>
+            </div>
+            <p *ngIf="item['description'] || item['summary']">{{ item['description'] || item['summary'] }}</p>
+            <p *ngIf="item['note']" class="person-dossier__relation-note">{{ item['note'] }}</p>
+            <small *ngIf="item['updated_at'] || item['occurred_at']">
+              {{ (item['updated_at'] || item['occurred_at']) | date:'dd/MM/yyyy, HH:mm' }}
+            </small>
+          </li>
+        </ul>
+        <ng-template #emptyState>
+          <p class="person-dossier__empty">
+            {{ ('dossier.empty.' + config.key) | translate }}
+          </p>
+        </ng-template>
+      </article>
+    </section>
+  </ng-container>
+</section>

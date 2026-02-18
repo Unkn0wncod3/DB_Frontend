@@ -263,6 +263,9 @@
         "bus": "Bus",
         "other": "Other"
       }
+    },
+    "view": {
+      "details": "Details"
     }
   },
   "entryList": {
@@ -571,6 +574,57 @@
     "badge": {
       "user": "All users",
       "admin": "Admins only"
+    }
+  },
+  "dossier": {
+    "tabLabel": "Dossier",
+    "title": "Dossier overview",
+    "subtitle": "Condensed, read-only snapshot for this person.",
+    "actions": {
+      "refresh": "Refresh dossier",
+      "refreshing": "Refreshing...",
+      "downloadPdf": "Download PDF",
+      "downloadingPdf": "Generating PDF..."
+    },
+    "status": {
+      "loading": "Loading dossier..."
+    },
+    "sections": {
+      "profiles": "Profiles",
+      "notes": "Notes",
+      "activities": "Activities",
+      "subtitle": "Showing up to {{ value }} items"
+    },
+    "limits": {
+      "profiles": "Profiles limit",
+      "notes": "Notes limit",
+      "activities": "Activities limit",
+      "hint": "Showing up to {{ value }}"
+    },
+    "meta": {
+      "person": "Person",
+      "visibility": "Visibility",
+      "lastActivity": "Last activity",
+      "adminVisible": "Admin-only data included",
+      "userLimited": "Some sections are hidden because you lack admin visibility.",
+      "none": "None",
+      "unknown": "Unknown",
+      "at": "at {{ value }}"
+    },
+    "stats": {
+      "updated": "Updated {{ value }}"
+    },
+    "audit": {
+      "created": "Created",
+      "updated": "Last updated: {{ value }}"
+    },
+    "empty": {
+      "profiles": "No profiles within your visibility scope.",
+      "notes": "No notes within your visibility scope.",
+      "activities": "No activities within your visibility scope."
+    },
+    "errors": {
+      "generic": "Unable to load dossier."
     }
   }
 }

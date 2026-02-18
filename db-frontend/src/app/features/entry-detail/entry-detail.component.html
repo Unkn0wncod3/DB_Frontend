@@ -35,9 +35,25 @@
       </div>
     </div>
     <div class="entry-detail__actions">
+      <div class="entry-detail__view-toggle" *ngIf="canShowDossierToggle()">
+        <button
+          type="button"
+          [class.is-active]="personView() === 'details'"
+          (click)="setPersonView('details')"
+        >
+          {{ 'entryDetail.view.details' | translate }}
+        </button>
+        <button
+          type="button"
+          [class.is-active]="personView() === 'dossier'"
+          (click)="setPersonView('dossier')"
+        >
+          {{ 'dossier.tabLabel' | translate }}
+        </button>
+      </div>
       <div
         class="entry-detail__layout-toggle"
-        *ngIf="showPersonRelations() && entryId"
+        *ngIf="showPersonRelations() && entryId && personView() === 'details'"
         role="group"
         [attr.aria-label]="'entryDetail.relations.layoutLabel' | translate">
         <label class="entry-detail__layout-option">
@@ -72,7 +88,7 @@
         </label>
       </div>
       <button
-        *ngIf="canEditEntries()"
+        *ngIf="canEditEntries() && personView() === 'details'"
         type="button"
         class="entry-detail__raw-toggle"
         (click)="toggleRawView()"
@@ -87,16 +103,16 @@
         <span *ngIf="isLoading(); else refreshLabel">{{ 'entryDetail.status.loading' | translate }}</span>
         <ng-template #refreshLabel>{{ 'entryDetail.actions.refresh' | translate }}</ng-template>
       </button>
-      <button *ngIf="canEditEntries()" type="submit" form="entryDetailForm" class="entry-detail__save" [disabled]="!hasChanges() || isSaving()">
+      <button *ngIf="canEditEntries() && personView() === 'details'" type="submit" form="entryDetailForm" class="entry-detail__save" [disabled]="!hasChanges() || isSaving()">
         <span *ngIf="isSaving(); else saveLabel">{{ 'entryDetail.status.saving' | translate }}</span>
         <ng-template #saveLabel>{{ 'entryDetail.actions.save' | translate }}</ng-template>
       </button>
-      <button *ngIf="canDeleteEntries()" type="button" class="entry-detail__delete" (click)="openDeleteDialog()" [disabled]="isDeleting()">
+      <button *ngIf="canDeleteEntries() && personView() === 'details'" type="button" class="entry-detail__delete" (click)="openDeleteDialog()" [disabled]="isDeleting()">
         <span *ngIf="isDeleting(); else deleteLabel">{{ 'entryDetail.status.deleting' | translate }}</span>
         <ng-template #deleteLabel>{{ 'entryDetail.actions.delete' | translate }}</ng-template>
       </button>
     </div>
-    <p class="entry-detail__readonly" *ngIf="!canEditEntries()">
+    <p class="entry-detail__readonly" *ngIf="!canEditEntries() && personView() === 'details'">
       {{ 'entryDetail.status.readOnly' | translate }}
     </p>
   </header>
@@ -110,10 +126,11 @@
   </section>
 
   <div
+    *ngIf="personView() === 'details' && entry() as record"
     class="entry-detail__content"
     [class.entry-detail__content--stacked]="relationsLayout() === 'stacked'"
     [class.entry-detail__content--full]="!(showPersonRelations() && entryId)"
-    *ngIf="entry() as record">
+  >
     <form
       id="entryDetailForm"
       class="entry-detail__form"
@@ -136,14 +153,20 @@
     ></app-entry-detail-relations>
   </div>
 
-  <section *ngIf="!entry() && !isLoading()" class="entry-detail__state">
+  <app-person-dossier
+    *ngIf="personView() === 'dossier' && entryId"
+    [personId]="entryId"
+    [personName]="entryTitle()"
+  ></app-person-dossier>
+
+  <section *ngIf="personView() === 'details' && !entry() && !isLoading()" class="entry-detail__state">
     <p>{{ 'entryDetail.status.empty' | translate }}</p>
   </section>
 
-  <app-entry-detail-raw-view *ngIf="canEditEntries()" [record]="entry()" [activated]="showRawView()"></app-entry-detail-raw-view>
+  <app-entry-detail-raw-view *ngIf="canEditEntries() && personView() === 'details'" [record]="entry()" [activated]="showRawView()"></app-entry-detail-raw-view>
 
   <app-entry-detail-delete-dialog
-    *ngIf="canDeleteEntries()"
+    *ngIf="canDeleteEntries() && personView() === 'details'"
     [isOpen]="isDeleteDialogOpen()"
     [isDeleting]="isDeleting()"
     [securityKey]="deleteSecurityKey"

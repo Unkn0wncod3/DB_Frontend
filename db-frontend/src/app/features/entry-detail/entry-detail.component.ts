@@ -17,6 +17,7 @@ import { EntryDetailRelationsComponent } from './components/entry-detail-relatio
 import { EntryDetailDeleteDialogComponent } from './components/entry-detail-delete-dialog/entry-detail-delete-dialog.component';
 import { EntryDetailRawViewComponent } from './components/entry-detail-raw-view/entry-detail-raw-view.component';
 import { DEFAULT_VISIBILITY_LEVEL, VisibilityLevel, coerceVisibilityLevel } from '../../shared/types/visibility-level.type';
+import { PersonDossierComponent } from './components/person-dossier/person-dossier.component';
 
 @Component({
   selector: 'app-entry-detail',
@@ -37,7 +38,8 @@ import { DEFAULT_VISIBILITY_LEVEL, VisibilityLevel, coerceVisibilityLevel } from
     EntryDetailRelationsComponent,
     EntryDetailDeleteDialogComponent,
     EntryDetailRawViewComponent,
-    ValueDropdownComponent
+    ValueDropdownComponent,
+    PersonDossierComponent
   ],
   templateUrl: './entry-detail.component.html',
   styleUrls: ['./entry-detail.component.scss'],
@@ -86,6 +88,7 @@ export class EntryDetailComponent {
   readonly showRawView = signal(this.loadRawViewPreference());
   readonly deleteSecurityKey = 'del1';
   readonly isDeleteDialogOpen = signal(false);
+  readonly personView = signal<'details' | 'dossier'>('details');
 
   form: FormGroup = this.fb.group({});
 
@@ -111,6 +114,9 @@ export class EntryDetailComponent {
 
       this.currentType = type;
       this.currentId = id;
+      if (!this.canShowDossierToggle()) {
+        this.personView.set('details');
+      }
       void this.loadEntry();
     });
 
@@ -123,6 +129,22 @@ export class EntryDetailComponent {
     });
 
     this.updateVisibilityControlState(DEFAULT_VISIBILITY_LEVEL);
+  }
+
+  setPersonView(view: 'details' | 'dossier'): void {
+    if (view === 'dossier' && !this.canShowDossierToggle()) {
+      this.personView.set('details');
+      return;
+    }
+    this.personView.set(view);
+  }
+
+  isDossierView(): boolean {
+    return this.personView() === 'dossier';
+  }
+
+  canShowDossierToggle(): boolean {
+    return this.showPersonRelations() && !!this.currentId;
   }
 
   openDeleteDialog(): void {

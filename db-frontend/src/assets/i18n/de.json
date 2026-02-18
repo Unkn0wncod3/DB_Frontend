@@ -263,6 +263,9 @@
         "bus": "Bus",
         "other": "Sonstige"
       }
+    },
+    "view": {
+      "details": "Details"
     }
   },
   "entryList": {
@@ -571,6 +574,57 @@
     "badge": {
       "user": "Alle Nutzer",
       "admin": "Nur Admins"
+    }
+  },
+  "dossier": {
+    "tabLabel": "Dossier",
+    "title": "Dossier-Ansicht",
+    "subtitle": "Verdichtete Leseansicht dieser Person.",
+    "actions": {
+      "refresh": "Dossier aktualisieren",
+      "refreshing": "Aktualisiere...",
+      "downloadPdf": "PDF herunterladen",
+      "downloadingPdf": "PDF wird erstellt..."
+    },
+    "status": {
+      "loading": "Dossier wird geladen..."
+    },
+    "sections": {
+      "profiles": "Profile",
+      "notes": "Notizen",
+      "activities": "Aktivitäten",
+      "subtitle": "Zeigt bis zu {{ value }} Einträge"
+    },
+    "limits": {
+      "profiles": "Profil-Limit",
+      "notes": "Notiz-Limit",
+      "activities": "Aktivitäts-Limit",
+      "hint": "Zeigt bis zu {{ value }}"
+    },
+    "meta": {
+      "person": "Person",
+      "visibility": "Sichtbarkeit",
+      "lastActivity": "Letzte Aktivität",
+      "adminVisible": "Enthält Admin-Daten",
+      "userLimited": "Einige Bereiche sind ausgeblendet, da du keine Admin-Sicht hast.",
+      "none": "Keine",
+      "unknown": "Unbekannt",
+      "at": "am {{ value }}"
+    },
+    "stats": {
+      "updated": "Aktualisiert {{ value }}"
+    },
+    "audit": {
+      "created": "Angelegt",
+      "updated": "Zuletzt aktualisiert: {{ value }}"
+    },
+    "empty": {
+      "profiles": "Keine Profile in deinem Sichtbarkeitsbereich.",
+      "notes": "Keine Notizen in deinem Sichtbarkeitsbereich.",
+      "activities": "Keine Aktivitäten in deinem Sichtbarkeitsbereich."
+    },
+    "errors": {
+      "generic": "Dossier konnte nicht geladen werden."
     }
   }
 }
