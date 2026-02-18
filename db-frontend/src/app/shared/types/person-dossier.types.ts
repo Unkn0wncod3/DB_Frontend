@@ -50,9 +50,12 @@ export interface PersonDossierAudit {
   last_activity?: {
     id?: string | number;
     type?: string;
+    activity_type?: string;
     occurred_at?: string | null;
     severity?: string | null;
     summary?: string | null;
+    visibility_level?: VisibilityLevel;
+    notes?: string | null;
   } | null;
 }
 
