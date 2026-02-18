@@ -11,6 +11,7 @@ import {
   PersonDossierResponse,
   PersonDossierStatsSection
 } from '../../../../shared/types/person-dossier.types';
+import { EntryDetailRawViewComponent } from '../entry-detail-raw-view/entry-detail-raw-view.component';
 
 interface DossierSectionConfig {
   key: keyof PersonDossierLimits;
@@ -20,7 +21,7 @@ interface DossierSectionConfig {
 @Component({
   selector: 'app-person-dossier',
   standalone: true,
-  imports: [NgIf, NgFor, NgClass, DatePipe, TranslateModule],
+  imports: [NgIf, NgFor, NgClass, DatePipe, TranslateModule, EntryDetailRawViewComponent],
   templateUrl: './person-dossier.component.html',
   styleUrls: ['./person-dossier.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -38,6 +39,7 @@ export class PersonDossierComponent implements OnChanges {
   readonly state = signal<PersonDossierResponse | null>(null);
   readonly limits = signal<PersonDossierLimits>({ profiles: 5, notes: 5, activities: 5 });
   readonly isPdfDownloading = signal(false);
+  readonly showRawData = signal(false);
 
   readonly sectionConfigs: DossierSectionConfig[] = [
     { key: 'profiles', translationKey: 'dossier.sections.profiles' },
@@ -154,6 +156,19 @@ export class PersonDossierComponent implements OnChanges {
 
   hasAdminBadge(item: PersonDossierRelationItem): boolean {
     return (item.visibility_level ?? '').toString().toLowerCase() === 'admin';
+  }
+
+  sectionCount(section: keyof PersonDossierLimits): number {
+    const statsCount = this.statValue(section)?.count;
+    return typeof statsCount === 'number' ? statsCount : this.relationItems(section).length;
+  }
+
+  sectionUpdatedAt(section: keyof PersonDossierLimits): string | null {
+    return this.statValue(section)?.last_updated_at ?? null;
+  }
+
+  toggleRawData(): void {
+    this.showRawData.set(!this.showRawData());
   }
 
   private fetchDossier(force = false): void {

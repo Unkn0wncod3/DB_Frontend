@@ -10,6 +10,19 @@
       </button>
       <button
         type="button"
+        class="person-dossier__raw-toggle"
+        (click)="toggleRawData()"
+        [attr.aria-pressed]="showRawData()"
+      >
+        <span class="person-dossier__raw-toggle-track" aria-hidden="true">
+          <span class="person-dossier__raw-toggle-thumb" [class.person-dossier__raw-toggle-thumb--active]="showRawData()"></span>
+        </span>
+        <span class="person-dossier__raw-label">
+          {{ (showRawData() ? 'dossier.rawView.hide' : 'dossier.rawView.show') | translate }}
+        </span>
+      </button>
+      <button
+        type="button"
         class="primary"
         (click)="downloadPdf()"
         [disabled]="!state() || isPdfDownloading()"
@@ -80,20 +93,21 @@
     </section>
 
     <section class="person-dossier__stats">
-      <article *ngFor="let config of sectionConfigs">
-        <header>
-          <span>{{ ('dossier.sections.' + config.key) | translate }}</span>
-          <strong>{{ statValue(config.key)?.count ?? 0 }}</strong>
-        </header>
-        <p class="person-dossier__stat-meta" *ngIf="statValue(config.key)?.last_updated_at as updated">
-          {{ 'dossier.stats.updated' | translate:{ value: (updated | date:'dd/MM/yyyy, HH:mm') } }}
+      <article *ngFor="let config of sectionConfigs" class="person-dossier__stat-card">
+        <span class="person-dossier__stat-label">{{ ('dossier.sections.' + config.key) | translate }}</span>
+        <div class="person-dossier__stat-value">{{ sectionCount(config.key) }}</div>
+        <p class="person-dossier__stat-meta">
+          <ng-container *ngIf="sectionUpdatedAt(config.key) as updated; else statUnknown">
+            {{ 'dossier.stats.updated' | translate:{ value: (updated | date:'dd/MM/yyyy, HH:mm') } }}
+          </ng-container>
+          <ng-template #statUnknown>{{ 'dossier.stats.updated' | translate:{ value: ('dossier.meta.unknown' | translate) } }}</ng-template>
         </p>
       </article>
-      <article>
-        <header>
-          <span>{{ 'dossier.audit.created' | translate }}</span>
-          <strong>{{ dossier.audit?.created_at ? (dossier.audit?.created_at | date:'dd/MM/yyyy, HH:mm') : ('dossier.meta.unknown' | translate) }}</strong>
-        </header>
+      <article class="person-dossier__stat-card">
+        <span class="person-dossier__stat-label">{{ 'dossier.audit.created' | translate }}</span>
+        <div class="person-dossier__stat-value">
+          {{ dossier.audit?.created_at ? (dossier.audit?.created_at | date:'dd/MM/yyyy, HH:mm') : ('dossier.meta.unknown' | translate) }}
+        </div>
         <p class="person-dossier__stat-meta">
           {{ 'dossier.audit.updated' | translate:{ value: dossier.audit?.updated_at ? (dossier.audit?.updated_at | date:'dd/MM/yyyy, HH:mm') : ('dossier.meta.unknown' | translate) } }}
         </p>
@@ -134,5 +148,9 @@
         </ng-template>
       </article>
     </section>
+    <app-entry-detail-raw-view
+      [record]="dossier"
+      [activated]="showRawData()"
+    ></app-entry-detail-raw-view>
   </ng-container>
 </section>

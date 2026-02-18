@@ -618,13 +618,17 @@
       "created": "Angelegt",
       "updated": "Zuletzt aktualisiert: {{ value }}"
     },
-    "empty": {
-      "profiles": "Keine Profile in deinem Sichtbarkeitsbereich.",
-      "notes": "Keine Notizen in deinem Sichtbarkeitsbereich.",
-      "activities": "Keine Aktivitäten in deinem Sichtbarkeitsbereich."
-    },
-    "errors": {
-      "generic": "Dossier konnte nicht geladen werden."
+      "empty": {
+        "profiles": "Keine Profile in deinem Sichtbarkeitsbereich.",
+        "notes": "Keine Notizen in deinem Sichtbarkeitsbereich.",
+        "activities": "Keine Aktivitäten in deinem Sichtbarkeitsbereich."
+      },
+      "errors": {
+        "generic": "Dossier konnte nicht geladen werden."
+      },
+      "rawView": {
+        "show": "Rohdaten anzeigen",
+        "hide": "Rohdaten ausblenden"
+      }
     }
   }
-}

@@ -618,13 +618,17 @@
       "created": "Created",
       "updated": "Last updated: {{ value }}"
     },
-    "empty": {
-      "profiles": "No profiles within your visibility scope.",
-      "notes": "No notes within your visibility scope.",
-      "activities": "No activities within your visibility scope."
-    },
-    "errors": {
-      "generic": "Unable to load dossier."
+      "empty": {
+        "profiles": "No profiles within your visibility scope.",
+        "notes": "No notes within your visibility scope.",
+        "activities": "No activities within your visibility scope."
+      },
+      "errors": {
+        "generic": "Unable to load dossier."
+      },
+      "rawView": {
+        "show": "Show raw data",
+        "hide": "Hide raw data"
+      }
     }
   }
-}
