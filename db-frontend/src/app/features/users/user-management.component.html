@@ -27,6 +27,7 @@
         <option
           *ngFor="let role of roleOptions"
           [value]="role"
+          [selected]="user.role === role"
           [disabled]="!canSelectRoleOption(role)"
         >
           {{ roleLabel(role) }}
