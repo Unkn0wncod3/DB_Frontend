@@ -27,7 +27,6 @@
         <option
           *ngFor="let role of roleOptions"
           [value]="role"
-          [selected]="user.role === role"
           [disabled]="!canSelectRoleOption(role)"
         >
           {{ roleLabel(role) }}
@@ -105,9 +104,8 @@
           </td>
           <td class="user-management__role-cell">
             <select
-              #roleSelect
-              [value]="user.role"
-              (change)="onRoleChange(user, roleSelect.value)"
+              [ngModel]="user.role"
+              (ngModelChange)="onRoleChange(user, $event)"
               [disabled]="!canEditUserRole(user) || roleUpdatingId() === user.id"
             >
               <option
