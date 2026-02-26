@@ -31,6 +31,7 @@ export class UserManagementComponent {
   readonly protectedUsername = 'core_admin_01';
   readonly viewingPreferences = signal<UserAccount | null>(null);
   readonly roleUpdatingId = signal<string | number | null>(null);
+  readonly statusUpdatingId = signal<string | number | null>(null);
   readonly currentUser = signal<AuthenticatedUser | null>(null);
   readonly roleOptions: AuthRole[] = ['head_admin', 'admin', 'editor', 'user'];
 
@@ -196,6 +197,24 @@ export class UserManagementComponent {
     void this.changeRole(user, newRole);
   }
 
+  async toggleStatus(user: UserAccount): Promise<void> {
+    const desiredState = !user.is_active;
+    await this.setAccountStatus(user, desiredState);
+  }
+
+  canToggleStatus(account: UserAccount): boolean {
+    if (this.isProtectedAccount(account) || this.isCurrentUser(account)) {
+      return false;
+    }
+    if (!this.auth.canManageUsers()) {
+      return false;
+    }
+    if (this.isCoreAdminUser()) {
+      return true;
+    }
+    return account.role !== 'admin' && account.role !== 'head_admin';
+  }
+
   trackByUser(_index: number, user: UserAccount): string | number {
     return user.id;
   }
@@ -257,6 +276,29 @@ export class UserManagementComponent {
       return true;
     }
     return current.username === this.protectedUsername;
+  }
+
+  private async setAccountStatus(user: UserAccount, isActive: boolean): Promise<void> {
+    if (user.is_active === isActive) {
+      return;
+    }
+    if (!this.canToggleStatus(user)) {
+      this.errorMessage.set(this.translate.instant('userManagement.status.statusRestricted'));
+      return;
+    }
+
+    this.statusUpdatingId.set(user.id);
+    this.errorMessage.set(null);
+    try {
+      await firstValueFrom(this.userService.updateUserStatus(user.id, isActive));
+      const key = isActive ? 'userManagement.status.activated' : 'userManagement.status.deactivated';
+      this.successMessage.set(this.translate.instant(key, { username: user.username }));
+      await this.refresh();
+    } catch (error) {
+      this.errorMessage.set(this.describeError(error));
+    } finally {
+      this.statusUpdatingId.set(null);
+    }
   }
 
   private describeError(error: unknown): string {

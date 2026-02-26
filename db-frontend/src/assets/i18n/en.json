@@ -521,7 +521,10 @@
       "locked": "Locked",
       "cancel": "Cancel",
       "confirmDeleteCta": "Delete user",
-      "deleting": "Deleting..."
+      "deleting": "Deleting...",
+      "deactivate": "Deactivate",
+      "activate": "Activate",
+      "updatingStatus": "Updating..."
     },
     "list": {
       "title": "Existing users",
@@ -547,7 +550,10 @@
       "genericError": "Action failed. Try again later.",
       "active": "Active",
       "inactive": "Inactive",
-      "updating": "Updating..."
+      "updating": "Updating...",
+      "statusRestricted": "You don't have permission to change that status.",
+      "deactivated": "Deactivated {{username}}.",
+      "activated": "Reactivated {{username}}."
     },
     "roles": {
       "head_admin": "Head admin",

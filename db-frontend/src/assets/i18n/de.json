@@ -521,7 +521,10 @@
       "locked": "Geschützt",
       "cancel": "Abbrechen",
       "confirmDeleteCta": "Benutzer entfernen",
-      "deleting": "Lösche..."
+      "deleting": "Lösche...",
+      "deactivate": "Deaktivieren",
+      "activate": "Aktivieren",
+      "updatingStatus": "Aktualisiere..."
     },
     "list": {
       "title": "Vorhandene Benutzer",
@@ -547,7 +550,10 @@
       "genericError": "Aktion fehlgeschlagen. Bitte später erneut versuchen.",
       "active": "Aktiv",
       "inactive": "Inaktiv",
-      "updating": "Aktualisiere..."
+      "updating": "Aktualisiere...",
+      "statusRestricted": "Du darfst den Status dieses Accounts nicht ändern.",
+      "deactivated": "{{username}} wurde deaktiviert.",
+      "activated": "{{username}} wurde reaktiviert."
     },
     "roles": {
       "head_admin": "Head Admin",

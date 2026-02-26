@@ -31,6 +31,10 @@ export interface UpdateUserPayload {
   preferences?: Record<string, unknown> | null;
 }
 
+export interface UpdateUserStatusPayload {
+  is_active: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private readonly api = inject(ApiService);
@@ -53,6 +57,14 @@ export class UserService {
   deleteUser(id: string | number): Observable<void> {
     const normalized = String(id).trim();
     return this.api.request<void>('DELETE', `/users/${encodeURIComponent(normalized)}`);
+  }
+
+  updateUserStatus(id: string | number, isActive: boolean): Observable<UserAccount> {
+    const normalized = String(id).trim();
+    const body: UpdateUserStatusPayload = { is_active: isActive };
+    return this.api
+      .request<UserAccount>('PATCH', `/users/${encodeURIComponent(normalized)}/status`, { body })
+      .pipe(map(this.normalizeUser));
   }
 
   private normalizeList = (payload: unknown): UserAccount[] => {

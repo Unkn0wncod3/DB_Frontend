@@ -120,10 +120,25 @@
               {{ 'userManagement.status.updating' | translate }}
             </span>
           </td>
-          <td>
+          <td class="user-management__status-cell">
             <span class="user-management__badge" [class.user-management__badge--inactive]="!user.is_active">
               {{ user.is_active ? ('userManagement.status.active' | translate) : ('userManagement.status.inactive' | translate) }}
             </span>
+            <button
+              type="button"
+              class="user-management__status-button"
+              [class.user-management__status-button--danger]="user.is_active"
+              [class.user-management__status-button--success]="!user.is_active"
+              [disabled]="!canToggleStatus(user) || statusUpdatingId() === user.id"
+              (click)="toggleStatus(user)"
+            >
+              <ng-container *ngIf="statusUpdatingId() === user.id">
+                {{ 'userManagement.actions.updatingStatus' | translate }}
+              </ng-container>
+              <ng-container *ngIf="statusUpdatingId() !== user.id">
+                {{ user.is_active ? ('userManagement.actions.deactivate' | translate) : ('userManagement.actions.activate' | translate) }}
+              </ng-container>
+            </button>
           </td>
           <td>{{ user.created_at ? (user.created_at | date:'dd/MM/yyyy, HH:mm') : '\u2013' }}</td>
           <td class="user-management__table-actions">
