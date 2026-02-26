@@ -39,7 +39,9 @@
       "reset": "Zurücksetzen",
       "loadMore": "Mehr laden",
       "loadingMore": "Lade...",
-      "refreshTimeline": "Timeline aktualisieren"
+      "refreshTimeline": "Timeline aktualisieren",
+      "clear": "Logs löschen",
+      "clearing": "Lösche..."
     },
     "filters": {
       "userId": "Benutzer-ID",
@@ -77,7 +79,15 @@
     "status": {
       "loading": "Logs werden geladen...",
       "empty": "Keine Logs entsprechen den Filtern.",
-      "genericError": "Logs konnten nicht geladen werden."
+      "genericError": "Logs konnten nicht geladen werden.",
+      "cleared": "Alle Logs wurden gelöscht."
+    }
+    ,
+    "modal": {
+      "title": "Alle Logs löschen?",
+      "body": "Dadurch werden sämtliche Audit-Einträge dauerhaft entfernt. Dieser Vorgang kann nicht rückgängig gemacht werden.",
+      "confirm": "Logs löschen",
+      "cancel": "Abbrechen"
     }
   },
   "profile": {

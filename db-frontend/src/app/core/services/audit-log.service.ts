@@ -124,4 +124,8 @@ export class AuditLogService {
       metadata: typeof metadata === 'object' && metadata !== null ? (metadata as Record<string, unknown>) : null
     };
   }
+
+  deleteLogs(): Observable<void> {
+    return this.api.request<void>('DELETE', '/audit/logs');
+  }
 }

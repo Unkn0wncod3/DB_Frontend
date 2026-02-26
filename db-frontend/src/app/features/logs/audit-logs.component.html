@@ -17,11 +17,22 @@
         <span *ngIf="isLoading(); else refreshLabel">{{ 'logs.actions.refreshing' | translate }}</span>
         <ng-template #refreshLabel>{{ 'logs.actions.refresh' | translate }}</ng-template>
       </button>
+      <button
+        type="button"
+        class="logs__hero-button logs__hero-button--danger"
+        (click)="openClearDialog()"
+        [disabled]="isLoading()"
+      >
+        {{ 'logs.actions.clear' | translate }}
+      </button>
     </div>
   </header>
 
   <section *ngIf="errorMessage() as error" class="logs__alert logs__alert--error">
     {{ error }}
+  </section>
+  <section *ngIf="successMessage() as success" class="logs__alert logs__alert--success">
+    {{ success }}
   </section>
 
   <form class="logs__filters" [formGroup]="filtersForm" (ngSubmit)="applyFilters()">
@@ -158,4 +169,21 @@
       <p class="logs__empty">{{ isLoading() ? ('logs.status.loading' | translate) : ('logs.status.empty' | translate) }}</p>
     </ng-template>
   </section>
+
+  <div class="logs__modal" *ngIf="showClearDialog()">
+    <div class="logs__modal-backdrop" (click)="closeClearDialog()"></div>
+    <div class="logs__modal-dialog" role="dialog" aria-modal="true">
+      <h3>{{ 'logs.modal.title' | translate }}</h3>
+      <p>{{ 'logs.modal.body' | translate }}</p>
+      <div class="logs__modal-actions">
+        <button type="button" class="ghost" (click)="closeClearDialog()" [disabled]="isClearing()">
+          {{ 'logs.modal.cancel' | translate }}
+        </button>
+        <button type="button" class="danger" (click)="confirmClear()" [disabled]="isClearing()">
+          <span *ngIf="isClearing(); else confirmLabel">{{ 'logs.actions.clearing' | translate }}</span>
+          <ng-template #confirmLabel>{{ 'logs.modal.confirm' | translate }}</ng-template>
+        </button>
+      </div>
+    </div>
+  </div>
 </section>

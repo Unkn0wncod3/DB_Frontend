@@ -26,10 +26,13 @@ export class AuditLogsComponent {
   private readonly destroyRef = inject(DestroyRef);
 
   readonly isLoading = signal(false);
+  readonly isClearing = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly successMessage = signal<string | null>(null);
   readonly logs = signal<AuditLogRecord[]>([]);
   readonly total = signal(0);
   readonly nextOffset = signal<number | null>(null);
+  readonly showClearDialog = signal(false);
 
   readonly filtersForm = this.fb.nonNullable.group({
     limit: [100, [Validators.min(1), Validators.max(500)]],
@@ -84,6 +87,7 @@ export class AuditLogsComponent {
   }
 
   async applyFilters(): Promise<void> {
+    this.successMessage.set(null);
     await this.loadLogs();
   }
 
@@ -103,7 +107,37 @@ export class AuditLogsComponent {
       resource: '',
       search: ''
     });
+    this.successMessage.set(null);
     void this.loadLogs();
+  }
+
+  openClearDialog(): void {
+    this.showClearDialog.set(true);
+  }
+
+  closeClearDialog(): void {
+    if (this.isClearing()) {
+      return;
+    }
+    this.showClearDialog.set(false);
+  }
+
+  async confirmClear(): Promise<void> {
+    if (this.isClearing()) {
+      return;
+    }
+    this.isClearing.set(true);
+    this.errorMessage.set(null);
+    try {
+      await firstValueFrom(this.auditLogs.deleteLogs());
+      this.successMessage.set(this.translate.instant('logs.status.cleared'));
+      this.showClearDialog.set(false);
+      await this.loadLogs();
+    } catch (error) {
+      this.errorMessage.set(this.describeError(error));
+    } finally {
+      this.isClearing.set(false);
+    }
   }
 
   private async loadLogs(offset = 0, preserveExisting = false, append = false): Promise<void> {
