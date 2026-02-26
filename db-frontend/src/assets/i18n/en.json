@@ -56,6 +56,7 @@
       "resources": "Most active resources",
       "users": "Most active users",
       "events": "{{ value }} events",
+      "userLabel": "{{user}} · {{ value }} events",
       "actionLabels": {
         "generic": "Accessed {{resource}}",
         "read": "Viewed {{resource}}",
