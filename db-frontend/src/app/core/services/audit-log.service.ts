@@ -33,7 +33,7 @@ export class AuditLogService {
   private readonly api = inject(ApiService);
 
   listLogs(params: AuditLogListParams = {}): Observable<AuditLogList> {
-    const query: Record<string, unknown> = {};
+    const query: Record<string, string | number | boolean> = {};
     if (typeof params.limit === 'number') {
       query['limit'] = params.limit;
     }
