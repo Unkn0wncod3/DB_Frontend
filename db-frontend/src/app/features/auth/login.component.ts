@@ -52,6 +52,9 @@ export class LoginComponent {
 
   private mapErrorToTranslation(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
+      if (this.isAccountDisabled(error)) {
+        return 'auth.errors.disabled';
+      }
       if (error.status === 401) {
         return 'auth.errors.invalidCredentials';
       }
@@ -60,5 +63,28 @@ export class LoginComponent {
       }
     }
     return 'auth.errors.generic';
+  }
+
+  private isAccountDisabled(error: HttpErrorResponse): boolean {
+    if (error.status !== 403 && error.status !== 423) {
+      return false;
+    }
+    const message = this.extractErrorMessage(error).toLowerCase();
+    const indicators = ['deactiv', 'disable', 'inactive', 'gesperrt', 'deaktiviert'];
+    return indicators.some((indicator) => message.includes(indicator));
+  }
+
+  private extractErrorMessage(error: HttpErrorResponse): string {
+    if (typeof error.error === 'string') {
+      return error.error;
+    }
+    if (error.error && typeof error.error === 'object') {
+      const body = error.error as Record<string, unknown>;
+      const candidate = body['detail'] ?? body['message'] ?? body['error'];
+      if (typeof candidate === 'string') {
+        return candidate;
+      }
+    }
+    return error.statusText ?? '';
   }
 }

@@ -493,6 +493,7 @@
     },
     "errors": {
       "invalidCredentials": "Invalid username or password.",
+      "disabled": "Your account has been disabled. Contact a head admin for help.",
       "validation": "Please check the input fields.",
       "generic": "Sign in failed. Please try again."
     },

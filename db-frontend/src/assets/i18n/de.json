@@ -493,6 +493,7 @@
     },
     "errors": {
       "invalidCredentials": "Benutzername oder Passwort falsch.",
+      "disabled": "Ihr Account wurde deaktiviert. Melden Sie sich bei einem Head Admin.",
       "validation": "Bitte Eingaben prüfen.",
       "generic": "Anmeldung fehlgeschlagen. Bitte erneut versuchen."
     },
