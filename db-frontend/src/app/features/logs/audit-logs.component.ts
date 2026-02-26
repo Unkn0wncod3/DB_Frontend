@@ -244,6 +244,10 @@ export class AuditLogsComponent {
   }
 
   private describeSummary(entry: AuditLogRecord): string {
+    const metadataSummary = this.describeMetadataEventSummary(entry);
+    if (metadataSummary) {
+      return metadataSummary;
+    }
     const user = entry.username ?? this.translate.instant('logs.timeline.unknownUser');
     const resource = this.describeResourceLabel(entry);
     const verbKey = this.resolveVerbKey(entry, entry.method ?? this.extractMethod(entry.action));
@@ -272,6 +276,10 @@ export class AuditLogsComponent {
     }
     if (entry.ip_address) {
       parts.push(this.translate.instant('logs.timeline.details.ip', { value: entry.ip_address }));
+    }
+    const query = this.metadataString(entry, 'query_string');
+    if (query) {
+      parts.push(this.translate.instant('logs.timeline.details.query', { value: query }));
     }
     return parts.length > 0 ? parts.join(' • ') : null;
   }
@@ -471,5 +479,281 @@ export class AuditLogsComponent {
 
   private humanizeType(value: string): string {
     return value.replace(/[-_]/g, ' ');
+  }
+
+  private describeMetadataEventSummary(entry: AuditLogRecord): string | null {
+    const event = this.metadataString(entry, 'event');
+    if (!event) {
+      return null;
+    }
+    const actor = entry.username ?? this.translate.instant('logs.timeline.unknownUser');
+    switch (event) {
+      case 'audit_logs_cleared':
+        return this.translate.instant('logs.events.audit_logs_cleared', { actor });
+      case 'user_created': {
+        const target = this.buildReference({
+          name: this.metadataString(entry, 'target_username'),
+          id: this.metadataString(entry, 'target_user_id'),
+          fallbackKey: 'logs.events.targets.user'
+        });
+        return this.translate.instant('logs.events.user_created', { actor, target });
+      }
+      case 'user_updated': {
+        const target = this.buildReference({
+          name: this.metadataString(entry, 'target_username'),
+          id: this.metadataString(entry, 'target_user_id'),
+          fallbackKey: 'logs.events.targets.user'
+        });
+        const fields = this.describeChangedFields(entry, 'changed_fields');
+        return this.translate.instant('logs.events.user_updated', { actor, target, fields });
+      }
+      case 'user_status_changed': {
+        const target = this.buildReference({
+          name: this.metadataString(entry, 'target_username'),
+          id: this.metadataString(entry, 'target_user_id'),
+          fallbackKey: 'logs.events.targets.user'
+        });
+        const isActive = this.metadataBoolean(entry, 'is_active');
+        const state = this.translate.instant(
+          isActive ? 'logs.events.states.activated' : 'logs.events.states.deactivated'
+        );
+        return this.translate.instant('logs.events.user_status_changed', { actor, target, state });
+      }
+      case 'user_deleted': {
+        const target = this.buildReference({
+          name: this.metadataString(entry, 'target_username'),
+          id: this.metadataString(entry, 'target_user_id'),
+          fallbackKey: 'logs.events.targets.user'
+        });
+        return this.translate.instant('logs.events.user_deleted', { actor, target });
+      }
+      case 'person_created': {
+        const target = this.buildReference({
+          name: this.composePersonName(entry),
+          id: this.metadataString(entry, 'person_id'),
+          fallbackKey: 'logs.events.targets.person'
+        });
+        const visibility = this.describeVisibility(this.metadataString(entry, 'visibility'));
+        return this.translate.instant('logs.events.person_created', { actor, target, visibility });
+      }
+      case 'person_updated': {
+        const target = this.buildReference({
+          name: this.composePersonName(entry),
+          id: this.metadataString(entry, 'person_id'),
+          fallbackKey: 'logs.events.targets.person'
+        });
+        const fields = this.describeChangedFields(entry, 'changed_fields');
+        return this.translate.instant('logs.events.person_updated', { actor, target, fields });
+      }
+      case 'person_deleted': {
+        const target = this.buildReference({
+          name: this.composePersonName(entry),
+          id: this.metadataString(entry, 'person_id'),
+          fallbackKey: 'logs.events.targets.person'
+        });
+        return this.translate.instant('logs.events.person_deleted', { actor, target });
+      }
+      case 'profile_created': {
+        const target = this.buildReference({
+          name: this.metadataString(entry, 'username'),
+          id: this.metadataString(entry, 'profile_id'),
+          fallbackKey: 'logs.events.targets.profile'
+        });
+        const platform = this.metadataString(entry, 'platform_id');
+        return this.translate.instant('logs.events.profile_created', { actor, target, platform });
+      }
+      case 'profile_updated': {
+        const target = this.buildReference({
+          name: this.metadataString(entry, 'username'),
+          id: this.metadataString(entry, 'profile_id'),
+          fallbackKey: 'logs.events.targets.profile'
+        });
+        const fields = this.describeChangedFields(entry, 'changed_fields');
+        return this.translate.instant('logs.events.profile_updated', { actor, target, fields });
+      }
+      case 'profile_deleted': {
+        const target = this.buildReference({
+          name: this.metadataString(entry, 'username'),
+          id: this.metadataString(entry, 'profile_id'),
+          fallbackKey: 'logs.events.targets.profile'
+        });
+        const platform = this.metadataString(entry, 'platform_id');
+        return this.translate.instant('logs.events.profile_deleted', { actor, target, platform });
+      }
+      case 'profile_linked': {
+        const person = this.buildReference({
+          name: this.composePersonName(entry),
+          id: this.metadataString(entry, 'person_id'),
+          fallbackKey: 'logs.events.targets.person'
+        });
+        const profile = this.buildReference({
+          name: this.metadataString(entry, 'username'),
+          id: this.metadataString(entry, 'profile_id'),
+          fallbackKey: 'logs.events.targets.profile'
+        });
+        const noteValue = this.metadataString(entry, 'note');
+        const note = noteValue ? this.translate.instant('logs.events.noteSuffix', { value: noteValue }) : '';
+        return this.translate.instant('logs.events.profile_linked', { actor, person, profile, note });
+      }
+      case 'profile_unlinked': {
+        const person = this.buildReference({
+          name: this.composePersonName(entry),
+          id: this.metadataString(entry, 'person_id'),
+          fallbackKey: 'logs.events.targets.person'
+        });
+        const profile = this.buildReference({
+          name: this.metadataString(entry, 'username'),
+          id: this.metadataString(entry, 'profile_id'),
+          fallbackKey: 'logs.events.targets.profile'
+        });
+        return this.translate.instant('logs.events.profile_unlinked', { actor, person, profile });
+      }
+      case 'note_created': {
+        const note = this.buildReference({
+          id: this.metadataString(entry, 'note_id'),
+          fallbackKey: 'logs.events.targets.note'
+        });
+        const person = this.buildReference({
+          id: this.metadataString(entry, 'person_id'),
+          fallbackKey: 'logs.events.targets.person'
+        });
+        const pinnedState = this.describePinnedState(this.metadataBoolean(entry, 'pinned'));
+        return this.translate.instant('logs.events.note_created', { actor, note, person, pinned: pinnedState });
+      }
+      case 'note_updated': {
+        const note = this.buildReference({
+          id: this.metadataString(entry, 'note_id'),
+          fallbackKey: 'logs.events.targets.note'
+        });
+        const fields = this.describeChangedFields(entry, 'changed_fields');
+        const pinnedState = this.describePinnedState(this.metadataBoolean(entry, 'pinned'));
+        return this.translate.instant('logs.events.note_updated', { actor, note, fields, pinned: pinnedState });
+      }
+      case 'note_deleted': {
+        const note = this.buildReference({
+          id: this.metadataString(entry, 'note_id'),
+          fallbackKey: 'logs.events.targets.note'
+        });
+        const person = this.buildReference({
+          id: this.metadataString(entry, 'person_id'),
+          fallbackKey: 'logs.events.targets.person'
+        });
+        return this.translate.instant('logs.events.note_deleted', { actor, note, person });
+      }
+      case 'activity_created': {
+        const activity = this.buildReference({
+          id: this.metadataString(entry, 'activity_id'),
+          fallbackKey: 'logs.events.targets.activity'
+        });
+        const person = this.buildReference({
+          id: this.metadataString(entry, 'person_id'),
+          fallbackKey: 'logs.events.targets.person'
+        });
+        const type = this.metadataString(entry, 'activity_type');
+        return this.translate.instant('logs.events.activity_created', { actor, activity, person, type: type ?? '' });
+      }
+      case 'activity_updated': {
+        const activity = this.buildReference({
+          id: this.metadataString(entry, 'activity_id'),
+          fallbackKey: 'logs.events.targets.activity'
+        });
+        const fields = this.describeChangedFields(entry, 'changed_fields');
+        return this.translate.instant('logs.events.activity_updated', { actor, activity, fields });
+      }
+      case 'activity_deleted': {
+        const activity = this.buildReference({
+          id: this.metadataString(entry, 'activity_id'),
+          fallbackKey: 'logs.events.targets.activity'
+        });
+        const type = this.metadataString(entry, 'activity_type');
+        return this.translate.instant('logs.events.activity_deleted', { actor, activity, type: type ?? '' });
+      }
+      default:
+        return null;
+    }
+  }
+
+  private describeChangedFields(entry: AuditLogRecord, key: string): string {
+    const fields = this.metadataList(entry, key);
+    if (fields.length === 0) {
+      return this.translate.instant('logs.events.fields.unknown');
+    }
+    return fields.join(', ');
+  }
+
+  private describePinnedState(state: boolean | null): string {
+    if (state === null) {
+      return '';
+    }
+    const label = this.translate.instant(state ? 'logs.events.states.pinned' : 'logs.events.states.unpinned');
+    return ` (${label})`;
+  }
+
+  private describeVisibility(value: string | null): string {
+    if (!value) {
+      return this.translate.instant('logs.events.visibility.unknown');
+    }
+    const key = `entryVisibility.options.${value}`;
+    const translated = this.translate.instant(key);
+    return translated === key ? value : translated;
+  }
+
+  private composePersonName(entry: AuditLogRecord): string | null {
+    const first = this.metadataString(entry, 'first_name');
+    const last = this.metadataString(entry, 'last_name');
+    const composed = [first, last].filter(Boolean).join(' ').trim();
+    return composed.length > 0 ? composed : null;
+  }
+
+  private buildReference(options: { name?: string | null; id?: string | null; fallbackKey: string }): string {
+    const name = options.name?.trim();
+    const id = options.id?.toString().trim();
+    if (name && id) {
+      return `${name} (#${id})`;
+    }
+    if (name) {
+      return name;
+    }
+    if (id) {
+      return `#${id}`;
+    }
+    return this.translate.instant(options.fallbackKey);
+  }
+
+  private metadataBoolean(entry: AuditLogRecord, key: string): boolean | null {
+    if (!entry.metadata || !(key in entry.metadata)) {
+      return null;
+    }
+    const value = entry.metadata[key];
+    if (typeof value === 'boolean') {
+      return value;
+    }
+    if (typeof value === 'number') {
+      return value !== 0;
+    }
+    if (typeof value === 'string') {
+      const normalized = value.toLowerCase();
+      if (['true', '1', 'yes', 'on'].includes(normalized)) {
+        return true;
+      }
+      if (['false', '0', 'no', 'off'].includes(normalized)) {
+        return false;
+      }
+    }
+    return null;
+  }
+
+  private metadataList(entry: AuditLogRecord, key: string): string[] {
+    if (!entry.metadata) {
+      return [];
+    }
+    const value = entry.metadata[key];
+    if (Array.isArray(value)) {
+      return value.map((item) => String(item));
+    }
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value.split(',').map((item) => item.trim()).filter((item) => item.length > 0);
+    }
+    return [];
   }
 }

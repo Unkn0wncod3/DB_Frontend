@@ -91,7 +91,8 @@
         "role": "Rolle: {{ value }}",
         "resource": "Ressource: {{ value }}",
         "status": "Status: {{ value }}",
-        "ip": "IP: {{ value }}"
+        "ip": "IP: {{ value }}",
+        "query": "Abfrage: {{ value }}"
       },
       "resources": {
         "unknown": "diese Ressource",
@@ -118,6 +119,47 @@
         "entriesList": "die {{type}}-Einträge",
         "entriesDetail": "{{type}}-Eintrag {{id}}"
       }
+    },
+    "events": {
+      "audit_logs_cleared": "{{actor}} hat die Audit-Historie geleert.",
+      "user_created": "{{actor}} hat den Benutzer {{target}} erstellt.",
+      "user_updated": "{{actor}} hat den Benutzer {{target}} aktualisiert ({{fields}}).",
+      "user_status_changed": "{{actor}} hat {{state}} Benutzer {{target}}.",
+      "user_deleted": "{{actor}} hat den Benutzer {{target}} gelöscht.",
+      "person_created": "{{actor}} hat die Person {{target}} mit Sichtbarkeit {{visibility}} angelegt.",
+      "person_updated": "{{actor}} hat die Person {{target}} aktualisiert ({{fields}}).",
+      "person_deleted": "{{actor}} hat die Person {{target}} entfernt.",
+      "profile_created": "{{actor}} hat das Profil {{target}} auf Plattform {{platform}} erstellt.",
+      "profile_updated": "{{actor}} hat das Profil {{target}} aktualisiert ({{fields}}).",
+      "profile_deleted": "{{actor}} hat das Profil {{target}} von Plattform {{platform}} gelöscht.",
+      "profile_linked": "{{actor}} hat das Profil {{profile}} mit {{person}} verknüpft{{note}}.",
+      "profile_unlinked": "{{actor}} hat das Profil {{profile}} von {{person}} getrennt.",
+      "note_created": "{{actor}} hat die Notiz {{note}} für {{person}} erstellt{{pinned}}.",
+      "note_updated": "{{actor}} hat die Notiz {{note}} aktualisiert ({{fields}}){{pinned}}.",
+      "note_deleted": "{{actor}} hat die Notiz {{note}} für {{person}} gelöscht.",
+      "activity_created": "{{actor}} hat die Aktivität {{activity}} ({{type}}) für {{person}} erfasst.",
+      "activity_updated": "{{actor}} hat die Aktivität {{activity}} aktualisiert ({{fields}}).",
+      "activity_deleted": "{{actor}} hat die Aktivität {{activity}} ({{type}}) gelöscht.",
+      "states": {
+        "activated": "aktiviert",
+        "deactivated": "deaktiviert",
+        "pinned": "angeheftet",
+        "unpinned": "gelöst"
+      },
+      "targets": {
+        "user": "dieser Benutzer",
+        "person": "diese Person",
+        "profile": "dieses Profil",
+        "note": "diese Notiz",
+        "activity": "diese Aktivität"
+      },
+      "fields": {
+        "unknown": "mehrere Felder"
+      },
+      "visibility": {
+        "unknown": "unbekannte Sichtbarkeit"
+      },
+      "noteSuffix": " (Notiz: {{ value }})"
     },
     "status": {
       "loading": "Logs werden geladen...",

@@ -91,7 +91,8 @@
         "role": "Role: {{ value }}",
         "resource": "Resource: {{ value }}",
         "status": "Status: {{ value }}",
-        "ip": "IP: {{ value }}"
+        "ip": "IP: {{ value }}",
+        "query": "Query: {{ value }}"
       },
       "resources": {
         "unknown": "this resource",
@@ -478,6 +479,47 @@
       "back": "Back to list",
       "submit": "Create entry",
       "cancel": "Cancel"
+    },
+    "events": {
+      "audit_logs_cleared": "{{actor}} cleared the audit history.",
+      "user_created": "{{actor}} created user {{target}}.",
+      "user_updated": "{{actor}} updated user {{target}} ({{fields}}).",
+      "user_status_changed": "{{actor}} {{state}} user {{target}}.",
+      "user_deleted": "{{actor}} deleted user {{target}}.",
+      "person_created": "{{actor}} created person {{target}} (visibility: {{visibility}}).",
+      "person_updated": "{{actor}} updated person {{target}} ({{fields}}).",
+      "person_deleted": "{{actor}} deleted person {{target}}.",
+      "profile_created": "{{actor}} created profile {{target}} on platform {{platform}}.",
+      "profile_updated": "{{actor}} updated profile {{target}} ({{fields}}).",
+      "profile_deleted": "{{actor}} deleted profile {{target}} from platform {{platform}}.",
+      "profile_linked": "{{actor}} linked profile {{profile}} to {{person}}{{note}}.",
+      "profile_unlinked": "{{actor}} removed profile {{profile}} from {{person}}.",
+      "note_created": "{{actor}} created note {{note}} for {{person}}{{pinned}}.",
+      "note_updated": "{{actor}} updated note {{note}} ({{fields}}){{pinned}}.",
+      "note_deleted": "{{actor}} deleted note {{note}} for {{person}}.",
+      "activity_created": "{{actor}} logged activity {{activity}} ({{type}}) for {{person}}.",
+      "activity_updated": "{{actor}} updated activity {{activity}} ({{fields}}).",
+      "activity_deleted": "{{actor}} removed activity {{activity}} ({{type}}).",
+      "states": {
+        "activated": "activated",
+        "deactivated": "deactivated",
+        "pinned": "pinned",
+        "unpinned": "unpinned"
+      },
+      "targets": {
+        "user": "this user",
+        "person": "this person",
+        "profile": "this profile",
+        "note": "this note",
+        "activity": "this activity"
+      },
+      "fields": {
+        "unknown": "selected fields"
+      },
+      "visibility": {
+        "unknown": "unknown visibility"
+      },
+      "noteSuffix": " (note: {{ value }})"
     },
     "form": {
       "booleanTrue": "True",
