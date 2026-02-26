@@ -209,7 +209,7 @@ export class UserManagementComponent {
     if (!this.auth.canManageUsers()) {
       return false;
     }
-    if (this.isCoreAdminUser()) {
+    if (this.isHeadAdminUser()) {
       return true;
     }
     return account.role !== 'admin' && account.role !== 'head_admin';
@@ -238,7 +238,7 @@ export class UserManagementComponent {
     if (!this.auth.canManageUsers()) {
       return false;
     }
-    if (!this.isCoreAdminUser() && (account.role === 'admin' || account.role === 'head_admin')) {
+    if (!this.isHeadAdminUser() && (account.role === 'admin' || account.role === 'head_admin')) {
       return false;
     }
     return true;
@@ -256,7 +256,7 @@ export class UserManagementComponent {
       return false;
     }
     if (
-      !this.isCoreAdminUser() &&
+      !this.isHeadAdminUser() &&
       (account.role === 'admin' ||
         account.role === 'head_admin' ||
         targetRole === 'admin' ||
@@ -267,15 +267,12 @@ export class UserManagementComponent {
     return true;
   }
 
-  private isCoreAdminUser(): boolean {
+  private isHeadAdminUser(): boolean {
     const current = this.currentUser();
     if (!current) {
       return false;
     }
-    if (current.role === 'head_admin') {
-      return true;
-    }
-    return current.username === this.protectedUsername;
+    return current.role === 'head_admin';
   }
 
   private async setAccountStatus(user: UserAccount, isActive: boolean): Promise<void> {
