@@ -228,24 +228,28 @@ export class AuditLogsComponent {
   }
 
   private describeSummary(entry: AuditLogRecord): string {
-    const tokens = this.buildActionTokens(entry);
     const user = entry.username ?? this.translate.instant('logs.timeline.unknownUser');
-    const verbKey = this.resolveVerbKey(entry, tokens.method);
+    const resource = this.describeResourceLabel(entry);
+    const verbKey = this.resolveVerbKey(entry, entry.method ?? this.extractMethod(entry.action));
+    if (verbKey === 'login') {
+      const outcome = this.describeLoginOutcome(entry);
+      const loginKey = outcome === 'success' ? 'loginSuccess' : outcome === 'failure' ? 'loginFailure' : 'login';
+      return this.translate.instant(`logs.timeline.summary.${loginKey}`, { user });
+    }
     return this.translate.instant(`logs.timeline.summary.${verbKey}`, {
       user,
-      action: tokens.label,
-      resource: tokens.target ?? this.translate.instant('logs.table.unknownResource')
+      resource
     });
   }
 
   private describeDetails(entry: AuditLogRecord): string | null {
-    const tokens = this.buildActionTokens(entry);
     const parts: string[] = [];
     if (entry.role) {
       parts.push(this.translate.instant('logs.timeline.details.role', { value: entry.role }));
     }
-    if (tokens.target) {
-      parts.push(this.translate.instant('logs.timeline.details.resource', { value: tokens.target }));
+    const resourcePath = this.normalizePath(entry);
+    if (resourcePath) {
+      parts.push(this.translate.instant('logs.timeline.details.resource', { value: resourcePath }));
     }
     if (entry.status_code != null) {
       parts.push(this.translate.instant('logs.timeline.details.status', { value: entry.status_code }));
@@ -254,13 +258,6 @@ export class AuditLogsComponent {
       parts.push(this.translate.instant('logs.timeline.details.ip', { value: entry.ip_address }));
     }
     return parts.length > 0 ? parts.join(' • ') : null;
-  }
-
-  private buildActionTokens(entry: AuditLogRecord): { method: string | null; target: string | null; label: string } {
-    const method = (entry.method ?? this.extractMethod(entry.action))?.toUpperCase() ?? null;
-    const target = entry.path ?? entry.resource ?? this.extractPath(entry.action) ?? null;
-    const label = [method, target].filter(Boolean).join(' ') || entry.action || this.translate.instant('logs.timeline.summary.unknownAction');
-    return { method, target, label };
   }
 
   private resolveVerbKey(entry: AuditLogRecord, method: string | null): string {
@@ -292,6 +289,36 @@ export class AuditLogsComponent {
     return null;
   }
 
+  private describeLoginOutcome(entry: AuditLogRecord): 'success' | 'failure' | null {
+    const outcome = this.metadataString(entry, 'outcome');
+    if (outcome) {
+      if (outcome.toLowerCase().includes('success')) {
+        return 'success';
+      }
+      if (outcome.toLowerCase().includes('fail')) {
+        return 'failure';
+      }
+    }
+    if (entry.status_code != null) {
+      return entry.status_code >= 400 ? 'failure' : 'success';
+    }
+    return null;
+  }
+
+  private metadataString(entry: AuditLogRecord, key: string): string | null {
+    if (!entry.metadata) {
+      return null;
+    }
+    const value = entry.metadata[key];
+    if (typeof value === 'string') {
+      return value;
+    }
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return String(value);
+    }
+    return null;
+  }
+
   private extractPath(action: string | undefined): string | null {
     if (!action) {
       return null;
@@ -301,5 +328,123 @@ export class AuditLogsComponent {
       return action.slice(spaceIndex + 1).trim();
     }
     return null;
+  }
+
+  private describeResourceLabel(entry: AuditLogRecord): string {
+    const path = this.normalizePath(entry);
+    const segments = path.split('/').filter(Boolean);
+    if (segments.length === 0) {
+      return this.translate.instant('logs.timeline.resources.unknown');
+    }
+    const [root, second, third] = segments;
+    const secondIsId = this.isNumeric(second);
+    switch (root) {
+      case 'persons': {
+        if (!second) {
+          return this.translate.instant('logs.timeline.resources.personList');
+        }
+        if (secondIsId) {
+          if (!third) {
+            return this.translate.instant('logs.timeline.resources.personDetail', { id: second });
+          }
+          if (third === 'profiles') {
+            return this.translate.instant('logs.timeline.resources.personProfiles', { id: second });
+          }
+          if (third === 'notes') {
+            return this.translate.instant('logs.timeline.resources.personNotes', { id: second });
+          }
+          if (third === 'activities') {
+            return this.translate.instant('logs.timeline.resources.personActivities', { id: second });
+          }
+        }
+        break;
+      }
+      case 'notes': {
+        if (second === 'by-person' && third && this.isNumeric(third)) {
+          return this.translate.instant('logs.timeline.resources.notesByPerson', { id: third });
+        }
+        if (!second) {
+          return this.translate.instant('logs.timeline.resources.noteList');
+        }
+        if (this.isNumeric(second)) {
+          return this.translate.instant('logs.timeline.resources.noteDetail', { id: second });
+        }
+        break;
+      }
+      case 'profiles': {
+        if (!second) {
+          return this.translate.instant('logs.timeline.resources.profileList');
+        }
+        if (this.isNumeric(second)) {
+          return this.translate.instant('logs.timeline.resources.profileDetail', { id: second });
+        }
+        break;
+      }
+      case 'activities':
+        return this.translate.instant('logs.timeline.resources.activities');
+      case 'users': {
+        if (!second) {
+          return this.translate.instant('logs.timeline.resources.users');
+        }
+        if (this.isNumeric(second)) {
+          return this.translate.instant('logs.timeline.resources.userDetail', { id: second });
+        }
+        break;
+      }
+      case 'audit':
+        if (second === 'logs') {
+          return this.translate.instant('logs.timeline.resources.auditLogs');
+        }
+        break;
+      case 'stats':
+        if (second === 'overview') {
+          return this.translate.instant('logs.timeline.resources.statsOverview');
+        }
+        break;
+      case 'auth':
+        if (second === 'me') {
+          return this.translate.instant('logs.timeline.resources.authMe');
+        }
+        if (second === 'login') {
+          return this.translate.instant('logs.timeline.resources.authLogin');
+        }
+        break;
+      case 'platforms': {
+        if (!second) {
+          return this.translate.instant('logs.timeline.resources.platforms');
+        }
+        if (this.isNumeric(second)) {
+          return this.translate.instant('logs.timeline.resources.platformDetail', { id: second });
+        }
+        break;
+      }
+      case 'entries': {
+        const type = second;
+        if (type) {
+          const readableType = this.humanizeType(type);
+          if (!third) {
+            return this.translate.instant('logs.timeline.resources.entriesList', { type: readableType });
+          }
+          return this.translate.instant('logs.timeline.resources.entriesDetail', {
+            type: readableType,
+            id: third
+          });
+        }
+        break;
+      }
+    }
+    return this.translate.instant('logs.timeline.resources.generic', { value: path });
+  }
+
+  private normalizePath(entry: AuditLogRecord): string {
+    return entry.path ?? entry.resource ?? this.extractPath(entry.action) ?? '';
+  }
+
+  private isNumeric(value: string | undefined): boolean {
+    return !!value && /^\d+$/.test(value);
+  }
+
+  private humanizeType(value: string): string {
+    return value.replace(/[-_]/g, ' ');
   }
 }

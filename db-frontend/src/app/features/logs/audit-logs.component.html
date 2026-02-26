@@ -119,9 +119,6 @@
           <p class="logs__timeline-detail" *ngIf="entry.detailLine">
             {{ entry.detailLine }}
           </p>
-          <div class="logs__timeline-metadata" *ngIf="entry.metadata as meta">
-            <pre>{{ meta | json }}</pre>
-          </div>
         </div>
       </article>
     </div>

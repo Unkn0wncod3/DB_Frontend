@@ -67,11 +67,13 @@
       "resource": "resource: {{ value }}",
       "unknownUser": "Unknown user",
       "summary": {
-        "generic": "{{user}} performed {{action}}",
-        "read": "{{user}} requested {{action}}",
-        "write": "{{user}} updated {{action}}",
-        "delete": "{{user}} deleted {{action}}",
+        "generic": "{{user}} accessed {{resource}}",
+        "read": "{{user}} viewed {{resource}}",
+        "write": "{{user}} updated {{resource}}",
+        "delete": "{{user}} deleted {{resource}}",
         "login": "{{user}} attempted to sign in",
+        "loginSuccess": "{{user}} signed in successfully",
+        "loginFailure": "{{user}} failed to sign in",
         "unknownAction": "an action"
       },
       "details": {
@@ -79,6 +81,31 @@
         "resource": "Resource: {{ value }}",
         "status": "Status: {{ value }}",
         "ip": "IP: {{ value }}"
+      },
+      "resources": {
+        "unknown": "this resource",
+        "generic": "{{ value }}",
+        "personList": "the list of persons",
+        "personDetail": "person #{{id}}",
+        "personProfiles": "profiles linked to person #{{id}}",
+        "personNotes": "notes linked to person #{{id}}",
+        "personActivities": "activities linked to person #{{id}}",
+        "notesByPerson": "notes for person #{{id}}",
+        "noteList": "the list of notes",
+        "noteDetail": "note #{{id}}",
+        "profileList": "the list of profiles",
+        "profileDetail": "profile #{{id}}",
+        "activities": "the activity dashboard",
+        "users": "the user directory",
+        "userDetail": "user #{{id}}",
+        "auditLogs": "the audit history",
+        "statsOverview": "the stats overview",
+        "authMe": "their profile overview",
+        "authLogin": "the login screen",
+        "platforms": "the platform catalog",
+        "platformDetail": "platform #{{id}}",
+        "entriesList": "the list of {{type}} entries",
+        "entriesDetail": "{{type}} entry {{id}}"
       }
     },
     "table": {

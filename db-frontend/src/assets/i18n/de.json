@@ -67,11 +67,13 @@
       "resource": "Ressource: {{ value }}",
       "unknownUser": "Unbekannter Nutzer",
       "summary": {
-        "generic": "{{user}} hat {{action}} ausgeführt",
-        "read": "{{user}} hat {{action}} abgefragt",
-        "write": "{{user}} hat {{action}} verändert",
-        "delete": "{{user}} hat {{action}} gelöscht",
+        "generic": "{{user}} hat {{resource}} geöffnet",
+        "read": "{{user}} hat {{resource}} angezeigt",
+        "write": "{{user}} hat {{resource}} bearbeitet",
+        "delete": "{{user}} hat {{resource}} gelöscht",
         "login": "{{user}} hat versucht, sich anzumelden",
+        "loginSuccess": "{{user}} hat sich erfolgreich angemeldet",
+        "loginFailure": "{{user}} konnte sich nicht anmelden",
         "unknownAction": "eine Aktion"
       },
       "details": {
@@ -79,6 +81,31 @@
         "resource": "Ressource: {{ value }}",
         "status": "Status: {{ value }}",
         "ip": "IP: {{ value }}"
+      },
+      "resources": {
+        "unknown": "diese Ressource",
+        "generic": "{{ value }}",
+        "personList": "die Personenliste",
+        "personDetail": "Person #{{id}}",
+        "personProfiles": "Profile zu Person #{{id}}",
+        "personNotes": "Notizen zu Person #{{id}}",
+        "personActivities": "Aktivitäten zu Person #{{id}}",
+        "notesByPerson": "Notizen für Person #{{id}}",
+        "noteList": "die Notizenliste",
+        "noteDetail": "Notiz #{{id}}",
+        "profileList": "die Profilübersicht",
+        "profileDetail": "Profil #{{id}}",
+        "activities": "die Aktivitätsübersicht",
+        "users": "die Benutzerverwaltung",
+        "userDetail": "Benutzer #{{id}}",
+        "auditLogs": "die Audit-Historie",
+        "statsOverview": "die Statistikübersicht",
+        "authMe": "das eigene Profil",
+        "authLogin": "den Login-Bereich",
+        "platforms": "die Plattformliste",
+        "platformDetail": "Plattform #{{id}}",
+        "entriesList": "die {{type}}-Einträge",
+        "entriesDetail": "{{type}}-Eintrag {{id}}"
       }
     },
     "table": {
