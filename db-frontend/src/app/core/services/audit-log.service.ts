@@ -51,7 +51,7 @@ export class AuditLogService {
     }
 
     return this.api
-      .request<unknown>('GET', '/logs', { params: query })
+      .request<unknown>('GET', '/audit/logs', { params: query })
       .pipe(map(this.normalizeResponse));
   }
 

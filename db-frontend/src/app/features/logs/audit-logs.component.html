@@ -6,11 +6,14 @@
       <p class="logs__subtitle">{{ 'logs.subtitle' | translate }}</p>
     </div>
     <div class="logs__hero-meta">
-      <div>
+      <div class="logs__hero-count">
         <span class="logs__hero-label">{{ 'logs.meta.visible' | translate }}</span>
-        <strong>{{ logs().length }} / {{ total() }}</strong>
+        <div class="logs__hero-value">
+          <strong>{{ logs().length }}</strong>
+          <span>/ {{ total() }}</span>
+        </div>
       </div>
-      <button type="button" (click)="applyFilters()" [disabled]="isLoading()">
+      <button type="button" class="logs__hero-button" (click)="applyFilters()" [disabled]="isLoading()">
         <span *ngIf="isLoading(); else refreshLabel">{{ 'logs.actions.refreshing' | translate }}</span>
         <ng-template #refreshLabel>{{ 'logs.actions.refresh' | translate }}</ng-template>
       </button>
@@ -43,7 +46,7 @@
       <input type="number" formControlName="limit" min="1" max="500" />
     </label>
     <div class="logs__filter-actions">
-      <button type="submit" [disabled]="isLoading()">
+      <button type="submit" class="logs__apply-button" [disabled]="isLoading()">
         <span *ngIf="isLoading(); else applyLabel">{{ 'logs.actions.applying' | translate }}</span>
         <ng-template #applyLabel>{{ 'logs.actions.apply' | translate }}</ng-template>
       </button>
