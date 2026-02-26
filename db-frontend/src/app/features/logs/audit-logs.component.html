@@ -133,41 +133,6 @@
     </div>
   </section>
 
-  <section class="logs__table">
-    <h2>{{ 'logs.table.title' | translate }}</h2>
-    <table *ngIf="logs().length > 0; else emptyTable">
-      <thead>
-        <tr>
-          <th>{{ 'logs.table.timestamp' | translate }}</th>
-          <th>{{ 'logs.table.user' | translate }}</th>
-          <th>{{ 'logs.table.action' | translate }}</th>
-          <th>{{ 'logs.table.resource' | translate }}</th>
-          <th>{{ 'logs.table.metadata' | translate }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let log of logs()">
-          <td>{{ log.created_at | date:'yyyy-MM-dd HH:mm:ss' }}</td>
-          <td>
-            <span *ngIf="log.username; else unknownUser">{{ log.username }}</span>
-            <ng-template #unknownUser>&mdash;</ng-template>
-          </td>
-          <td>{{ log.action }}</td>
-          <td>{{ log.resource || ('logs.table.unknownResource' | translate) }}</td>
-          <td>
-            <div class="logs__metadata" *ngIf="log.metadata; else noData">
-              <pre>{{ log.metadata | json }}</pre>
-            </div>
-            <ng-template #noData>&mdash;</ng-template>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <ng-template #emptyTable>
-      <p class="logs__empty">{{ isLoading() ? ('logs.status.loading' | translate) : ('logs.status.empty' | translate) }}</p>
-    </ng-template>
-  </section>
-
   <div class="logs__modal" *ngIf="showClearDialog()">
     <div class="logs__modal-backdrop" (click)="closeClearDialog()"></div>
     <div class="logs__modal-dialog" role="dialog" aria-modal="true">

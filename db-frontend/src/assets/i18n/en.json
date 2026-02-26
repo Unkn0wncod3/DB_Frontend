@@ -119,16 +119,6 @@
         "entriesDetail": "{{type}} entry {{id}}"
       }
     },
-    "table": {
-      "title": "Raw log table",
-      "timestamp": "Timestamp",
-      "user": "User",
-      "action": "Action",
-      "resource": "Resource",
-      "metadata": "Metadata",
-      "unknownResource": "Unknown resource",
-      "unknownAction": "Unknown action"
-    },
     "status": {
       "loading": "Loading logs...",
       "empty": "No logs match the selected filters.",

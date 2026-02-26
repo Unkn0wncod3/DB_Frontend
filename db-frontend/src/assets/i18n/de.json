@@ -119,16 +119,6 @@
         "entriesDetail": "{{type}}-Eintrag {{id}}"
       }
     },
-    "table": {
-      "title": "Log-Tabelle",
-      "timestamp": "Zeitstempel",
-      "user": "Benutzer",
-      "action": "Aktion",
-      "resource": "Ressource",
-      "metadata": "Metadaten",
-      "unknownResource": "Unbekannte Ressource",
-      "unknownAction": "Unbekannte Aktion"
-    },
     "status": {
       "loading": "Logs werden geladen...",
       "empty": "Keine Logs entsprechen den Filtern.",
