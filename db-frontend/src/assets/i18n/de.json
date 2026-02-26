@@ -54,7 +54,18 @@
     "insights": {
       "actions": "Häufigste Aktionen",
       "resources": "Aktivste Ressourcen",
-      "events": "{{ value }} Ereignisse"
+      "users": "Aktivste Nutzer",
+      "events": "{{ value }} Ereignisse",
+      "userLabel": "{{user}} · {{ value }} Aktionen",
+      "actionLabels": {
+        "generic": "{{resource}} aufgerufen",
+        "read": "{{resource}} angezeigt",
+        "write": "{{resource}} bearbeitet",
+        "delete": "{{resource}} gelöscht",
+        "login": "Anmeldeversuche",
+        "loginSuccess": "Erfolgreiche Anmeldungen",
+        "loginFailure": "Fehlgeschlagene Anmeldungen"
+      }
     },
     "timeline": {
       "title": "Chronologische Ansicht",

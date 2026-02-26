@@ -46,27 +46,43 @@ export class AuditLogsComponent {
 
   readonly actionStats = computed(() => {
     const entries = this.logs();
-    const map = new Map<string, number>();
+    const map = new Map<string, { label: string; count: number }>();
     for (const entry of entries) {
-      const action = entry.action || this.translate.instant('logs.table.unknownAction');
-      map.set(action, (map.get(action) ?? 0) + 1);
+      const descriptor = this.describeActionLabel(entry);
+      const bucket = map.get(descriptor.key);
+      if (bucket) {
+        bucket.count += 1;
+      } else {
+        map.set(descriptor.key, { label: descriptor.label, count: 1 });
+      }
     }
-    const max = Math.max(...Array.from(map.values()), 1);
-    return Array.from(map.entries()).map(([label, value]) => ({
-      label,
-      value,
-      percent: Math.round((value / max) * 100)
-    }));
+    const items = Array.from(map.values());
+    const max = Math.max(...items.map((item) => item.count), 1);
+    return items
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 8)
+      .map((item) => ({
+        label: item.label,
+        value: item.count,
+        percent: Math.round((item.count / max) * 100)
+      }));
   });
 
-  readonly resourceStats = computed(() => {
+  readonly userActivityStats = computed(() => {
     const entries = this.logs();
     const map = new Map<string, number>();
     for (const entry of entries) {
-      const resource = entry.resource || this.translate.instant('logs.table.unknownResource');
-      map.set(resource, (map.get(resource) ?? 0) + 1);
+      const user = entry.username ?? this.translate.instant('logs.timeline.unknownUser');
+      map.set(user, (map.get(user) ?? 0) + 1);
     }
-    return Array.from(map.entries()).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    return Array.from(map.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([user, value]) => ({
+        user,
+        value,
+        label: this.translate.instant('logs.insights.userLabel', { user, value })
+      }));
   });
 
   readonly timeline = computed<TimelineEntry[]>(() => {
@@ -434,6 +450,15 @@ export class AuditLogsComponent {
       }
     }
     return this.translate.instant('logs.timeline.resources.generic', { value: path });
+  }
+
+  private describeActionLabel(entry: AuditLogRecord): { key: string; label: string } {
+    const verbKey = this.resolveVerbKey(entry, entry.method ?? this.extractMethod(entry.action));
+    const resource = this.describeResourceLabel(entry);
+    const normalizedPath = this.normalizePath(entry);
+    const label = this.translate.instant(`logs.insights.actionLabels.${verbKey}`, { resource });
+    const key = `${verbKey}:${normalizedPath || 'root'}`;
+    return { key, label };
   }
 
   private normalizePath(entry: AuditLogRecord): string {

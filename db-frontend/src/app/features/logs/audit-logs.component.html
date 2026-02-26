@@ -86,16 +86,16 @@
       </ul>
     </div>
     <div class="logs__card">
-      <h3>{{ 'logs.insights.resources' | translate }}</h3>
+      <h3>{{ 'logs.insights.users' | translate }}</h3>
       <ol>
-        <li *ngFor="let resource of resourceStats(); index as idx">
+        <li *ngFor="let user of userActivityStats(); index as idx">
           <span>{{ idx + 1 }}.</span>
           <div>
-            <strong>{{ resource[0] }}</strong>
-            <p>{{ 'logs.insights.events' | translate:{ value: resource[1] } }}</p>
+            <strong>{{ user.user }}</strong>
+            <p>{{ user.label }}</p>
           </div>
         </li>
-        <li *ngIf="resourceStats().length === 0" class="logs__empty">
+        <li *ngIf="userActivityStats().length === 0" class="logs__empty">
           {{ 'logs.status.empty' | translate }}
         </li>
       </ol>

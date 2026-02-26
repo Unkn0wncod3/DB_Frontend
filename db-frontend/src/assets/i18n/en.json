@@ -52,9 +52,20 @@
       "limit": "Limit"
     },
     "insights": {
-      "actions": "Top actions",
+      "actions": "Most common actions",
       "resources": "Most active resources",
-      "events": "{{ value }} events"
+      "users": "Most active users",
+      "events": "{{ value }} events",
+      "userLabel": "{{user}} · {{ value }} events",
+      "actionLabels": {
+        "generic": "Accessed {{resource}}",
+        "read": "Viewed {{resource}}",
+        "write": "Updated {{resource}}",
+        "delete": "Deleted {{resource}}",
+        "login": "Sign-in attempts",
+        "loginSuccess": "Successful sign-ins",
+        "loginFailure": "Failed sign-ins"
+      }
     },
     "timeline": {
       "title": "Chronological view",
