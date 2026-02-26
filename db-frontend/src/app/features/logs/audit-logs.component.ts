@@ -9,6 +9,8 @@ import { AuditLogRecord, AuditLogService } from '../../core/services/audit-log.s
 
 interface TimelineEntry extends AuditLogRecord {
   relativeLabel: string;
+  summary: string;
+  detailLine: string | null;
 }
 
 @Component({
@@ -73,7 +75,9 @@ export class AuditLogsComponent {
       .filter((entry) => this.matchesSearch(entry, search))
       .map((entry) => ({
         ...entry,
-        relativeLabel: this.relativeTime(entry.created_at)
+        relativeLabel: this.relativeTime(entry.created_at),
+        summary: this.describeSummary(entry),
+        detailLine: this.describeDetails(entry)
       }));
   });
 
@@ -221,5 +225,81 @@ export class AuditLogsComponent {
       return String((error as { message?: unknown }).message ?? '');
     }
     return this.translate.instant('logs.status.genericError');
+  }
+
+  private describeSummary(entry: AuditLogRecord): string {
+    const tokens = this.buildActionTokens(entry);
+    const user = entry.username ?? this.translate.instant('logs.timeline.unknownUser');
+    const verbKey = this.resolveVerbKey(entry, tokens.method);
+    return this.translate.instant(`logs.timeline.summary.${verbKey}`, {
+      user,
+      action: tokens.label,
+      resource: tokens.target ?? this.translate.instant('logs.table.unknownResource')
+    });
+  }
+
+  private describeDetails(entry: AuditLogRecord): string | null {
+    const tokens = this.buildActionTokens(entry);
+    const parts: string[] = [];
+    if (entry.role) {
+      parts.push(this.translate.instant('logs.timeline.details.role', { value: entry.role }));
+    }
+    if (tokens.target) {
+      parts.push(this.translate.instant('logs.timeline.details.resource', { value: tokens.target }));
+    }
+    if (entry.status_code != null) {
+      parts.push(this.translate.instant('logs.timeline.details.status', { value: entry.status_code }));
+    }
+    if (entry.ip_address) {
+      parts.push(this.translate.instant('logs.timeline.details.ip', { value: entry.ip_address }));
+    }
+    return parts.length > 0 ? parts.join(' • ') : null;
+  }
+
+  private buildActionTokens(entry: AuditLogRecord): { method: string | null; target: string | null; label: string } {
+    const method = (entry.method ?? this.extractMethod(entry.action))?.toUpperCase() ?? null;
+    const target = entry.path ?? entry.resource ?? this.extractPath(entry.action) ?? null;
+    const label = [method, target].filter(Boolean).join(' ') || entry.action || this.translate.instant('logs.timeline.summary.unknownAction');
+    return { method, target, label };
+  }
+
+  private resolveVerbKey(entry: AuditLogRecord, method: string | null): string {
+    const action = entry.action?.toLowerCase() ?? '';
+    if (action.includes('login') || action.includes('auth/login')) {
+      return 'login';
+    }
+    const normalized = method?.toUpperCase();
+    if (normalized === 'DELETE') {
+      return 'delete';
+    }
+    if (normalized === 'POST' || normalized === 'PUT' || normalized === 'PATCH') {
+      return 'write';
+    }
+    if (normalized === 'GET') {
+      return 'read';
+    }
+    return 'generic';
+  }
+
+  private extractMethod(action: string | undefined): string | null {
+    if (!action) {
+      return null;
+    }
+    const parts = action.trim().split(/\s+/);
+    if (parts.length > 1 && parts[0].length <= 10) {
+      return parts[0];
+    }
+    return null;
+  }
+
+  private extractPath(action: string | undefined): string | null {
+    if (!action) {
+      return null;
+    }
+    const spaceIndex = action.indexOf(' ');
+    if (spaceIndex >= 0) {
+      return action.slice(spaceIndex + 1).trim();
+    }
+    return null;
   }
 }

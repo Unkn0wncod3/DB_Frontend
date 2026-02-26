@@ -11,6 +11,11 @@ export interface AuditLogRecord {
   created_at: string;
   user_id?: number | string | null;
   username?: string | null;
+  role?: string | null;
+  method?: string | null;
+  path?: string | null;
+  status_code?: number | null;
+  ip_address?: string | null;
   metadata?: Record<string, unknown> | null;
 }
 
@@ -114,6 +119,14 @@ export class AuditLogService {
     }
 
     const metadata = record['metadata'];
+    const method = typeof record['method'] === 'string' ? record['method'] : this.extractMethod(String(action));
+    const path = typeof record['path'] === 'string' ? record['path'] : this.extractPath(String(action));
+    const status =
+      typeof record['status_code'] === 'number'
+        ? record['status_code']
+        : typeof record['status'] === 'number'
+          ? record['status']
+          : undefined;
     return {
       id: typeof id === 'string' || typeof id === 'number' ? id : String(id),
       action: String(action),
@@ -121,11 +134,38 @@ export class AuditLogService {
       created_at: typeof createdAt === 'string' ? createdAt : new Date(createdAt as number).toISOString(),
       user_id: typeof record['user_id'] === 'number' ? record['user_id'] : undefined,
       username: typeof record['username'] === 'string' ? record['username'] : undefined,
+      role: typeof record['role'] === 'string' ? record['role'] : undefined,
+      method: method ?? null,
+      path: path ?? null,
+      status_code: status ?? null,
+      ip_address: typeof record['ip'] === 'string' ? record['ip'] : typeof record['ip_address'] === 'string' ? record['ip_address'] : undefined,
       metadata: typeof metadata === 'object' && metadata !== null ? (metadata as Record<string, unknown>) : null
     };
   }
 
   deleteLogs(): Observable<void> {
     return this.api.request<void>('DELETE', '/audit/logs');
+  }
+
+  private extractMethod(action: string): string | null {
+    if (!action) {
+      return null;
+    }
+    const parts = action.trim().split(/\s+/);
+    if (parts.length > 1 && parts[0].length <= 10) {
+      return parts[0].toUpperCase();
+    }
+    return null;
+  }
+
+  private extractPath(action: string): string | null {
+    if (!action) {
+      return null;
+    }
+    const spaceIndex = action.indexOf(' ');
+    if (spaceIndex >= 0) {
+      return action.slice(spaceIndex + 1).trim();
+    }
+    return null;
   }
 }

@@ -64,7 +64,22 @@
       "hoursAgo": "vor {{ value }} Std.",
       "daysAgo": "vor {{ value }} Tagen",
       "byUser": "von {{ value }}",
-      "resource": "Ressource: {{ value }}"
+      "resource": "Ressource: {{ value }}",
+      "unknownUser": "Unbekannter Nutzer",
+      "summary": {
+        "generic": "{{user}} hat {{action}} ausgeführt",
+        "read": "{{user}} hat {{action}} abgefragt",
+        "write": "{{user}} hat {{action}} verändert",
+        "delete": "{{user}} hat {{action}} gelöscht",
+        "login": "{{user}} hat versucht, sich anzumelden",
+        "unknownAction": "eine Aktion"
+      },
+      "details": {
+        "role": "Rolle: {{ value }}",
+        "resource": "Ressource: {{ value }}",
+        "status": "Status: {{ value }}",
+        "ip": "IP: {{ value }}"
+      }
     },
     "table": {
       "title": "Log-Tabelle",

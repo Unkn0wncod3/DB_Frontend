@@ -110,13 +110,14 @@
         <div class="logs__timeline-icon"></div>
         <div class="logs__timeline-body">
           <header>
-            <strong>{{ entry.action }}</strong>
+            <strong>{{ entry.summary }}</strong>
             <span>{{ entry.relativeLabel }}</span>
           </header>
           <p class="logs__timeline-meta">
             <span>{{ entry.created_at | date: 'MMM d, HH:mm:ss' }}</span>
-            <span *ngIf="entry.username">{{ 'logs.timeline.byUser' | translate:{ value: entry.username } }}</span>
-            <span>{{ 'logs.timeline.resource' | translate:{ value: entry.resource || ('logs.table.unknownResource' | translate) } }}</span>
+          </p>
+          <p class="logs__timeline-detail" *ngIf="entry.detailLine">
+            {{ entry.detailLine }}
           </p>
           <div class="logs__timeline-metadata" *ngIf="entry.metadata as meta">
             <pre>{{ meta | json }}</pre>

@@ -245,6 +245,12 @@
   font-size: 0.9rem;
 }
 
+.logs__timeline-detail {
+  margin: 0.25rem 0 0;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
 .logs__timeline-metadata pre,
 .logs__metadata pre {
   margin: 0.5rem 0 0;

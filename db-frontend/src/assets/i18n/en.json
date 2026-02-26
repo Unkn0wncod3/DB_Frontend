@@ -64,7 +64,22 @@
       "hoursAgo": "{{ value }} h ago",
       "daysAgo": "{{ value }} d ago",
       "byUser": "by {{ value }}",
-      "resource": "resource: {{ value }}"
+      "resource": "resource: {{ value }}",
+      "unknownUser": "Unknown user",
+      "summary": {
+        "generic": "{{user}} performed {{action}}",
+        "read": "{{user}} requested {{action}}",
+        "write": "{{user}} updated {{action}}",
+        "delete": "{{user}} deleted {{action}}",
+        "login": "{{user}} attempted to sign in",
+        "unknownAction": "an action"
+      },
+      "details": {
+        "role": "Role: {{ value }}",
+        "resource": "Resource: {{ value }}",
+        "status": "Status: {{ value }}",
+        "ip": "IP: {{ value }}"
+      }
     },
     "table": {
       "title": "Raw log table",
