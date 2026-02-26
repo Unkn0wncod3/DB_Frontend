@@ -1,39 +1,24 @@
 <section class="entry-detail">
-
-  <!-- ═══════════════════════════════════════
-       HEADER
-  ════════════════════════════════════════ -->
   <header class="entry-detail__header">
-
-    <!-- Left: Title + Meta -->
     <div class="entry-detail__title">
-      <a routerLink="/" class="entry-detail__back">
-        {{ 'entryDetail.actions.back' | translate }}
-      </a>
-
-      <h1>
-        {{ 'entryDetail.title' | translate:{ value: entryTitle() ?? (entryId ?? ('entryDetail.labels.unknownId' | translate)) } }}
-      </h1>
-
-      <p class="entry-detail__subtitle" *ngIf="entryType || entryId">
+      <a routerLink="/" class="entry-detail__back">{{ 'entryDetail.actions.back' | translate }}</a>
+      <h1>{{ 'entryDetail.title' | translate:{ value: entryTitle() ?? (entryId ?? ('entryDetail.labels.unknownId' | translate)) } }}</h1>
+      <p *ngIf="entryType || entryId">
         <span *ngIf="entryType">{{ 'entryDetail.labels.type' | translate:{ type: entryType } }}</span>
-        <span *ngIf="entryType && entryId" class="entry-detail__separator" aria-hidden="true">&middot;</span>
+        <span *ngIf="entryType && entryId" aria-hidden="true">&nbsp;&middot;&nbsp;</span>
         <span *ngIf="entryId">{{ 'entryDetail.labels.id' | translate:{ id: entryId } }}</span>
       </p>
-
       <p class="entry-detail__meta" *ngIf="entry()">
         <span *ngIf="createdTimestamp as createdAt">
           {{ 'entryDetail.labels.createdAt' | translate }}
           <strong>{{ createdAt | date:'dd/MM/yyyy, HH:mm' }}</strong>
         </span>
-        <span *ngIf="createdTimestamp && updatedTimestamp" class="entry-detail__separator" aria-hidden="true">&middot;</span>
+        <span *ngIf="createdTimestamp && updatedTimestamp" aria-hidden="true">&nbsp;&middot;&nbsp;</span>
         <span *ngIf="updatedTimestamp as updatedAt">
           {{ 'entryDetail.labels.updatedAt' | translate }}
           <strong>{{ updatedAt | date:'dd/MM/yyyy, HH:mm' }}</strong>
         </span>
       </p>
-
-      <!-- Visibility -->
       <div class="entry-detail__visibility" *ngIf="entry() && canEditVisibility()">
         <div class="entry-detail__visibility-info">
           <span [ngClass]="visibilityBadgeClasses()">
@@ -48,17 +33,8 @@
           [placeholder]="'entryVisibility.placeholder' | translate"
         ></app-value-dropdown>
       </div>
-
-      <!-- Read-only notice -->
-      <p class="entry-detail__readonly" *ngIf="!canEditEntries() && personView() === 'details'">
-        {{ 'entryDetail.status.readOnly' | translate }}
-      </p>
     </div>
-
-    <!-- Right: Controls + Actions -->
     <div class="entry-detail__actions">
-
-      <!-- View toggle: Details / Dossier -->
       <div class="entry-detail__view-toggle" *ngIf="canShowDossierToggle()">
         <button
           type="button"
@@ -75,14 +51,11 @@
           {{ 'dossier.tabLabel' | translate }}
         </button>
       </div>
-
-      <!-- Layout toggle: Side / Stacked -->
       <div
         class="entry-detail__layout-toggle"
         *ngIf="showPersonRelations() && entryId && personView() === 'details'"
         role="group"
-        [attr.aria-label]="'entryDetail.relations.layoutLabel' | translate"
-      >
+        [attr.aria-label]="'entryDetail.relations.layoutLabel' | translate">
         <label class="entry-detail__layout-option">
           <input
             type="radio"
@@ -93,7 +66,9 @@
           />
           <span class="entry-detail__layout-body">
             <span class="entry-detail__layout-icon entry-detail__layout-icon--side" aria-hidden="true"></span>
-            <span class="sr-only">{{ 'entryDetail.relations.layoutOptionSide' | translate }}</span>
+            <span class="sr-only">
+              {{ 'entryDetail.relations.layoutOptionSide' | translate }}
+            </span>
           </span>
         </label>
         <label class="entry-detail__layout-option">
@@ -106,88 +81,50 @@
           />
           <span class="entry-detail__layout-body">
             <span class="entry-detail__layout-icon entry-detail__layout-icon--stacked" aria-hidden="true"></span>
-            <span class="sr-only">{{ 'entryDetail.relations.layoutOptionStacked' | translate }}</span>
+            <span class="sr-only">
+              {{ 'entryDetail.relations.layoutOptionStacked' | translate }}
+            </span>
           </span>
         </label>
       </div>
-
-      <!-- Raw view toggle -->
       <button
         *ngIf="canEditEntries() && personView() === 'details'"
         type="button"
         class="entry-detail__raw-toggle"
         (click)="toggleRawView()"
         [attr.aria-pressed]="showRawView()"
-        [attr.aria-label]="(showRawView() ? 'entryDetail.rawView.hide' : 'entryDetail.rawView.show') | translate"
-      >
+        [attr.aria-label]="(showRawView() ? 'entryDetail.rawView.hide' : 'entryDetail.rawView.show') | translate">
         <span class="entry-detail__raw-toggle-track" aria-hidden="true">
           <span class="entry-detail__raw-toggle-thumb" [class.entry-detail__raw-toggle-thumb--active]="showRawView()"></span>
         </span>
         <span class="entry-detail__raw-toggle-label">{{ 'entryDetail.rawView.label' | translate }}</span>
       </button>
-
-      <!-- Action buttons -->
-      <div class="entry-detail__action-buttons">
-        <button
-          type="button"
-          class="entry-detail__refresh"
-          (click)="refresh()"
-          [disabled]="isLoading() || isSaving()"
-        >
-          <span *ngIf="isLoading(); else refreshLabel">{{ 'entryDetail.status.loading' | translate }}</span>
-          <ng-template #refreshLabel>{{ 'entryDetail.actions.refresh' | translate }}</ng-template>
-        </button>
-
-        <button
-          *ngIf="canEditEntries() && personView() === 'details'"
-          type="submit"
-          form="entryDetailForm"
-          class="entry-detail__save"
-          [disabled]="!hasChanges() || isSaving()"
-        >
-          <span *ngIf="isSaving(); else saveLabel">{{ 'entryDetail.status.saving' | translate }}</span>
-          <ng-template #saveLabel>{{ 'entryDetail.actions.save' | translate }}</ng-template>
-        </button>
-
-        <button
-          *ngIf="canDeleteEntries() && personView() === 'details'"
-          type="button"
-          class="entry-detail__delete"
-          (click)="openDeleteDialog()"
-          [disabled]="isDeleting()"
-        >
-          <span *ngIf="isDeleting(); else deleteLabel">{{ 'entryDetail.status.deleting' | translate }}</span>
-          <ng-template #deleteLabel>{{ 'entryDetail.actions.delete' | translate }}</ng-template>
-        </button>
-      </div>
-
+      <button type="button" class="entry-detail__refresh" (click)="refresh()" [disabled]="isLoading() || isSaving()">
+        <span *ngIf="isLoading(); else refreshLabel">{{ 'entryDetail.status.loading' | translate }}</span>
+        <ng-template #refreshLabel>{{ 'entryDetail.actions.refresh' | translate }}</ng-template>
+      </button>
+      <button *ngIf="canEditEntries() && personView() === 'details'" type="submit" form="entryDetailForm" class="entry-detail__save" [disabled]="!hasChanges() || isSaving()">
+        <span *ngIf="isSaving(); else saveLabel">{{ 'entryDetail.status.saving' | translate }}</span>
+        <ng-template #saveLabel>{{ 'entryDetail.actions.save' | translate }}</ng-template>
+      </button>
+      <button *ngIf="canDeleteEntries() && personView() === 'details'" type="button" class="entry-detail__delete" (click)="openDeleteDialog()" [disabled]="isDeleting()">
+        <span *ngIf="isDeleting(); else deleteLabel">{{ 'entryDetail.status.deleting' | translate }}</span>
+        <ng-template #deleteLabel>{{ 'entryDetail.actions.delete' | translate }}</ng-template>
+      </button>
     </div>
+    <p class="entry-detail__readonly" *ngIf="!canEditEntries() && personView() === 'details'">
+      {{ 'entryDetail.status.readOnly' | translate }}
+    </p>
   </header>
 
-  <!-- ═══════════════════════════════════════
-       ALERTS
-  ════════════════════════════════════════ -->
-  <section
-    *ngIf="errorMessage() as error"
-    class="entry-detail__alert entry-detail__alert--error"
-    role="alert"
-    aria-live="polite"
-  >
+  <section *ngIf="errorMessage() as error" class="entry-detail__alert entry-detail__alert--error">
     <p>{{ error }}</p>
   </section>
 
-  <section
-    *ngIf="successMessage() as success"
-    class="entry-detail__alert entry-detail__alert--success"
-    role="status"
-    aria-live="polite"
-  >
+  <section *ngIf="successMessage() as success" class="entry-detail__alert entry-detail__alert--success">
     <p>{{ success }}</p>
   </section>
 
-  <!-- ═══════════════════════════════════════
-       MAIN CONTENT — Details view
-  ════════════════════════════════════════ -->
   <div
     *ngIf="personView() === 'details' && entry() as record"
     class="entry-detail__content"
@@ -216,33 +153,17 @@
     ></app-entry-detail-relations>
   </div>
 
-  <!-- ═══════════════════════════════════════
-       DOSSIER view
-  ════════════════════════════════════════ -->
   <app-person-dossier
     *ngIf="personView() === 'dossier' && entryId"
     [personId]="entryId"
     [personName]="entryTitle()"
   ></app-person-dossier>
 
-  <!-- ═══════════════════════════════════════
-       EMPTY STATE
-  ════════════════════════════════════════ -->
-  <section
-    *ngIf="personView() === 'details' && !entry() && !isLoading()"
-    class="entry-detail__state"
-  >
+  <section *ngIf="personView() === 'details' && !entry() && !isLoading()" class="entry-detail__state">
     <p>{{ 'entryDetail.status.empty' | translate }}</p>
   </section>
 
-  <!-- ═══════════════════════════════════════
-       RAW VIEW + DELETE DIALOG (portals)
-  ════════════════════════════════════════ -->
-  <app-entry-detail-raw-view
-    *ngIf="canEditEntries() && personView() === 'details'"
-    [record]="entry()"
-    [activated]="showRawView()"
-  ></app-entry-detail-raw-view>
+  <app-entry-detail-raw-view *ngIf="canEditEntries() && personView() === 'details'" [record]="entry()" [activated]="showRawView()"></app-entry-detail-raw-view>
 
   <app-entry-detail-delete-dialog
     *ngIf="canDeleteEntries() && personView() === 'details'"
@@ -252,5 +173,4 @@
     (confirmed)="handleDeleteConfirmed()"
     (closed)="closeDeleteDialog()"
   ></app-entry-detail-delete-dialog>
-
 </section>
