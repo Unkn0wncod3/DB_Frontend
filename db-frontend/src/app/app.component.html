@@ -11,6 +11,9 @@
       <a *ngIf="auth.isAdmin()" routerLink="/explorer" routerLinkActive="is-active">
         {{ 'layout.nav.explorer' | translate }}
       </a>
+      <a *ngIf="auth.isAdmin()" routerLink="/admin/logs" routerLinkActive="is-active">
+        {{ 'layout.nav.logs' | translate }}
+      </a>
       <a *ngIf="auth.canManageUsers()" routerLink="/admin/users" routerLinkActive="is-active">
         {{ 'layout.nav.users' | translate }}
       </a>

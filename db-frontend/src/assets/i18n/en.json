@@ -5,6 +5,7 @@
       "dashboard": "Dashboard",
       "profile": "Profile",
       "explorer": "API Explorer",
+      "logs": "Logs",
       "users": "Users"
     },
     "language": "Language",
@@ -21,6 +22,62 @@
       "admin": "Admin",
       "editor": "Editor",
       "user": "User"
+    }
+  },
+  "logs": {
+    "eyebrow": "Security insights",
+    "title": "Audit logs",
+    "subtitle": "Review sensitive activity across the platform. Filter by user, action or resource to investigate issues quickly.",
+    "meta": {
+      "visible": "Visible entries"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "refreshing": "Refreshing...",
+      "apply": "Apply filters",
+      "applying": "Applying...",
+      "reset": "Reset",
+      "loadMore": "Load more",
+      "loadingMore": "Loading...",
+      "refreshTimeline": "Refresh timeline"
+    },
+    "filters": {
+      "userId": "User ID",
+      "action": "Action",
+      "resource": "Resource",
+      "search": "Search within results",
+      "searchPlaceholder": "payload, username, IP...",
+      "limit": "Limit"
+    },
+    "insights": {
+      "actions": "Top actions",
+      "resources": "Most active resources",
+      "events": "{{ value }} events"
+    },
+    "timeline": {
+      "title": "Chronological view",
+      "subtitle": "Newest events first. Use filters to focus your investigation.",
+      "justNow": "just now",
+      "minutesAgo": "{{ value }} min ago",
+      "hoursAgo": "{{ value }} h ago",
+      "daysAgo": "{{ value }} d ago",
+      "byUser": "by {{ value }}",
+      "resource": "resource: {{ value }}"
+    },
+    "table": {
+      "title": "Raw log table",
+      "timestamp": "Timestamp",
+      "user": "User",
+      "action": "Action",
+      "resource": "Resource",
+      "metadata": "Metadata",
+      "unknownResource": "Unknown resource",
+      "unknownAction": "Unknown action"
+    },
+    "status": {
+      "loading": "Loading logs...",
+      "empty": "No logs match the selected filters.",
+      "genericError": "Unable to load logs."
     }
   },
   "profile": {

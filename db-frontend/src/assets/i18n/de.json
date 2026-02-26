@@ -5,6 +5,7 @@
       "dashboard": "Dashboard",
       "profile": "Profil",
       "explorer": "API Explorer",
+      "logs": "Protokolle",
       "users": "Benutzer"
     },
     "language": "Sprache",
@@ -21,6 +22,62 @@
       "admin": "Admin",
       "editor": "Editor",
       "user": "Nutzer"
+    }
+  },
+  "logs": {
+    "eyebrow": "Sicherheitsübersicht",
+    "title": "Audit-Logs",
+    "subtitle": "Zeigt sicherheitsrelevante Aktivitäten chronologisch an. Nach Nutzer, Aktion oder Ressource filtern, um Vorfälle schneller zu prüfen.",
+    "meta": {
+      "visible": "Sichtbare Einträge"
+    },
+    "actions": {
+      "refresh": "Aktualisieren",
+      "refreshing": "Aktualisiere...",
+      "apply": "Filter anwenden",
+      "applying": "Wende an...",
+      "reset": "Zurücksetzen",
+      "loadMore": "Mehr laden",
+      "loadingMore": "Lade...",
+      "refreshTimeline": "Timeline aktualisieren"
+    },
+    "filters": {
+      "userId": "Benutzer-ID",
+      "action": "Aktion",
+      "resource": "Ressource",
+      "search": "In Ergebnissen suchen",
+      "searchPlaceholder": "Payload, Benutzername, IP...",
+      "limit": "Limit"
+    },
+    "insights": {
+      "actions": "Häufigste Aktionen",
+      "resources": "Aktivste Ressourcen",
+      "events": "{{ value }} Ereignisse"
+    },
+    "timeline": {
+      "title": "Chronologische Ansicht",
+      "subtitle": "Neueste Ereignisse zuerst. Filter anpassen, um gezielt zu analysieren.",
+      "justNow": "gerade eben",
+      "minutesAgo": "vor {{ value }} Min.",
+      "hoursAgo": "vor {{ value }} Std.",
+      "daysAgo": "vor {{ value }} Tagen",
+      "byUser": "von {{ value }}",
+      "resource": "Ressource: {{ value }}"
+    },
+    "table": {
+      "title": "Log-Tabelle",
+      "timestamp": "Zeitstempel",
+      "user": "Benutzer",
+      "action": "Aktion",
+      "resource": "Ressource",
+      "metadata": "Metadaten",
+      "unknownResource": "Unbekannte Ressource",
+      "unknownAction": "Unbekannte Aktion"
+    },
+    "status": {
+      "loading": "Logs werden geladen...",
+      "empty": "Keine Logs entsprechen den Filtern.",
+      "genericError": "Logs konnten nicht geladen werden."
     }
   },
   "profile": {

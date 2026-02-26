@@ -1,0 +1,158 @@
+<section class="logs">
+  <header class="logs__hero">
+    <div>
+      <p class="logs__eyebrow">{{ 'logs.eyebrow' | translate }}</p>
+      <h1>{{ 'logs.title' | translate }}</h1>
+      <p class="logs__subtitle">{{ 'logs.subtitle' | translate }}</p>
+    </div>
+    <div class="logs__hero-meta">
+      <div>
+        <span class="logs__hero-label">{{ 'logs.meta.visible' | translate }}</span>
+        <strong>{{ logs().length }} / {{ total() }}</strong>
+      </div>
+      <button type="button" (click)="applyFilters()" [disabled]="isLoading()">
+        <span *ngIf="isLoading(); else refreshLabel">{{ 'logs.actions.refreshing' | translate }}</span>
+        <ng-template #refreshLabel>{{ 'logs.actions.refresh' | translate }}</ng-template>
+      </button>
+    </div>
+  </header>
+
+  <section *ngIf="errorMessage() as error" class="logs__alert logs__alert--error">
+    {{ error }}
+  </section>
+
+  <form class="logs__filters" [formGroup]="filtersForm" (ngSubmit)="applyFilters()">
+    <label>
+      <span>{{ 'logs.filters.userId' | translate }}</span>
+      <input type="number" formControlName="userId" min="1" placeholder="42" />
+    </label>
+    <label>
+      <span>{{ 'logs.filters.action' | translate }}</span>
+      <input type="text" formControlName="action" placeholder="login" autocomplete="off" />
+    </label>
+    <label>
+      <span>{{ 'logs.filters.resource' | translate }}</span>
+      <input type="text" formControlName="resource" placeholder="users" autocomplete="off" />
+    </label>
+    <label>
+      <span>{{ 'logs.filters.search' | translate }}</span>
+      <input type="text" formControlName="search" placeholder="{{ 'logs.filters.searchPlaceholder' | translate }}" />
+    </label>
+    <label>
+      <span>{{ 'logs.filters.limit' | translate }}</span>
+      <input type="number" formControlName="limit" min="1" max="500" />
+    </label>
+    <div class="logs__filter-actions">
+      <button type="submit" [disabled]="isLoading()">
+        <span *ngIf="isLoading(); else applyLabel">{{ 'logs.actions.applying' | translate }}</span>
+        <ng-template #applyLabel>{{ 'logs.actions.apply' | translate }}</ng-template>
+      </button>
+      <button type="button" class="ghost" (click)="resetFilters()" [disabled]="isLoading()">
+        {{ 'logs.actions.reset' | translate }}
+      </button>
+    </div>
+  </form>
+
+  <section class="logs__insights">
+    <div class="logs__card">
+      <h3>{{ 'logs.insights.actions' | translate }}</h3>
+      <ul>
+        <li *ngFor="let stat of actionStats()">
+          <div class="logs__stat-label">
+            <span>{{ stat.label }}</span>
+            <span>{{ stat.value }}</span>
+          </div>
+          <div class="logs__stat-bar">
+            <span [style.width.%]="stat.percent"></span>
+          </div>
+        </li>
+        <li *ngIf="actionStats().length === 0" class="logs__empty">
+          {{ 'logs.status.empty' | translate }}
+        </li>
+      </ul>
+    </div>
+    <div class="logs__card">
+      <h3>{{ 'logs.insights.resources' | translate }}</h3>
+      <ol>
+        <li *ngFor="let resource of resourceStats(); index as idx">
+          <span>{{ idx + 1 }}.</span>
+          <div>
+            <strong>{{ resource[0] }}</strong>
+            <p>{{ 'logs.insights.events' | translate:{ value: resource[1] } }}</p>
+          </div>
+        </li>
+        <li *ngIf="resourceStats().length === 0" class="logs__empty">
+          {{ 'logs.status.empty' | translate }}
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="logs__timeline">
+    <h2>{{ 'logs.timeline.title' | translate }}</h2>
+    <p>{{ 'logs.timeline.subtitle' | translate }}</p>
+    <div class="logs__timeline-list" *ngIf="timeline().length > 0; else noTimeline">
+      <article *ngFor="let entry of timeline()">
+        <div class="logs__timeline-icon"></div>
+        <div class="logs__timeline-body">
+          <header>
+            <strong>{{ entry.action }}</strong>
+            <span>{{ entry.relativeLabel }}</span>
+          </header>
+          <p class="logs__timeline-meta">
+            <span>{{ entry.created_at | date: 'MMM d, HH:mm:ss' }}</span>
+            <span *ngIf="entry.username">{{ 'logs.timeline.byUser' | translate:{ value: entry.username } }}</span>
+            <span>{{ 'logs.timeline.resource' | translate:{ value: entry.resource || ('logs.table.unknownResource' | translate) } }}</span>
+          </p>
+          <div class="logs__timeline-metadata" *ngIf="entry.metadata as meta">
+            <pre>{{ meta | json }}</pre>
+          </div>
+        </div>
+      </article>
+    </div>
+    <ng-template #noTimeline>
+      <p class="logs__empty">{{ 'logs.status.empty' | translate }}</p>
+    </ng-template>
+    <div class="logs__load-more" *ngIf="nextOffset() !== null">
+      <button type="button" (click)="loadMore()" [disabled]="isLoading()">
+        <span *ngIf="isLoading(); else loadLabel">{{ 'logs.actions.loadingMore' | translate }}</span>
+        <ng-template #loadLabel>{{ 'logs.actions.loadMore' | translate }}</ng-template>
+      </button>
+    </div>
+  </section>
+
+  <section class="logs__table">
+    <h2>{{ 'logs.table.title' | translate }}</h2>
+    <table *ngIf="logs().length > 0; else emptyTable">
+      <thead>
+        <tr>
+          <th>{{ 'logs.table.timestamp' | translate }}</th>
+          <th>{{ 'logs.table.user' | translate }}</th>
+          <th>{{ 'logs.table.action' | translate }}</th>
+          <th>{{ 'logs.table.resource' | translate }}</th>
+          <th>{{ 'logs.table.metadata' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let log of logs()">
+          <td>{{ log.created_at | date:'yyyy-MM-dd HH:mm:ss' }}</td>
+          <td>
+            <span *ngIf="log.username; else unknownUser">{{ log.username }}</span>
+            <ng-template #unknownUser>&mdash;</ng-template>
+          </td>
+          <td>{{ log.action }}</td>
+          <td>{{ log.resource || ('logs.table.unknownResource' | translate) }}</td>
+          <td>
+            <div class="logs__metadata" *ngIf="log.metadata; else noData">
+              <pre>{{ log.metadata | json }}</pre>
+            </div>
+            <ng-template #noData>&mdash;</ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #emptyTable>
+      <p class="logs__empty">{{ isLoading() ? ('logs.status.loading' | translate) : ('logs.status.empty' | translate) }}</p>
+    </ng-template>
+  </section>
+</section>

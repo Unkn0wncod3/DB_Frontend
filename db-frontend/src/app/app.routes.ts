@@ -11,6 +11,7 @@ import { ImprintComponent } from './features/info/imprint.component';
 import { LoginComponent } from './features/auth/login.component';
 import { ProfileComponent } from './features/profile/profile.component';
 import { UserManagementComponent } from './features/users/user-management.component';
+import { AuditLogsComponent } from './features/logs/audit-logs.component';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
 import { editorGuard } from './core/guards/editor.guard';
@@ -25,6 +26,7 @@ export const routes: Routes = [
   { path: 'entries/:type/:id', component: EntryDetailComponent, canActivate: [authGuard] },
   { path: 'explorer', component: ApiExplorerComponent, canActivate: [authGuard, adminGuard] },
   { path: 'admin/users', component: UserManagementComponent, canActivate: [authGuard, adminGuard] },
+  { path: 'admin/logs', component: AuditLogsComponent, canActivate: [authGuard, adminGuard] },
   { path: 'contact', component: ContactComponent },
   { path: 'imprint', component: ImprintComponent },
   { path: '**', redirectTo: '' }
