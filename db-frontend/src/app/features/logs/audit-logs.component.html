@@ -90,10 +90,7 @@
       <ol>
         <li *ngFor="let user of userActivityStats(); index as idx">
           <span>{{ idx + 1 }}.</span>
-          <div>
-            <strong>{{ user.user }}</strong>
-            <p>{{ user.label }}</p>
-          </div>
+          <strong>{{ user.label }}</strong>
         </li>
         <li *ngIf="userActivityStats().length === 0" class="logs__empty">
           {{ 'logs.status.empty' | translate }}

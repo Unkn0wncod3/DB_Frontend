@@ -56,7 +56,6 @@
       "resources": "Aktivste Ressourcen",
       "users": "Aktivste Nutzer",
       "events": "{{ value }} Ereignisse",
-      "userLabel": "{{user}} · {{ value }} Aktionen",
       "actionLabels": {
         "generic": "{{resource}} aufgerufen",
         "read": "{{resource}} angezeigt",
