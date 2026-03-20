@@ -481,7 +481,7 @@
       "title": "Titel",
       "status": "Status",
       "visibility": "Sichtbarkeit",
-      "ownerId": "Owner-ID",
+      "ownerId": "Besitzer",
       "comment": "Kommentar",
       "commentHelp": "Optionale Notiz, die zusammen mit der Änderung in der Historie gespeichert wird."
     },
@@ -606,7 +606,7 @@
         "title": "Titel",
         "status": "Status",
         "visibility": "Sichtbarkeit",
-        "ownerId": "Owner-ID"
+        "ownerId": "Besitzer"
       }
     }
   },

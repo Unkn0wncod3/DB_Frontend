@@ -9,7 +9,7 @@
       </p>
       <div class="entry-detail__chips" *ngIf="entry()">
         <span class="entry-detail__chip">{{ entry()?.status || ('entryDetail.status.noValue' | translate) }}</span>
-        <span class="entry-detail__chip">{{ entry()?.visibility_level }}</span>
+        <span class="entry-detail__chip">{{ ('entryDetail.visibility.' + entry()?.visibility_level) | translate }}</span>
         <span class="entry-detail__chip" *ngIf="entry()?.owner_id != null">
           {{ 'entryDetail.meta.ownerId' | translate }} {{ entry()?.owner_id }}
         </span>

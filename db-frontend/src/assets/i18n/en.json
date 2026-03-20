@@ -440,7 +440,7 @@
       "title": "Title",
       "status": "Status",
       "visibility": "Visibility",
-      "ownerId": "Owner ID",
+      "ownerId": "Owner",
       "comment": "Comment",
       "commentHelp": "Optional note stored with the history record for this update."
     },
@@ -622,7 +622,7 @@
         "title": "Title",
         "status": "Status",
         "visibility": "Visibility",
-        "ownerId": "Owner ID"
+        "ownerId": "Owner"
       }
     },
     "status": {
