@@ -318,6 +318,21 @@
   color: var(--color-primary-contrast);
 }
 
+.schema-overview__button--danger {
+  border-color: color-mix(in srgb, var(--color-danger) 50%, var(--schema-border-strong));
+  background: color-mix(in srgb, var(--color-danger) 10%, var(--schema-subtle));
+  color: var(--color-danger);
+}
+
+.schema-overview__dialog--danger {
+  width: min(34rem, 100%);
+}
+
+.schema-overview__dialog-warning {
+  color: var(--color-danger) !important;
+  font-weight: 700;
+}
+
 .schema-overview__content {
   display: grid;
   gap: 0.5rem;

@@ -36,7 +36,9 @@ export class SchemaOverviewComponent implements OnInit {
   readonly overview = this.statsService.overview;
   readonly isLoading = this.statsService.isLoading;
   readonly isSavingSchema = signal(false);
+  readonly isDeletingSchema = signal(false);
   readonly isSchemaDialogOpen = signal(false);
+  readonly isDeleteDialogOpen = signal(false);
   readonly successMessage = signal<string | null>(null);
   readonly dialogError = signal<string | null>(null);
   readonly editingSchema = signal<EntrySchema | null>(null);
@@ -139,6 +141,18 @@ export class SchemaOverviewComponent implements OnInit {
     this.dialogError.set(null);
   }
 
+  openDeleteDialog(): void {
+    if (!this.editingSchema()) {
+      return;
+    }
+
+    this.isDeleteDialogOpen.set(true);
+  }
+
+  closeDeleteDialog(): void {
+    this.isDeleteDialogOpen.set(false);
+  }
+
   async saveSchema(): Promise<void> {
     this.form.markAllAsTouched();
     if (this.form.invalid || this.isSavingSchema()) {
@@ -191,6 +205,30 @@ export class SchemaOverviewComponent implements OnInit {
       this.dialogError.set(this.describeMutationError(error));
     } finally {
       this.isSavingSchema.set(false);
+    }
+  }
+
+  async deleteSchema(): Promise<void> {
+    const schema = this.editingSchema();
+    if (!schema || this.isDeletingSchema()) {
+      return;
+    }
+
+    this.isDeletingSchema.set(true);
+    this.dialogError.set(null);
+    this.successMessage.set(null);
+
+    try {
+      await firstValueFrom(this.schemaService.deleteSchema(schema.id));
+      this.successMessage.set(this.translate.instant('schemaOverview.status.deleted', { value: schema.name }));
+      this.closeDeleteDialog();
+      this.closeSchemaDialog();
+      await this.reloadData(true);
+    } catch (error) {
+      this.dialogError.set(this.describeMutationError(error));
+      this.closeDeleteDialog();
+    } finally {
+      this.isDeletingSchema.set(false);
     }
   }
 

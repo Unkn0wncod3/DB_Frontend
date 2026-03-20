@@ -87,6 +87,15 @@ export class SchemaService {
     );
   }
 
+  deleteSchema(schemaId: string | number): Observable<EntrySchema> {
+    return this.api.request<EntrySchema>('DELETE', `/schemas/${encodeURIComponent(String(schemaId))}`).pipe(
+      map((schema) => this.normalizeSchema(schema)),
+      tap(() => {
+        this.schemas.set(this.schemas().filter((item) => String(item.id) !== String(schemaId)));
+      })
+    );
+  }
+
   createField(schemaId: string | number, payload: CreateFieldPayload): Observable<SchemaField> {
     return this.api.request<SchemaField>('POST', `/schemas/${encodeURIComponent(String(schemaId))}/fields`, { body: payload }).pipe(
       tap((field) => {

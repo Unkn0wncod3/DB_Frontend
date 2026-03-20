@@ -963,7 +963,10 @@
       "hideInactive": "Hide inactive schemas",
       "edit": "Edit schema",
       "create": "Create schema",
-      "save": "Save schema"
+      "save": "Save schema",
+      "delete": "Delete schema",
+      "deleting": "Deleting...",
+      "confirmDelete": "Delete schema"
     },
     "dialog": {
       "title": "Create schema",
@@ -980,7 +983,13 @@
     "status": {
       "empty": "No schemas available.",
       "created": "Schema {{ value }} created.",
-      "updated": "Schema {{ value }} updated."
+      "updated": "Schema {{ value }} updated.",
+      "deleted": "Schema {{ value }} deleted."
+    },
+    "deleteDialog": {
+      "title": "Delete schema?",
+      "body": "Do you really want to delete schema {{ name }} ({{ key }})?",
+      "warning": "This also removes all entries that belong to this schema."
     },
     "errors": {
       "loadFailed": "Unable to load schemas overview ({{ status }}): {{ message }}",

@@ -136,6 +136,9 @@
             <span>{{ 'schemaCreate.fields.isActive' | translate }}</span>
           </label>
           <div class="schema-overview__dialog-actions">
+            <button type="button" class="schema-overview__button schema-overview__button--danger" (click)="openDeleteDialog()">
+              {{ 'schemaOverview.actions.delete' | translate }}
+            </button>
             <button type="button" class="schema-overview__button schema-overview__button--ghost" (click)="closeSchemaDialog()">
               {{ 'schemaFields.actions.cancel' | translate }}
             </button>
@@ -155,6 +158,24 @@
           (submitted)="createSchemaFromDialog($event)"
         />
       </ng-template>
+    </section>
+  </div>
+
+  <div class="schema-overview__dialog-backdrop" *ngIf="isDeleteDialogOpen()" (click)="closeDeleteDialog()">
+    <section class="schema-overview__dialog schema-overview__dialog--danger" (click)="$event.stopPropagation()">
+      <h2>{{ 'schemaOverview.deleteDialog.title' | translate }}</h2>
+      <p>{{ 'schemaOverview.deleteDialog.body' | translate:{ name: editingSchema()?.name, key: editingSchema()?.key } }}</p>
+      <p class="schema-overview__dialog-warning">
+        {{ 'schemaOverview.deleteDialog.warning' | translate }}
+      </p>
+      <div class="schema-overview__dialog-actions">
+        <button type="button" class="schema-overview__button schema-overview__button--ghost" (click)="closeDeleteDialog()" [disabled]="isDeletingSchema()">
+          {{ 'schemaFields.actions.cancel' | translate }}
+        </button>
+        <button type="button" class="schema-overview__button schema-overview__button--danger" (click)="deleteSchema()" [disabled]="isDeletingSchema()">
+          {{ isDeletingSchema() ? ('schemaOverview.actions.deleting' | translate) : ('schemaOverview.actions.confirmDelete' | translate) }}
+        </button>
+      </div>
     </section>
   </div>
 </section>

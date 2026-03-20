@@ -971,7 +971,10 @@
       "hideInactive": "Inaktive Schemas ausblenden",
       "edit": "Schema bearbeiten",
       "create": "Schema erstellen",
-      "save": "Schema speichern"
+      "save": "Schema speichern",
+      "delete": "Schema löschen",
+      "deleting": "Lösche...",
+      "confirmDelete": "Schema löschen"
     },
     "dialog": {
       "title": "Schema erstellen",
@@ -988,7 +991,13 @@
     "status": {
       "empty": "Keine Schemas verfügbar.",
       "created": "Schema {{ value }} erstellt.",
-      "updated": "Schema {{ value }} aktualisiert."
+      "updated": "Schema {{ value }} aktualisiert.",
+      "deleted": "Schema {{ value }} gelöscht."
+    },
+    "deleteDialog": {
+      "title": "Schema löschen?",
+      "body": "Möchtest du das Schema {{ name }} ({{ key }}) wirklich löschen?",
+      "warning": "Dabei werden auch alle Einträge gelöscht, die zu diesem Schema gehören."
     },
     "errors": {
       "loadFailed": "Schema-Übersicht konnte nicht geladen werden ({{ status }}): {{ message }}",
