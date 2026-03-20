@@ -2,7 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { map, Observable, of, tap } from 'rxjs';
 
 import { ApiService } from './api.service';
-import { EntrySchema, SchemaEntriesResponse } from '../models/metadata.models';
+import { CreateSchemaPayload, EntrySchema, SchemaEntriesResponse } from '../models/metadata.models';
 import { sortSchemaFields } from '../utils/schema.utils';
 
 @Injectable({ providedIn: 'root' })
@@ -44,6 +44,13 @@ export class SchemaService {
           entries: Array.isArray(payload.entries) ? payload.entries : []
         }))
       );
+  }
+
+  createSchema(payload: CreateSchemaPayload): Observable<EntrySchema> {
+    return this.api.request<EntrySchema>('POST', '/schemas', { body: payload }).pipe(
+      map((schema) => this.normalizeSchema(schema)),
+      tap((schema) => this.schemas.set([...this.schemas(), schema]))
+    );
   }
 
   resolveSchemaByKey(key: string, schemas: EntrySchema[] = this.schemas()): EntrySchema | null {

@@ -204,7 +204,14 @@
       "createButton": "Create {{ schema }}",
       "createTitle": "Create",
       "createEntryTitle": "Create entry",
-      "createHelp": "Pick a schema directly and jump into a new entry without using a dropdown."
+      "createHelp": "Pick a schema directly and jump into a new entry without using a dropdown.",
+      "createSchemaTitle": "Create schema",
+      "createEntryHelp": "Pick a schema directly and jump into a new entry.",
+      "createSchemaHelp": "Create a new schema definition before adding fields and entries.",
+      "modeEntry": "Entry",
+      "modeSchema": "Schema",
+      "createEntryButton": "Create {{ schema }}",
+      "createSchemaButton": "Create schema"
     },
     "meta": {
       "lastUpdated": "Last updated {{ value }}"
@@ -853,6 +860,28 @@
     "rawView": {
       "show": "Show raw data",
       "hide": "Hide raw data"
+    }
+  },
+  "schemaCreate": {
+    "title": "Create schema",
+    "subtitle": "Add a new metadata schema that can later receive fields and entries.",
+    "actions": {
+      "back": "Back to dashboard",
+      "submit": "Create schema"
+    },
+    "fields": {
+      "key": "Schema key",
+      "name": "Name",
+      "description": "Description",
+      "icon": "Icon",
+      "isActive": "Active schema"
+    },
+    "hints": {
+      "key": "Use lowercase letters, numbers and underscores.",
+      "icon": "Use a lucide icon name like car-front or user-round."
+    },
+    "errors": {
+      "loadFallback": "Unable to create schema."
     }
   }
 }

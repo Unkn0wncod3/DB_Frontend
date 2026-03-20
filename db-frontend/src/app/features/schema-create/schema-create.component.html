@@ -1,0 +1,52 @@
+<section class="schema-create">
+  <header class="schema-create__header">
+    <a routerLink="/" class="schema-create__back">{{ 'schemaCreate.actions.back' | translate }}</a>
+    <div>
+      <h1>{{ 'schemaCreate.title' | translate }}</h1>
+      <p>{{ 'schemaCreate.subtitle' | translate }}</p>
+    </div>
+  </header>
+
+  <section *ngIf="errorMessage() as error" class="schema-create__alert">
+    {{ error }}
+  </section>
+
+  <form class="schema-create__form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="schema-create__grid">
+      <div class="schema-create__field">
+        <label for="schema-key">{{ 'schemaCreate.fields.key' | translate }}</label>
+        <input id="schema-key" type="text" formControlName="key" />
+        <small>{{ 'schemaCreate.hints.key' | translate }}</small>
+      </div>
+
+      <div class="schema-create__field">
+        <label for="schema-name">{{ 'schemaCreate.fields.name' | translate }}</label>
+        <input id="schema-name" type="text" formControlName="name" />
+      </div>
+
+      <div class="schema-create__field">
+        <label for="schema-icon">{{ 'schemaCreate.fields.icon' | translate }}</label>
+        <input id="schema-icon" type="text" formControlName="icon" />
+        <small>{{ 'schemaCreate.hints.icon' | translate }}</small>
+      </div>
+
+      <div class="schema-create__field schema-create__field--toggle">
+        <label>
+          <input type="checkbox" formControlName="is_active" />
+          <span>{{ 'schemaCreate.fields.isActive' | translate }}</span>
+        </label>
+      </div>
+
+      <div class="schema-create__field schema-create__field--full">
+        <label for="schema-description">{{ 'schemaCreate.fields.description' | translate }}</label>
+        <textarea id="schema-description" rows="5" formControlName="description"></textarea>
+      </div>
+    </div>
+
+    <div class="schema-create__actions">
+      <button type="submit" [disabled]="isSubmitting()">
+        {{ 'schemaCreate.actions.submit' | translate }}
+      </button>
+    </div>
+  </form>
+</section>

@@ -36,6 +36,7 @@ export class DashboardComponent implements OnInit {
   readonly latestCreated = computed(() => this.overview()?.latest_created ?? []);
   readonly latestUpdated = computed(() => this.overview()?.latest_updated ?? []);
   readonly schemaTotals = computed(() => this.overview()?.totals_per_schema ?? []);
+  readonly createMode = signal<'entry' | 'schema'>('entry');
   readonly selectedCreateType = signal('');
   readonly createTypeOptions = computed(() =>
     this.schemaTotals().map((schema) => ({
@@ -97,7 +98,16 @@ export class DashboardComponent implements OnInit {
     this.selectedCreateType.set(type);
   }
 
+  selectCreateMode(mode: 'entry' | 'schema'): void {
+    this.createMode.set(mode);
+  }
+
   startCreate(): void {
+    if (this.createMode() === 'schema') {
+      void this.router.navigate(['/schemas/new']);
+      return;
+    }
+
     const schemaKey = this.selectedCreateType();
     if (!schemaKey) {
       return;

@@ -160,6 +160,14 @@ export interface SchemaEntriesResponse {
   entries: EntryRecordWithAccess[];
 }
 
+export interface CreateSchemaPayload {
+  key: string;
+  name: string;
+  description?: string | null;
+  icon?: string | null;
+  is_active?: boolean;
+}
+
 export interface CreateEntryPayload {
   schema_id: string | number;
   title: string;

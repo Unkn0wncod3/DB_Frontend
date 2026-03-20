@@ -5,6 +5,7 @@ import { ApiExplorerComponent } from './features/api-explorer/api-explorer.compo
 import { EntryDetailComponent } from './features/entry-detail/entry-detail.component';
 import { EntryListComponent } from './features/entry-list/entry-list.component';
 import { EntryCreateComponent } from './features/entry-create/entry-create.component';
+import { SchemaCreateComponent } from './features/schema-create/schema-create.component';
 import { ActivitiesTimelineComponent } from './features/activities-timeline/activities-timeline.component';
 import { ContactComponent } from './features/info/contact.component';
 import { ImprintComponent } from './features/info/imprint.component';
@@ -15,10 +16,12 @@ import { AuditLogsComponent } from './features/logs/audit-logs.component';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
 import { editorGuard } from './core/guards/editor.guard';
+import { managerGuard } from './core/guards/manager.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: '', component: DashboardComponent },
+  { path: 'schemas/new', component: SchemaCreateComponent, canActivate: [authGuard, managerGuard] },
   { path: 'entries/:schemaKey/new', component: EntryCreateComponent, canActivate: [authGuard, editorGuard] },
   { path: 'entries/activities/timeline', component: ActivitiesTimelineComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },

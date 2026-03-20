@@ -245,7 +245,14 @@
       "createButton": "{{ schema }} erstellen",
       "createTitle": "Create",
       "createEntryTitle": "Eintrag erstellen",
-      "createHelp": "Wähle direkt ein Schema aus und starte ohne Dropdown in einen neuen Eintrag."
+      "createHelp": "Wähle direkt ein Schema aus und starte ohne Dropdown in einen neuen Eintrag.",
+      "createSchemaTitle": "Schema erstellen",
+      "createEntryHelp": "Wähle direkt ein Schema aus und starte einen neuen Eintrag.",
+      "createSchemaHelp": "Erstelle zuerst ein neues Schema, bevor du Felder und Einträge anlegst.",
+      "modeEntry": "Eintrag",
+      "modeSchema": "Schema",
+      "createEntryButton": "{{ schema }} erstellen",
+      "createSchemaButton": "Schema erstellen"
     },
     "meta": {
       "lastUpdated": "Zuletzt aktualisiert am {{ value }}"
@@ -853,6 +860,28 @@
     "rawView": {
       "show": "Rohdaten anzeigen",
       "hide": "Rohdaten ausblenden"
+    }
+  },
+  "schemaCreate": {
+    "title": "Schema erstellen",
+    "subtitle": "Lege ein neues Metadaten-Schema an, das später Felder und Einträge erhalten kann.",
+    "actions": {
+      "back": "Zurück zum Dashboard",
+      "submit": "Schema erstellen"
+    },
+    "fields": {
+      "key": "Schema-Key",
+      "name": "Name",
+      "description": "Beschreibung",
+      "icon": "Icon",
+      "isActive": "Schema aktiv"
+    },
+    "hints": {
+      "key": "Verwende nur Kleinbuchstaben, Zahlen und Unterstriche.",
+      "icon": "Nutze einen Lucide-Icon-Namen wie car-front oder user-round."
+    },
+    "errors": {
+      "loadFallback": "Schema konnte nicht erstellt werden."
     }
   }
 }
