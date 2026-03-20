@@ -16,15 +16,25 @@
   </header>
 
   <section *ngIf="createTypeOptions().length > 0 && auth.canCreateEntries()" class="dashboard__quick-create">
-    <label for="create-type-select">{{ 'dashboard.actions.createLabel' | translate }}</label>
+    <div class="dashboard__quick-create-copy">
+      <p class="dashboard__quick-create-kicker">{{ 'dashboard.actions.createTitle' | translate }}</p>
+      <h2>{{ 'dashboard.actions.createEntryTitle' | translate }}</h2>
+      <p>{{ 'dashboard.actions.createHelp' | translate }}</p>
+    </div>
     <div class="dashboard__quick-create-controls">
-      <select id="create-type-select" class="dashboard__quick-create-select" (change)="handleCreateTypeChange($event)">
-        <option *ngFor="let option of createTypeOptions()" [value]="option.type" [selected]="selectedCreateType() === option.type">
+      <div class="dashboard__quick-create-options">
+        <button
+          *ngFor="let option of createTypeOptions()"
+          type="button"
+          class="dashboard__quick-create-chip"
+          [class.dashboard__quick-create-chip--active]="selectedCreateType() === option.type"
+          (click)="selectCreateType(option.type)"
+        >
           {{ option.label }}
-        </option>
-      </select>
+        </button>
+      </div>
       <button type="button" class="dashboard__refresh" (click)="startCreate()" [disabled]="!selectedCreateType()">
-        {{ 'dashboard.actions.createButton' | translate }}
+        {{ 'dashboard.actions.createButton' | translate:{ schema: selectedCreateTypeLabel() } }}
       </button>
     </div>
   </section>

@@ -242,7 +242,10 @@
       "refresh": "Jetzt aktualisieren",
       "refreshing": "Aktualisiere...",
       "createLabel": "Neuen Eintrag erstellen für",
-      "createButton": "Eintrag erstellen"
+      "createButton": "{{ schema }} erstellen",
+      "createTitle": "Create",
+      "createEntryTitle": "Eintrag erstellen",
+      "createHelp": "Wähle direkt ein Schema aus und starte ohne Dropdown in einen neuen Eintrag."
     },
     "meta": {
       "lastUpdated": "Zuletzt aktualisiert am {{ value }}"
@@ -272,7 +275,7 @@
       "itemType": "Schema: {{ value }}",
       "itemTypeWithId": "Schema: {{ type }} (Eintrags-ID: {{ id }})",
       "itemId": "ID: {{ value }}",
-      "entryMeta": "Schema: {{ schema }} ? Status: {{ status }} ? Sichtbarkeit: {{ visibility }}",
+      "entryMeta": "Schema: {{ schema }} - Status: {{ status }} - Sichtbarkeit: {{ visibility }}",
       "lastCreatedAt": "Zuletzt erstellt {{ value }}",
       "lastUpdatedAt": "Zuletzt aktualisiert {{ value }}"
     },

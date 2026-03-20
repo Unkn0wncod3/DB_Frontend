@@ -41,6 +41,9 @@ export class DashboardComponent implements OnInit {
       label: schema.schema_name
     }))
   );
+  readonly selectedCreateTypeLabel = computed(
+    () => this.createTypeOptions().find((option) => option.type === this.selectedCreateType())?.label ?? ''
+  );
 
   readonly hasDashboardContent = computed(
     () => this.totalEntries() > 0 || this.latestCreated().length > 0 || this.latestUpdated().length > 0 || this.schemaTotals().length > 0
@@ -88,12 +91,8 @@ export class DashboardComponent implements OnInit {
     void this.statsService.loadOverview(true);
   }
 
-  handleCreateTypeChange(event: Event): void {
-    const target = event.target as HTMLSelectElement | null;
-    if (!target) {
-      return;
-    }
-    this.selectedCreateType.set(target.value);
+  selectCreateType(type: string): void {
+    this.selectedCreateType.set(type);
   }
 
   startCreate(): void {
