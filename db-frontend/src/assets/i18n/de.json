@@ -999,5 +999,41 @@
     },
     "listTitle": "{{ schema }} Felder",
     "listSubtitle": "Verwalte die Schema-Felddefinitionen für Einträge."
+  },
+  "logsHistory": {
+    "eyebrow": "Eintrags-Historie",
+    "title": "Logs",
+    "subtitle": "Durchsuche Entry-History-EintrÃ¤ge Ã¼ber alle Schemas hinweg.",
+    "actions": {
+      "refresh": "Aktualisieren",
+      "refreshing": "Aktualisiere...",
+      "reset": "Zurücksetzen"
+    },
+    "search": {
+      "label": "Suche",
+      "placeholder": "Schema, Eintrag, Kommentar, User oder geÃ¤nderte Felder suchen"
+    },
+    "labels": {
+      "visibleRows": "sichtbare Zeilen von {{ value }}"
+    },
+    "columns": {
+      "changedAt": "Geändert am",
+      "schema": "Schema",
+      "entry": "Eintrag",
+      "changeType": "Änderungstyp",
+      "changedBy": "Geändert von",
+      "visibility": "Sichtbarkeit",
+      "summary": "Geänderte Felder",
+      "comment": "Kommentar"
+    },
+    "status": {
+      "loading": "Entry-History wird geladen...",
+      "empty": "Keine History-Einträge gefunden."
+    },
+    "errors": {
+      "loadFallback": "Entry-History konnte nicht geladen werden."
+    },
+    "visibilityOnly": "Nur Sichtbarkeit geändert",
+    "noFieldChanges": "Keine Feldänderungen"
   }
 }

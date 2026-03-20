@@ -1,149 +1,78 @@
-<section class="logs">
-  <header class="logs__hero">
+<section class="logs-history">
+  <header class="logs-history__header">
     <div>
-      <p class="logs__eyebrow">{{ 'logs.eyebrow' | translate }}</p>
-      <h1>{{ 'logs.title' | translate }}</h1>
-      <p class="logs__subtitle">{{ 'logs.subtitle' | translate }}</p>
+      <p class="logs-history__eyebrow">{{ 'logsHistory.eyebrow' | translate }}</p>
+      <h1>{{ 'logsHistory.title' | translate }}</h1>
+      <p class="logs-history__subtitle">{{ 'logsHistory.subtitle' | translate }}</p>
     </div>
-    <div class="logs__hero-meta">
-      <div class="logs__hero-count">
-        <span class="logs__hero-label">{{ 'logs.meta.visible' | translate }}</span>
-        <div class="logs__hero-value">
-          <strong>{{ logs().length }}</strong>
-          <span>/ {{ total() }}</span>
-        </div>
-      </div>
-      <button type="button" class="logs__hero-button" (click)="applyFilters()" [disabled]="isLoading()">
-        <span *ngIf="isLoading(); else refreshLabel">{{ 'logs.actions.refreshing' | translate }}</span>
-        <ng-template #refreshLabel>{{ 'logs.actions.refresh' | translate }}</ng-template>
-      </button>
-      <button
-        type="button"
-        class="logs__hero-button logs__hero-button--danger"
-        (click)="openClearDialog()"
-        [disabled]="isLoading()"
-      >
-        {{ 'logs.actions.clear' | translate }}
-      </button>
-    </div>
+    <button type="button" class="logs-history__refresh" (click)="refresh()" [disabled]="isLoading()">
+      {{ (isLoading() ? 'logsHistory.actions.refreshing' : 'logsHistory.actions.refresh') | translate }}
+    </button>
   </header>
 
-  <section *ngIf="errorMessage() as error" class="logs__alert logs__alert--error">
+  <section *ngIf="errorMessage() as error" class="logs-history__alert logs-history__alert--error">
     {{ error }}
   </section>
-  <section *ngIf="successMessage() as success" class="logs__alert logs__alert--success">
-    {{ success }}
-  </section>
 
-  <form class="logs__filters" [formGroup]="filtersForm" (ngSubmit)="applyFilters()">
-    <label>
-      <span>{{ 'logs.filters.userId' | translate }}</span>
-      <input type="number" formControlName="userId" min="1" placeholder="42" />
-    </label>
-    <label>
-      <span>{{ 'logs.filters.action' | translate }}</span>
-      <input type="text" formControlName="action" placeholder="login" autocomplete="off" />
-    </label>
-    <label>
-      <span>{{ 'logs.filters.resource' | translate }}</span>
-      <input type="text" formControlName="resource" placeholder="users" autocomplete="off" />
-    </label>
-    <label>
-      <span>{{ 'logs.filters.search' | translate }}</span>
-      <input type="text" formControlName="search" placeholder="{{ 'logs.filters.searchPlaceholder' | translate }}" />
-    </label>
-    <label>
-      <span>{{ 'logs.filters.limit' | translate }}</span>
-      <input type="number" formControlName="limit" min="1" max="500" />
-    </label>
-    <div class="logs__filter-actions">
-      <button type="submit" class="logs__apply-button" [disabled]="isLoading()">
-        <span *ngIf="isLoading(); else applyLabel">{{ 'logs.actions.applying' | translate }}</span>
-        <ng-template #applyLabel>{{ 'logs.actions.apply' | translate }}</ng-template>
-      </button>
-      <button type="button" class="ghost" (click)="resetFilters()" [disabled]="isLoading()">
-        {{ 'logs.actions.reset' | translate }}
+  <section class="logs-history__panel">
+    <div class="logs-history__toolbar" [formGroup]="filtersForm">
+      <label class="logs-history__search">
+        <span>{{ 'logsHistory.search.label' | translate }}</span>
+        <input
+          type="text"
+          formControlName="search"
+          [placeholder]="'logsHistory.search.placeholder' | translate"
+        />
+      </label>
+      <button type="button" class="logs-history__reset" (click)="resetSearch()">
+        {{ 'logsHistory.actions.reset' | translate }}
       </button>
     </div>
-  </form>
 
-  <section class="logs__insights">
-    <div class="logs__card">
-      <h3>{{ 'logs.insights.actions' | translate }}</h3>
-      <ul>
-        <li *ngFor="let stat of actionStats()">
-          <div class="logs__stat-label">
-            <span>{{ stat.label }}</span>
-            <span>{{ stat.value }}</span>
-          </div>
-          <div class="logs__stat-bar">
-            <span [style.width.%]="stat.percent"></span>
-          </div>
-        </li>
-        <li *ngIf="actionStats().length === 0" class="logs__empty">
-          {{ 'logs.status.empty' | translate }}
-        </li>
-      </ul>
+    <div class="logs-history__summary">
+      <strong>{{ filteredRows().length }}</strong>
+      <span>{{ 'logsHistory.labels.visibleRows' | translate:{ value: rows().length } }}</span>
     </div>
-    <div class="logs__card">
-      <h3>{{ 'logs.insights.users' | translate }}</h3>
-      <ol>
-        <li *ngFor="let user of userActivityStats(); index as idx">
-          <span>{{ idx + 1 }}.</span>
-          <strong>{{ user.label }}</strong>
-        </li>
-        <li *ngIf="userActivityStats().length === 0" class="logs__empty">
-          {{ 'logs.status.empty' | translate }}
-        </li>
-      </ol>
+
+    <div class="logs-history__table-wrap" *ngIf="filteredRows().length > 0; else emptyState">
+      <table class="logs-history__table">
+        <thead>
+          <tr>
+            <th>{{ 'logsHistory.columns.changedAt' | translate }}</th>
+            <th>{{ 'logsHistory.columns.schema' | translate }}</th>
+            <th>{{ 'logsHistory.columns.entry' | translate }}</th>
+            <th>{{ 'logsHistory.columns.changeType' | translate }}</th>
+            <th>{{ 'logsHistory.columns.changedBy' | translate }}</th>
+            <th>{{ 'logsHistory.columns.visibility' | translate }}</th>
+            <th>{{ 'logsHistory.columns.summary' | translate }}</th>
+            <th>{{ 'logsHistory.columns.comment' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of filteredRows(); trackBy: trackRow">
+            <td>{{ row.changedAt | date:'dd/MM/yyyy, HH:mm' }}</td>
+            <td>
+              <strong>{{ row.schemaName }}</strong>
+              <div class="logs-history__muted">{{ row.schemaKey }}</div>
+            </td>
+            <td>
+              <a [routerLink]="entryLink(row)" class="logs-history__entry-link">{{ row.entryTitle }}</a>
+              <div class="logs-history__muted">#{{ row.entryId }}</div>
+            </td>
+            <td>{{ row.changeType }}</td>
+            <td>{{ row.changedBy }}</td>
+            <td>{{ row.visibility }}</td>
+            <td>{{ row.summary }}</td>
+            <td>{{ row.comment || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
-  <section class="logs__timeline">
-    <h2>{{ 'logs.timeline.title' | translate }}</h2>
-    <p>{{ 'logs.timeline.subtitle' | translate }}</p>
-    <div class="logs__timeline-list" *ngIf="timeline().length > 0; else noTimeline">
-      <article *ngFor="let entry of timeline()">
-        <div class="logs__timeline-icon"></div>
-        <div class="logs__timeline-body">
-          <header>
-            <strong>{{ entry.summary }}</strong>
-            <span>{{ entry.relativeLabel }}</span>
-          </header>
-          <p class="logs__timeline-meta">
-            <span>{{ entry.created_at | date: 'MMM d, HH:mm:ss' }}</span>
-          </p>
-          <p class="logs__timeline-detail" *ngIf="entry.detailLine">
-            {{ entry.detailLine }}
-          </p>
-        </div>
-      </article>
-    </div>
-    <ng-template #noTimeline>
-      <p class="logs__empty">{{ 'logs.status.empty' | translate }}</p>
-    </ng-template>
-    <div class="logs__load-more" *ngIf="nextOffset() !== null">
-      <button type="button" (click)="loadMore()" [disabled]="isLoading()">
-        <span *ngIf="isLoading(); else loadLabel">{{ 'logs.actions.loadingMore' | translate }}</span>
-        <ng-template #loadLabel>{{ 'logs.actions.loadMore' | translate }}</ng-template>
-      </button>
-    </div>
-  </section>
-
-  <div class="logs__modal" *ngIf="showClearDialog()">
-    <div class="logs__modal-backdrop" (click)="closeClearDialog()"></div>
-    <div class="logs__modal-dialog" role="dialog" aria-modal="true">
-      <h3>{{ 'logs.modal.title' | translate }}</h3>
-      <p>{{ 'logs.modal.body' | translate }}</p>
-      <div class="logs__modal-actions">
-        <button type="button" class="ghost" (click)="closeClearDialog()" [disabled]="isClearing()">
-          {{ 'logs.modal.cancel' | translate }}
-        </button>
-        <button type="button" class="danger" (click)="confirmClear()" [disabled]="isClearing()">
-          <span *ngIf="isClearing(); else confirmLabel">{{ 'logs.actions.clearing' | translate }}</span>
-          <ng-template #confirmLabel>{{ 'logs.modal.confirm' | translate }}</ng-template>
-        </button>
-      </div>
-    </div>
-  </div>
+  <ng-template #emptyState>
+    <section class="logs-history__empty">
+      {{ (isLoading() ? 'logsHistory.status.loading' : 'logsHistory.status.empty') | translate }}
+    </section>
+  </ng-template>
 </section>

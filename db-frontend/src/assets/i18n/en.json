@@ -999,5 +999,41 @@
     },
     "listTitle": "{{ schema }} fields",
     "listSubtitle": "Manage the schema field definitions available for entries."
+  },
+  "logsHistory": {
+    "eyebrow": "Entry history",
+    "title": "Logs",
+    "subtitle": "Search through entry history records across all schemas.",
+    "actions": {
+      "refresh": "Refresh",
+      "refreshing": "Refreshing...",
+      "reset": "Reset"
+    },
+    "search": {
+      "label": "Search",
+      "placeholder": "Search schema, entry, comment, user or changed fields"
+    },
+    "labels": {
+      "visibleRows": "visible rows of {{ value }}"
+    },
+    "columns": {
+      "changedAt": "Changed at",
+      "schema": "Schema",
+      "entry": "Entry",
+      "changeType": "Change type",
+      "changedBy": "Changed by",
+      "visibility": "Visibility",
+      "summary": "Changed fields",
+      "comment": "Comment"
+    },
+    "status": {
+      "loading": "Loading entry history...",
+      "empty": "No history entries found."
+    },
+    "errors": {
+      "loadFallback": "Unable to load entry history."
+    },
+    "visibilityOnly": "Visibility changed",
+    "noFieldChanges": "No field changes"
   }
 }
