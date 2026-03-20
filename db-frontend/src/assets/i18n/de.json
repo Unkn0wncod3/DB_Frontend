@@ -620,12 +620,17 @@
     },
     "meta": {
       "title": "Eintrags-Metadaten",
+      "help": "Kernfelder, Besitz und Standardstatus für den neuen Eintrag.",
       "fields": {
         "title": "Titel",
         "status": "Status",
         "visibility": "Sichtbarkeit",
-        "ownerId": "Besitzer"
+        "ownerId": "Owner-User-ID",
+        "ownerHelp": "Standardmäßig deine aktuelle users.id und relevant für die Besitz-Zuordnung."
       }
+    },
+    "sections": {
+      "schemaFieldsHelp": "Diese Eingaben werden direkt aus den aktiven Schema-Felddefinitionen erzeugt."
     }
   },
   "apiExplorer": {

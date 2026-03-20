@@ -1,4 +1,4 @@
-import { JsonPipe, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -9,9 +9,8 @@ import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { EntryService } from '../../core/services/entry.service';
 import { SchemaService } from '../../core/services/schema.service';
-import { CreateEntryPayload, EntrySchema, SchemaField, VisibilityLevel } from '../../core/models/metadata.models';
+import { CreateEntryPayload, EntrySchema, FieldDataType, SchemaField, VisibilityLevel } from '../../core/models/metadata.models';
 import { getFieldOptions, humanizeKey, sortSchemaFields, supportsMultiple } from '../../core/utils/schema.utils';
-import { ValueDropdownComponent } from '../../shared/components/value-dropdown/value-dropdown.component';
 
 interface FormField {
   field: SchemaField;
@@ -21,7 +20,7 @@ interface FormField {
 @Component({
   selector: 'app-entry-create',
   standalone: true,
-  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, JsonPipe, ReactiveFormsModule, RouterLink, TranslateModule, ValueDropdownComponent],
+  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterLink, TranslateModule],
   templateUrl: './entry-create.component.html',
   styleUrl: './entry-create.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -37,17 +36,36 @@ export class EntryCreateComponent {
   readonly auth = inject(AuthService);
 
   readonly isSubmitting = signal(false);
+  readonly isCreatingField = signal(false);
+  readonly isDeletingField = signal(false);
+  readonly isFieldDialogOpen = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly successMessage = signal<string | null>(null);
   readonly schema = signal<EntrySchema | null>(null);
   readonly formFields = signal<FormField[]>([]);
   readonly schemaLabel = computed(() => this.schema()?.name ?? humanizeKey(this.currentSchemaKey ?? 'entry'));
+  readonly editingField = signal<SchemaField | null>(null);
+  readonly visibilityLevels: VisibilityLevel[] = ['public', 'internal', 'restricted', 'private'];
+  readonly defaultStatusOptions = ['active', 'draft', 'review', 'inactive', 'archived'];
+  readonly fieldTypes: FieldDataType[] = ['text', 'long_text', 'integer', 'decimal', 'boolean', 'date', 'datetime', 'email', 'url', 'select', 'multi_select', 'reference', 'file', 'json'];
+  readonly statusOptions = computed(() => {
+    const current = this.metaForm.controls.status.getRawValue().trim();
+    return Array.from(new Set([current, ...this.defaultStatusOptions].filter((value) => value.length > 0)));
+  });
 
   readonly metaForm = this.fb.nonNullable.group({
     title: ['', Validators.required],
-    status: ['draft'],
-    visibility_level: ['internal'],
+    status: ['active'],
+    visibility_level: ['internal' as VisibilityLevel],
     owner_id: [''],
     comment: ['']
+  });
+  readonly createFieldForm = this.fb.nonNullable.group({
+    label: ['', [Validators.required]],
+    key: [''],
+    description: [''],
+    data_type: ['text' as FieldDataType, [Validators.required]],
+    is_required: [false]
   });
 
   form: FormGroup = this.fb.group({});
@@ -80,6 +98,164 @@ export class EntryCreateComponent {
     return supportsMultiple(field) || field.data_type === 'multi_select';
   }
 
+  metaStatusLabel(value: string): string {
+    return humanizeKey(value);
+  }
+
+  fieldLabel(field: SchemaField): string {
+    return field.label?.trim() || humanizeKey(field.key);
+  }
+
+  fieldHint(field: SchemaField): string | null {
+    return field.description?.trim() || null;
+  }
+
+  fieldControlId(field: SchemaField): string {
+    return `create-field-${field.key}`;
+  }
+
+  isWideField(field: SchemaField): boolean {
+    return field.data_type === 'long_text' || field.data_type === 'json';
+  }
+
+  isBooleanField(field: SchemaField): boolean {
+    return field.data_type === 'boolean';
+  }
+
+  openFieldDialog(): void {
+    if (!this.schema() || !this.auth.canManageSchemas()) {
+      return;
+    }
+    this.editingField.set(null);
+    this.createFieldForm.reset({ label: '', key: '', description: '', data_type: 'text', is_required: false });
+    this.isFieldDialogOpen.set(true);
+  }
+
+  editField(field: SchemaField): void {
+    if (!this.auth.canManageSchemas()) {
+      return;
+    }
+    this.editingField.set(field);
+    this.createFieldForm.reset({
+      label: field.label ?? '',
+      key: field.key ?? '',
+      description: field.description ?? '',
+      data_type: field.data_type,
+      is_required: field.is_required
+    });
+    this.isFieldDialogOpen.set(true);
+  }
+
+  closeFieldDialog(): void {
+    this.isFieldDialogOpen.set(false);
+    this.editingField.set(null);
+  }
+
+  async createField(): Promise<void> {
+    const schema = this.schema();
+    if (!schema || this.createFieldForm.invalid || this.isCreatingField()) {
+      return;
+    }
+
+    this.isCreatingField.set(true);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+    const raw = this.createFieldForm.getRawValue();
+    const label = raw.label.trim();
+    const editingField = this.editingField();
+
+    try {
+      if (editingField) {
+        await firstValueFrom(
+          this.schemaService.updateField(schema.id, editingField.id, {
+            key: raw.key.trim(),
+            label,
+            description: raw.description.trim() || null,
+            data_type: raw.data_type,
+            is_required: raw.is_required
+          })
+        );
+      } else {
+        await firstValueFrom(
+          this.schemaService.createField(schema.id, {
+            key: raw.key.trim() || this.toFieldKey(label),
+            label,
+            description: raw.description.trim() || null,
+            data_type: raw.data_type,
+            is_required: raw.is_required,
+            is_unique: false,
+            sort_order: (schema.fields?.length ?? 0) * 10 + 10,
+            is_active: true,
+            validation_json: {},
+            settings_json: {}
+          })
+        );
+      }
+
+      this.isFieldDialogOpen.set(false);
+      await this.loadSchema();
+      this.successMessage.set(
+        this.translate.instant(editingField ? 'schemaFields.status.updated' : 'schemaFields.status.created', { value: label })
+      );
+    } catch (error) {
+      this.errorMessage.set(this.describeError(error));
+    } finally {
+      this.isCreatingField.set(false);
+    }
+  }
+
+  async deleteField(field: SchemaField): Promise<void> {
+    const schema = this.schema();
+    if (!schema || !this.auth.canManageSchemas() || this.isDeletingField()) {
+      return;
+    }
+
+    this.isDeletingField.set(true);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
+    try {
+      await firstValueFrom(this.schemaService.deleteField(schema.id, field.id));
+      if (this.editingField()?.id === field.id) {
+        this.closeFieldDialog();
+      }
+      await this.loadSchema();
+      this.successMessage.set(this.translate.instant('schemaFields.status.deleted', { value: field.label || field.key }));
+    } catch (error) {
+      this.errorMessage.set(this.describeError(error));
+    } finally {
+      this.isDeletingField.set(false);
+    }
+  }
+
+  async deleteEditingField(): Promise<void> {
+    const field = this.editingField();
+    if (!field) {
+      return;
+    }
+
+    this.isFieldDialogOpen.set(false);
+    await this.deleteField(field);
+  }
+
+  fieldDialogTitle(): string {
+    return this.editingField()
+      ? this.translate.instant('schemaFields.dialog.editTitle')
+      : this.translate.instant('schemaFields.dialog.title');
+  }
+
+  fieldDialogSubtitle(): string {
+    return this.editingField()
+      ? this.translate.instant('schemaFields.dialog.editSubtitle')
+      : this.translate.instant('schemaFields.dialog.subtitle');
+  }
+
+  fieldButtonLabel(): string {
+    return this.editingField()
+      ? this.translate.instant('schemaFields.actions.save')
+      : this.translate.instant('schemaFields.actions.create');
+  }
+
   async submit(): Promise<void> {
     if (!this.schema() || this.isSubmitting() || this.metaForm.invalid || this.form.invalid) {
       this.metaForm.markAllAsTouched();
@@ -90,6 +266,7 @@ export class EntryCreateComponent {
     const payload = this.buildPayload(this.schema()!);
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
+    this.successMessage.set(null);
 
     try {
       const created = await firstValueFrom(this.entryService.createEntry(payload));
@@ -126,7 +303,13 @@ export class EntryCreateComponent {
 
       this.formFields.set(formFields);
       this.form = this.fb.group(controls);
-      this.metaForm.patchValue({ title: schema.name, status: 'draft', visibility_level: 'internal' });
+      const currentUser = this.auth.user();
+      this.metaForm.patchValue({
+        title: schema.name,
+        status: 'active',
+        visibility_level: 'internal',
+        owner_id: currentUser?.id != null ? String(currentUser.id) : ''
+      });
       this.errorMessage.set(null);
     } catch (error) {
       this.errorMessage.set(this.describeError(error));
@@ -204,5 +387,13 @@ export class EntryCreateComponent {
       return String((error as { message?: unknown }).message ?? '');
     }
     return this.translate.instant('entryCreate.errors.loadFallback');
+  }
+
+  private toFieldKey(label: string): string {
+    return label
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '');
   }
 }

@@ -636,12 +636,17 @@
     },
     "meta": {
       "title": "Entry metadata",
+      "help": "Core fields, ownership and default state for the new entry.",
       "fields": {
         "title": "Title",
         "status": "Status",
         "visibility": "Visibility",
-        "ownerId": "Owner"
+        "ownerId": "Owner user ID",
+        "ownerHelp": "Defaults to your current users.id value and controls ownership."
       }
+    },
+    "sections": {
+      "schemaFieldsHelp": "These inputs are created directly from the active schema field definitions."
     },
     "status": {
       "submitting": "Creating...",
