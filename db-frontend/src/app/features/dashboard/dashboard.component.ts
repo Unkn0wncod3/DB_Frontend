@@ -1,10 +1,12 @@
 import { DatePipe, DecimalPipe, NgFor, NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { LucideIconData, icons as lucideIcons } from 'lucide-angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AuthService } from '../../core/services/auth.service';
+import { LucideIconsModule } from '../../core/modules/lucide-icons.module';
 import {
   DashboardEntrySummary,
   DashboardSchemaTotal,
@@ -14,7 +16,7 @@ import {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgIf, NgFor, DatePipe, DecimalPipe, TranslateModule, RouterLink],
+  imports: [NgIf, NgFor, DatePipe, DecimalPipe, TranslateModule, RouterLink, LucideIconsModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -126,5 +128,26 @@ export class DashboardComponent implements OnInit {
 
   trackEntry(_index: number, item: DashboardEntrySummary): string {
     return `${item.schema_key}-${item.id}`;
+  }
+
+  resolveLucideIcon(icon: string | null | undefined): LucideIconData | null {
+    const normalized = (icon ?? '').trim();
+    if (!normalized) {
+      return null;
+    }
+
+    const key = normalized
+      .split(/[-_\s]+/)
+      .filter((part) => part.length > 0)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join('');
+
+    const match = (lucideIcons as Record<string, LucideIconData | undefined>)[key];
+    return match ?? null;
+  }
+
+  iconFallbackLabel(item: DashboardSchemaTotal): string {
+    const source = item.schema_name?.trim() || item.schema_key?.trim() || '?';
+    return source.charAt(0).toUpperCase();
   }
 }

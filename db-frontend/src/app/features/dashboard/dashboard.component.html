@@ -107,7 +107,12 @@
     <div class="dashboard__grid" *ngIf="schemaTotals().length > 0; else schemaTotalsEmpty">
       <article *ngFor="let item of schemaTotals(); trackBy: trackSchema" class="dashboard__card dashboard__card--linkable">
         <a [routerLink]="schemaLink(item)" class="dashboard__card-link">
-          <p class="dashboard__card-icon" *ngIf="item.icon">{{ item.icon }}</p>
+          <div class="dashboard__card-icon" [attr.aria-label]="item.icon || item.schema_name">
+            <lucide-angular *ngIf="resolveLucideIcon(item.icon) as icon; else iconFallback" [img]="icon" [size]="22"></lucide-angular>
+            <ng-template #iconFallback>
+              <span>{{ iconFallbackLabel(item) }}</span>
+            </ng-template>
+          </div>
           <h2>{{ item.schema_name }}</h2>
           <p class="dashboard__value">{{ item.total_entries | number }}</p>
           <p class="dashboard__recent-meta" *ngIf="item.last_created_at">

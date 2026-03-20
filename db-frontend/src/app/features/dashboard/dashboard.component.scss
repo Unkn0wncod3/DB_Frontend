@@ -159,6 +159,30 @@
   text-decoration: none;
 }
 
+.dashboard__card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-bottom: 0.9rem;
+  border-radius: 0.9rem;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(59, 130, 246, 0.2));
+  color: var(--color-primary);
+  font-size: 1.05rem;
+  font-weight: 700;
+
+  svg {
+    width: 1.35rem;
+    height: 1.35rem;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
 .dashboard__card--linkable .dashboard__card-link {
   display: block;
   color: inherit;
