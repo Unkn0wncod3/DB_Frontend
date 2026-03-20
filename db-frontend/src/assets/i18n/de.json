@@ -260,6 +260,10 @@
       "lastUpdated": "Zuletzt aktualisiert am {{ value }}"
     },
     "sections": {
+      "metadata": "Eintrags-Metadaten",
+      "metadataHelp": "Kernfelder, Besitz und Kommentar für die Historie.",
+      "schemaFieldsNamed": "{{ schema }} Felder",
+      "schemaFieldsHelp": "Diese Eingaben werden direkt aus den Felddefinitionen im Bundle erzeugt.",
       "activity": "Aktivität",
       "latest": "Neueste Änderungen",
       "recent": "Aktuelle Einträge",
@@ -355,15 +359,29 @@
       "noAttachmentAccess": "Kein Zugriff auf Anhänge.",
       "noHistory": "Keine Historieneinträge vorhanden.",
       "noPermissions": "Keine expliziten Berechtigungen vorhanden.",
-      "loadingEntry": "Eintrag wird geladen..."
+      "loadingEntry": "Eintrag wird geladen...",
+      "readOnlyShort": "Nur Lesen",
+      "noAttachments": "Keine Anhänge vorhanden.",
+      "noValue": "Kein Wert"
     },
     "sections": {
       "raw": "Rohdaten",
       "formattedData": "Formatierte Daten",
+      "formattedDataHelp": "Lesbare Werte auf Basis der Schema-Felddefinitionen.",
       "relations": "Relationen",
+      "relationsHelp": "Verknuepfte Eintraege und Metadaten der Relation.",
       "attachments": "Anhänge",
+      "attachmentsHelp": "Externe Dateien und verlinkte Ressourcen zu diesem Eintrag.",
       "history": "Historie",
-      "permissions": "Berechtigungen"
+      "historyHelp": "Aenderungen, Kommentare und Feld-Diffs.",
+      "permissions": "Berechtigungen",
+      "permissionsHelp": "Explizite Freigaben fuer diesen Eintrag."
+    },
+    "visibility": {
+      "public": "Öffentlich",
+      "internal": "Intern",
+      "restricted": "Eingeschränkt",
+      "private": "Privat"
     },
     "relations": {
       "profiles": "Profile",
@@ -464,10 +482,18 @@
       "status": "Status",
       "visibility": "Sichtbarkeit",
       "ownerId": "Owner-ID",
-      "comment": "Kommentar"
+      "comment": "Kommentar",
+      "commentHelp": "Optionale Notiz, die zusammen mit der Änderung in der Historie gespeichert wird."
     },
     "history": {
-      "by": "von {{value}}"
+      "by": "von {{value}}",
+      "visibility": "Sichtbarkeit",
+      "noFieldChanges": "Keine Feld-Änderungen protokolliert."
+    },
+    "attachments": {
+      "mimeType": "MIME-Typ",
+      "fileSize": "Dateigroesse",
+      "uploadedBy": "Hochgeladen von"
     },
     "permissions": {
       "columns": {

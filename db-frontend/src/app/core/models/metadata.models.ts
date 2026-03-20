@@ -150,6 +150,16 @@ export interface EntryAccessMap {
   manage: boolean;
 }
 
+export interface EntryBundle {
+  entry: EntryRecord;
+  schema: EntrySchema;
+  access: EntryAccessMap;
+  history: EntryHistoryRecord[];
+  relations: EntryRelationRecord[];
+  attachments: AttachmentRecord[];
+  permissions: EntryPermissionRecord[];
+}
+
 export interface EntryListParams {
   schema_id?: string | number;
   owner_id?: string | number;

@@ -310,19 +310,37 @@
       "loadingRelations": "Loading related items...",
       "noRelations": "No related entries found.",
       "readOnly": "Read-only role: you can browse data but your role cannot save changes.",
+      "readOnlyShort": "Read only",
       "noRelationAccess": "No relation access.",
       "noAttachmentAccess": "No attachment access.",
       "noHistory": "No history entries.",
       "noPermissions": "No explicit grants.",
-      "loadingEntry": "Loading entry..."
+      "loadingEntry": "Loading entry...",
+      "noAttachments": "No attachments available.",
+      "noValue": "No value"
     },
     "sections": {
+      "metadata": "Entry metadata",
+      "metadataHelp": "Core fields, ownership and update comment.",
+      "schemaFieldsNamed": "{{ schema }} fields",
+      "schemaFieldsHelp": "These inputs are generated from the schema fields returned in the bundle.",
       "raw": "Raw payload",
       "formattedData": "Formatted data",
+      "formattedDataHelp": "Readable values based on the schema field definitions.",
       "relations": "Relations",
+      "relationsHelp": "Connected entries and relation metadata.",
       "attachments": "Attachments",
+      "attachmentsHelp": "External files and linked resources for this entry.",
       "history": "History",
-      "permissions": "Permissions"
+      "historyHelp": "Recent changes, comments and field diffs.",
+      "permissions": "Permissions",
+      "permissionsHelp": "Explicit grants returned for this entry."
+    },
+    "visibility": {
+      "public": "Public",
+      "internal": "Internal",
+      "restricted": "Restricted",
+      "private": "Private"
     },
     "relations": {
       "profiles": "Profiles",
@@ -423,10 +441,18 @@
       "status": "Status",
       "visibility": "Visibility",
       "ownerId": "Owner ID",
-      "comment": "Comment"
+      "comment": "Comment",
+      "commentHelp": "Optional note stored with the history record for this update."
     },
     "history": {
-      "by": "by {{value}}"
+      "by": "by {{value}}",
+      "visibility": "Visibility",
+      "noFieldChanges": "No field changes recorded."
+    },
+    "attachments": {
+      "mimeType": "MIME type",
+      "fileSize": "File size",
+      "uploadedBy": "Uploaded by"
     },
     "permissions": {
       "columns": {

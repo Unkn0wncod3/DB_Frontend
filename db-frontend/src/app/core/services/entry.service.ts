@@ -7,6 +7,7 @@ import {
   AttachmentRecord,
   CreateEntryPayload,
   EntryAccessMap,
+  EntryBundle,
   EntryHistoryRecord,
   EntryListParams,
   EntryPermission,
@@ -93,6 +94,10 @@ export class EntryService {
   getEntry(entryIdOrSchemaKey: string | number, maybeEntryId?: string | number): Observable<EntryRecord> {
     const entryId = maybeEntryId ?? entryIdOrSchemaKey;
     return this.api.request<EntryRecord>('GET', `/entries/${encodeURIComponent(String(entryId))}`);
+  }
+
+  getEntryBundle(entryId: string | number): Observable<EntryBundle> {
+    return this.api.request<EntryBundle>('GET', `/entries/${encodeURIComponent(String(entryId))}/bundle`);
   }
 
   createEntry(payload: CreateEntryPayload): Observable<EntryRecord> {

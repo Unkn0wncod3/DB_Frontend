@@ -1,23 +1,24 @@
-import { DatePipe, JsonPipe, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { DatePipe, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { firstValueFrom, forkJoin, of } from 'rxjs';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 import { EntryService } from '../../core/services/entry.service';
-import { SchemaService } from '../../core/services/schema.service';
 import {
   AttachmentRecord,
   EntryAccessMap,
+  EntryBundle,
   EntryHistoryRecord,
   EntryPermissionRecord,
   EntryRecord,
   EntryRelationRecord,
   EntrySchema,
-  SchemaField
+  SchemaField,
+  VisibilityLevel
 } from '../../core/models/metadata.models';
 import {
   formatFieldValue,
@@ -38,7 +39,7 @@ interface DetailField {
 @Component({
   selector: 'app-entry-detail',
   standalone: true,
-  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, JsonPipe, RouterModule, DatePipe, TranslateModule],
+  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterModule, DatePipe, TranslateModule],
   templateUrl: './entry-detail.component.html',
   styleUrls: ['./entry-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -48,7 +49,6 @@ export class EntryDetailComponent {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly entryService = inject(EntryService);
-  private readonly schemaService = inject(SchemaService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly translate = inject(TranslateService);
   readonly auth = inject(AuthService);
@@ -67,16 +67,23 @@ export class EntryDetailComponent {
   readonly permissions = signal<EntryPermissionRecord[]>([]);
   readonly fields = signal<DetailField[]>([]);
   readonly referenceTitles = signal<Record<string, string>>({});
+  readonly visibilityLevels: VisibilityLevel[] = ['public', 'internal', 'restricted', 'private'];
+
   readonly entryTitle = computed(() => {
     const entry = this.entry();
     return entry ? resolveEntryTitle(entry, this.schema()) : this.translate.instant('entryDetail.labels.unknownId');
   });
   readonly canEdit = computed(() => this.access().manage || this.access().edit);
+  readonly canDelete = computed(() => this.access().manage || this.access().delete);
+  readonly schemaFieldsTitle = computed(() => {
+    const schema = this.schema();
+    return schema ? this.translate.instant('entryDetail.sections.schemaFieldsNamed', { schema: schema.name }) : '';
+  });
 
   readonly metaForm = this.fb.nonNullable.group({
     title: ['', Validators.required],
     status: [''],
-    visibility_level: ['internal'],
+    visibility_level: ['internal' as VisibilityLevel],
     owner_id: [''],
     comment: ['']
   });
@@ -90,6 +97,7 @@ export class EntryDetailComponent {
       const schemaKey = params.get('schemaKey');
       const entryId = params.get('id');
       if (!schemaKey || !entryId) {
+        this.errorMessage.set(this.translate.instant('entryDetail.errors.missingParams'));
         return;
       }
       if (schemaKey === this.currentSchemaKey && entryId === this.currentEntryId) {
@@ -116,26 +124,23 @@ export class EntryDetailComponent {
     this.successMessage.set(null);
 
     try {
-      const updated = await firstValueFrom(
+      await firstValueFrom(
         this.entryService.updateEntry(entry.id, {
           title: this.metaForm.getRawValue().title.trim(),
           status: this.access().edit_status || this.access().manage ? this.metaForm.getRawValue().status.trim() || null : undefined,
           visibility_level:
             this.access().edit_visibility || this.access().manage
-              ? (this.metaForm.getRawValue().visibility_level as EntryRecord['visibility_level'])
+              ? (this.metaForm.getRawValue().visibility_level as VisibilityLevel)
               : undefined,
           owner_id: this.metaForm.getRawValue().owner_id.trim() || null,
           comment: this.metaForm.getRawValue().comment.trim() || null,
           data_json: this.buildDataJson()
         })
       );
+      await this.load();
       this.successMessage.set(this.translate.instant('entryDetail.status.saved'));
-      this.entry.set(updated);
-      this.rebuildForms(updated, this.schema());
-      await this.loadSecondaryData(updated.id);
-      this.applyFormAccessState();
     } catch (error) {
-      this.errorMessage.set(this.describeError(error));
+      this.errorMessage.set(this.describeError(error, 'save'));
     } finally {
       this.isSaving.set(false);
     }
@@ -143,15 +148,15 @@ export class EntryDetailComponent {
 
   async deleteEntry(): Promise<void> {
     const entry = this.entry();
-    if (!entry || !(this.access().delete || this.access().manage)) {
+    if (!entry || !this.canDelete()) {
       return;
     }
 
     try {
       await firstValueFrom(this.entryService.softDeleteEntry(entry.id, this.metaForm.getRawValue().comment.trim()));
-      await this.router.navigate(['/entries', this.currentSchemaKey]);
+      await this.router.navigate(['/entries', this.schema()?.key ?? this.currentSchemaKey ?? '']);
     } catch (error) {
-      this.errorMessage.set(this.describeError(error));
+      this.errorMessage.set(this.describeError(error, 'delete'));
     }
   }
 
@@ -179,32 +184,88 @@ export class EntryDetailComponent {
     return getFieldOptions(field);
   }
 
-  renderFieldValue(field: SchemaField): string {
-    const value = getFieldValue(this.entry()!, field);
-    return formatFieldValue(value, field);
+  fieldLabel(field: SchemaField): string {
+    return field.label?.trim() || humanizeKey(field.key);
+  }
+
+  fieldHint(field: SchemaField): string | null {
+    const description = field.description?.trim();
+    return description ? description : null;
+  }
+
+  fieldControlId(field: SchemaField): string {
+    return `entry-field-${field.key}`;
+  }
+
+  isWideField(field: SchemaField): boolean {
+    return field.data_type === 'long_text' || field.data_type === 'json' || supportsMultiple(field);
+  }
+
+  isBooleanField(field: SchemaField): boolean {
+    return field.data_type === 'boolean';
+  }
+
+  summaryValue(field: SchemaField): string {
+    const detailField = this.fields().find((item) => item.field.key === field.key);
+    if (!detailField) {
+      return '';
+    }
+
+    const displayValue = this.coerceDisplayValue(field, detailField.control.value);
+    if (field.data_type === 'reference' && !supportsMultiple(field) && displayValue != null) {
+      const key = String(displayValue);
+      return this.referenceTitles()[key] ?? key;
+    }
+
+    if ((field.data_type === 'reference' || field.data_type === 'file') && supportsMultiple(field) && Array.isArray(displayValue)) {
+      return displayValue.map((item) => String(item)).join(', ');
+    }
+
+    if (field.data_type === 'date') {
+      return this.formatReadableDate(displayValue, false);
+    }
+
+    if (field.data_type === 'datetime') {
+      return this.formatReadableDate(displayValue, true);
+    }
+
+    return formatFieldValue(displayValue, field);
   }
 
   renderHistoryDiff(record: EntryHistoryRecord): string[] {
     const before = record.old_data_json ?? {};
     const after = record.new_data_json ?? {};
     const keys = Array.from(new Set([...Object.keys(before), ...Object.keys(after)]));
-    return keys
+    const diffs = keys
       .filter((key) => JSON.stringify(before[key]) !== JSON.stringify(after[key]))
-      .map((key) => `${humanizeKey(key)}: ${formatFieldValue(before[key])} -> ${formatFieldValue(after[key])}`);
+      .map((key) => {
+        const label = this.labelForHistoryKey(key);
+        const previous = formatFieldValue(before[key]);
+        const next = formatFieldValue(after[key]);
+        return `${label}: ${previous || '-'} -> ${next || '-'}`;
+      });
+
+    if (record.old_visibility_level !== record.new_visibility_level) {
+      diffs.push(
+        `${this.translate.instant('entryDetail.history.visibility')}: ${record.old_visibility_level ?? '-'} -> ${
+          record.new_visibility_level ?? '-'
+        }`
+      );
+    }
+
+    return diffs;
   }
 
-  referenceLink(field: SchemaField): string[] | null {
-    const rawValue = getFieldValue(this.entry()!, field);
+  referenceLink(field: SchemaField, value: unknown): string[] | null {
     const schemaKey = getReferenceSchemaKey(field);
-    if (!schemaKey || (typeof rawValue !== 'string' && typeof rawValue !== 'number')) {
+    if (!schemaKey || (typeof value !== 'string' && typeof value !== 'number')) {
       return null;
     }
-    return ['/entries', schemaKey, String(rawValue)];
+    return ['/entries', schemaKey, String(value)];
   }
 
-  referenceLabel(field: SchemaField): string {
-    const rawValue = getFieldValue(this.entry()!, field);
-    const id = String(rawValue ?? '').trim();
+  referenceLabel(value: unknown): string {
+    const id = String(value ?? '').trim();
     return this.referenceTitles()[id] ?? id;
   }
 
@@ -213,8 +274,12 @@ export class EntryDetailComponent {
     return candidate && candidate.trim().length > 0 ? candidate : null;
   }
 
+  relationMetadata(relation: EntryRelationRecord): string {
+    return relation.metadata_json ? JSON.stringify(relation.metadata_json, null, 2) : '';
+  }
+
   private async load(): Promise<void> {
-    if (!this.currentEntryId || !this.currentSchemaKey) {
+    if (!this.currentEntryId) {
       return;
     }
 
@@ -222,43 +287,43 @@ export class EntryDetailComponent {
     this.errorMessage.set(null);
 
     try {
-      const entry = await firstValueFrom(this.entryService.getEntry(this.currentEntryId));
-      const schema = await this.resolveSchema(entry.schema_id, this.currentSchemaKey);
-      this.entry.set(entry);
-      this.schema.set(schema);
-      this.rebuildForms(entry, schema);
-      await this.loadSecondaryData(entry.id);
-      this.applyFormAccessState();
-      await this.loadReferenceTitles(entry, schema);
+      const bundle = await firstValueFrom(this.entryService.getEntryBundle(this.currentEntryId));
+      this.applyBundle(bundle);
+      await this.loadReferenceTitles(bundle.entry, bundle.schema);
     } catch (error) {
-      this.errorMessage.set(this.describeError(error));
+      this.errorMessage.set(this.describeError(error, 'load'));
     } finally {
       this.isLoading.set(false);
     }
   }
 
-  private async resolveSchema(schemaId: string | number, schemaKey: string): Promise<EntrySchema | null> {
-    const schemas = await firstValueFrom(this.schemaService.loadSchemas());
-    const cached = schemas.find((item) => String(item.id) === String(schemaId) || item.key === schemaKey) ?? null;
-    if (cached) {
-      return cached;
-    }
-    return await firstValueFrom(this.schemaService.getSchema(schemaId));
+  private applyBundle(bundle: EntryBundle): void {
+    this.entry.set(bundle.entry);
+    this.schema.set(bundle.schema);
+    this.access.set({ ...this.emptyAccess(), ...(bundle.access ?? this.emptyAccess()) });
+    this.history.set(bundle.history ?? []);
+    this.relations.set(bundle.relations ?? []);
+    this.attachments.set(bundle.attachments ?? []);
+    this.permissions.set(bundle.permissions ?? []);
+    this.rebuildForms(bundle.entry, bundle.schema);
   }
 
   private rebuildForms(entry: EntryRecord, schema: EntrySchema | null): void {
-    this.metaForm.patchValue({
-      title: entry.title,
-      status: entry.status ?? '',
-      visibility_level: entry.visibility_level,
-      owner_id: entry.owner_id != null ? String(entry.owner_id) : '',
-      comment: ''
-    });
+    this.metaForm.reset(
+      {
+        title: entry.title ?? '',
+        status: entry.status ?? '',
+        visibility_level: entry.visibility_level ?? 'internal',
+        owner_id: entry.owner_id != null ? String(entry.owner_id) : '',
+        comment: ''
+      },
+      { emitEvent: false }
+    );
 
     const controls: Record<string, FormControl<unknown>> = {};
     const fields = sortSchemaFields(schema?.fields ?? []).map<DetailField>((field) => {
       const validators = field.is_required ? [Validators.required] : [];
-      const control = this.fb.control(getFieldValue(entry, field), validators);
+      const control = this.fb.control(this.prepareFieldControlValue(entry, field), validators);
       controls[field.key] = control;
       return { field, control };
     });
@@ -266,36 +331,6 @@ export class EntryDetailComponent {
     this.fields.set(fields);
     this.form = this.fb.group(controls);
     this.applyFormAccessState();
-  }
-
-  private async loadSecondaryData(entryId: string | number): Promise<void> {
-    const access = await firstValueFrom(this.entryService.loadAccessMap(entryId));
-    this.access.set(access);
-
-    const loaders = {
-      relations: access.manage_relations || access.read ? this.entryService.getRelations(entryId) : null,
-      attachments: access.manage_attachments || access.read ? this.entryService.getAttachments(entryId) : null,
-      history: access.view_history || access.manage ? this.entryService.getHistory(entryId) : null,
-      permissions: access.manage_permissions || access.manage ? this.entryService.getPermissions(entryId) : null
-    };
-
-    const requests = forkJoin({
-      relations: loaders.relations ?? of([] as EntryRelationRecord[]),
-      attachments: loaders.attachments ?? of([] as AttachmentRecord[]),
-      history: loaders.history ?? of([] as EntryHistoryRecord[]),
-      permissions: loaders.permissions ?? of([] as EntryPermissionRecord[])
-    });
-
-    const result: {
-      relations: EntryRelationRecord[];
-      attachments: AttachmentRecord[];
-      history: EntryHistoryRecord[];
-      permissions: EntryPermissionRecord[];
-    } = await firstValueFrom(requests);
-    this.relations.set(result.relations);
-    this.attachments.set(result.attachments);
-    this.history.set(result.history);
-    this.permissions.set(result.permissions);
   }
 
   private applyFormAccessState(): void {
@@ -307,6 +342,7 @@ export class EntryDetailComponent {
 
     this.metaForm.enable({ emitEvent: false });
     this.form.enable({ emitEvent: false });
+    this.metaForm.controls.comment.enable({ emitEvent: false });
 
     if (!(this.access().edit_status || this.access().manage)) {
       this.metaForm.controls.status.disable({ emitEvent: false });
@@ -360,7 +396,56 @@ export class EntryDetailComponent {
     }, {});
   }
 
+  private prepareFieldControlValue(entry: EntryRecord, field: SchemaField): unknown {
+    const value = getFieldValue(entry, field);
+    if (value == null) {
+      if (field.data_type === 'boolean') {
+        return false;
+      }
+      if (supportsMultiple(field)) {
+        return [];
+      }
+      return '';
+    }
+
+    if (field.data_type === 'json') {
+      return this.stringifyJson(value);
+    }
+
+    if (field.data_type === 'date') {
+      return this.toDateInputValue(value);
+    }
+
+    if (field.data_type === 'datetime') {
+      return this.toDateTimeInputValue(value);
+    }
+
+    if (field.data_type === 'boolean') {
+      return this.toBoolean(value);
+    }
+
+    if (field.data_type === 'multi_select' || ((field.data_type === 'reference' || field.data_type === 'file') && supportsMultiple(field))) {
+      return this.toArrayValue(value);
+    }
+
+    return value;
+  }
+
   private normalizeFieldValue(field: SchemaField, value: unknown): unknown {
+    if (field.data_type === 'boolean') {
+      return this.toBoolean(value);
+    }
+
+    if (field.data_type === 'multi_select') {
+      const values = this.toArrayValue(value);
+      return values.length > 0 || field.is_required ? values : undefined;
+    }
+
+    if ((field.data_type === 'reference' || field.data_type === 'file') && supportsMultiple(field)) {
+      const values = this.toArrayValue(value);
+      return values.length > 0 || field.is_required ? values : undefined;
+    }
+
     if (value === '' || value === null || value === undefined) {
       return field.is_required ? value : undefined;
     }
@@ -370,22 +455,115 @@ export class EntryDetailComponent {
         return Number.parseInt(String(value), 10);
       case 'decimal':
         return Number.parseFloat(String(value));
-      case 'boolean':
-        return Boolean(value);
       case 'json':
         return typeof value === 'string' ? JSON.parse(value) : value;
-      case 'multi_select':
-        return Array.isArray(value) ? value : String(value).split(',').map((item) => item.trim()).filter(Boolean);
       case 'datetime':
         return typeof value === 'string' && value.length > 0 ? new Date(value).toISOString() : value;
       case 'reference':
       case 'file':
-        if (supportsMultiple(field)) {
-          return Array.isArray(value) ? value : String(value).split(',').map((item) => item.trim()).filter(Boolean);
-        }
         return String(value).trim();
       default:
         return typeof value === 'string' ? value.trim() : value;
+    }
+  }
+
+  private coerceDisplayValue(field: SchemaField, value: unknown): unknown {
+    if (value === '' || value === null || value === undefined) {
+      return null;
+    }
+
+    if (field.data_type === 'json' && typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return value;
+      }
+    }
+
+    if (field.data_type === 'multi_select') {
+      return this.toArrayValue(value);
+    }
+
+    if ((field.data_type === 'reference' || field.data_type === 'file') && supportsMultiple(field)) {
+      return this.toArrayValue(value);
+    }
+
+    return value;
+  }
+
+  private labelForHistoryKey(key: string): string {
+    const match = this.schema()?.fields.find((field) => field.key === key);
+    return match ? this.fieldLabel(match) : humanizeKey(key);
+  }
+
+  private formatReadableDate(value: unknown, withTime: boolean): string {
+    if (typeof value !== 'string' || value.trim().length === 0) {
+      return '';
+    }
+
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+      return value;
+    }
+
+    return new Intl.DateTimeFormat(this.translate.currentLang || undefined, {
+      dateStyle: 'medium',
+      ...(withTime ? { timeStyle: 'short' } : {})
+    }).format(parsed);
+  }
+
+  private toDateInputValue(value: unknown): string {
+    const parsed = new Date(String(value));
+    if (Number.isNaN(parsed.getTime())) {
+      return String(value);
+    }
+    return parsed.toISOString().slice(0, 10);
+  }
+
+  private toDateTimeInputValue(value: unknown): string {
+    const parsed = new Date(String(value));
+    if (Number.isNaN(parsed.getTime())) {
+      return String(value);
+    }
+    const year = parsed.getFullYear();
+    const month = `${parsed.getMonth() + 1}`.padStart(2, '0');
+    const day = `${parsed.getDate()}`.padStart(2, '0');
+    const hours = `${parsed.getHours()}`.padStart(2, '0');
+    const minutes = `${parsed.getMinutes()}`.padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  private toArrayValue(value: unknown): string[] {
+    if (Array.isArray(value)) {
+      return value.map((item) => String(item)).filter((item) => item.trim().length > 0);
+    }
+    if (typeof value === 'string') {
+      return value
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0);
+    }
+    return value == null ? [] : [String(value)];
+  }
+
+  private toBoolean(value: unknown): boolean {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+    if (typeof value === 'number') {
+      return value !== 0;
+    }
+    if (typeof value === 'string') {
+      return ['true', '1', 'yes', 'on'].includes(value.trim().toLowerCase());
+    }
+    return false;
+  }
+
+  private stringifyJson(value: unknown): string {
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch {
+      return String(value);
     }
   }
 
@@ -404,13 +582,18 @@ export class EntryDetailComponent {
     };
   }
 
-  private describeError(error: unknown): string {
-    if (error instanceof Error) {
-      return error.message;
+  private describeError(error: unknown, action: 'load' | 'save' | 'delete'): string {
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'object' && error !== null && 'message' in error
+          ? String((error as { message?: unknown }).message ?? '')
+          : '';
+
+    if (!message) {
+      return this.translate.instant('entryDetail.errors.loadFallback');
     }
-    if (typeof error === 'object' && error !== null && 'message' in error) {
-      return String((error as { message?: unknown }).message ?? '');
-    }
-    return this.translate.instant('entryDetail.errors.loadFallback');
+
+    return this.translate.instant(`entryDetail.errors.${action}Failed`, { message });
   }
 }

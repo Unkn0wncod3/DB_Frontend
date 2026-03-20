@@ -1,20 +1,35 @@
 <section class="entry-detail">
-  <header class="entry-detail__header">
-    <div class="entry-detail__title">
+  <header class="entry-detail__hero">
+    <div class="entry-detail__hero-copy">
       <a routerLink="/" class="entry-detail__back">{{ 'entryDetail.actions.back' | translate }}</a>
+      <p class="entry-detail__eyebrow" *ngIf="schema() as currentSchema">{{ currentSchema.name }}</p>
       <h1>{{ entry() ? entryTitle() : ('entryDetail.labels.unknownId' | translate) }}</h1>
-      <p *ngIf="schema() as currentSchema">
+      <p class="entry-detail__lede" *ngIf="schema() as currentSchema">
         {{ 'entryDetail.labels.schemaWithId' | translate:{ schema: currentSchema.name, id: entry()?.id } }}
       </p>
+      <div class="entry-detail__chips" *ngIf="entry()">
+        <span class="entry-detail__chip">{{ entry()?.status || ('entryDetail.status.noValue' | translate) }}</span>
+        <span class="entry-detail__chip">{{ entry()?.visibility_level }}</span>
+        <span class="entry-detail__chip" *ngIf="entry()?.owner_id != null">
+          {{ 'entryDetail.meta.ownerId' | translate }} {{ entry()?.owner_id }}
+        </span>
+      </div>
       <p class="entry-detail__meta" *ngIf="entry()">
-        {{ 'entryDetail.labels.createdAt' | translate }} {{ entry()?.created_at | date:'dd/MM/yyyy, HH:mm' }}
-        <span *ngIf="entry()?.updated_at"> &middot; {{ 'entryDetail.labels.updatedAt' | translate }} {{ entry()?.updated_at | date:'dd/MM/yyyy, HH:mm' }}</span>
+        <span>{{ 'entryDetail.labels.createdAt' | translate }} {{ entry()?.created_at | date:'dd/MM/yyyy, HH:mm' }}</span>
+        <span *ngIf="entry()?.updated_at">{{ 'entryDetail.labels.updatedAt' | translate }} {{ entry()?.updated_at | date:'dd/MM/yyyy, HH:mm' }}</span>
       </p>
     </div>
-    <div class="entry-detail__actions">
-      <button type="button" (click)="refresh()" [disabled]="isLoading()">{{ 'entryDetail.actions.refresh' | translate }}</button>
-      <button type="button" *ngIf="canEdit()" (click)="save()" [disabled]="isSaving()">{{ 'entryDetail.actions.save' | translate }}</button>
-      <button type="button" *ngIf="access().delete || access().manage" (click)="deleteEntry()">{{ 'entryDetail.actions.delete' | translate }}</button>
+
+    <div class="entry-detail__hero-actions">
+      <button type="button" class="entry-detail__button entry-detail__button--ghost" (click)="refresh()" [disabled]="isLoading()">
+        {{ 'entryDetail.actions.refresh' | translate }}
+      </button>
+      <button type="button" class="entry-detail__button entry-detail__button--primary" *ngIf="canEdit()" (click)="save()" [disabled]="isSaving()">
+        {{ 'entryDetail.actions.save' | translate }}
+      </button>
+      <button type="button" class="entry-detail__button entry-detail__button--danger" *ngIf="canDelete()" (click)="deleteEntry()">
+        {{ 'entryDetail.actions.delete' | translate }}
+      </button>
     </div>
   </header>
 
@@ -25,156 +40,274 @@
     {{ success }}
   </section>
 
-  <section *ngIf="entry(); else loadingState" class="entry-detail__content">
-    <form class="entry-detail__form" [formGroup]="metaForm">
-      <div class="entry-detail__grid">
-        <div class="entry-detail__field">
-          <label for="entry-title">{{ 'entryDetail.meta.title' | translate }}</label>
-          <input id="entry-title" type="text" formControlName="title" />
-        </div>
-        <div class="entry-detail__field">
-          <label for="entry-status">{{ 'entryDetail.meta.status' | translate }}</label>
-          <input id="entry-status" type="text" formControlName="status" />
-        </div>
-        <div class="entry-detail__field">
-          <label for="entry-visibility">{{ 'entryDetail.meta.visibility' | translate }}</label>
-          <select id="entry-visibility" formControlName="visibility_level">
-            <option value="public">public</option>
-            <option value="internal">internal</option>
-            <option value="private">private</option>
-            <option value="restricted">restricted</option>
-          </select>
-        </div>
-        <div class="entry-detail__field">
-          <label for="entry-owner">{{ 'entryDetail.meta.ownerId' | translate }}</label>
-          <input id="entry-owner" type="text" formControlName="owner_id" />
-        </div>
-        <div class="entry-detail__field entry-detail__field--full">
-          <label for="entry-comment">{{ 'entryDetail.meta.comment' | translate }}</label>
-          <textarea id="entry-comment" rows="3" formControlName="comment"></textarea>
-        </div>
-      </div>
-    </form>
+  <section *ngIf="entry(); else loadingState" class="entry-detail__body">
+    <div class="entry-detail__editor-grid">
+      <article class="entry-detail__panel">
+        <header class="entry-detail__panel-header">
+          <div>
+            <h2>{{ 'entryDetail.sections.metadata' | translate }}</h2>
+            <p>{{ 'entryDetail.sections.metadataHelp' | translate }}</p>
+          </div>
+          <span class="entry-detail__state-badge" *ngIf="!canEdit()">{{ 'entryDetail.status.readOnlyShort' | translate }}</span>
+        </header>
 
-    <form class="entry-detail__form" [formGroup]="form">
-      <div class="entry-detail__grid">
-        <div *ngFor="let item of fields(); trackBy: trackField" class="entry-detail__field">
-          <label [attr.for]="item.field.key">{{ item.field.label || item.field.key }}</label>
-          <small *ngIf="item.field.description">{{ item.field.description }}</small>
+        <form class="entry-detail__form entry-detail__form--meta" [formGroup]="metaForm">
+          <div class="entry-detail__field-card">
+            <label for="entry-title">{{ 'entryDetail.meta.title' | translate }}</label>
+            <input id="entry-title" type="text" formControlName="title" />
+          </div>
 
-          <ng-container [ngSwitch]="item.field.data_type">
-            <textarea *ngSwitchCase="'long_text'" [id]="item.field.key" [formControl]="item.control" rows="5"></textarea>
-            <textarea *ngSwitchCase="'json'" [id]="item.field.key" [formControl]="item.control" rows="8"></textarea>
-            <input *ngSwitchCase="'integer'" type="number" [id]="item.field.key" [formControl]="item.control" step="1" />
-            <input *ngSwitchCase="'decimal'" type="number" [id]="item.field.key" [formControl]="item.control" step="0.01" />
-            <input *ngSwitchCase="'boolean'" type="checkbox" [id]="item.field.key" [formControl]="item.control" />
-            <input *ngSwitchCase="'date'" type="date" [id]="item.field.key" [formControl]="item.control" />
-            <input *ngSwitchCase="'datetime'" type="datetime-local" [id]="item.field.key" [formControl]="item.control" />
-            <input *ngSwitchCase="'email'" type="email" [id]="item.field.key" [formControl]="item.control" />
-            <input *ngSwitchCase="'url'" type="url" [id]="item.field.key" [formControl]="item.control" />
-            <select *ngSwitchCase="'select'" [id]="item.field.key" [formControl]="item.control">
-              <option value="">-</option>
-              <option *ngFor="let option of fieldOptions(item.field)" [value]="option.value">{{ option.label }}</option>
+          <div class="entry-detail__field-card">
+            <label for="entry-status">{{ 'entryDetail.meta.status' | translate }}</label>
+            <input id="entry-status" type="text" formControlName="status" />
+          </div>
+
+          <div class="entry-detail__field-card">
+            <label for="entry-visibility">{{ 'entryDetail.meta.visibility' | translate }}</label>
+            <select id="entry-visibility" formControlName="visibility_level">
+              <option *ngFor="let level of visibilityLevels" [value]="level">
+                {{ ('entryDetail.visibility.' + level) | translate }}
+              </option>
             </select>
-            <select *ngSwitchCase="'multi_select'" [id]="item.field.key" [formControl]="item.control" [attr.multiple]="true">
-              <option *ngFor="let option of fieldOptions(item.field)" [value]="option.value">{{ option.label }}</option>
-            </select>
-            <ng-container *ngSwitchCase="'reference'">
-              <input type="text" [id]="item.field.key" [formControl]="item.control" />
-              <a *ngIf="referenceLink(item.field) as link" [routerLink]="link">{{ referenceLabel(item.field) }}</a>
-            </ng-container>
-            <input *ngSwitchDefault type="text" [id]="item.field.key" [formControl]="item.control" />
-          </ng-container>
-        </div>
-      </div>
-    </form>
+          </div>
 
-    <section class="entry-detail__panel">
-      <h2>{{ 'entryDetail.sections.formattedData' | translate }}</h2>
+          <div class="entry-detail__field-card">
+            <label for="entry-owner">{{ 'entryDetail.meta.ownerId' | translate }}</label>
+            <input id="entry-owner" type="text" formControlName="owner_id" />
+          </div>
+
+          <div class="entry-detail__field-card entry-detail__field-card--full">
+            <label for="entry-comment">{{ 'entryDetail.meta.comment' | translate }}</label>
+            <p class="entry-detail__field-help">{{ 'entryDetail.meta.commentHelp' | translate }}</p>
+            <textarea id="entry-comment" rows="4" formControlName="comment"></textarea>
+          </div>
+        </form>
+      </article>
+
+      <article class="entry-detail__panel" *ngIf="fields().length > 0">
+        <header class="entry-detail__panel-header">
+          <div>
+            <h2>{{ schemaFieldsTitle() }}</h2>
+            <p>{{ 'entryDetail.sections.schemaFieldsHelp' | translate }}</p>
+          </div>
+        </header>
+
+        <form class="entry-detail__form" [formGroup]="form">
+          <div class="entry-detail__field-grid">
+            <div
+              *ngFor="let item of fields(); trackBy: trackField"
+              class="entry-detail__field-card"
+              [class.entry-detail__field-card--full]="isWideField(item.field)"
+              [class.entry-detail__field-card--boolean]="isBooleanField(item.field)"
+            >
+              <ng-container *ngIf="item.field.data_type === 'boolean'; else defaultField">
+                <label class="entry-detail__checkbox" [attr.for]="fieldControlId(item.field)">
+                  <input type="checkbox" [id]="fieldControlId(item.field)" [formControl]="item.control" />
+                  <span>{{ fieldLabel(item.field) }}</span>
+                </label>
+                <p class="entry-detail__field-help" *ngIf="fieldHint(item.field) as hint">{{ hint }}</p>
+              </ng-container>
+
+              <ng-template #defaultField>
+                <label [attr.for]="fieldControlId(item.field)">{{ fieldLabel(item.field) }}</label>
+                <p class="entry-detail__field-help" *ngIf="fieldHint(item.field) as hint">{{ hint }}</p>
+
+                <ng-container [ngSwitch]="item.field.data_type">
+                  <textarea *ngSwitchCase="'long_text'" [id]="fieldControlId(item.field)" [formControl]="item.control" rows="6"></textarea>
+                  <textarea *ngSwitchCase="'json'" [id]="fieldControlId(item.field)" [formControl]="item.control" rows="8"></textarea>
+                  <input *ngSwitchCase="'integer'" type="number" [id]="fieldControlId(item.field)" [formControl]="item.control" step="1" />
+                  <input *ngSwitchCase="'decimal'" type="number" [id]="fieldControlId(item.field)" [formControl]="item.control" step="0.01" />
+                  <input *ngSwitchCase="'date'" type="date" [id]="fieldControlId(item.field)" [formControl]="item.control" />
+                  <input *ngSwitchCase="'datetime'" type="datetime-local" [id]="fieldControlId(item.field)" [formControl]="item.control" />
+                  <input *ngSwitchCase="'email'" type="email" [id]="fieldControlId(item.field)" [formControl]="item.control" />
+                  <input *ngSwitchCase="'url'" type="url" [id]="fieldControlId(item.field)" [formControl]="item.control" />
+
+                  <select *ngSwitchCase="'select'" [id]="fieldControlId(item.field)" [formControl]="item.control">
+                    <option value="">{{ 'entryDetail.form.selectPlaceholder' | translate }}</option>
+                    <option *ngFor="let option of fieldOptions(item.field)" [value]="option.value">{{ option.label }}</option>
+                  </select>
+
+                  <select *ngSwitchCase="'multi_select'" [id]="fieldControlId(item.field)" [formControl]="item.control" multiple>
+                    <option *ngFor="let option of fieldOptions(item.field)" [value]="option.value">{{ option.label }}</option>
+                  </select>
+
+                  <div *ngSwitchCase="'reference'" class="entry-detail__reference-field">
+                    <input type="text" [id]="fieldControlId(item.field)" [formControl]="item.control" />
+                    <a
+                      *ngIf="referenceLink(item.field, item.control.value) as link"
+                      class="entry-detail__reference-link"
+                      [routerLink]="link"
+                    >
+                      {{ referenceLabel(item.control.value) }}
+                    </a>
+                  </div>
+
+                  <input *ngSwitchDefault type="text" [id]="fieldControlId(item.field)" [formControl]="item.control" />
+                </ng-container>
+              </ng-template>
+            </div>
+          </div>
+        </form>
+      </article>
+    </div>
+
+    <section class="entry-detail__panel" *ngIf="fields().length > 0">
+      <header class="entry-detail__panel-header">
+        <div>
+          <h2>{{ 'entryDetail.sections.formattedData' | translate }}</h2>
+          <p>{{ 'entryDetail.sections.formattedDataHelp' | translate }}</p>
+        </div>
+      </header>
+
       <div class="entry-detail__summary-grid">
-        <div *ngFor="let item of fields(); trackBy: trackField" class="entry-detail__summary-item">
-          <strong>{{ item.field.label || item.field.key }}</strong>
-          <span>{{ renderFieldValue(item.field) }}</span>
-        </div>
+        <article *ngFor="let item of fields(); trackBy: trackField" class="entry-detail__summary-card">
+          <p class="entry-detail__summary-label">{{ fieldLabel(item.field) }}</p>
+          <div class="entry-detail__summary-value" [class.entry-detail__summary-value--code]="item.field.data_type === 'json'">
+            {{ summaryValue(item.field) || ('entryDetail.status.noValue' | translate) }}
+          </div>
+        </article>
       </div>
     </section>
 
     <section class="entry-detail__panel" *ngIf="relations().length > 0 || access().manage_relations || access().manage">
-      <h2>{{ 'entryDetail.sections.relations' | translate }}</h2>
-      <p *ngIf="!(access().manage_relations || access().manage) && relations().length === 0">{{ 'entryDetail.status.noRelationAccess' | translate }}</p>
-      <table *ngIf="relations().length > 0">
-        <thead>
-          <tr>
-            <th>{{ 'entryDetail.relations.columns.type' | translate }}</th>
-            <th>{{ 'entryDetail.relations.columns.from' | translate }}</th>
-            <th>{{ 'entryDetail.relations.columns.to' | translate }}</th>
-            <th>{{ 'entryDetail.relations.columns.order' | translate }}</th>
-            <th>{{ 'entryDetail.relations.columns.created' | translate }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let relation of relations(); trackBy: trackRelation">
-            <td>{{ relation.relation_type }}</td>
-            <td>{{ relation.from_entry_id }}</td>
-            <td>{{ relation.to_entry_id }}</td>
-            <td>{{ relation.sort_order }}</td>
-            <td>{{ relation.created_at | date:'dd/MM/yyyy, HH:mm' }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <header class="entry-detail__panel-header">
+        <div>
+          <h2>{{ 'entryDetail.sections.relations' | translate }}</h2>
+          <p>{{ 'entryDetail.sections.relationsHelp' | translate }}</p>
+        </div>
+      </header>
+
+      <p class="entry-detail__empty" *ngIf="relations().length === 0">{{ 'entryDetail.status.noRelations' | translate }}</p>
+
+      <div class="entry-detail__entity-grid" *ngIf="relations().length > 0">
+        <article *ngFor="let relation of relations(); trackBy: trackRelation" class="entry-detail__entity-card">
+          <div class="entry-detail__entity-header">
+            <span class="entry-detail__chip">{{ relation.relation_type }}</span>
+            <time *ngIf="relation.created_at">{{ relation.created_at | date:'dd/MM/yyyy, HH:mm' }}</time>
+          </div>
+          <dl class="entry-detail__meta-list">
+            <div>
+              <dt>{{ 'entryDetail.relations.columns.from' | translate }}</dt>
+              <dd>{{ relation.from_entry_id }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'entryDetail.relations.columns.to' | translate }}</dt>
+              <dd>{{ relation.to_entry_id }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'entryDetail.relations.columns.order' | translate }}</dt>
+              <dd>{{ relation.sort_order ?? 0 }}</dd>
+            </div>
+          </dl>
+          <pre class="entry-detail__code-block" *ngIf="relation.metadata_json">{{ relationMetadata(relation) }}</pre>
+        </article>
+      </div>
     </section>
 
     <section class="entry-detail__panel" *ngIf="attachments().length > 0 || access().manage_attachments || access().manage">
-      <h2>{{ 'entryDetail.sections.attachments' | translate }}</h2>
-      <p *ngIf="!(access().manage_attachments || access().manage) && attachments().length === 0">{{ 'entryDetail.status.noAttachmentAccess' | translate }}</p>
-      <ul>
-        <li *ngFor="let attachment of attachments(); trackBy: trackAttachment">
-          <a *ngIf="attachmentUrl(attachment) as url" [href]="url" target="_blank" rel="noopener">{{ attachment.file_name }}</a>
-          <span *ngIf="!attachmentUrl(attachment)">{{ attachment.file_name }}</span>
-          <span *ngIf="attachment.description"> &middot; {{ attachment.description }}</span>
-        </li>
-      </ul>
+      <header class="entry-detail__panel-header">
+        <div>
+          <h2>{{ 'entryDetail.sections.attachments' | translate }}</h2>
+          <p>{{ 'entryDetail.sections.attachmentsHelp' | translate }}</p>
+        </div>
+      </header>
+
+      <p class="entry-detail__empty" *ngIf="attachments().length === 0">{{ 'entryDetail.status.noAttachments' | translate }}</p>
+
+      <div class="entry-detail__entity-grid" *ngIf="attachments().length > 0">
+        <article *ngFor="let attachment of attachments(); trackBy: trackAttachment" class="entry-detail__entity-card">
+          <div class="entry-detail__entity-header">
+            <a *ngIf="attachmentUrl(attachment) as url; else attachmentName" [href]="url" target="_blank" rel="noopener">
+              {{ attachment.file_name }}
+            </a>
+            <ng-template #attachmentName>
+              <strong>{{ attachment.file_name }}</strong>
+            </ng-template>
+            <time *ngIf="attachment.uploaded_at">{{ attachment.uploaded_at | date:'dd/MM/yyyy, HH:mm' }}</time>
+          </div>
+          <p class="entry-detail__field-help" *ngIf="attachment.description">{{ attachment.description }}</p>
+          <dl class="entry-detail__meta-list">
+            <div *ngIf="attachment.mime_type">
+              <dt>{{ 'entryDetail.attachments.mimeType' | translate }}</dt>
+              <dd>{{ attachment.mime_type }}</dd>
+            </div>
+            <div *ngIf="attachment.file_size != null">
+              <dt>{{ 'entryDetail.attachments.fileSize' | translate }}</dt>
+              <dd>{{ attachment.file_size }}</dd>
+            </div>
+            <div *ngIf="attachment.uploaded_by != null">
+              <dt>{{ 'entryDetail.attachments.uploadedBy' | translate }}</dt>
+              <dd>{{ attachment.uploaded_by }}</dd>
+            </div>
+          </dl>
+        </article>
+      </div>
     </section>
 
     <section class="entry-detail__panel" *ngIf="access().view_history || access().manage">
-      <h2>{{ 'entryDetail.sections.history' | translate }}</h2>
-      <div *ngIf="history().length === 0">{{ 'entryDetail.status.noHistory' | translate }}</div>
-      <article *ngFor="let item of history(); trackBy: trackHistory" class="entry-detail__history-item">
-        <header>
-          <strong>{{ item.change_type }}</strong>
-          <span> &middot; {{ item.changed_at | date:'dd/MM/yyyy, HH:mm' }}</span>
-          <span *ngIf="item.changed_by"> &middot; {{ 'entryDetail.history.by' | translate:{ value: item.changed_by } }}</span>
-        </header>
-        <p *ngIf="item.comment">{{ item.comment }}</p>
-        <ul>
-          <li *ngFor="let diff of renderHistoryDiff(item)">{{ diff }}</li>
-        </ul>
-      </article>
+      <header class="entry-detail__panel-header">
+        <div>
+          <h2>{{ 'entryDetail.sections.history' | translate }}</h2>
+          <p>{{ 'entryDetail.sections.historyHelp' | translate }}</p>
+        </div>
+      </header>
+
+      <p class="entry-detail__empty" *ngIf="history().length === 0">{{ 'entryDetail.status.noHistory' | translate }}</p>
+
+      <div class="entry-detail__timeline" *ngIf="history().length > 0">
+        <article *ngFor="let item of history(); trackBy: trackHistory" class="entry-detail__timeline-item">
+          <header class="entry-detail__timeline-header">
+            <div>
+              <strong>{{ item.change_type }}</strong>
+              <p *ngIf="item.comment">{{ item.comment }}</p>
+            </div>
+            <div class="entry-detail__timeline-meta">
+              <time>{{ item.changed_at | date:'dd/MM/yyyy, HH:mm' }}</time>
+              <span *ngIf="item.changed_by != null">{{ 'entryDetail.history.by' | translate:{ value: item.changed_by } }}</span>
+            </div>
+          </header>
+          <ul class="entry-detail__diff-list" *ngIf="renderHistoryDiff(item).length > 0; else noDiffs">
+            <li *ngFor="let diff of renderHistoryDiff(item)">{{ diff }}</li>
+          </ul>
+          <ng-template #noDiffs>
+            <p class="entry-detail__field-help">{{ 'entryDetail.history.noFieldChanges' | translate }}</p>
+          </ng-template>
+        </article>
+      </div>
     </section>
 
     <section class="entry-detail__panel" *ngIf="access().manage_permissions || access().manage">
-      <h2>{{ 'entryDetail.sections.permissions' | translate }}</h2>
-      <table *ngIf="permissions().length > 0">
-        <thead>
-          <tr>
-            <th>{{ 'entryDetail.permissions.columns.subjectType' | translate }}</th>
-            <th>{{ 'entryDetail.permissions.columns.subjectId' | translate }}</th>
-            <th>{{ 'entryDetail.permissions.columns.permission' | translate }}</th>
-            <th>{{ 'entryDetail.permissions.columns.createdBy' | translate }}</th>
-            <th>{{ 'entryDetail.permissions.columns.createdAt' | translate }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let permission of permissions(); trackBy: trackPermission">
-            <td>{{ permission.subject_type }}</td>
-            <td>{{ permission.subject_id }}</td>
-            <td>{{ permission.permission }}</td>
-            <td>{{ permission.created_by }}</td>
-            <td>{{ permission.created_at | date:'dd/MM/yyyy, HH:mm' }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <p *ngIf="permissions().length === 0">{{ 'entryDetail.status.noPermissions' | translate }}</p>
+      <header class="entry-detail__panel-header">
+        <div>
+          <h2>{{ 'entryDetail.sections.permissions' | translate }}</h2>
+          <p>{{ 'entryDetail.sections.permissionsHelp' | translate }}</p>
+        </div>
+      </header>
+
+      <p class="entry-detail__empty" *ngIf="permissions().length === 0">{{ 'entryDetail.status.noPermissions' | translate }}</p>
+
+      <div class="entry-detail__table-wrap" *ngIf="permissions().length > 0">
+        <table class="entry-detail__table">
+          <thead>
+            <tr>
+              <th>{{ 'entryDetail.permissions.columns.subjectType' | translate }}</th>
+              <th>{{ 'entryDetail.permissions.columns.subjectId' | translate }}</th>
+              <th>{{ 'entryDetail.permissions.columns.permission' | translate }}</th>
+              <th>{{ 'entryDetail.permissions.columns.createdBy' | translate }}</th>
+              <th>{{ 'entryDetail.permissions.columns.createdAt' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let permission of permissions(); trackBy: trackPermission">
+              <td>{{ permission.subject_type }}</td>
+              <td>{{ permission.subject_id }}</td>
+              <td>{{ permission.permission }}</td>
+              <td>{{ permission.created_by ?? '-' }}</td>
+              <td>{{ permission.created_at ? (permission.created_at | date:'dd/MM/yyyy, HH:mm') : '-' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
   </section>
 
