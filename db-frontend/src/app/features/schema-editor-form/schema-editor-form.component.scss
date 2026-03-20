@@ -96,6 +96,7 @@
 .schema-editor__field {
   display: grid;
   gap: 0.45rem;
+  align-content: start;
 }
 
 .schema-editor__field--full,

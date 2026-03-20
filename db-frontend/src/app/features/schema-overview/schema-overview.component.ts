@@ -13,6 +13,11 @@ import { SchemaService } from '../../core/services/schema.service';
 import { DashboardSchemaTotal, StatsService } from '../../core/services/stats.service';
 import { SchemaEditorFormComponent, SchemaEditorSubmitPayload } from '../schema-editor-form/schema-editor-form.component';
 
+interface SchemaOverviewCard extends DashboardSchemaTotal {
+  is_active: boolean;
+  description?: string | null;
+}
+
 @Component({
   selector: 'app-schema-overview',
   standalone: true,
@@ -35,7 +40,26 @@ export class SchemaOverviewComponent implements OnInit {
   readonly successMessage = signal<string | null>(null);
   readonly dialogError = signal<string | null>(null);
   readonly editingSchema = signal<EntrySchema | null>(null);
-  readonly schemas = computed(() => this.overview()?.totals_per_schema ?? []);
+  readonly showInactive = signal(false);
+  readonly schemaList = signal<EntrySchema[]>([]);
+  readonly schemas = computed<SchemaOverviewCard[]>(() => {
+    const totals = new Map((this.overview()?.totals_per_schema ?? []).map((item) => [String(item.schema_id), item]));
+
+    return this.schemaList().map((schema) => {
+      const total = totals.get(String(schema.id));
+      return {
+        schema_id: schema.id,
+        schema_key: schema.key,
+        schema_name: schema.name,
+        icon: schema.icon ?? null,
+        total_entries: total?.total_entries ?? 0,
+        last_created_at: total?.last_created_at ?? null,
+        last_updated_at: total?.last_updated_at ?? null,
+        is_active: schema.is_active,
+        description: schema.description ?? null
+      };
+    });
+  });
   readonly form = this.fb.nonNullable.group({
     key: ['', [Validators.required, Validators.pattern(/^[a-z0-9_]+$/)]],
     name: ['', Validators.required],
@@ -62,11 +86,16 @@ export class SchemaOverviewComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    void this.statsService.loadOverview();
+    void this.reloadData();
   }
 
   refresh(): void {
-    void this.statsService.loadOverview(true);
+    void this.reloadData(true);
+  }
+
+  toggleInactiveVisibility(): void {
+    this.showInactive.update((value) => !value);
+    void this.reloadData(true);
   }
 
   openCreateDialog(): void {
@@ -140,7 +169,7 @@ export class SchemaOverviewComponent implements OnInit {
       }
 
       this.closeSchemaDialog();
-      await this.statsService.loadOverview(true);
+      await this.reloadData(true);
     } catch (error) {
       this.dialogError.set(this.describeMutationError(error));
     } finally {
@@ -157,7 +186,7 @@ export class SchemaOverviewComponent implements OnInit {
       await firstValueFrom(this.schemaService.createSchemaWithFields(payload.schema, payload.fields));
       this.successMessage.set(this.translate.instant('schemaOverview.status.created', { value: payload.schema.name }));
       this.closeSchemaDialog();
-      await this.statsService.loadOverview(true);
+      await this.reloadData(true);
     } catch (error) {
       this.dialogError.set(this.describeMutationError(error));
     } finally {
@@ -210,6 +239,21 @@ export class SchemaOverviewComponent implements OnInit {
     return this.editingSchema()
       ? this.translate.instant('schemaOverview.actions.save')
       : this.translate.instant('schemaOverview.actions.create');
+  }
+
+  inactiveToggleLabel(): string {
+    return this.showInactive()
+      ? this.translate.instant('schemaOverview.actions.hideInactive')
+      : this.translate.instant('schemaOverview.actions.showInactive');
+  }
+
+  private async reloadData(forceRefresh = false): Promise<void> {
+    await Promise.all([
+      this.statsService.loadOverview(forceRefresh),
+      firstValueFrom(this.schemaService.loadSchemas(forceRefresh, this.showInactive())).then((schemas) => {
+        this.schemaList.set(schemas);
+      })
+    ]);
   }
 
   private describeMutationError(error: unknown): string {

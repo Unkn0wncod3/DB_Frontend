@@ -225,7 +225,9 @@ export class SchemaEditorFormComponent implements OnChanges {
   }
 
   fieldTypeLabel(type: FieldDataType): string {
-    return this.translate.instant(`entryForm.types.${type}`);
+    const translationKey = `entryForm.types.${type}`;
+    const translated = this.translate.instant(translationKey);
+    return translated !== translationKey ? translated : humanizeKey(type);
   }
 
   fieldSummary(field: CreateFieldPayload): string {

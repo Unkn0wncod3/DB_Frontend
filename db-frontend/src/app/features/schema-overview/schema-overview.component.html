@@ -6,6 +6,16 @@
       <p>{{ 'schemaOverview.subtitle' | translate }}</p>
     </div>
     <div class="schema-overview__actions">
+      <button
+        *ngIf="auth.canManageSchemas()"
+        type="button"
+        class="schema-overview__toggle"
+        [class.schema-overview__toggle--active]="showInactive()"
+        (click)="toggleInactiveVisibility()"
+      >
+        <span class="schema-overview__toggle-knob"></span>
+        <span>{{ inactiveToggleLabel() }}</span>
+      </button>
       <button type="button" class="schema-overview__refresh" (click)="refresh()" [disabled]="isLoading()">
         <span *ngIf="isLoading(); else idleState">{{ 'schemaOverview.actions.refreshing' | translate }}</span>
         <ng-template #idleState>{{ 'schemaOverview.actions.refresh' | translate }}</ng-template>
@@ -51,7 +61,12 @@
         </div>
         <div class="schema-overview__content">
           <div class="schema-overview__heading">
-            <h2>{{ item.schema_name }}</h2>
+            <div class="schema-overview__heading-row">
+              <h2>{{ item.schema_name }}</h2>
+              <span *ngIf="!item.is_active" class="schema-overview__state-badge">
+                {{ 'schemaOverview.labels.inactive' | translate }}
+              </span>
+            </div>
             <span>{{ item.schema_key }}</span>
           </div>
           <div class="schema-overview__stats">

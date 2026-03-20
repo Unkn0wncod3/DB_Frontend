@@ -959,6 +959,8 @@
       "back": "Back to dashboard",
       "refresh": "Refresh",
       "refreshing": "Refreshing...",
+      "showInactive": "Show inactive schemas",
+      "hideInactive": "Hide inactive schemas",
       "edit": "Edit schema",
       "create": "Create schema",
       "save": "Save schema"
@@ -971,6 +973,7 @@
     },
     "labels": {
       "entries": "entries",
+      "inactive": "Inactive",
       "lastCreatedAt": "Last created {{ value }}",
       "lastUpdatedAt": "Last updated {{ value }}"
     },

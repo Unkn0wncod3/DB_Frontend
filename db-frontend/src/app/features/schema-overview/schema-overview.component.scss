@@ -27,20 +27,73 @@
   }
 }
 
+.schema-overview__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
 .schema-overview__back {
   color: var(--color-primary);
   text-decoration: none;
   font-weight: 700;
 }
 
+.schema-overview__toggle,
 .schema-overview__refresh {
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  border: 1px solid var(--schema-border-strong);
   border-radius: 999px;
-  padding: 0.55rem 1.4rem;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-alt));
-  color: var(--color-primary-contrast);
+  padding: 0.55rem 1rem;
+  background: var(--schema-subtle);
+  color: var(--color-text);
   font-weight: 600;
   cursor: pointer;
+}
+
+.schema-overview__refresh {
+  padding-inline: 1.4rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-alt));
+  color: var(--color-primary-contrast);
+  border-color: transparent;
+}
+
+.schema-overview__toggle-knob {
+  position: relative;
+  display: inline-flex;
+  width: 2.7rem;
+  height: 1.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-border-strong) 70%, var(--schema-subtle));
+  transition: background-color 0.18s ease;
+}
+
+.schema-overview__toggle-knob::after {
+  content: '';
+  position: absolute;
+  top: 0.16rem;
+  left: 0.16rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  transition: transform 0.18s ease;
+}
+
+.schema-overview__toggle--active {
+  border-color: color-mix(in srgb, var(--color-primary) 45%, var(--schema-border-strong));
+}
+
+.schema-overview__toggle--active .schema-overview__toggle-knob {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-alt));
+}
+
+.schema-overview__toggle--active .schema-overview__toggle-knob::after {
+  transform: translateX(1.15rem);
 }
 
 .schema-overview__error,
@@ -283,6 +336,26 @@
     color: var(--color-text-muted);
     font-size: 0.85rem;
   }
+}
+
+.schema-overview__heading-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.schema-overview__state-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-danger) 14%, transparent);
+  color: var(--color-danger);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .schema-overview__stats {
