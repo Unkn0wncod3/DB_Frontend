@@ -154,6 +154,21 @@ export class EntryService {
     });
   }
 
+  updateRelation(entryId: string | number, relationId: string | number, payload: Partial<EntryRelationRecord>): Observable<EntryRelationRecord> {
+    return this.api.request<EntryRelationRecord>(
+      'PATCH',
+      `/entries/${encodeURIComponent(String(entryId))}/relations/${encodeURIComponent(String(relationId))}`,
+      { body: payload }
+    );
+  }
+
+  deleteRelation(entryId: string | number, relationId: string | number): Observable<EntryRelationRecord> {
+    return this.api.request<EntryRelationRecord>(
+      'DELETE',
+      `/entries/${encodeURIComponent(String(entryId))}/relations/${encodeURIComponent(String(relationId))}`
+    );
+  }
+
   getPermissions(entryId: string | number): Observable<EntryPermissionRecord[]> {
     return this.api.request<EntryPermissionRecord[]>('GET', `/entries/${encodeURIComponent(String(entryId))}/permissions`);
   }

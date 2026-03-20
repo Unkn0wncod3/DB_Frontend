@@ -221,30 +221,74 @@
           <h2>{{ 'entryDetail.sections.relations' | translate }}</h2>
           <p>{{ 'entryDetail.sections.relationsHelp' | translate }}</p>
         </div>
+        <div class="entry-detail__relations-toolbar">
+          <input
+            type="text"
+            class="entry-detail__relations-search"
+            [value]="relationSearch()"
+            (input)="relationSearch.set(($any($event.target).value || '').trim())"
+            [placeholder]="'entryDetail.relations.searchPlaceholder' | translate"
+          />
+          <select
+            class="entry-detail__relations-filter"
+            [value]="relationTypeFilter()"
+            (change)="relationTypeFilter.set($any($event.target).value)"
+          >
+            <option value="all">{{ 'entryDetail.relations.filters.allTypes' | translate }}</option>
+            <option *ngFor="let type of relationTypes" [value]="type">{{ relationTypeLabel(type) }}</option>
+          </select>
+          <button
+            *ngIf="access().manage_relations || access().manage"
+            type="button"
+            class="entry-detail__button entry-detail__button--primary"
+            (click)="openRelationDialog()"
+          >
+            {{ 'entryDetail.relations.actions.create' | translate }}
+          </button>
+        </div>
       </header>
 
-      <p class="entry-detail__empty" *ngIf="relations().length === 0">{{ 'entryDetail.status.noRelations' | translate }}</p>
+      <p class="entry-detail__empty" *ngIf="filteredRelations().length === 0">{{ 'entryDetail.status.noRelations' | translate }}</p>
 
-      <div class="entry-detail__entity-grid" *ngIf="relations().length > 0">
-        <article *ngFor="let relation of relations(); trackBy: trackRelation" class="entry-detail__entity-card">
+      <div class="entry-detail__entity-grid" *ngIf="filteredRelations().length > 0">
+        <article *ngFor="let relation of filteredRelations(); trackBy: trackRelation" class="entry-detail__entity-card">
           <div class="entry-detail__entity-header">
-            <span class="entry-detail__chip">{{ relation.relation_type }}</span>
+            <div class="entry-detail__relations-card-head">
+              <a *ngIf="relationCounterpartLink(relation) as link; else fallbackRelationTitle" [routerLink]="link" class="entry-detail__relations-link">
+                {{ relationCounterpart(relation)?.title || ('entryDetail.relations.labels.entryFallback' | translate:{ id: relation.to_entry_id }) }}
+              </a>
+              <ng-template #fallbackRelationTitle>
+                <strong>{{ relationCounterpart(relation)?.title || ('entryDetail.relations.labels.entryFallback' | translate:{ id: relation.to_entry_id }) }}</strong>
+              </ng-template>
+              <div class="entry-detail__chips">
+                <span class="entry-detail__chip">{{ relationTypeLabel(relation.relation_type) }}</span>
+                <span class="entry-detail__chip entry-detail__chip--muted">{{ relationDirectionLabel(relation) }}</span>
+              </div>
+            </div>
             <time *ngIf="relation.created_at">{{ relation.created_at | date:'dd/MM/yyyy, HH:mm' }}</time>
           </div>
           <dl class="entry-detail__meta-list">
             <div>
-              <dt>{{ 'entryDetail.relations.columns.from' | translate }}</dt>
-              <dd>{{ relation.from_entry_id }}</dd>
+              <dt>{{ 'entryDetail.relations.columns.target' | translate }}</dt>
+              <dd>{{ relationCounterpart(relation)?.schema_name || ('entryDetail.labels.unknownId' | translate) }}</dd>
             </div>
             <div>
-              <dt>{{ 'entryDetail.relations.columns.to' | translate }}</dt>
-              <dd>{{ relation.to_entry_id }}</dd>
+              <dt>{{ 'entryDetail.relations.columns.targetId' | translate }}</dt>
+              <dd>{{ relationCounterpart(relation)?.id || relation.to_entry_id }}</dd>
             </div>
             <div>
               <dt>{{ 'entryDetail.relations.columns.order' | translate }}</dt>
               <dd>{{ relation.sort_order ?? 0 }}</dd>
             </div>
           </dl>
+          <div class="entry-detail__entity-actions" *ngIf="access().manage_relations || access().manage">
+            <button type="button" class="entry-detail__button entry-detail__button--ghost" (click)="openRelationDialog(relation)">
+              {{ 'schemaFields.actions.edit' | translate }}
+            </button>
+            <button type="button" class="entry-detail__button entry-detail__button--danger" (click)="deleteRelation(relation)">
+              {{ 'schemaFields.actions.delete' | translate }}
+            </button>
+          </div>
           <pre class="entry-detail__code-block" *ngIf="relation.metadata_json">{{ relationMetadata(relation) }}</pre>
         </article>
       </div>
@@ -405,6 +449,92 @@
           </button>
           <button type="submit" class="entry-detail__button entry-detail__button--primary" [disabled]="createFieldForm.invalid || isCreatingField()">
             {{ isCreatingField() ? ('schemaFields.actions.creating' | translate) : fieldButtonLabel() }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="entry-detail__dialog-backdrop" *ngIf="isRelationDialogOpen()" (click)="closeRelationDialog()">
+    <section class="entry-detail__dialog entry-detail__dialog--wide" (click)="$event.stopPropagation()">
+      <h2>
+        {{ editingRelation() ? ('entryDetail.relations.dialog.editTitle' | translate) : ('entryDetail.relations.dialog.createTitle' | translate) }}
+      </h2>
+      <p>
+        {{ editingRelation() ? ('entryDetail.relations.dialog.editSubtitle' | translate) : ('entryDetail.relations.dialog.createSubtitle' | translate) }}
+      </p>
+      <form [formGroup]="relationForm" class="entry-detail__dialog-form" (ngSubmit)="saveRelation()">
+        <label class="entry-detail__dialog-field entry-detail__dialog-field--full">
+          <span>{{ 'entryDetail.relations.fields.search' | translate }}</span>
+          <input
+            type="text"
+            [value]="relationSearch()"
+            (input)="relationSearch.set(($any($event.target).value || '').trim())"
+            [placeholder]="'entryDetail.relations.searchPlaceholder' | translate"
+          />
+        </label>
+
+        <label class="entry-detail__dialog-field">
+          <span>{{ 'entryDetail.relations.fields.schemaFilter' | translate }}</span>
+          <select [value]="relationSchemaFilter()" (change)="relationSchemaFilter.set($any($event.target).value)">
+            <option value="all">{{ 'entryDetail.relations.filters.allSchemas' | translate }}</option>
+            <option *ngFor="let item of relationSchemaOptions()" [value]="item.schema_id">{{ item.schema_name }}</option>
+          </select>
+        </label>
+
+        <label class="entry-detail__dialog-field">
+          <span>{{ 'entryDetail.relations.fields.type' | translate }}</span>
+          <select formControlName="relation_type">
+            <option *ngFor="let type of relationTypes" [value]="type">{{ relationTypeLabel(type) }}</option>
+          </select>
+        </label>
+
+        <label class="entry-detail__dialog-field">
+          <span>{{ 'entryDetail.relations.fields.sortOrder' | translate }}</span>
+          <input type="number" formControlName="sort_order" />
+        </label>
+
+        <label class="entry-detail__dialog-field entry-detail__dialog-field--full">
+          <span>{{ 'entryDetail.relations.fields.target' | translate }}</span>
+          <input type="text" formControlName="to_entry_id" [readonly]="true" />
+          <small *ngIf="selectedRelationTarget() as target">
+            {{ target.title }} · {{ target.schema_name }} · #{{ target.id }}
+          </small>
+        </label>
+
+        <div class="entry-detail__relation-candidate-list entry-detail__dialog-field--full">
+          <button
+            type="button"
+            *ngFor="let item of relationCandidates()"
+            class="entry-detail__relation-candidate"
+            [class.entry-detail__relation-candidate--active]="isSelectedRelationCandidate(item)"
+            (click)="selectRelationCandidate(item)"
+          >
+            <strong>{{ item.title }}</strong>
+            <span>{{ relationCandidateSubtitle(item) }}</span>
+          </button>
+        </div>
+
+        <label class="entry-detail__dialog-field entry-detail__dialog-field--full">
+          <span>{{ 'entryDetail.relations.fields.metadata' | translate }}</span>
+          <textarea rows="5" formControlName="metadata_json"></textarea>
+        </label>
+
+        <div class="entry-detail__dialog-actions">
+          <button
+            *ngIf="editingRelation()"
+            type="button"
+            class="entry-detail__button entry-detail__button--danger entry-detail__button--split"
+            (click)="deleteRelation()"
+            [disabled]="isDeletingRelation()"
+          >
+            {{ 'schemaFields.actions.delete' | translate }}
+          </button>
+          <button type="button" class="entry-detail__button entry-detail__button--ghost" (click)="closeRelationDialog()">
+            {{ 'schemaFields.actions.cancel' | translate }}
+          </button>
+          <button type="submit" class="entry-detail__button entry-detail__button--primary" [disabled]="relationForm.invalid || isSavingRelation()">
+            {{ isSavingRelation() ? ('schemaFields.actions.creating' | translate) : (editingRelation() ? ('schemaFields.actions.save' | translate) : ('entryDetail.relations.actions.create' | translate)) }}
           </button>
         </div>
       </form>

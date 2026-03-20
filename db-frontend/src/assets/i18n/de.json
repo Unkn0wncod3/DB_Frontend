@@ -407,6 +407,7 @@
       "private": "Privat"
     },
     "relations": {
+      "searchPlaceholder": "Verknüpfte Einträge oder Relationstyp suchen",
       "profiles": "Profile",
       "notes": "Notizen",
       "activities": "Aktivitäten",
@@ -426,8 +427,51 @@
         "type": "Typ",
         "from": "Von",
         "to": "Nach",
+        "target": "Ziel-Schema",
+        "targetId": "Ziel-Eintrag",
         "order": "Reihenfolge",
         "created": "Erstellt"
+      },
+      "actions": {
+        "create": "Relation erstellen"
+      },
+      "dialog": {
+        "createTitle": "Relation erstellen",
+        "createSubtitle": "Suche einen sichtbaren Eintrag, wähle den Relationstyp und speichere die Verknüpfung.",
+        "editTitle": "Relation bearbeiten",
+        "editSubtitle": "Aktualisiere Ziel-Eintrag, Relationstyp, Reihenfolge oder Metadaten."
+      },
+      "fields": {
+        "search": "Eintrag suchen",
+        "schemaFilter": "Schema-Filter",
+        "type": "Relationstyp",
+        "sortOrder": "Sortierung",
+        "target": "Ziel-Eintrag-ID",
+        "metadata": "Metadaten-JSON"
+      },
+      "filters": {
+        "allTypes": "Alle Relationstypen",
+        "allSchemas": "Alle Schemas"
+      },
+      "direction": {
+        "outgoing": "Vom aktuellen Eintrag",
+        "incoming": "Zum aktuellen Eintrag"
+      },
+      "labels": {
+        "entryFallback": "Eintrag #{{ id }}"
+      },
+      "types": {
+        "belongs_to": "Gehört zu",
+        "parent_of": "Ist Elternteil von",
+        "references": "Referenziert",
+        "assigned_to": "Zugewiesen an",
+        "contains": "Enthält",
+        "related_to": "Verknüpft mit"
+      },
+      "status": {
+        "created": "Relation erstellt.",
+        "updated": "Relation aktualisiert.",
+        "deleted": "Relation gelöscht."
       }
     },
     "delete": {

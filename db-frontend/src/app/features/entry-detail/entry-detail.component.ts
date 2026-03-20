@@ -5,7 +5,7 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 import { EntryService } from '../../core/services/entry.service';
@@ -39,6 +39,14 @@ interface DetailField {
   control: FormControl<unknown>;
 }
 
+interface RelationLookupItem {
+  id: string | number;
+  title: string;
+  schema_id: string | number;
+  schema_key: string;
+  schema_name: string;
+}
+
 @Component({
   selector: 'app-entry-detail',
   standalone: true,
@@ -62,6 +70,9 @@ export class EntryDetailComponent {
   readonly isCreatingField = signal(false);
   readonly isDeletingField = signal(false);
   readonly isFieldDialogOpen = signal(false);
+  readonly isRelationDialogOpen = signal(false);
+  readonly isSavingRelation = signal(false);
+  readonly isDeletingRelation = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
 
@@ -74,12 +85,18 @@ export class EntryDetailComponent {
   readonly permissions = signal<EntryPermissionRecord[]>([]);
   readonly fields = signal<DetailField[]>([]);
   readonly referenceTitles = signal<Record<string, string>>({});
+  readonly relationEntries = signal<RelationLookupItem[]>([]);
+  readonly relationSearch = signal('');
+  readonly relationTypeFilter = signal<'all' | string>('all');
+  readonly relationSchemaFilter = signal<'all' | string>('all');
   readonly originalComparableState = signal('');
   readonly formRevision = signal(0);
   readonly visibilityLevels: VisibilityLevel[] = ['public', 'internal', 'restricted', 'private'];
   readonly defaultStatusOptions = ['draft', 'review', 'active', 'inactive', 'archived'];
   readonly fieldTypes: FieldDataType[] = ['text', 'long_text', 'integer', 'decimal', 'boolean', 'date', 'datetime', 'email', 'url', 'select', 'multi_select', 'reference', 'file', 'json'];
+  readonly relationTypes = ['belongs_to', 'parent_of', 'references', 'assigned_to', 'contains', 'related_to'] as const;
   readonly editingField = signal<SchemaField | null>(null);
+  readonly editingRelation = signal<EntryRelationRecord | null>(null);
 
   readonly entryTitle = computed(() => {
     const entry = this.entry();
@@ -99,6 +116,90 @@ export class EntryDetailComponent {
     const current = this.metaForm.controls.status.getRawValue().trim();
     return Array.from(new Set([current, ...this.defaultStatusOptions].filter((value) => value.length > 0)));
   });
+  readonly filteredRelations = computed(() => {
+    const search = this.relationSearch().trim().toLowerCase();
+    const typeFilter = this.relationTypeFilter();
+    const currentEntryId = String(this.entry()?.id ?? '');
+
+    return [...this.relations()]
+      .filter((relation) => {
+        if (typeFilter !== 'all' && relation.relation_type !== typeFilter) {
+          return false;
+        }
+
+        if (!search) {
+          return true;
+        }
+
+        const counterpart = this.relationCounterpart(relation);
+        const haystack = [
+          relation.relation_type,
+          relation.from_entry_id,
+          relation.to_entry_id,
+          relation.sort_order ?? 0,
+          counterpart?.title,
+          counterpart?.schema_name,
+          counterpart?.schema_key,
+          currentEntryId === String(relation.from_entry_id) ? 'outgoing' : 'incoming',
+          relation.metadata_json ? JSON.stringify(relation.metadata_json) : ''
+        ]
+          .filter((value) => value != null)
+          .join(' ')
+          .toLowerCase();
+
+        return haystack.includes(search);
+      })
+      .sort((left, right) => {
+        const orderDiff = (left.sort_order ?? 0) - (right.sort_order ?? 0);
+        if (orderDiff !== 0) {
+          return orderDiff;
+        }
+
+        return String(right.created_at ?? '').localeCompare(String(left.created_at ?? ''));
+      });
+  });
+  readonly relationCandidates = computed(() => {
+    const search = this.relationSearch().trim().toLowerCase();
+    const schemaFilter = this.relationSchemaFilter();
+    const currentEntryId = String(this.entry()?.id ?? '');
+    const selectedId = String(this.relationForm.controls.to_entry_id.getRawValue() ?? '');
+
+    return this.relationEntries()
+      .filter((item) => {
+        if (String(item.id) === currentEntryId) {
+          return false;
+        }
+        if (schemaFilter !== 'all' && String(item.schema_id) !== schemaFilter) {
+          return false;
+        }
+        if (!search) {
+          return true;
+        }
+
+        return [item.title, item.schema_name, item.schema_key, item.id].join(' ').toLowerCase().includes(search);
+      })
+      .sort((left, right) => {
+        const leftSelected = String(left.id) === selectedId;
+        const rightSelected = String(right.id) === selectedId;
+        if (leftSelected !== rightSelected) {
+          return leftSelected ? -1 : 1;
+        }
+
+        return left.title.localeCompare(right.title);
+      })
+      .slice(0, 24);
+  });
+  readonly relationSchemaOptions = computed(() => {
+    const seen = new Set<string>();
+    return this.relationEntries().filter((item) => {
+      const key = String(item.schema_id);
+      if (seen.has(key)) {
+        return false;
+      }
+      seen.add(key);
+      return true;
+    });
+  });
 
   readonly metaForm = this.fb.nonNullable.group({
     title: ['', Validators.required],
@@ -113,6 +214,12 @@ export class EntryDetailComponent {
     description: [''],
     data_type: ['text' as FieldDataType, [Validators.required]],
     is_required: [false]
+  });
+  readonly relationForm = this.fb.nonNullable.group({
+    to_entry_id: ['', Validators.required],
+    relation_type: ['references'],
+    sort_order: [0],
+    metadata_json: ['{}']
   });
 
   form: FormGroup = this.fb.group({});
@@ -219,6 +326,106 @@ export class EntryDetailComponent {
   closeFieldDialog(): void {
     this.isFieldDialogOpen.set(false);
     this.editingField.set(null);
+  }
+
+  async openRelationDialog(relation?: EntryRelationRecord): Promise<void> {
+    const entry = this.entry();
+    if (!entry || !(this.access().manage_relations || this.access().manage)) {
+      return;
+    }
+
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+    await this.loadRelationEntries();
+
+    if (relation) {
+      this.editingRelation.set(relation);
+      this.relationForm.reset({
+        to_entry_id: String(relation.to_entry_id),
+        relation_type: relation.relation_type,
+        sort_order: relation.sort_order ?? 0,
+        metadata_json: relation.metadata_json ? JSON.stringify(relation.metadata_json, null, 2) : '{}'
+      });
+    } else {
+      this.editingRelation.set(null);
+      this.relationForm.reset({
+        to_entry_id: '',
+        relation_type: 'references',
+        sort_order: 0,
+        metadata_json: '{}'
+      });
+    }
+
+    this.relationSearch.set('');
+    this.relationSchemaFilter.set('all');
+    this.isRelationDialogOpen.set(true);
+  }
+
+  closeRelationDialog(): void {
+    this.isRelationDialogOpen.set(false);
+    this.editingRelation.set(null);
+  }
+
+  async saveRelation(): Promise<void> {
+    const entry = this.entry();
+    if (!entry || this.relationForm.invalid || this.isSavingRelation()) {
+      return;
+    }
+
+    this.isSavingRelation.set(true);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
+    try {
+      const raw = this.relationForm.getRawValue();
+      const payload = {
+        to_entry_id: Number.parseInt(raw.to_entry_id, 10),
+        relation_type: raw.relation_type,
+        sort_order: Number(raw.sort_order || 0),
+        metadata_json: this.parseRelationMetadata(raw.metadata_json)
+      };
+
+      const editingRelation = this.editingRelation();
+      if (editingRelation) {
+        await firstValueFrom(this.entryService.updateRelation(entry.id, editingRelation.id, payload));
+        this.successMessage.set(this.translate.instant('entryDetail.relations.status.updated'));
+      } else {
+        await firstValueFrom(this.entryService.createRelation(entry.id, payload));
+        this.successMessage.set(this.translate.instant('entryDetail.relations.status.created'));
+      }
+
+      this.closeRelationDialog();
+      await this.reloadRelations();
+    } catch (error) {
+      this.errorMessage.set(this.describeError(error, 'save'));
+    } finally {
+      this.isSavingRelation.set(false);
+    }
+  }
+
+  async deleteRelation(relation?: EntryRelationRecord): Promise<void> {
+    const entry = this.entry();
+    const targetRelation = relation ?? this.editingRelation();
+    if (!entry || !targetRelation || this.isDeletingRelation()) {
+      return;
+    }
+
+    this.isDeletingRelation.set(true);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
+    try {
+      await firstValueFrom(this.entryService.deleteRelation(entry.id, targetRelation.id));
+      this.successMessage.set(this.translate.instant('entryDetail.relations.status.deleted'));
+      if (!relation) {
+        this.closeRelationDialog();
+      }
+      await this.reloadRelations();
+    } catch (error) {
+      this.errorMessage.set(this.describeError(error, 'delete'));
+    } finally {
+      this.isDeletingRelation.set(false);
+    }
   }
 
   async createField(): Promise<void> {
@@ -444,6 +651,45 @@ export class EntryDetailComponent {
     return relation.metadata_json ? JSON.stringify(relation.metadata_json, null, 2) : '';
   }
 
+  relationCounterpart(relation: EntryRelationRecord): RelationLookupItem | null {
+    const currentEntryId = String(this.entry()?.id ?? '');
+    const counterpartId =
+      String(relation.from_entry_id) === currentEntryId ? String(relation.to_entry_id) : String(relation.from_entry_id);
+    return this.relationEntries().find((item) => String(item.id) === counterpartId) ?? null;
+  }
+
+  relationCounterpartLink(relation: EntryRelationRecord): string[] | null {
+    const counterpart = this.relationCounterpart(relation);
+    return counterpart ? ['/entries', counterpart.schema_key, String(counterpart.id)] : null;
+  }
+
+  relationDirectionLabel(relation: EntryRelationRecord): string {
+    return String(relation.from_entry_id) === String(this.entry()?.id ?? '')
+      ? this.translate.instant('entryDetail.relations.direction.outgoing')
+      : this.translate.instant('entryDetail.relations.direction.incoming');
+  }
+
+  relationTypeLabel(type: string): string {
+    return this.translate.instant(`entryDetail.relations.types.${type}`);
+  }
+
+  relationCandidateSubtitle(item: RelationLookupItem): string {
+    return `${item.schema_name} · #${item.id}`;
+  }
+
+  selectRelationCandidate(item: RelationLookupItem): void {
+    this.relationForm.controls.to_entry_id.setValue(String(item.id));
+  }
+
+  isSelectedRelationCandidate(item: RelationLookupItem): boolean {
+    return String(item.id) === String(this.relationForm.controls.to_entry_id.getRawValue() ?? '');
+  }
+
+  selectedRelationTarget(): RelationLookupItem | null {
+    const selectedId = String(this.relationForm.controls.to_entry_id.getRawValue() ?? '');
+    return this.relationEntries().find((item) => String(item.id) === selectedId) ?? null;
+  }
+
   private async load(): Promise<void> {
     if (!this.currentEntryId) {
       return;
@@ -456,6 +702,7 @@ export class EntryDetailComponent {
       const bundle = await firstValueFrom(this.entryService.getEntryBundle(this.currentEntryId));
       this.applyBundle(bundle);
       await this.loadReferenceTitles(bundle.entry, bundle.schema);
+      await this.loadRelationEntries();
     } catch (error) {
       this.errorMessage.set(this.describeError(error, 'load'));
     } finally {
@@ -472,6 +719,17 @@ export class EntryDetailComponent {
     this.attachments.set(bundle.attachments ?? []);
     this.permissions.set(bundle.permissions ?? []);
     this.rebuildForms(bundle.entry, bundle.schema);
+  }
+
+  private async reloadRelations(): Promise<void> {
+    const entry = this.entry();
+    if (!entry) {
+      return;
+    }
+
+    const relations = await firstValueFrom(this.entryService.getRelations(entry.id));
+    this.relations.set(relations);
+    await this.loadRelationEntries();
   }
 
   private rebuildForms(entry: EntryRecord, schema: EntrySchema | null): void {
@@ -556,6 +814,37 @@ export class EntryDetailComponent {
         return result;
       }, {})
     );
+  }
+
+  private async loadRelationEntries(): Promise<void> {
+    const [schemas, entries] = await Promise.all([
+      firstValueFrom(this.schemaService.loadSchemas(false, true)),
+      firstValueFrom(this.entryService.listEntries({}) as Observable<EntryRecord[]>)
+    ]);
+
+    const schemaMap = new Map(schemas.map((schema) => [String(schema.id), schema]));
+    const items = (entries as EntryRecord[]).map<RelationLookupItem>((item) => {
+      const relatedSchema = schemaMap.get(String(item.schema_id));
+      return {
+        id: item.id,
+        title: resolveEntryTitle(item, relatedSchema ?? null),
+        schema_id: item.schema_id,
+        schema_key: relatedSchema?.key ?? '',
+        schema_name: relatedSchema?.name ?? this.translate.instant('entryDetail.labels.unknownId')
+      };
+    });
+
+    this.relationEntries.set(items);
+  }
+
+  private parseRelationMetadata(value: string): Record<string, unknown> {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return {};
+    }
+
+    const parsed = JSON.parse(trimmed);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Record<string, unknown> : {};
   }
 
   private buildDataJson(): Record<string, unknown> {

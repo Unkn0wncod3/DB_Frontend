@@ -104,7 +104,9 @@
 .entry-detail__meta,
 .entry-detail__hero-actions,
 .entry-detail__entity-header,
-.entry-detail__timeline-header {
+.entry-detail__timeline-header,
+.entry-detail__entity-actions,
+.entry-detail__relations-toolbar {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1rem;
@@ -181,6 +183,11 @@
   border-color: var(--color-danger);
   background: var(--color-error-bg);
   color: var(--color-error-text);
+}
+
+.entry-detail__chip--muted {
+  color: var(--color-text-soft);
+  font-weight: 600;
 }
 
 .entry-detail__alert,
@@ -394,6 +401,36 @@
   margin-bottom: 0.85rem;
 }
 
+.entry-detail__relations-toolbar {
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.entry-detail__relations-search,
+.entry-detail__relations-filter {
+  min-height: 2.75rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--detail-border-strong);
+  border-radius: 12px;
+  background: var(--detail-input);
+  color: var(--color-text);
+}
+
+.entry-detail__relations-search {
+  min-width: min(100%, 18rem);
+}
+
+.entry-detail__relations-card-head {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.entry-detail__relations-link {
+  color: var(--color-text);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
 .entry-detail__entity-header a,
 .entry-detail__entity-header strong {
   color: var(--color-text);
@@ -470,6 +507,10 @@
   box-shadow: var(--shadow-strong);
 }
 
+.entry-detail__dialog--wide {
+  width: min(920px, 100%);
+}
+
 .entry-detail__dialog h2 {
   margin: 0 0 0.5rem;
 }
@@ -482,6 +523,7 @@
 .entry-detail__dialog-form {
   display: grid;
   gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
 .entry-detail__dialog-form label {
@@ -491,13 +533,57 @@
   font-weight: 600;
 }
 
+.entry-detail__dialog-field--full {
+  grid-column: 1 / -1;
+}
+
 .entry-detail__dialog-form input,
-.entry-detail__dialog-form select {
+.entry-detail__dialog-form select,
+.entry-detail__dialog-form textarea {
   border: 1px solid var(--detail-border-strong);
   border-radius: 0.5rem;
   padding: 0.65rem 0.85rem;
   background: var(--detail-input);
   color: var(--color-text);
+}
+
+.entry-detail__dialog-form textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.entry-detail__relation-candidate-list {
+  display: grid;
+  gap: 0.75rem;
+  max-height: 18rem;
+  overflow: auto;
+  padding-right: 0.2rem;
+}
+
+.entry-detail__relation-candidate {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--detail-border);
+  border-radius: 14px;
+  background: var(--detail-subtle);
+  text-align: left;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.entry-detail__relation-candidate strong {
+  font-size: 0.98rem;
+}
+
+.entry-detail__relation-candidate span {
+  color: var(--color-text-soft);
+  font-size: 0.88rem;
+}
+
+.entry-detail__relation-candidate--active {
+  border-color: color-mix(in srgb, var(--color-primary) 50%, var(--detail-border));
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--detail-subtle));
 }
 
 .entry-detail__dialog-checkbox {

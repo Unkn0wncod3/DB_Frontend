@@ -358,6 +358,7 @@
       "private": "Private"
     },
     "relations": {
+      "searchPlaceholder": "Search linked entries or relation type",
       "profiles": "Profiles",
       "notes": "Notes",
       "activities": "Activities",
@@ -377,8 +378,51 @@
         "type": "Type",
         "from": "From",
         "to": "To",
+        "target": "Target schema",
+        "targetId": "Target entry",
         "order": "Order",
         "created": "Created"
+      },
+      "actions": {
+        "create": "Create relation"
+      },
+      "dialog": {
+        "createTitle": "Create relation",
+        "createSubtitle": "Search a visible entry, choose the relation type and save the link.",
+        "editTitle": "Edit relation",
+        "editSubtitle": "Update target entry, relation type, order or metadata."
+      },
+      "fields": {
+        "search": "Search entry",
+        "schemaFilter": "Schema filter",
+        "type": "Relation type",
+        "sortOrder": "Sort order",
+        "target": "Target entry ID",
+        "metadata": "Metadata JSON"
+      },
+      "filters": {
+        "allTypes": "All relation types",
+        "allSchemas": "All schemas"
+      },
+      "direction": {
+        "outgoing": "From current entry",
+        "incoming": "To current entry"
+      },
+      "labels": {
+        "entryFallback": "Entry #{{ id }}"
+      },
+      "types": {
+        "belongs_to": "Belongs to",
+        "parent_of": "Parent of",
+        "references": "References",
+        "assigned_to": "Assigned to",
+        "contains": "Contains",
+        "related_to": "Related to"
+      },
+      "status": {
+        "created": "Relation created.",
+        "updated": "Relation updated.",
+        "deleted": "Relation deleted."
       }
     },
     "delete": {
