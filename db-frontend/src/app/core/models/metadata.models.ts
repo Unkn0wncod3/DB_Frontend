@@ -103,6 +103,34 @@ export interface EntryHistoryRecord {
   comment?: string | null;
 }
 
+export interface GlobalHistoryRecord extends EntryHistoryRecord {
+  entry_title?: string | null;
+  schema_id: string | number;
+  schema_key: string;
+  schema_name: string;
+  changed_by_username?: string | null;
+  changed_fields?: string[] | null;
+}
+
+export interface GlobalHistoryListResponse {
+  items: GlobalHistoryRecord[];
+  limit: number;
+  offset: number;
+  total: number;
+}
+
+export interface GlobalHistoryListParams {
+  limit?: number;
+  offset?: number;
+  search?: string;
+  schema_id?: string | number;
+  entry_id?: string | number;
+  changed_by?: string | number;
+  change_type?: string;
+  date_from?: string;
+  date_to?: string;
+}
+
 export interface EntryRelationRecord {
   id: string | number;
   from_entry_id: string | number;

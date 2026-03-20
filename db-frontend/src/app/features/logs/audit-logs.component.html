@@ -15,7 +15,7 @@
   </section>
 
   <section class="logs-history__panel">
-    <div class="logs-history__toolbar" [formGroup]="filtersForm">
+    <form class="logs-history__toolbar" [formGroup]="filtersForm" (ngSubmit)="refresh()">
       <label class="logs-history__search">
         <span>{{ 'logsHistory.search.label' | translate }}</span>
         <input
@@ -24,17 +24,20 @@
           [placeholder]="'logsHistory.search.placeholder' | translate"
         />
       </label>
+      <button type="submit" class="logs-history__refresh" [disabled]="isLoading()">
+        {{ (isLoading() ? 'logsHistory.actions.refreshing' : 'logsHistory.actions.search') | translate }}
+      </button>
       <button type="button" class="logs-history__reset" (click)="resetSearch()">
         {{ 'logsHistory.actions.reset' | translate }}
       </button>
-    </div>
+    </form>
 
     <div class="logs-history__summary">
-      <strong>{{ filteredRows().length }}</strong>
-      <span>{{ 'logsHistory.labels.visibleRows' | translate:{ value: rows().length } }}</span>
+      <strong>{{ rows().length }}</strong>
+      <span>{{ 'logsHistory.labels.visibleRows' | translate:{ value: total() } }}</span>
     </div>
 
-    <div class="logs-history__table-wrap" *ngIf="filteredRows().length > 0; else emptyState">
+    <div class="logs-history__table-wrap" *ngIf="rows().length > 0; else emptyState">
       <table class="logs-history__table">
         <thead>
           <tr>
@@ -49,7 +52,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of filteredRows(); trackBy: trackRow">
+          <tr *ngFor="let row of rows(); trackBy: trackRow">
             <td>{{ row.changedAt | date:'dd/MM/yyyy, HH:mm' }}</td>
             <td>
               <strong>{{ row.schemaName }}</strong>

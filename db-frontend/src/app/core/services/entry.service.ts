@@ -9,6 +9,8 @@ import {
   EntryAccessMap,
   EntryBundle,
   EntryHistoryRecord,
+  GlobalHistoryListParams,
+  GlobalHistoryListResponse,
   EntryListParams,
   EntryPermission,
   EntryPermissionRecord,
@@ -128,6 +130,18 @@ export class EntryService {
 
   getHistory(entryId: string | number): Observable<EntryHistoryRecord[]> {
     return this.api.request<EntryHistoryRecord[]>('GET', `/entries/${encodeURIComponent(String(entryId))}/history`);
+  }
+
+  getGlobalHistory(params: GlobalHistoryListParams = {}): Observable<GlobalHistoryListResponse> {
+    const query = Object.entries(params).reduce<Record<string, string>>((result, [key, value]) => {
+      if (value === null || value === undefined || value === '') {
+        return result;
+      }
+      result[key] = String(value);
+      return result;
+    }, {});
+
+    return this.api.request<GlobalHistoryListResponse>('GET', '/history', { params: query });
   }
 
   getRelations(entryId: string | number): Observable<EntryRelationRecord[]> {

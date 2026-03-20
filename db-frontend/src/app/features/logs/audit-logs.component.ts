@@ -5,9 +5,8 @@ import { RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
-import { EntryHistoryRecord, EntryRecordWithAccess } from '../../core/models/metadata.models';
+import { GlobalHistoryRecord } from '../../core/models/metadata.models';
 import { EntryService } from '../../core/services/entry.service';
-import { SchemaService } from '../../core/services/schema.service';
 import { humanizeKey } from '../../core/utils/schema.utils';
 
 interface HistoryRow {
@@ -34,40 +33,16 @@ interface HistoryRow {
 })
 export class AuditLogsComponent {
   private readonly fb = inject(FormBuilder);
-  private readonly schemaService = inject(SchemaService);
   private readonly entryService = inject(EntryService);
   private readonly translate = inject(TranslateService);
 
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly rows = signal<HistoryRow[]>([]);
+  readonly total = signal(0);
 
   readonly filtersForm = this.fb.nonNullable.group({
     search: ['']
-  });
-
-  readonly filteredRows = computed(() => {
-    const search = this.filtersForm.controls.search.getRawValue().trim().toLowerCase();
-    if (!search) {
-      return this.rows();
-    }
-
-    return this.rows().filter((row) =>
-      [
-        row.schemaName,
-        row.schemaKey,
-        row.entryTitle,
-        row.entryId,
-        row.changeType,
-        row.changedBy,
-        row.comment ?? '',
-        row.visibility,
-        row.summary
-      ]
-        .join(' ')
-        .toLowerCase()
-        .includes(search)
-    );
   });
 
   constructor() {
@@ -80,6 +55,7 @@ export class AuditLogsComponent {
 
   resetSearch(): void {
     this.filtersForm.reset({ search: '' });
+    void this.loadHistory();
   }
 
   trackRow(_index: number, row: HistoryRow): string {
@@ -95,34 +71,16 @@ export class AuditLogsComponent {
     this.errorMessage.set(null);
 
     try {
-      const schemas = await firstValueFrom(this.schemaService.loadSchemas(true, true));
-      const schemaEntries = await Promise.all(
-        schemas.map(async (schema) => {
-          const response = await firstValueFrom(this.schemaService.getSchemaEntries(schema.id));
-          return {
-            schemaId: schema.id,
-            schemaKey: schema.key,
-            schemaName: schema.name,
-            entries: response.entries ?? []
-          };
+      const response = await firstValueFrom(
+        this.entryService.getGlobalHistory({
+          limit: 200,
+          offset: 0,
+          search: this.filtersForm.controls.search.getRawValue().trim() || undefined
         })
       );
 
-      const historyGroups = await Promise.all(
-        schemaEntries.flatMap((group) =>
-          group.entries.map(async (entry) => ({
-            schemaKey: group.schemaKey,
-            schemaName: group.schemaName,
-            entry,
-            history: await this.safeLoadEntryHistory(entry)
-          }))
-        )
-      );
-
-      const rows = historyGroups
-        .flatMap((group) =>
-          group.history.map((record) => this.toHistoryRow(group.schemaKey, group.schemaName, group.entry, record))
-        )
+      const rows = (response.items ?? [])
+        .map((record) => this.toHistoryRow(record))
         .sort((a, b) => {
           const timeDiff = Date.parse(b.changedAt) - Date.parse(a.changedAt);
           if (!Number.isNaN(timeDiff) && timeDiff !== 0) {
@@ -132,36 +90,27 @@ export class AuditLogsComponent {
         });
 
       this.rows.set(rows);
+      this.total.set(response.total ?? rows.length);
     } catch (error) {
       this.rows.set([]);
+      this.total.set(0);
       this.errorMessage.set(this.describeError(error));
     } finally {
       this.isLoading.set(false);
     }
   }
 
-  private async safeLoadEntryHistory(entry: EntryRecordWithAccess): Promise<EntryHistoryRecord[]> {
-    try {
-      return await firstValueFrom(this.entryService.getHistory(entry.id));
-    } catch {
-      return [];
-    }
-  }
-
-  private toHistoryRow(
-    schemaKey: string,
-    schemaName: string,
-    entry: EntryRecordWithAccess,
-    record: EntryHistoryRecord
-  ): HistoryRow {
+  private toHistoryRow(record: GlobalHistoryRecord): HistoryRow {
     return {
       historyId: record.id,
-      entryId: entry.id,
-      schemaKey,
-      schemaName,
-      entryTitle: entry.title?.trim() || `${schemaName} #${entry.id}`,
+      entryId: record.entry_id,
+      schemaKey: record.schema_key,
+      schemaName: record.schema_name,
+      entryTitle: record.entry_title?.trim() || `${record.schema_name} #${record.entry_id}`,
       changeType: humanizeKey(record.change_type),
-      changedBy: record.changed_by != null ? `#${record.changed_by}` : '-',
+      changedBy:
+        record.changed_by_username?.trim() ||
+        (record.changed_by != null ? `#${record.changed_by}` : '-'),
       changedAt: record.changed_at,
       comment: record.comment?.trim() || null,
       visibility: this.visibilityLabel(record),
@@ -169,7 +118,7 @@ export class AuditLogsComponent {
     };
   }
 
-  private visibilityLabel(record: EntryHistoryRecord): string {
+  private visibilityLabel(record: GlobalHistoryRecord): string {
     const oldValue = record.old_visibility_level ?? '-';
     const newValue = record.new_visibility_level ?? '-';
 
@@ -180,7 +129,11 @@ export class AuditLogsComponent {
     return `${humanizeKey(String(oldValue))} -> ${humanizeKey(String(newValue))}`;
   }
 
-  private diffSummary(record: EntryHistoryRecord): string {
+  private diffSummary(record: GlobalHistoryRecord): string {
+    if (Array.isArray(record.changed_fields) && record.changed_fields.length > 0) {
+      return record.changed_fields.map((key) => humanizeKey(key)).join(', ');
+    }
+
     const before = record.old_data_json ?? {};
     const after = record.new_data_json ?? {};
     const changedKeys = Array.from(new Set([...Object.keys(before), ...Object.keys(after)])).filter(
