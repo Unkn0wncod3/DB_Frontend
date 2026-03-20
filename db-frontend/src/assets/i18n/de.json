@@ -1,4 +1,4 @@
-{
+﻿{
   "layout": {
     "brand": "DB Frontend",
     "nav": {
@@ -1007,6 +1007,7 @@
     "actions": {
       "refresh": "Aktualisieren",
       "refreshing": "Aktualisiere...",
+      "search": "Suchen",
       "reset": "Zurücksetzen"
     },
     "search": {
