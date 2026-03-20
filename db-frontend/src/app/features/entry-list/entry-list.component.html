@@ -14,7 +14,6 @@
       </p>
     </div>
     <div class="entry-list__actions">
-      <button *ngIf="schema() && auth.canManageSchemas()" type="button" class="entry-list__field-add" (click)="openFieldDialog()">+</button>
       <a *ngIf="createLink() as create" [routerLink]="create" class="entry-list__create">
         {{ 'entryList.actions.create' | translate }}
       </a>
@@ -26,28 +25,6 @@
 
   <section *ngIf="errorMessage() as error" class="entry-list__alert entry-list__alert--error">
     <p>{{ error }}</p>
-  </section>
-  <section *ngIf="successMessage() as success" class="entry-list__alert entry-list__alert--success">
-    <p>{{ success }}</p>
-  </section>
-
-  <section class="entry-list__field-manager" *ngIf="schema() as currentSchema">
-    <header class="entry-list__field-manager-header">
-      <h2>{{ 'schemaFields.listTitle' | translate:{ schema: currentSchema.name } }}</h2>
-      <p>{{ 'schemaFields.listSubtitle' | translate }}</p>
-    </header>
-    <div class="entry-list__field-pills">
-      <article *ngFor="let field of currentSchema.fields; trackBy: trackFieldDefinition" class="entry-list__field-pill">
-        <div>
-          <strong>{{ field.label || field.key }}</strong>
-          <span>{{ field.data_type }}</span>
-        </div>
-        <div class="entry-list__field-pill-actions" *ngIf="auth.canManageSchemas()">
-          <button type="button" (click)="editField(field)">{{ 'schemaFields.actions.edit' | translate }}</button>
-          <button type="button" (click)="deleteField(field)">{{ 'schemaFields.actions.delete' | translate }}</button>
-        </div>
-      </article>
-    </div>
   </section>
 
   <section class="entry-list__content" *ngIf="entries().length > 0; else emptyState">
@@ -81,41 +58,4 @@
       <p>{{ (isLoading() ? 'entryList.status.loading' : 'entryList.status.empty') | translate }}</p>
     </section>
   </ng-template>
-
-  <div class="entry-list__dialog-backdrop" *ngIf="isFieldDialogOpen()" (click)="closeFieldDialog()">
-    <section class="entry-list__dialog" (click)="$event.stopPropagation()">
-      <h2>{{ fieldDialogTitle() }}</h2>
-      <p>{{ fieldDialogSubtitle() }}</p>
-      <form [formGroup]="fieldForm" class="entry-list__dialog-form" (ngSubmit)="createField()">
-        <label>
-          <span>{{ 'schemaFields.fields.label' | translate }}</span>
-          <input type="text" formControlName="label" />
-        </label>
-        <label>
-          <span>{{ 'schemaFields.fields.key' | translate }}</span>
-          <input type="text" formControlName="key" />
-        </label>
-        <label>
-          <span>{{ 'schemaFields.fields.description' | translate }}</span>
-          <input type="text" formControlName="description" />
-        </label>
-        <label>
-          <span>{{ 'schemaFields.fields.type' | translate }}</span>
-          <select formControlName="data_type">
-            <option *ngFor="let type of fieldTypes" [value]="type">{{ type }}</option>
-          </select>
-        </label>
-        <label class="entry-list__dialog-checkbox">
-          <input type="checkbox" formControlName="is_required" />
-          <span>{{ 'schemaFields.fields.required' | translate }}</span>
-        </label>
-        <div class="entry-list__dialog-actions">
-          <button type="button" (click)="closeFieldDialog()">{{ 'schemaFields.actions.cancel' | translate }}</button>
-          <button type="submit" [disabled]="fieldForm.invalid || isCreatingField()">
-            {{ (isCreatingField() ? 'schemaFields.actions.creating' : fieldButtonLabel()) }}
-          </button>
-        </div>
-      </form>
-    </section>
-  </div>
 </section>
