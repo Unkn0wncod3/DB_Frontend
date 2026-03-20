@@ -169,12 +169,14 @@
     },
     "actions": {
       "save": "Save changes",
-      "saving": "Saving..."
+      "saving": "Saving...",
+      "changePassword": "Change password"
     },
     "status": {
       "loading": "Loading profile...",
       "updated": "Profile updated.",
-      "noChanges": "Nothing to update."
+      "noChanges": "Nothing to update.",
+      "passwordUpdated": "Password updated."
     },
     "meta": {
       "title": "Account overview",
@@ -193,6 +195,19 @@
       "validation": "Please check the entered values.",
       "conflict": "That username is already taken.",
       "generic": "Unable to update your profile."
+    },
+    "passwordDialog": {
+      "title": "Change password",
+      "subtitle": "Enter the new password twice to confirm the change.",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "confirmPlaceholder": "Repeat the new password",
+      "passwordHint": "Use at least 8 characters.",
+      "mismatch": "The passwords do not match.",
+      "show": "Show",
+      "hide": "Hide",
+      "cancel": "Cancel",
+      "confirm": "Update password"
     }
   },
   "dashboard": {
@@ -741,6 +756,8 @@
       "subtitle": "Enter your credentials to access the dashboard.",
       "username": "Username",
       "password": "Password",
+      "showPassword": "Show",
+      "hidePassword": "Hide",
       "submit": "Sign in",
       "loading": "Signing in..."
     },

@@ -11,7 +11,12 @@
 
       <label>
         <span>{{ 'auth.login.password' | translate }}</span>
-        <input type="password" formControlName="password" autocomplete="current-password" />
+        <div class="login__password-input">
+          <input [type]="showPassword() ? 'text' : 'password'" formControlName="password" autocomplete="current-password" />
+          <button type="button" class="login__password-toggle" (click)="togglePasswordVisibility()">
+            {{ (showPassword() ? 'auth.login.hidePassword' : 'auth.login.showPassword') | translate }}
+          </button>
+        </div>
       </label>
 
       <div class="login__error" *ngIf="errorMessage() as errorKey">

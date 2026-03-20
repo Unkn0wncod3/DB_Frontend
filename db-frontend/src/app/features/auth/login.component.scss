@@ -44,6 +44,23 @@ input {
   color: var(--color-text);
 }
 
+.login__password-input {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+}
+
+.login__password-toggle {
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  background: var(--color-panel-muted);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .login__error {
   color: var(--color-error-text);
   font-weight: 600;

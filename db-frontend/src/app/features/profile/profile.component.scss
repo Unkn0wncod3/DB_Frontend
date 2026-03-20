@@ -99,7 +99,9 @@
   gap: 0.75rem;
 }
 
-.profile__actions button {
+.profile__actions button,
+.profile__dialog-actions button,
+.profile__password-toggle {
   border: none;
   border-radius: 0.5rem;
   padding: 0.75rem 1.5rem;
@@ -108,19 +110,28 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.profile__actions button:not([disabled]):hover {
+.profile__actions button:not([disabled]):hover,
+.profile__dialog-actions button:not([disabled]):hover {
   transform: translateY(-1px);
 }
 
-.profile__actions button[disabled] {
+.profile__actions button[disabled],
+.profile__dialog-actions button[disabled] {
   opacity: 0.65;
   cursor: not-allowed;
 }
 
-.profile__actions button[type='submit'] {
+.profile__actions button[type='submit'],
+.profile__dialog-actions button[type='submit'] {
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-alt));
   color: var(--color-primary-contrast);
   box-shadow: var(--shadow-strong);
+}
+
+.profile__secondary-action {
+  background: var(--color-panel-muted);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
 }
 
 .profile__meta {
@@ -221,4 +232,59 @@
   text-align: center;
   padding: 2rem 0;
   color: var(--color-text-muted);
+}
+
+.profile__dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(15, 23, 42, 0.55);
+  z-index: 30;
+}
+
+.profile__dialog {
+  width: min(520px, 100%);
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-panel);
+  box-shadow: var(--shadow-strong);
+}
+
+.profile__dialog-header h2 {
+  margin: 0;
+}
+
+.profile__dialog-header p {
+  margin: 0.4rem 0 0;
+  color: var(--color-text-muted);
+}
+
+.profile__dialog-form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.profile__dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.profile__password-input {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.profile__password-toggle {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-panel-muted);
+  color: var(--color-text);
+  box-shadow: none;
 }

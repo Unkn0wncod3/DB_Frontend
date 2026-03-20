@@ -19,6 +19,8 @@ import { ThemeService } from './core/services/theme.service';
 })
 export class AppComponent implements OnInit, OnDestroy {
   readonly languages = ['en', 'de'];
+  readonly defaultProfileImage =
+    'https://media.istockphoto.com/id/1495088043/de/vektor/benutzerprofil-symbol-avatar-oder-personensymbol-profilbild-portr%C3%A4tsymbol-standard.jpg?s=612x612&w=0&k=20&c=mmj93kpr1sFn8VJYI_MUabWE4B86zRD5Uf9fBbTbQqk=';
   currentLang: string;
   readonly githubUrl = 'https://github.com/Unkn0wncod3';
   private statusIntervalSub?: Subscription;
@@ -89,6 +91,21 @@ export class AppComponent implements OnInit, OnDestroy {
     if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  }
+
+  profileImageSrc(user: AuthenticatedUser | null): string {
+    const src = user?.profile_picture_url?.trim();
+    return src && src.length > 0 ? src : this.defaultProfileImage;
+  }
+
+  handleProfileImageError(event: Event): void {
+    const image = event.target as HTMLImageElement | null;
+    if (!image || image.dataset['fallbackApplied'] === 'true') {
+      return;
+    }
+
+    image.dataset['fallbackApplied'] = 'true';
+    image.src = this.defaultProfileImage;
   }
 
   private applyUserPreferences(user: AuthenticatedUser | null): void {

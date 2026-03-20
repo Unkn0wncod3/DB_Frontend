@@ -8,9 +8,6 @@
       <a routerLink="/schemas" routerLinkActive="is-active">
         {{ 'layout.nav.schemas' | translate }}
       </a>
-      <a routerLink="/profile" routerLinkActive="is-active">
-        {{ 'layout.nav.profile' | translate }}
-      </a>
       <a *ngIf="auth.isAdmin()" routerLink="/explorer" routerLinkActive="is-active">
         {{ 'layout.nav.explorer' | translate }}
       </a>
@@ -49,10 +46,10 @@
           <a *ngIf="auth.user() as currentUser" class="app-shell__user-link" routerLink="/profile">
             <div class="app-shell__user-meta">
               <img
-                *ngIf="currentUser.profile_picture_url"
                 class="app-shell__user-avatar"
-                [src]="currentUser.profile_picture_url"
+                [src]="profileImageSrc(currentUser)"
                 [alt]="currentUser.username"
+                (error)="handleProfileImageError($event)"
               />
               <div class="app-shell__user-text">
                 <span class="app-shell__user-name">{{ currentUser.username }}</span>

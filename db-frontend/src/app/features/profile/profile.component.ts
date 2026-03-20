@@ -25,6 +25,8 @@ interface ProfileFormPreferences {
   styleUrl: './profile.component.scss'
 })
 export class ProfileComponent {
+  readonly defaultProfileImage =
+    'https://media.istockphoto.com/id/1495088043/de/vektor/benutzerprofil-symbol-avatar-oder-personensymbol-profilbild-portr%C3%A4tsymbol-standard.jpg?s=612x612&w=0&k=20&c=mmj93kpr1sFn8VJYI_MUabWE4B86zRD5Uf9fBbTbQqk=';
   private readonly fb = inject(FormBuilder);
   private readonly account = inject(AccountService);
   private readonly auth = inject(AuthService);
@@ -32,17 +34,23 @@ export class ProfileComponent {
 
   readonly form = this.fb.nonNullable.group({
     username: ['', [Validators.required]],
-    password: [''],
     profile_picture_url: [''],
     theme: ['system' as PreferenceTheme],
     language: ['en'],
     email_notifications: [false],
     push_notifications: [false]
   });
+  readonly passwordForm = this.fb.nonNullable.group({
+    password: ['', [Validators.required, Validators.minLength(8)]],
+    confirm_password: ['', [Validators.required]]
+  });
 
   readonly profile = signal<AuthenticatedUser | null>(null);
   readonly isLoading = signal(true);
   readonly isSaving = signal(false);
+  readonly isPasswordDialogOpen = signal(false);
+  readonly showNewPassword = signal(false);
+  readonly showConfirmPassword = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
 
@@ -52,6 +60,26 @@ export class ProfileComponent {
 
   preferencesDisplay(user: AuthenticatedUser | null) {
     return this.normalizePreferences(user?.preferences);
+  }
+
+  passwordMismatch(): boolean {
+    const raw = this.passwordForm.getRawValue();
+    return raw.password.length > 0 && raw.confirm_password.length > 0 && raw.password !== raw.confirm_password;
+  }
+
+  profileImageSrc(user: AuthenticatedUser | null): string {
+    const src = user?.profile_picture_url?.trim();
+    return src && src.length > 0 ? src : this.defaultProfileImage;
+  }
+
+  handleProfileImageError(event: Event): void {
+    const image = event.target as HTMLImageElement | null;
+    if (!image || image.dataset['fallbackApplied'] === 'true') {
+      return;
+    }
+
+    image.dataset['fallbackApplied'] = 'true';
+    image.src = this.defaultProfileImage;
   }
 
   async loadProfile(): Promise<void> {
@@ -90,10 +118,6 @@ export class ProfileComponent {
       payload.username = trimmedUsername;
     }
 
-    if (raw.password && raw.password.length > 0) {
-      payload.password = raw.password;
-    }
-
     const newProfilePicture = (raw.profile_picture_url ?? '').trim();
     const normalizedNewPicture = newProfilePicture ? newProfilePicture : null;
     const normalizedCurrentPicture = currentProfile?.profile_picture_url ?? null;
@@ -111,7 +135,6 @@ export class ProfileComponent {
 
     if (Object.keys(payload).length === 0) {
       this.successMessage.set(this.translate.instant('profile.status.noChanges'));
-      this.form.patchValue({ password: '' });
       return;
     }
 
@@ -132,12 +155,63 @@ export class ProfileComponent {
     }
   }
 
+  openPasswordDialog(): void {
+    this.passwordForm.reset({
+      password: '',
+      confirm_password: ''
+    });
+    this.showNewPassword.set(false);
+    this.showConfirmPassword.set(false);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+    this.isPasswordDialogOpen.set(true);
+  }
+
+  closePasswordDialog(): void {
+    this.isPasswordDialogOpen.set(false);
+  }
+
+  togglePasswordVisibility(target: 'new' | 'confirm'): void {
+    if (target === 'new') {
+      this.showNewPassword.update((value) => !value);
+      return;
+    }
+    this.showConfirmPassword.update((value) => !value);
+  }
+
+  async savePasswordChange(): Promise<void> {
+    this.passwordForm.markAllAsTouched();
+    if (this.passwordForm.invalid || this.passwordMismatch() || this.isSaving()) {
+      return;
+    }
+
+    this.isSaving.set(true);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
+    try {
+      const updated = await firstValueFrom(
+        this.account.updateProfile({
+          password: this.passwordForm.getRawValue().password
+        })
+      );
+      this.profile.set(updated);
+      this.auth.updateUser(updated);
+      this.resetFormWithProfile(updated);
+      this.isPasswordDialogOpen.set(false);
+      this.successMessage.set(this.translate.instant('profile.status.passwordUpdated'));
+    } catch (error) {
+      this.errorMessage.set(this.describeError(error));
+    } finally {
+      this.isSaving.set(false);
+    }
+  }
+
   private resetFormWithProfile(user: AuthenticatedUser): void {
     const normalizedPreferences = this.normalizePreferences(user.preferences);
 
     this.form.reset({
       username: user.username ?? '',
-      password: '',
       profile_picture_url: user.profile_picture_url ?? '',
       theme: normalizedPreferences.theme,
       language: normalizedPreferences.language,

@@ -210,12 +210,14 @@
     },
     "actions": {
       "save": "Änderungen speichern",
-      "saving": "Speichere..."
+      "saving": "Speichere...",
+      "changePassword": "Passwort ändern"
     },
     "status": {
       "loading": "Profil wird geladen...",
       "updated": "Profil aktualisiert.",
-      "noChanges": "Keine Änderungen erforderlich."
+      "noChanges": "Keine Änderungen erforderlich.",
+      "passwordUpdated": "Passwort aktualisiert."
     },
     "meta": {
       "title": "Kontodetails",
@@ -234,6 +236,19 @@
       "validation": "Bitte Eingaben prüfen.",
       "conflict": "Dieser Benutzername ist bereits vergeben.",
       "generic": "Profil konnte nicht aktualisiert werden."
+    },
+    "passwordDialog": {
+      "title": "Passwort ändern",
+      "subtitle": "Bitte das neue Passwort zur Bestätigung zweimal eingeben.",
+      "newPassword": "Neues Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "confirmPlaceholder": "Neues Passwort wiederholen",
+      "passwordHint": "Mindestens 8 Zeichen verwenden.",
+      "mismatch": "Die Passwörter stimmen nicht überein.",
+      "show": "Anzeigen",
+      "hide": "Verbergen",
+      "cancel": "Abbrechen",
+      "confirm": "Passwort aktualisieren"
     }
   },
   "dashboard": {
@@ -741,6 +756,8 @@
       "subtitle": "Bitte Zugangsdaten eingeben, um fortzufahren.",
       "username": "Benutzername",
       "password": "Passwort",
+      "showPassword": "Anzeigen",
+      "hidePassword": "Verbergen",
       "submit": "Anmelden",
       "loading": "Melde an..."
     },

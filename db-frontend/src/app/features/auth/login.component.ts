@@ -20,6 +20,7 @@ export class LoginComponent {
   private readonly router = inject(Router);
 
   readonly isSubmitting = signal(false);
+  readonly showPassword = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
   readonly form = this.fb.nonNullable.group({
@@ -48,6 +49,10 @@ export class LoginComponent {
           this.errorMessage.set(this.mapErrorToTranslation(err));
         }
       });
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword.update((value) => !value);
   }
 
   private mapErrorToTranslation(error: unknown): string {
