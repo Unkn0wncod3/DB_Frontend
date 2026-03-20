@@ -391,7 +391,8 @@
       "hide": "Hide raw data"
     },
     "form": {
-      "selectPlaceholder": "Choose a value"
+      "selectPlaceholder": "Choose a value",
+      "noMultiSelectOptions": "No options available for this field."
     },
     "selectOptions": {
       "gender": {

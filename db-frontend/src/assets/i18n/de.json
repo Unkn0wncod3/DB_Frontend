@@ -432,7 +432,8 @@
       "hide": "Rohdaten ausblenden"
     },
     "form": {
-      "selectPlaceholder": "Wert auswählen"
+      "selectPlaceholder": "Wert auswählen",
+      "noMultiSelectOptions": "Für dieses Feld sind keine Optionen vorhanden."
     },
     "selectOptions": {
       "gender": {
