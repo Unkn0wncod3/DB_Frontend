@@ -21,7 +21,8 @@
       "head_admin": "Head admin",
       "admin": "Admin",
       "editor": "Editor",
-      "user": "User"
+      "manager": "Manager",
+      "reader": "Reader"
     }
   },
   "logs": {
@@ -116,8 +117,8 @@
         "authLogin": "the login screen",
         "platforms": "the platform catalog",
         "platformDetail": "platform #{{id}}",
-        "entriesList": "the list of {{type}} entries",
-        "entriesDetail": "{{type}} entry {{id}}"
+        "entriesList": "the entry list for schema {{type}}",
+        "entriesDetail": "entry {{id}} for schema {{type}}"
       }
     },
     "status": {
@@ -125,8 +126,7 @@
       "empty": "No logs match the selected filters.",
       "genericError": "Unable to load logs.",
       "cleared": "All logs were deleted."
-    }
-    ,
+    },
     "modal": {
       "title": "Delete all logs?",
       "body": "This removes every audit entry permanently. This action cannot be undone.",
@@ -196,7 +196,7 @@
   },
   "dashboard": {
     "title": "Database Overview",
-    "subtitle": "Key stats and recent activity from DB_API.",
+    "subtitle": "Schema-driven overview for schemas, entries and recent changes.",
     "actions": {
       "refresh": "Refresh now",
       "refreshing": "Refreshing...",
@@ -225,8 +225,8 @@
       "unknownEntry": "Unnamed entry",
       "noRecentCreate": "No recent creations",
       "noRecentUpdate": "No recent updates",
-      "itemType": "Type: {{ value }}",
-      "itemTypeWithId": "Type: {{ type }} (ID: {{ id }})",
+      "itemType": "Schema: {{ value }}",
+      "itemTypeWithId": "Schema: {{ type }} (Entry ID: {{ id }})",
       "itemId": "ID: {{ value }}"
     },
     "status": {
@@ -240,7 +240,7 @@
     },
     "totals": {
       "entries": "Total entries",
-      "collections": "Collections",
+      "collections": "Schemas",
       "users": "Users"
     },
     "activity": {
@@ -250,7 +250,7 @@
     },
     "totalLabels": {
       "entries": "Entries",
-      "collections": "Collections",
+      "collections": "Schemas",
       "users": "Users",
       "persons": "Persons",
       "profiles": "Profiles",
@@ -264,12 +264,13 @@
     "title": "{{ value }}",
     "labels": {
       "unknownId": "Unknown entry",
-      "type": "Type: {{ type }}",
+      "type": "Schema: {{ type }}",
       "id": "ID: {{ id }}",
       "relationships": "Related items",
       "connectedItems": "Profiles, notes and activities linked to this person",
       "createdAt": "Created",
-      "updatedAt": "Updated"
+      "updatedAt": "Updated",
+      "schemaWithId": "Schema {{schema}} - Entry ID {{id}}"
     },
     "actions": {
       "back": "Back to dashboard",
@@ -287,10 +288,20 @@
       "empty": "No data available for this entry.",
       "loadingRelations": "Loading related items...",
       "noRelations": "No related entries found.",
-      "readOnly": "Read-only role: you can browse data but your role cannot save changes."
+      "readOnly": "Read-only role: you can browse data but your role cannot save changes.",
+      "noRelationAccess": "No relation access.",
+      "noAttachmentAccess": "No attachment access.",
+      "noHistory": "No history entries.",
+      "noPermissions": "No explicit grants.",
+      "loadingEntry": "Loading entry..."
     },
     "sections": {
-      "raw": "Raw payload"
+      "raw": "Raw payload",
+      "formattedData": "Formatted data",
+      "relations": "Relations",
+      "attachments": "Attachments",
+      "history": "History",
+      "permissions": "Permissions"
     },
     "relations": {
       "profiles": "Profiles",
@@ -307,7 +318,14 @@
       "profileLinkInvalid": "Enter a valid profile ID before linking.",
       "layoutLabel": "Relations layout",
       "layoutOptionSide": "Side by side",
-      "layoutOptionStacked": "Below form"
+      "layoutOptionStacked": "Below form",
+      "columns": {
+        "type": "Type",
+        "from": "From",
+        "to": "To",
+        "order": "Order",
+        "created": "Created"
+      }
     },
     "delete": {
       "dialogTitle": "Confirm deletion",
@@ -325,7 +343,8 @@
       "deleteFailed": "Unable to delete entry: {{ message }}",
       "invalidPayload": "The API returned an unexpected response.",
       "unknown": "Unknown error",
-      "hiddenFromUser": "This entry is restricted to admin visibility."
+      "hiddenFromUser": "This entry is restricted to admin visibility.",
+      "loadFallback": "Unable to load entry."
     },
     "rawView": {
       "label": "Raw data",
@@ -377,10 +396,29 @@
     },
     "view": {
       "details": "Details"
+    },
+    "meta": {
+      "title": "Title",
+      "status": "Status",
+      "visibility": "Visibility",
+      "ownerId": "Owner ID",
+      "comment": "Comment"
+    },
+    "history": {
+      "by": "by {{value}}"
+    },
+    "permissions": {
+      "columns": {
+        "subjectType": "Subject type",
+        "subjectId": "Subject ID",
+        "permission": "Permission",
+        "createdBy": "Created by",
+        "createdAt": "Created at"
+      }
     }
   },
   "entryList": {
-    "title": "All {{ type }}",
+    "title": "{{ schema }} entries",
     "actions": {
       "back": "Back to dashboard",
       "create": "New entry",
@@ -396,7 +434,8 @@
     },
     "meta": {
       "total": "{{ value }} entries",
-      "lastUpdated": "Last updated {{ value }}"
+      "lastUpdated": "Last updated {{ value }}",
+      "schemaDriven": "Schema-driven entry list"
     },
     "table": {
       "actions": "Actions"
@@ -411,9 +450,11 @@
       "page": "Page {{ page }} - {{ pageSize }} per page"
     },
     "errors": {
-      "missingType": "Entry type missing.",
+      "missingType": "Schema key missing.",
       "loadFailed": "Unable to load entries: {{ message }}",
-      "unknown": "Unknown error"
+      "unknown": "Unknown error",
+      "loadFallback": "Unable to load entries.",
+      "unknownSchema": "Unknown schema: {{ schema }}"
     },
     "types": {
       "persons": "Persons",
@@ -422,7 +463,7 @@
       "vehicles": "Vehicles",
       "notes": "Notes",
       "platforms": "Platforms",
-      "collections": "Collections",
+      "collections": "Schemas",
       "users": "Users"
     },
     "timeline": {
@@ -473,8 +514,8 @@
     "error": "Unable to load platforms"
   },
   "entryCreate": {
-    "title": "Create {{ type }}",
-    "subtitle": "Fill out the required fields and submit to create a new {{ type }} record.",
+    "title": "Create entry for {{ schema }}",
+    "subtitle": "Fill the schema fields and entry metadata to create a new entry.",
     "actions": {
       "back": "Back to list",
       "submit": "Create entry",
@@ -497,9 +538,9 @@
       "note_created": "{{actor}} created note {{note}} for {{person}}{{pinned}}.",
       "note_updated": "{{actor}} updated note {{note}} ({{fields}}){{pinned}}.",
       "note_deleted": "{{actor}} deleted note {{note}} for {{person}}.",
-      "activity_created": "{{actor}} logged activity {{activity}} ({{type}}) for {{person}}.",
+      "activity_created": "{{actor}} logged activity {{activity}} (schema {{type}}) for {{person}}.",
       "activity_updated": "{{actor}} updated activity {{activity}} ({{fields}}).",
-      "activity_deleted": "{{actor}} removed activity {{activity}} ({{type}}).",
+      "activity_deleted": "{{actor}} removed activity {{activity}} (schema {{type}}).",
       "states": {
         "activated": "activated",
         "deactivated": "deactivated",
@@ -528,14 +569,23 @@
       "rawPayloadTitle": "Additional payload (JSON)",
       "rawPayloadHint": "Optional JSON that will be merged into the request body after the fields above."
     },
+    "meta": {
+      "title": "Entry metadata",
+      "fields": {
+        "title": "Title",
+        "status": "Status",
+        "visibility": "Visibility",
+        "ownerId": "Owner ID"
+      }
+    },
     "status": {
       "submitting": "Creating...",
       "created": "Entry created successfully.",
-      "noSchema": "No schema configured for this type yet.",
-      "schemaHelp": "Update src/app/features/entry-create/entry-create.schemas.ts to describe the fields for this entry type."
+      "noSchema": "No schema configured for this schema key yet.",
+      "schemaHelp": "This screen reads the field definitions from the backend schema metadata."
     },
     "errors": {
-      "missingType": "Entry type missing.",
+      "missingType": "Schema key missing.",
       "invalidPayload": "Payload invalid: {{ message }}",
       "emptyPayload": "Add at least one field or raw payload value before submitting.",
       "createFailed": "Unable to create entry: {{ message }}",
@@ -544,7 +594,9 @@
       "invalidDate": "Date fields require a valid ISO date/time value.",
       "requireOneOf": "Provide at least one of: {{ fields }}.",
       "requiredField": "This field is required.",
-      "unknown": "Unknown error"
+      "unknown": "Unknown error",
+      "unknownSchema": "Unknown schema: {{ schema }}",
+      "loadFallback": "Unable to create entry."
     }
   },
   "apiExplorer": {
@@ -654,7 +706,7 @@
   "userManagement": {
     "eyebrow": "Admin tools",
     "title": "User management",
-    "subtitle": "Create, remove or review internal accounts. Admin-level users can manage accounts; only head admins may modify admin roles.",
+    "subtitle": "Create, remove or review internal accounts. Admins can manage accounts; only head admins may assign or revoke high-level roles.",
     "form": {
       "username": "Username",
       "password": "Password",
@@ -712,7 +764,8 @@
       "head_admin": "Head admin",
       "admin": "Admin",
       "editor": "Editor",
-      "user": "User"
+      "manager": "Manager",
+      "reader": "Reader"
     },
     "modal": {
       "title": "Delete account?",
@@ -777,17 +830,17 @@
       "created": "Created",
       "updated": "Last updated: {{ value }}"
     },
-      "empty": {
-        "profiles": "No profiles within your visibility scope.",
-        "notes": "No notes within your visibility scope.",
-        "activities": "No activities within your visibility scope."
-      },
-      "errors": {
-        "generic": "Unable to load dossier."
-      },
-      "rawView": {
-        "show": "Show raw data",
-        "hide": "Hide raw data"
-      }
+    "empty": {
+      "profiles": "No profiles within your visibility scope.",
+      "notes": "No notes within your visibility scope.",
+      "activities": "No activities within your visibility scope."
+    },
+    "errors": {
+      "generic": "Unable to load dossier."
+    },
+    "rawView": {
+      "show": "Show raw data",
+      "hide": "Hide raw data"
     }
   }
+}

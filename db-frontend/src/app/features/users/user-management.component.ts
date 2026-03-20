@@ -33,12 +33,12 @@ export class UserManagementComponent {
   readonly roleUpdatingId = signal<string | number | null>(null);
   readonly statusUpdatingId = signal<string | number | null>(null);
   readonly currentUser = signal<AuthenticatedUser | null>(null);
-  readonly roleOptions: AuthRole[] = ['head_admin', 'admin', 'editor', 'user'];
+  readonly roleOptions: AuthRole[] = ['head_admin', 'admin', 'manager', 'editor', 'reader'];
 
   readonly createForm = this.fb.nonNullable.group({
     username: ['', [Validators.required, Validators.minLength(3)]],
     password: ['', [Validators.required]],
-    role: ['user' as AuthRole, Validators.required],
+    role: ['reader' as AuthRole, Validators.required],
     profile_picture_url: ['']
   });
 
@@ -99,7 +99,7 @@ export class UserManagementComponent {
       this.createForm.reset({
         username: '',
         password: '',
-        role: 'user',
+        role: 'reader',
         profile_picture_url: ''
       });
       await this.refresh();

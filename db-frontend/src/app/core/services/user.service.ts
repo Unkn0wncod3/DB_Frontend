@@ -95,7 +95,7 @@ export class UserService {
     const record = candidate as Record<string, unknown>;
     const id = record['id'] ?? record['_id'];
     const username = typeof record['username'] === 'string' ? record['username'] : '';
-    const role = (record['role'] as AuthRole) ?? 'user';
+    const role = (record['role'] as AuthRole) ?? 'reader';
     const isActive = Boolean(record['is_active'] ?? true);
 
     if (!username) {

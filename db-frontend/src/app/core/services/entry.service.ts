@@ -1,23 +1,32 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
 
 import { ApiService } from './api.service';
-import { VisibilityLevel } from '../../shared/types/visibility-level.type';
+import { SchemaService } from './schema.service';
+import {
+  AttachmentRecord,
+  CreateEntryPayload,
+  EntryAccessMap,
+  EntryHistoryRecord,
+  EntryListParams,
+  EntryPermission,
+  EntryPermissionRecord,
+  EntryRecord,
+  EntryRelationRecord,
+  UpdateEntryPayload
+} from '../models/metadata.models';
 
-export interface EntryListParams {
+export type { EntryListParams } from '../models/metadata.models';
+
+export interface LegacyEntryListParams {
   page?: number;
   pageSize?: number;
   search?: string;
   filters?: Record<string, string | number | boolean | null | undefined>;
 }
 
-export interface EntryRecord extends Record<string, unknown> {
-  visibility_level?: VisibilityLevel;
-}
-
-export interface EntryListResult {
-  items: EntryRecord[];
+export interface LegacyEntryListResult {
+  items: Record<string, unknown>[];
   total: number | null;
   page: number;
   pageSize: number;
@@ -25,278 +34,179 @@ export interface EntryListResult {
   raw: unknown;
 }
 
+const ENTRY_PERMISSIONS: EntryPermission[] = [
+  'read',
+  'view_history',
+  'edit',
+  'edit_status',
+  'edit_visibility',
+  'manage_relations',
+  'manage_attachments',
+  'manage_permissions',
+  'delete',
+  'manage'
+];
+
 @Injectable({ providedIn: 'root' })
 export class EntryService {
   private readonly api = inject(ApiService);
-  private readonly defaultPageSize = 25;
+  private readonly schemaService = inject(SchemaService);
 
-  listEntries(type: string, params: EntryListParams = {}): Observable<EntryListResult> {
-    const page = this.normalizePage(params.page ?? 1);
-    const pageSize = this.normalizePageSize(params.pageSize ?? this.defaultPageSize);
-    const query = this.buildListQuery(params, page, pageSize);
+  listEntries(params: EntryListParams): Observable<EntryRecord[]>;
+  listEntries(schemaKey: string, params?: LegacyEntryListParams): Observable<LegacyEntryListResult>;
+  listEntries(typeOrParams: string | EntryListParams, legacyParams?: LegacyEntryListParams): Observable<EntryRecord[] | LegacyEntryListResult> {
+    if (typeof typeOrParams === 'string') {
+      return this.schemaService.loadSchemas().pipe(
+        switchMap((schemas) => {
+          const schema = schemas.find((item) => item.key === typeOrParams) ?? null;
+          if (!schema) {
+            throw new Error(`Unknown schema: ${typeOrParams}`);
+          }
+          return this.listEntries({ schema_id: schema.id }).pipe(
+            map((entries) => ({
+              items: entries as unknown as Record<string, unknown>[],
+              total: entries.length,
+              page: legacyParams?.page ?? 1,
+              pageSize: legacyParams?.pageSize ?? entries.length,
+              hasMore: false,
+              raw: entries
+            }))
+          );
+        })
+      );
+    }
 
+    return this.api.request<EntryRecord[]>('GET', '/entries', { params: this.compactParams(typeOrParams) });
+  }
+
+  getEntry(entryId: string | number): Observable<EntryRecord>;
+  getEntry(_schemaKey: string, entryId: string | number): Observable<EntryRecord>;
+  getEntry(entryIdOrSchemaKey: string | number, maybeEntryId?: string | number): Observable<EntryRecord> {
+    const entryId = maybeEntryId ?? entryIdOrSchemaKey;
+    return this.api.request<EntryRecord>('GET', `/entries/${encodeURIComponent(String(entryId))}`);
+  }
+
+  createEntry(payload: CreateEntryPayload): Observable<EntryRecord> {
+    return this.api.request<EntryRecord>('POST', '/entries', { body: payload });
+  }
+
+  updateEntry(entryId: string | number, payload: UpdateEntryPayload): Observable<EntryRecord>;
+  updateEntry(_schemaKey: string, entryId: string | number, payload: UpdateEntryPayload): Observable<EntryRecord>;
+  updateEntry(entryIdOrSchemaKey: string | number, payloadOrEntryId: UpdateEntryPayload | string | number, maybePayload?: UpdateEntryPayload): Observable<EntryRecord> {
+    const entryId = maybePayload ? payloadOrEntryId : entryIdOrSchemaKey;
+    const payload = maybePayload ?? (payloadOrEntryId as UpdateEntryPayload);
+    return this.api.request<EntryRecord>('PATCH', `/entries/${encodeURIComponent(String(entryId))}`, { body: payload });
+  }
+
+  softDeleteEntry(entryId: string | number, comment?: string): Observable<EntryRecord> {
+    return this.updateEntry(entryId, {
+      deleted_at: new Date().toISOString(),
+      comment: comment?.trim() || 'Deleted from UI'
+    });
+  }
+
+  deleteEntry(entryId: string | number): Observable<EntryRecord>;
+  deleteEntry(_schemaKey: string, entryId: string | number): Observable<EntryRecord>;
+  deleteEntry(entryIdOrSchemaKey: string | number, maybeEntryId?: string | number): Observable<EntryRecord> {
+    const entryId = maybeEntryId ?? entryIdOrSchemaKey;
+    return this.softDeleteEntry(entryId);
+  }
+
+  getHistory(entryId: string | number): Observable<EntryHistoryRecord[]> {
+    return this.api.request<EntryHistoryRecord[]>('GET', `/entries/${encodeURIComponent(String(entryId))}/history`);
+  }
+
+  getRelations(entryId: string | number): Observable<EntryRelationRecord[]> {
+    return this.api.request<EntryRelationRecord[]>('GET', `/entries/${encodeURIComponent(String(entryId))}/relations`);
+  }
+
+  createRelation(entryId: string | number, payload: Partial<EntryRelationRecord>): Observable<EntryRelationRecord> {
+    return this.api.request<EntryRelationRecord>('POST', `/entries/${encodeURIComponent(String(entryId))}/relations`, {
+      body: payload
+    });
+  }
+
+  getPermissions(entryId: string | number): Observable<EntryPermissionRecord[]> {
+    return this.api.request<EntryPermissionRecord[]>('GET', `/entries/${encodeURIComponent(String(entryId))}/permissions`);
+  }
+
+  createPermission(entryId: string | number, payload: Partial<EntryPermissionRecord>): Observable<EntryPermissionRecord> {
+    return this.api.request<EntryPermissionRecord>('POST', `/entries/${encodeURIComponent(String(entryId))}/permissions`, {
+      body: payload
+    });
+  }
+
+  getAttachments(entryId: string | number): Observable<AttachmentRecord[]> {
+    return this.api.request<AttachmentRecord[]>('GET', `/entries/${encodeURIComponent(String(entryId))}/attachments`);
+  }
+
+  createAttachment(entryId: string | number, payload: Partial<AttachmentRecord>): Observable<AttachmentRecord> {
+    return this.api.request<AttachmentRecord>('POST', `/entries/${encodeURIComponent(String(entryId))}/attachments`, {
+      body: payload
+    });
+  }
+
+  checkAccess(entryId: string | number, permission: EntryPermission): Observable<boolean> {
     return this.api
-      .request<unknown>('GET', this.buildCollectionEndpoint(type), { params: query })
-      .pipe(map((payload) => this.normalizeListResponse(payload, page, pageSize)));
+      .request<unknown>('GET', `/entries/${encodeURIComponent(String(entryId))}/access/${permission}`)
+      .pipe(map((payload) => this.normalizeBooleanResponse(payload)));
   }
 
-  getEntry(type: string, id: string): Observable<EntryRecord> {
-    return this.api.request<EntryRecord>('GET', this.buildItemEndpoint(type, id));
+  loadAccessMap(entryId: string | number): Observable<EntryAccessMap> {
+    if (entryId == null || entryId === '') {
+      return of(this.emptyAccessMap());
+    }
+
+    const requests = Object.fromEntries(
+      ENTRY_PERMISSIONS.map((permission) => [
+        permission,
+        this.checkAccess(entryId, permission)
+      ])
+    ) as Record<EntryPermission, Observable<boolean>>;
+
+    return forkJoin(requests).pipe(map((result) => ({ ...this.emptyAccessMap(), ...result })));
   }
 
-  createEntry(type: string, payload: Record<string, unknown>): Observable<EntryRecord> {
-    const normalizedType = type?.trim().toLowerCase();
-    if (normalizedType === 'notes' && payload && 'person_id' in payload) {
-      const personId = this.extractPersonId(payload['person_id']);
-      if (!personId) {
-        throw new Error('Person ID is required');
+  private normalizeBooleanResponse(payload: unknown): boolean {
+    if (typeof payload === 'boolean') {
+      return payload;
+    }
+    if (typeof payload === 'number') {
+      return payload !== 0;
+    }
+    if (typeof payload === 'string') {
+      return ['true', '1', 'yes'].includes(payload.trim().toLowerCase());
+    }
+    if (payload && typeof payload === 'object') {
+      const record = payload as Record<string, unknown>;
+      const candidate = record['allowed'] ?? record['has_access'] ?? record['access'] ?? record['result'];
+      return this.normalizeBooleanResponse(candidate);
+    }
+    return false;
+  }
+
+  private compactParams(params: EntryListParams): Record<string, string> {
+    return Object.entries(params).reduce<Record<string, string>>((result, [key, value]) => {
+      if (value === null || value === undefined || value === '') {
+        return result;
       }
-      const { person_id: _omit, ...notePayload } = payload;
-      return this.createNoteForPerson(personId, notePayload);
-    }
-
-    return this.api.request<EntryRecord>('POST', this.buildCollectionEndpoint(type), {
-      body: payload
-    });
-  }
-
-  createNoteForPerson(personId: string, payload: Record<string, unknown>): Observable<EntryRecord> {
-    const sanitizedId = this.extractPersonId(personId);
-    if (!sanitizedId) {
-      throw new Error('Person ID is required');
-    }
-
-    return this.api.request<EntryRecord>(
-      'POST',
-      `/notes/by-person/${encodeURIComponent(sanitizedId)}`,
-      { body: payload }
-    );
-  }
-
-  private extractPersonId(value: unknown): string | null {
-    if (typeof value === 'number' && Number.isFinite(value)) {
-      return value.toString();
-    }
-    if (typeof value === 'string') {
-      const trimmed = value.trim();
-      return trimmed.length > 0 ? trimmed : null;
-    }
-    return null;
-  }
-
-  updateEntry(type: string, id: string, payload: Record<string, unknown>): Observable<EntryRecord> {
-    return this.api.request<EntryRecord>('PATCH', this.buildItemEndpoint(type, id), {
-      body: payload
-    });
-  }
-
-  deleteEntry(type: string, id: string): Observable<unknown> {
-    return this.api.request('DELETE', this.buildItemEndpoint(type, id));
-  }
-
-  private buildListQuery(params: EntryListParams, page: number, pageSize: number): Record<string, string> {
-    const query: Record<string, string> = {
-      page: page.toString(),
-      limit: pageSize.toString(),
-      pageSize: pageSize.toString(),
-      perPage: pageSize.toString()
-    };
-
-    const search = params.search?.trim();
-    if (search && search.length > 0) {
-      query['search'] = search;
-      query['q'] = search;
-    }
-
-    const filters = params.filters;
-    if (filters) {
-      for (const [key, value] of Object.entries(filters)) {
-        if (value === undefined || value === null || value === '') {
-          continue;
-        }
-        const stringValue = String(value);
-        query[`filter[${key}]`] = stringValue;
-        query[key] = stringValue;
-      }
-    }
-
-    return query;
-  }
-
-  private buildCollectionEndpoint(type: string): string {
-    const sanitizedType = this.sanitizeType(type);
-    if (!sanitizedType) {
-      throw new Error('Entry type is required');
-    }
-    return `/${sanitizedType}`;
-  }
-
-  private buildItemEndpoint(type: string, id: string): string {
-    const collectionEndpoint = this.buildCollectionEndpoint(type);
-    const sanitizedId = id.trim();
-
-    if (!sanitizedId) {
-      throw new Error('Entry id is required');
-    }
-
-    return `${collectionEndpoint}/${encodeURIComponent(sanitizedId)}`;
-  }
-
-  private sanitizeType(type: string): string {
-    return type
-      .split('/')
-      .map((segment) => segment.trim())
-      .filter((segment) => segment.length > 0)
-      .join('/');
-  }
-
-  private normalizeListResponse(payload: unknown, page: number, pageSize: number): EntryListResult {
-    const result: EntryListResult = {
-      items: [],
-      total: null,
-      page,
-      pageSize,
-      hasMore: false,
-      raw: payload
-    };
-
-    if (Array.isArray(payload)) {
-      result.items = this.toRecordList(payload);
-      result.total = result.items.length;
-      result.hasMore = result.items.length === pageSize;
+      result[key] = String(value);
       return result;
-    }
-
-    if (!payload || typeof payload !== 'object') {
-      return result;
-    }
-
-    const record = payload as Record<string, unknown>;
-
-    const itemKeys = ['items', 'results', 'data', 'entries', 'records', 'rows'];
-    for (const key of itemKeys) {
-      const value = record[key];
-      if (Array.isArray(value)) {
-        result.items = this.toRecordList(value);
-        break;
-      }
-      if (value && typeof value === 'object') {
-        const nested = (value as Record<string, unknown>)['data'];
-        if (Array.isArray(nested)) {
-          result.items = this.toRecordList(nested);
-          break;
-        }
-      }
-    }
-
-    const totalSources = [
-      record['total'],
-      record['totalCount'],
-      record['totalItems'],
-      record['total_items'],
-      record['count'],
-      this.extractNestedNumber(record['meta'], ['total', 'count']),
-      this.extractNestedNumber(record['pagination'], ['total', 'count'])
-    ];
-    for (const source of totalSources) {
-      const parsed = this.toNumber(source);
-      if (parsed != null) {
-        result.total = parsed;
-        break;
-      }
-    }
-
-    const pageSources = [
-      record['page'],
-      record['currentPage'],
-      record['pageIndex'],
-      this.extractNestedNumber(record['meta'], ['page', 'currentPage']),
-      this.extractNestedNumber(record['pagination'], ['page'])
-    ];
-    for (const source of pageSources) {
-      const parsed = this.toNumber(source);
-      if (parsed != null) {
-        result.page = this.normalizePage(parsed);
-        break;
-      }
-    }
-
-    const pageSizeSources = [
-      record['pageSize'],
-      record['limit'],
-      record['perPage'],
-      record['page_size'],
-      this.extractNestedNumber(record['meta'], ['pageSize', 'perPage', 'limit']),
-      this.extractNestedNumber(record['pagination'], ['pageSize', 'perPage', 'limit'])
-    ];
-    for (const source of pageSizeSources) {
-      const parsed = this.toNumber(source);
-      if (parsed != null) {
-        result.pageSize = this.normalizePageSize(parsed);
-        break;
-      }
-    }
-
-    if (result.items.length === 0 && record['data'] && typeof record['data'] === 'object') {
-      const data = record['data'] as Record<string, unknown>;
-      for (const value of Object.values(data)) {
-        if (Array.isArray(value)) {
-          result.items = this.toRecordList(value);
-          break;
-        }
-      }
-    }
-
-    if (result.total != null) {
-      result.hasMore = result.page * result.pageSize < result.total;
-    } else {
-      result.hasMore = result.items.length === result.pageSize;
-    }
-
-    return result;
+    }, {});
   }
 
-  private toRecordList(source: unknown[]): EntryRecord[] {
-    return source.map((item) => {
-      if (item && typeof item === 'object' && !Array.isArray(item)) {
-        return item as EntryRecord;
-      }
-      return { value: item } as EntryRecord;
-    });
-  }
-
-  private extractNestedNumber(source: unknown, keys: string[]): number | null {
-    if (!source || typeof source !== 'object') {
-      return null;
-    }
-
-    const record = source as Record<string, unknown>;
-    for (const key of keys) {
-      const value = record[key];
-      const parsed = this.toNumber(value);
-      if (parsed != null) {
-        return parsed;
-      }
-    }
-    return null;
-  }
-
-  private toNumber(value: unknown): number | null {
-    if (typeof value === 'number' && Number.isFinite(value)) {
-      return value;
-    }
-    if (typeof value === 'string' && value.trim().length > 0) {
-      const parsed = Number(value);
-      return Number.isFinite(parsed) ? parsed : null;
-    }
-    return null;
-  }
-
-  private normalizePage(value: number): number {
-    return Math.max(1, Math.trunc(value || 1));
-  }
-
-  private normalizePageSize(value: number): number {
-    return Math.max(1, Math.min(200, Math.trunc(value || this.defaultPageSize)));
+  private emptyAccessMap(): EntryAccessMap {
+    return {
+      read: false,
+      view_history: false,
+      edit: false,
+      edit_status: false,
+      edit_visibility: false,
+      manage_relations: false,
+      manage_attachments: false,
+      manage_permissions: false,
+      delete: false,
+      manage: false
+    };
   }
 }

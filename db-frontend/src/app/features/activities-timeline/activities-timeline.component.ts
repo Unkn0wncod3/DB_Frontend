@@ -4,8 +4,9 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { firstValueFrom } from 'rxjs';
 
-import { EntryListParams, EntryService } from '../../core/services/entry.service';
+import { EntryService, LegacyEntryListParams } from '../../core/services/entry.service';
 import { PersonLookupComponent } from '../../shared/components/person-lookup/person-lookup.component';
 
 interface TimelineEntry {
@@ -56,7 +57,7 @@ export class ActivitiesTimelineComponent {
     this.errorMessage.set(null);
     try {
       const formValue = this.filterForm.getRawValue();
-      const params: EntryListParams = {
+      const params: LegacyEntryListParams = {
         page: 1,
         pageSize: formValue.limit ?? 100,
         filters: {}
@@ -66,7 +67,7 @@ export class ActivitiesTimelineComponent {
         params.filters!['person_id'] = personId;
       }
 
-      const result = await this.entryService.listEntries('activities', params).toPromise();
+      const result = await firstValueFrom(this.entryService.listEntries('activities', params));
       if (!result) {
         this.entries.set([]);
         return;

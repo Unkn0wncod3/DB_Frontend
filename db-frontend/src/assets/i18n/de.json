@@ -21,7 +21,8 @@
       "head_admin": "Head Admin",
       "admin": "Admin",
       "editor": "Editor",
-      "user": "Nutzer"
+      "manager": "Manager",
+      "reader": "Leser"
     }
   },
   "logs": {
@@ -116,8 +117,8 @@
         "authLogin": "den Login-Bereich",
         "platforms": "die Plattformliste",
         "platformDetail": "Plattform #{{id}}",
-        "entriesList": "die {{type}}-Einträge",
-        "entriesDetail": "{{type}}-Eintrag {{id}}"
+        "entriesList": "die Eintragsliste des Schemas {{type}}",
+        "entriesDetail": "Eintrag {{id}} des Schemas {{type}}"
       }
     },
     "events": {
@@ -166,8 +167,7 @@
       "empty": "Keine Logs entsprechen den Filtern.",
       "genericError": "Logs konnten nicht geladen werden.",
       "cleared": "Alle Logs wurden gelöscht."
-    }
-    ,
+    },
     "modal": {
       "title": "Alle Logs löschen?",
       "body": "Dadurch werden sämtliche Audit-Einträge dauerhaft entfernt. Dieser Vorgang kann nicht rückgängig gemacht werden.",
@@ -237,7 +237,7 @@
   },
   "dashboard": {
     "title": "Datenbank-Übersicht",
-    "subtitle": "Wichtige Kennzahlen und Aktivitäten der DB_API.",
+    "subtitle": "Schema-gesteuerte Übersicht für Schemas, Einträge und letzte Änderungen.",
     "actions": {
       "refresh": "Jetzt aktualisieren",
       "refreshing": "Aktualisiere...",
@@ -266,8 +266,8 @@
       "unknownEntry": "Unbenannter Eintrag",
       "noRecentCreate": "Keine aktuellen Erstellungen",
       "noRecentUpdate": "Keine aktuellen Aktualisierungen",
-      "itemType": "Typ: {{ value }}",
-      "itemTypeWithId": "Typ: {{ type }} (ID: {{ id }})",
+      "itemType": "Schema: {{ value }}",
+      "itemTypeWithId": "Schema: {{ type }} (Eintrags-ID: {{ id }})",
       "itemId": "ID: {{ value }}"
     },
     "status": {
@@ -281,7 +281,7 @@
     },
     "totals": {
       "entries": "Gesamtanzahl Einträge",
-      "collections": "Sammlungen",
+      "collections": "Schemas",
       "users": "Benutzer"
     },
     "activity": {
@@ -291,7 +291,7 @@
     },
     "totalLabels": {
       "entries": "Einträge",
-      "collections": "Sammlungen",
+      "collections": "Schemas",
       "users": "Benutzer",
       "persons": "Personen",
       "profiles": "Profile",
@@ -305,12 +305,13 @@
     "title": "{{ value }}",
     "labels": {
       "unknownId": "Unbekannter Eintrag",
-      "type": "Typ: {{ type }}",
+      "type": "Schema: {{ type }}",
       "id": "ID: {{ id }}",
       "relationships": "Verknüpfte Daten",
       "connectedItems": "Verbundene Profile, Notizen und Aktivitäten",
       "createdAt": "Erstellt",
-      "updatedAt": "Zuletzt geändert"
+      "updatedAt": "Zuletzt geändert",
+      "schemaWithId": "Schema {{schema}} - Eintrags-ID {{id}}"
     },
     "actions": {
       "back": "Zurück zum Dashboard",
@@ -328,10 +329,20 @@
       "empty": "Keine Daten für diesen Eintrag verfügbar.",
       "loadingRelations": "Verknüpfungen werden geladen...",
       "noRelations": "Keine verknüpften Einträge gefunden.",
-      "readOnly": "Nur-Lese-Rolle: Du kannst Daten ansehen, aber keine Änderungen speichern."
+      "readOnly": "Nur-Lese-Rolle: Du kannst Daten ansehen, aber keine Änderungen speichern.",
+      "noRelationAccess": "Kein Zugriff auf Relationen.",
+      "noAttachmentAccess": "Kein Zugriff auf Anhänge.",
+      "noHistory": "Keine Historieneinträge vorhanden.",
+      "noPermissions": "Keine expliziten Berechtigungen vorhanden.",
+      "loadingEntry": "Eintrag wird geladen..."
     },
     "sections": {
-      "raw": "Rohdaten"
+      "raw": "Rohdaten",
+      "formattedData": "Formatierte Daten",
+      "relations": "Relationen",
+      "attachments": "Anhänge",
+      "history": "Historie",
+      "permissions": "Berechtigungen"
     },
     "relations": {
       "profiles": "Profile",
@@ -348,7 +359,14 @@
       "profileLinkInvalid": "Bitte eine gültige Profil-ID angeben.",
       "layoutLabel": "Position der Beziehungen",
       "layoutOptionSide": "Rechts daneben",
-      "layoutOptionStacked": "Unter dem Formular"
+      "layoutOptionStacked": "Unter dem Formular",
+      "columns": {
+        "type": "Typ",
+        "from": "Von",
+        "to": "Nach",
+        "order": "Reihenfolge",
+        "created": "Erstellt"
+      }
     },
     "delete": {
       "dialogTitle": "Löschen bestätigen",
@@ -366,7 +384,8 @@
       "deleteFailed": "Eintrag konnte nicht gelöscht werden: {{ message }}",
       "invalidPayload": "Die API hat eine unerwartete Antwort geliefert.",
       "unknown": "Unbekannter Fehler",
-      "hiddenFromUser": "Dieser Eintrag ist nur für Admins sichtbar."
+      "hiddenFromUser": "Dieser Eintrag ist nur für Admins sichtbar.",
+      "loadFallback": "Eintrag konnte nicht geladen werden."
     },
     "rawView": {
       "label": "Rohdaten",
@@ -418,10 +437,29 @@
     },
     "view": {
       "details": "Details"
+    },
+    "meta": {
+      "title": "Titel",
+      "status": "Status",
+      "visibility": "Sichtbarkeit",
+      "ownerId": "Owner-ID",
+      "comment": "Kommentar"
+    },
+    "history": {
+      "by": "von {{value}}"
+    },
+    "permissions": {
+      "columns": {
+        "subjectType": "Subjekttyp",
+        "subjectId": "Subjekt-ID",
+        "permission": "Berechtigung",
+        "createdBy": "Erstellt von",
+        "createdAt": "Erstellt am"
+      }
     }
   },
   "entryList": {
-    "title": "Alle {{ type }}",
+    "title": "{{ schema }} Einträge",
     "actions": {
       "back": "Zurück zum Dashboard",
       "create": "Neuer Eintrag",
@@ -437,7 +475,8 @@
     },
     "meta": {
       "total": "{{ value }} Einträge",
-      "lastUpdated": "Zuletzt aktualisiert {{ value }}"
+      "lastUpdated": "Zuletzt aktualisiert {{ value }}",
+      "schemaDriven": "Schema-gesteuerte Eintragsliste"
     },
     "table": {
       "actions": "Aktionen"
@@ -452,9 +491,11 @@
       "page": "Seite {{ page }} - {{ pageSize }} pro Seite"
     },
     "errors": {
-      "missingType": "Eintragstyp fehlt.",
+      "missingType": "Schema-Key fehlt.",
       "loadFailed": "Einträge konnten nicht geladen werden: {{ message }}",
-      "unknown": "Unbekannter Fehler"
+      "unknown": "Unbekannter Fehler",
+      "loadFallback": "Einträge konnten nicht geladen werden.",
+      "unknownSchema": "Unbekanntes Schema: {{ schema }}"
     },
     "types": {
       "persons": "Personen",
@@ -463,7 +504,7 @@
       "vehicles": "Fahrzeuge",
       "notes": "Notizen",
       "platforms": "Plattformen",
-      "collections": "Sammlungen",
+      "collections": "Schemas",
       "users": "Benutzer"
     },
     "timeline": {
@@ -478,8 +519,8 @@
     }
   },
   "entryCreate": {
-    "title": "Neuen {{ type }} anlegen",
-    "subtitle": "Pflichtfelder ausfüllen und absenden, um einen neuen {{ type }}-Datensatz zu erstellen.",
+    "title": "Eintrag für {{ schema }} erstellen",
+    "subtitle": "Schema-Felder und Eintrags-Metadaten ausfüllen, um einen neuen Eintrag zu erstellen.",
     "actions": {
       "back": "Zurück zur Liste",
       "submit": "Eintrag erstellen",
@@ -495,11 +536,11 @@
     "status": {
       "submitting": "Erstelle...",
       "created": "Eintrag erfolgreich erstellt.",
-      "noSchema": "Für diesen Typ ist noch kein Schema hinterlegt.",
-      "schemaHelp": "Passe src/app/features/entry-create/entry-create.schemas.ts an, um die Felder für diesen Typ zu definieren."
+      "noSchema": "Für diesen Schema-Key ist noch kein Schema hinterlegt.",
+      "schemaHelp": "Diese Ansicht liest die Felddefinitionen direkt aus den Backend-Schemas."
     },
     "errors": {
-      "missingType": "Eintragstyp fehlt.",
+      "missingType": "Schema-Key fehlt.",
       "invalidPayload": "Payload ungültig: {{ message }}",
       "emptyPayload": "Bitte mindestens ein Feld oder ein JSON angeben.",
       "createFailed": "Eintrag konnte nicht erstellt werden: {{ message }}",
@@ -508,7 +549,18 @@
       "invalidDate": "Datum benötigt einen gültigen ISO-Zeitstempel.",
       "requireOneOf": "Bitte mindestens eines der folgenden Felder ausfüllen: {{ fields }}.",
       "requiredField": "Dieses Feld ist erforderlich.",
-      "unknown": "Unbekannter Fehler"
+      "unknown": "Unbekannter Fehler",
+      "unknownSchema": "Unbekanntes Schema: {{ schema }}",
+      "loadFallback": "Eintrag konnte nicht erstellt werden."
+    },
+    "meta": {
+      "title": "Eintrags-Metadaten",
+      "fields": {
+        "title": "Titel",
+        "status": "Status",
+        "visibility": "Sichtbarkeit",
+        "ownerId": "Owner-ID"
+      }
     }
   },
   "apiExplorer": {
@@ -654,7 +706,7 @@
   "userManagement": {
     "eyebrow": "Admin-Werkzeuge",
     "title": "Benutzerverwaltung",
-    "subtitle": "Interne Accounts anlegen oder prüfen. Admin-Rollen verwalten Benutzer; nur Head-Admins dürfen Admin-Rollen vergeben oder entziehen.",
+    "subtitle": "Interne Accounts anlegen oder prüfen. Admins verwalten Accounts; nur Head-Admins dürfen hohe Rollen vergeben oder entziehen.",
     "form": {
       "username": "Benutzername",
       "password": "Passwort",
@@ -712,7 +764,8 @@
       "head_admin": "Head Admin",
       "admin": "Admin",
       "editor": "Editor",
-      "user": "Nutzer"
+      "manager": "Manager",
+      "reader": "Leser"
     },
     "modal": {
       "title": "Account löschen?",
@@ -777,17 +830,17 @@
       "created": "Angelegt",
       "updated": "Zuletzt aktualisiert: {{ value }}"
     },
-      "empty": {
-        "profiles": "Keine Profile in deinem Sichtbarkeitsbereich.",
-        "notes": "Keine Notizen in deinem Sichtbarkeitsbereich.",
-        "activities": "Keine Aktivitäten in deinem Sichtbarkeitsbereich."
-      },
-      "errors": {
-        "generic": "Dossier konnte nicht geladen werden."
-      },
-      "rawView": {
-        "show": "Rohdaten anzeigen",
-        "hide": "Rohdaten ausblenden"
-      }
+    "empty": {
+      "profiles": "Keine Profile in deinem Sichtbarkeitsbereich.",
+      "notes": "Keine Notizen in deinem Sichtbarkeitsbereich.",
+      "activities": "Keine Aktivitäten in deinem Sichtbarkeitsbereich."
+    },
+    "errors": {
+      "generic": "Dossier konnte nicht geladen werden."
+    },
+    "rawView": {
+      "show": "Rohdaten anzeigen",
+      "hide": "Rohdaten ausblenden"
     }
   }
+}

@@ -4,150 +4,85 @@
       <a *ngIf="backLink() as back" [routerLink]="back" class="entry-create__back">
         {{ 'entryCreate.actions.back' | translate }}
       </a>
-      <h1>{{ 'entryCreate.title' | translate:{ type: typeLabel() } }}</h1>
+      <h1>{{ 'entryCreate.title' | translate:{ schema: schemaLabel() } }}</h1>
       <p class="entry-create__subtitle">
-        {{ 'entryCreate.subtitle' | translate:{ type: typeLabel() } }}
+        {{ 'entryCreate.subtitle' | translate:{ schema: schemaLabel() } }}
       </p>
-      <p *ngIf="schema()?.description" class="entry-create__schema-description">
-        {{ schema()?.description }}
+      <p *ngIf="schema() as currentSchema" class="entry-create__schema-description">
+        {{ currentSchema.description }}
       </p>
     </div>
   </header>
 
   <section *ngIf="errorMessage() as error" class="entry-create__alert entry-create__alert--error">
     <p>{{ error }}</p>
-    <div class="entry-create__debug" *ngIf="lastRequestInfo() as requestInfo">
-      <p><strong>Endpoint:</strong> {{ requestInfo.endpoint }}</p>
-      <pre>{{ requestInfo.payload | json }}</pre>
-    </div>
   </section>
 
-  <section *ngIf="successMessage() as success" class="entry-create__alert entry-create__alert--success">
-    <p>{{ success }}</p>
-  </section>
-
-  <form class="entry-create__form" [formGroup]="form" (ngSubmit)="submit()">
-    <section *ngIf="hasSchema(); else missingSchema" class="entry-create__fields">
-      <article *ngFor="let item of schemaFields(); trackBy: trackField" class="entry-create__field" [class.entry-create__field--visibility]="isVisibilitySchemaField(item.field)">
-        <label [attr.for]="item.field.key">
-          {{ item.field.label }}
-          <ng-container *ngIf="isPersonLookupField(item.field)">
-            <span *ngIf="personIdLabel(item.control) as personId" class="entry-create__person-id">
-              (ID: {{ personId }})
-            </span>
-          </ng-container>
-          <span *ngIf="item.field.required" class="entry-create__required">*</span>
-        </label>
-        <small *ngIf="item.field.description" class="entry-create__hint">
-          {{ item.field.description }}
-        </small>
-        <small *ngIf="isVisibilitySchemaField(item.field)" class="entry-create__hint">
-          {{ 'entryVisibility.helper' | translate }}
-        </small>
-
-        <ng-container *ngIf="isPersonLookupField(item.field); else platformField">
-          <app-person-lookup [formControl]="item.control"></app-person-lookup>
-        </ng-container>
-
-        <ng-template #platformField>
-          <ng-container *ngIf="isPlatformLookupField(item.field); else regularField">
-            <app-platform-lookup [formControl]="item.control"></app-platform-lookup>
-          </ng-container>
-        </ng-template>
-
-        <ng-template #regularField>
-          <ng-container [ngSwitch]="item.field.type">
-            <textarea
-              *ngSwitchCase="'textarea'"
-              [id]="item.field.key"
-              [formControl]="item.control"
-              rows="4"
-              [placeholder]="item.field.placeholder || ''"
-            ></textarea>
-
-            <textarea
-              *ngSwitchCase="'json'"
-              [id]="item.field.key"
-              [formControl]="item.control"
-              rows="6"
-              [placeholder]="item.field.placeholder || '{ }'"
-            ></textarea>
-
-            <input
-              *ngSwitchCase="'number'"
-              type="number"
-              [id]="item.field.key"
-              [formControl]="item.control"
-              [placeholder]="item.field.placeholder || ''"
-            />
-
-            <input
-              *ngSwitchCase="'date'"
-              [attr.type]="item.field.dateVariant === 'date' ? 'date' : 'datetime-local'"
-              [id]="item.field.key"
-              [formControl]="item.control"
-              [placeholder]="item.field.placeholder || ''"
-            />
-
-            <app-value-dropdown
-              *ngSwitchCase="'boolean'"
-              [options]="booleanOptions()"
-              [placeholder]="'entryCreate.form.booleanPlaceholder' | translate"
-              [formControl]="item.control"
-            ></app-value-dropdown>
-
-            <app-value-dropdown
-              *ngSwitchCase="'visibility'"
-              [options]="visibilityOptions()"
-              [placeholder]="'entryVisibility.placeholder' | translate"
-              [formControl]="item.control"
-            ></app-value-dropdown>
-
-            <input
-              *ngSwitchDefault
-              type="text"
-              [id]="item.field.key"
-              [formControl]="item.control"
-              [placeholder]="item.field.placeholder || ''"
-            />
-          </ng-container>
-        </ng-template>
-
-        <p
-          *ngIf="item.field.required && item.control.invalid && (item.control.touched || item.control.dirty)"
-          class="entry-create__error"
-        >
-          {{ 'entryCreate.errors.requiredField' | translate }}
-        </p>
-      </article>
-    </section>
-
-    <ng-template #missingSchema>
-      <section class="entry-create__panel entry-create__panel--info">
-        <p>{{ 'entryCreate.status.noSchema' | translate }}</p>
-        <p class="entry-create__schema-hint">
-          {{ 'entryCreate.status.schemaHelp' | translate }}
-        </p>
-      </section>
-    </ng-template>
-
+  <form class="entry-create__form" [formGroup]="metaForm" (ngSubmit)="submit()">
     <section class="entry-create__panel">
       <header>
-        <h2>{{ 'entryCreate.form.rawPayloadTitle' | translate }}</h2>
-        <p>{{ 'entryCreate.form.rawPayloadHint' | translate }}</p>
+        <h2>{{ 'entryCreate.meta.title' | translate }}</h2>
       </header>
-      <textarea
-        class="entry-create__raw"
-        rows="8"
-        [formControl]="rawPayloadControl"
-        placeholder="{{ '{\n  \"field\": \"value\"\n}' }}"
-      ></textarea>
+      <div class="entry-create__fields">
+        <article class="entry-create__field">
+          <label for="title">{{ 'entryCreate.meta.fields.title' | translate }} *</label>
+          <input id="title" type="text" formControlName="title" />
+        </article>
+        <article class="entry-create__field">
+          <label for="status">{{ 'entryCreate.meta.fields.status' | translate }}</label>
+          <input id="status" type="text" formControlName="status" />
+        </article>
+        <article class="entry-create__field">
+          <label for="visibility_level">{{ 'entryCreate.meta.fields.visibility' | translate }}</label>
+          <select id="visibility_level" formControlName="visibility_level">
+            <option value="public">public</option>
+            <option value="internal">internal</option>
+            <option value="private">private</option>
+            <option value="restricted">restricted</option>
+          </select>
+        </article>
+        <article class="entry-create__field">
+          <label for="owner_id">{{ 'entryCreate.meta.fields.ownerId' | translate }}</label>
+          <input id="owner_id" type="text" formControlName="owner_id" />
+        </article>
+      </div>
+    </section>
+
+    <section class="entry-create__fields" *ngIf="schema() && formFields().length > 0" [formGroup]="form">
+      <article *ngFor="let item of formFields(); trackBy: trackField" class="entry-create__field">
+        <label [attr.for]="item.field.key">
+          {{ item.field.label || item.field.key }}
+          <span *ngIf="item.field.is_required" class="entry-create__required">*</span>
+        </label>
+        <small *ngIf="item.field.description" class="entry-create__hint">{{ item.field.description }}</small>
+
+        <ng-container [ngSwitch]="item.field.data_type">
+          <textarea *ngSwitchCase="'long_text'" [id]="item.field.key" [formControl]="item.control" rows="5"></textarea>
+          <textarea *ngSwitchCase="'json'" [id]="item.field.key" [formControl]="item.control" rows="8"></textarea>
+          <input *ngSwitchCase="'integer'" type="number" [id]="item.field.key" [formControl]="item.control" step="1" />
+          <input *ngSwitchCase="'decimal'" type="number" [id]="item.field.key" [formControl]="item.control" step="0.01" />
+          <input *ngSwitchCase="'boolean'" type="checkbox" [id]="item.field.key" [formControl]="item.control" />
+          <input *ngSwitchCase="'date'" type="date" [id]="item.field.key" [formControl]="item.control" />
+          <input *ngSwitchCase="'datetime'" type="datetime-local" [id]="item.field.key" [formControl]="item.control" />
+          <input *ngSwitchCase="'email'" type="email" [id]="item.field.key" [formControl]="item.control" />
+          <input *ngSwitchCase="'url'" type="url" [id]="item.field.key" [formControl]="item.control" />
+          <select *ngSwitchCase="'select'" [id]="item.field.key" [formControl]="item.control">
+            <option value="">-</option>
+            <option *ngFor="let option of fieldOptions(item.field)" [value]="option.value">{{ option.label }}</option>
+          </select>
+          <select *ngSwitchCase="'multi_select'" [id]="item.field.key" [formControl]="item.control" [attr.multiple]="true">
+            <option *ngFor="let option of fieldOptions(item.field)" [value]="option.value">{{ option.label }}</option>
+          </select>
+          <input *ngSwitchCase="'reference'" type="text" [id]="item.field.key" [formControl]="item.control" />
+          <input *ngSwitchCase="'file'" type="text" [id]="item.field.key" [formControl]="item.control" />
+          <input *ngSwitchDefault type="text" [id]="item.field.key" [formControl]="item.control" />
+        </ng-container>
+      </article>
     </section>
 
     <footer class="entry-create__actions">
       <button type="submit" [disabled]="isSubmitting()">
-        <span *ngIf="isSubmitting(); else submitLabel">{{ 'entryCreate.status.submitting' | translate }}</span>
-        <ng-template #submitLabel>{{ 'entryCreate.actions.submit' | translate }}</ng-template>
+        {{ (isSubmitting() ? 'entryCreate.status.submitting' : 'entryCreate.actions.submit') | translate }}
       </button>
       <a *ngIf="backLink() as link" [routerLink]="link" class="entry-create__cancel">
         {{ 'entryCreate.actions.cancel' | translate }}

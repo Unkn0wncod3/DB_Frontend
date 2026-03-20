@@ -1,10 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 import { API_BASE_URL } from '../tokens/api-base-url.token';
+import { AuthenticatedUser, UserRole } from '../models/metadata.models';
+
+export type AuthRole = UserRole;
+export type { AuthenticatedUser } from '../models/metadata.models';
 
 const AUTH_TOKEN_TTL_MS = 4 * 60 * 60 * 1000;
 
@@ -13,20 +17,9 @@ export interface AuthLoginRequest {
   password: string;
 }
 
-export type AuthRole = 'head_admin' | 'admin' | 'editor' | 'user';
-
-export interface AuthenticatedUser {
-  id: string | number;
-  username: string;
-  role: AuthRole;
-  is_active: boolean;
-  created_at?: string;
-  profile_picture_url?: string | null;
-  preferences?: Record<string, unknown> | null;
-}
-
 export interface AuthLoginResponse {
   access_token: string;
+  token_type?: string;
   user: AuthenticatedUser;
 }
 
@@ -36,11 +29,12 @@ interface StoredAuthState {
   expiresAt: number;
 }
 
-const ROLE_PRIORITY: Record<AuthRole, number> = {
-  user: 0,
+const ROLE_PRIORITY: Record<UserRole, number> = {
+  reader: 0,
   editor: 1,
-  admin: 2,
-  head_admin: 3
+  manager: 2,
+  admin: 3,
+  head_admin: 4
 };
 
 @Injectable({ providedIn: 'root' })
@@ -74,6 +68,10 @@ export class AuthService {
     }
 
     this.userSubject.next(this.userValue);
+
+    if (this.tokenValue) {
+      this.refreshCurrentUser().subscribe();
+    }
   }
 
   login(payload: AuthLoginRequest): Observable<AuthLoginResponse> {
@@ -83,6 +81,17 @@ export class AuthService {
         const expiresAt = Date.now() + this.sessionDurationMs;
         this.persistState({ token: response.access_token, user: response.user, expiresAt });
       })
+    );
+  }
+
+  refreshCurrentUser(): Observable<AuthenticatedUser | null> {
+    if (!this.token()) {
+      return of(null);
+    }
+
+    return this.http.get<AuthenticatedUser>(this.normalizeUrl('/auth/me')).pipe(
+      tap((user) => this.updateUser(user)),
+      catchError(() => of(this.user()))
     );
   }
 
@@ -107,77 +116,60 @@ export class AuthService {
     return this.userSubject.asObservable();
   }
 
-  hasRole(role: AuthRole): boolean {
-    const user = this.user();
-    return !!user && user.role === role;
+  hasRole(role: UserRole): boolean {
+    return this.user()?.role === role;
   }
 
-  hasAnyRole(...roles: AuthRole[]): boolean {
-    if (!roles || roles.length === 0) {
-      return false;
-    }
-    const user = this.user();
-    if (!user) {
-      return false;
-    }
-    return roles.includes(user.role);
+  hasAnyRole(...roles: UserRole[]): boolean {
+    const currentRole = this.user()?.role;
+    return !!currentRole && roles.includes(currentRole);
   }
 
-  isAtLeast(role: AuthRole): boolean {
+  isAtLeast(role: UserRole): boolean {
     const userRole = this.user()?.role;
-    if (!userRole) {
-      return false;
-    }
-    return ROLE_PRIORITY[userRole] >= ROLE_PRIORITY[role];
-  }
-
-  canWrite(): boolean {
-    return this.canEditEntries();
-  }
-
-  canEditEntries(): boolean {
-    return this.hasAnyRole('editor', 'admin', 'head_admin');
+    return !!userRole && ROLE_PRIORITY[userRole] >= ROLE_PRIORITY[role];
   }
 
   canCreateEntries(): boolean {
-    return this.canEditEntries();
+    return this.isAtLeast('editor');
+  }
+
+  canEditEntries(): boolean {
+    return this.isAtLeast('editor');
+  }
+
+  canManageSchemas(): boolean {
+    return this.isAtLeast('manager');
   }
 
   canDeleteEntries(): boolean {
-    return this.hasAnyRole('admin', 'head_admin');
+    return this.isAtLeast('editor');
   }
 
   canManageUsers(): boolean {
-    return this.hasAnyRole('admin', 'head_admin');
-  }
-
-  canAssignRole(targetRole: AuthRole): boolean {
-    const currentRole = this.user()?.role;
-    if (!currentRole) {
-      return false;
-    }
-
-    if (currentRole === 'head_admin') {
-      return true;
-    }
-
-    if (currentRole === 'admin') {
-      return targetRole === 'editor' || targetRole === 'user';
-    }
-
-    return false;
+    return this.isAtLeast('admin');
   }
 
   canViewAdminVisibility(): boolean {
-    return this.hasAnyRole('admin', 'head_admin');
+    return this.isAdmin();
   }
 
   canManageVisibility(): boolean {
-    return this.canViewAdminVisibility();
+    return this.isAtLeast('manager');
+  }
+
+  canAssignRole(targetRole: UserRole): boolean {
+    if (this.hasRole('head_admin')) {
+      return true;
+    }
+    if (this.hasRole('admin')) {
+      return targetRole === 'manager' || targetRole === 'editor' || targetRole === 'reader';
+    }
+    return false;
   }
 
   isAdmin(): boolean {
-    return this.hasAnyRole('admin', 'head_admin');
+    return this.isAtLeast('admin');
   }
 
   isHeadAdmin(): boolean {
@@ -271,5 +263,3 @@ export class AuthService {
     }
   }
 }
-
-

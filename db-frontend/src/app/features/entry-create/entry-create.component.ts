@@ -4,25 +4,24 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { firstValueFrom, Observable } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
-import { EntryService } from '../../core/services/entry.service';
-import { EntrySchema, EntrySchemaField, EntryFieldType, getEntrySchema } from './entry-create.schemas';
-import { PlatformLookupComponent } from '../../shared/components/platform-lookup/platform-lookup.component';
-import { PersonLookupComponent } from '../../shared/components/person-lookup/person-lookup.component';
-import { ValueDropdownComponent, ValueDropdownOption } from '../../shared/components/value-dropdown/value-dropdown.component';
 import { AuthService } from '../../core/services/auth.service';
-import { DEFAULT_VISIBILITY_LEVEL, VisibilityLevel, coerceVisibilityLevel } from '../../shared/types/visibility-level.type';
+import { EntryService } from '../../core/services/entry.service';
+import { SchemaService } from '../../core/services/schema.service';
+import { CreateEntryPayload, EntrySchema, SchemaField, VisibilityLevel } from '../../core/models/metadata.models';
+import { getFieldOptions, humanizeKey, sortSchemaFields, supportsMultiple } from '../../core/utils/schema.utils';
+import { ValueDropdownComponent } from '../../shared/components/value-dropdown/value-dropdown.component';
 
-interface SchemaFieldControl {
-  field: EntrySchemaField;
-  control: FormControl<string | boolean | number | null>;
+interface FormField {
+  field: SchemaField;
+  control: FormControl<unknown>;
 }
 
 @Component({
   selector: 'app-entry-create',
   standalone: true,
-  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, JsonPipe, ReactiveFormsModule, RouterLink, TranslateModule, PlatformLookupComponent, PersonLookupComponent, ValueDropdownComponent],
+  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, JsonPipe, ReactiveFormsModule, RouterLink, TranslateModule, ValueDropdownComponent],
   templateUrl: './entry-create.component.html',
   styleUrl: './entry-create.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -31,455 +30,179 @@ export class EntryCreateComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
-  private readonly translate = inject(TranslateService);
   private readonly entryService = inject(EntryService);
+  private readonly schemaService = inject(SchemaService);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly auth = inject(AuthService);
+  private readonly translate = inject(TranslateService);
+  readonly auth = inject(AuthService);
 
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
-  readonly successMessage = signal<string | null>(null);
   readonly schema = signal<EntrySchema | null>(null);
-  readonly schemaFields = signal<SchemaFieldControl[]>([]);
-  readonly typeLabel = signal('');
-  readonly hasSchema = computed(() => this.schemaFields().length > 0);
-  readonly rawPayloadControl = this.fb.nonNullable.control<string>('');
-  readonly booleanOptions = signal<ValueDropdownOption[]>([]);
-  readonly visibilityOptions = signal<ValueDropdownOption[]>([]);
-  readonly lastRequestInfo = signal<{ endpoint: string; payload: Record<string, unknown> } | null>(null);
+  readonly formFields = signal<FormField[]>([]);
+  readonly schemaLabel = computed(() => this.schema()?.name ?? humanizeKey(this.currentSchemaKey ?? 'entry'));
+
+  readonly metaForm = this.fb.nonNullable.group({
+    title: ['', Validators.required],
+    status: ['draft'],
+    visibility_level: ['internal'],
+    owner_id: [''],
+    comment: ['']
+  });
 
   form: FormGroup = this.fb.group({});
-  private currentType: string | null = null;
+  private currentSchemaKey: string | null = null;
 
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-      const type = params.get('type');
-      if (!type) {
-        this.errorMessage.set(this.translate.instant('entryCreate.errors.missingType'));
+      const schemaKey = params.get('schemaKey');
+      if (!schemaKey || schemaKey === this.currentSchemaKey) {
         return;
       }
-
-      if (type === this.currentType) {
-        return;
-      }
-
-      this.currentType = type;
-      this.loadSchema(type);
+      this.currentSchemaKey = schemaKey;
+      void this.loadSchema();
     });
-
-    this.booleanOptions.set(this.buildBooleanOptions());
-    this.visibilityOptions.set(this.buildVisibilityOptions());
-    this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      this.booleanOptions.set(this.buildBooleanOptions());
-      this.visibilityOptions.set(this.buildVisibilityOptions());
-    });
-  }
-
-  trackField(_index: number, item: SchemaFieldControl): string {
-    return item.field.key;
-  }
-
-  isPlatformLookupField(field: EntrySchemaField): boolean {
-    return (this.currentType ?? '').toLowerCase() === 'profiles' && field.key === 'platform_id';
-  }
-
-  isPersonLookupField(field: EntrySchemaField): boolean {
-    const normalizedKey = field.key.toLowerCase();
-    return normalizedKey === 'person_id' || normalizedKey.endsWith('_person_id');
-  }
-
-  isVisibilitySchemaField(field: EntrySchemaField): boolean {
-    return field.type === 'visibility';
-  }
-
-  private isNotesType(): boolean {
-    return (this.currentType ?? '').toLowerCase() === 'notes';
-  }
-
-  private extractPersonId(payload: Record<string, unknown>): string | null {
-    const candidate = payload['person_id'];
-    if (typeof candidate === 'number' && Number.isFinite(candidate)) {
-      return candidate.toString();
-    }
-    if (typeof candidate === 'string') {
-      const trimmed = candidate.trim();
-      return trimmed.length > 0 ? trimmed : null;
-    }
-    return null;
-  }
-
-  personIdLabel(control: FormControl<string | boolean | number | null>): string | null {
-    const value = control.value;
-    if (value == null) {
-      return null;
-    }
-
-    if (typeof value === 'number') {
-      return value.toString();
-    }
-
-    if (typeof value === 'string') {
-      const trimmed = value.trim();
-      return trimmed.length > 0 ? trimmed : null;
-    }
-
-    return null;
-  }
-
-  private buildBooleanOptions(): ValueDropdownOption[] {
-    return [
-      { label: this.translate.instant('entryCreate.form.booleanTrue'), value: true },
-      { label: this.translate.instant('entryCreate.form.booleanFalse'), value: false }
-    ];
-  }
-
-  private buildVisibilityOptions(): ValueDropdownOption[] {
-    return [
-      { label: this.translate.instant('entryVisibility.options.user'), value: 'user' },
-      { label: this.translate.instant('entryVisibility.options.admin'), value: 'admin' }
-    ];
   }
 
   backLink(): string[] | null {
-    if (!this.currentType) {
-      return null;
-    }
-
-    return ['/entries', this.currentType];
+    return this.currentSchemaKey ? ['/entries', this.currentSchemaKey] : null;
   }
 
-  showVisibilitySelector(): boolean {
-    return this.auth.canManageVisibility();
+  trackField(_index: number, item: FormField): string {
+    return item.field.key;
+  }
+
+  fieldOptions(field: SchemaField) {
+    return getFieldOptions(field);
+  }
+
+  isMultiple(field: SchemaField): boolean {
+    return supportsMultiple(field) || field.data_type === 'multi_select';
   }
 
   async submit(): Promise<void> {
-    if (!this.currentType || this.isSubmitting()) {
-      return;
-    }
-
-    if (this.hasSchema() && this.form.invalid) {
+    if (!this.schema() || this.isSubmitting() || this.metaForm.invalid || this.form.invalid) {
+      this.metaForm.markAllAsTouched();
       this.form.markAllAsTouched();
       return;
     }
 
-    let payload: Record<string, unknown>;
-    try {
-      payload = this.buildPayload();
-    } catch (error) {
-      this.errorMessage.set(this.translate.instant('entryCreate.errors.invalidPayload', {
-        message: this.describeError(error)
-      }));
-      return;
-    }
-
-    if (!this.validateSchemaRequirements(payload)) {
-      return;
-    }
-
-    if (Object.keys(payload).length === 0) {
-      this.errorMessage.set(this.translate.instant('entryCreate.errors.emptyPayload'));
-      return;
-    }
-
+    const payload = this.buildPayload(this.schema()!);
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
-    this.successMessage.set(null);
 
     try {
-      const { request$, endpoint } = this.buildCreateRequest(payload);
-      this.lastRequestInfo.set({ endpoint, payload });
-      const result = await firstValueFrom(request$);
-      this.successMessage.set(this.translate.instant('entryCreate.status.created'));
-      this.lastRequestInfo.set(null);
-
-      const entryId = this.extractId(result);
-      if (entryId) {
-        await this.router.navigate(['/entries', this.currentType, entryId]);
-        return;
-      }
-
-      this.form.reset();
-      this.rawPayloadControl.reset('');
+      const created = await firstValueFrom(this.entryService.createEntry(payload));
+      await this.router.navigate(['/entries', this.currentSchemaKey, created.id]);
     } catch (error) {
-      this.errorMessage.set(this.translate.instant('entryCreate.errors.createFailed', {
-        message: this.describeError(error)
-      }));
+      this.errorMessage.set(this.describeError(error));
     } finally {
       this.isSubmitting.set(false);
     }
   }
 
-  private validateSchemaRequirements(payload: Record<string, unknown>): boolean {
-    const schema = this.schema();
-    const requirement = schema?.requireOneOf;
-    if (!schema || !requirement || !Array.isArray(requirement.keys) || requirement.keys.length === 0) {
-      return true;
+  private async loadSchema(): Promise<void> {
+    if (!this.currentSchemaKey) {
+      return;
     }
 
-    const satisfied = requirement.keys.some((key) => this.hasTruthyValue(payload[key]));
-    if (satisfied) {
-      return true;
-    }
+    try {
+      const schemas = await firstValueFrom(this.schemaService.loadSchemas());
+      const schema = schemas.find((item) => item.key === this.currentSchemaKey) ?? null;
+      this.schema.set(schema);
 
-    const fieldsList = requirement.keys.map((key) => this.humanize(key)).join(', ');
-    const messageKey = requirement.messageKey ?? 'entryCreate.errors.requireOneOf';
-    let message = this.translate.instant(messageKey, { fields: fieldsList });
-    if (!message || message === messageKey) {
-      message = `Please provide at least one of: ${fieldsList}.`;
-    }
-    this.errorMessage.set(message);
-    return false;
-  }
-
-  private hasTruthyValue(value: unknown): boolean {
-    if (value == null) {
-      return false;
-    }
-
-    if (typeof value === 'string') {
-      return value.trim().length > 0;
-    }
-
-    if (typeof value === 'number') {
-      return !Number.isNaN(value);
-    }
-
-    if (typeof value === 'boolean') {
-      return true;
-    }
-
-    return true;
-  }
-
-  private buildCreateRequest(payload: Record<string, unknown>): { request$: Observable<Record<string, unknown>>; endpoint: string } {
-    if (!this.currentType) {
-      throw new Error('Missing entry type');
-    }
-
-    if (this.isNotesType()) {
-      const personId = this.extractPersonId(payload);
-      if (!personId) {
-        throw new Error('Person ID is required for notes.');
+      if (!schema) {
+        this.errorMessage.set(this.translate.instant('entryCreate.errors.unknownSchema', { schema: this.currentSchemaKey }));
+        return;
       }
-      const { person_id: _omit, ...notePayload } = payload;
-      const endpoint = `/notes/by-person/${encodeURIComponent(personId)}`;
-      return {
-        request$: this.entryService.createNoteForPerson(personId, notePayload),
-        endpoint
-      };
-    }
 
-    const normalized = this.currentType.trim().replace(/^\//, '');
-    const endpoint = `/${normalized}`;
+      const controls: Record<string, FormControl<unknown>> = {};
+      const formFields = sortSchemaFields(schema.fields).map<FormField>((field) => {
+        const validators = field.is_required ? [Validators.required] : [];
+        const control = this.fb.control(this.defaultFieldValue(field), validators);
+        controls[field.key] = control;
+        return { field, control };
+      });
+
+      this.formFields.set(formFields);
+      this.form = this.fb.group(controls);
+      this.metaForm.patchValue({ title: schema.name, status: 'draft', visibility_level: 'internal' });
+      this.errorMessage.set(null);
+    } catch (error) {
+      this.errorMessage.set(this.describeError(error));
+    }
+  }
+
+  private buildPayload(schema: EntrySchema): CreateEntryPayload {
+    const data_json = this.formFields().reduce<Record<string, unknown>>((result, item) => {
+      const value = this.normalizeFieldValue(item.field, item.control.value);
+      if (value !== undefined) {
+        result[item.field.key] = value;
+      }
+      return result;
+    }, {});
+
+    const meta = this.metaForm.getRawValue();
     return {
-      request$: this.entryService.createEntry(this.currentType, payload),
-      endpoint
+      schema_id: schema.id,
+      title: meta.title.trim(),
+      status: meta.status.trim() || null,
+      visibility_level: meta.visibility_level as VisibilityLevel,
+      owner_id: meta.owner_id.trim() || null,
+      data_json
     };
   }
 
-  private loadSchema(type: string): void {
-    const schema = getEntrySchema(type);
-    this.schema.set(schema);
-    this.typeLabel.set(schema?.title ?? this.humanize(type));
-    this.rebuildForm(schema);
-    this.successMessage.set(null);
-    this.errorMessage.set(null);
-  }
-
-  private rebuildForm(schema: EntrySchema | null): void {
-    const controls: Record<string, FormControl<string | boolean | number | null>> = {};
-    const schemaControls: SchemaFieldControl[] = [];
-
-    if (schema) {
-      for (const field of schema.fields) {
-        if (this.isVisibilitySchemaField(field) && !this.showVisibilitySelector()) {
-          continue;
-        }
-        const control = this.createControl(field);
-        controls[field.key] = control;
-        schemaControls.push({ field, control });
-      }
+  private defaultFieldValue(field: SchemaField): unknown {
+    if (field.default_value !== undefined && field.default_value !== null) {
+      return field.default_value;
     }
 
-    this.schemaFields.set(schemaControls);
-    this.form = this.fb.group(controls);
-  }
-
-  private createControl(field: EntrySchemaField): FormControl<string | boolean | number | null> {
-    const validators = field.required ? [Validators.required] : [];
-
-    if (this.isPlatformLookupField(field)) {
-      const defaultValue = field.defaultValue != null ? String(field.defaultValue) : '';
-      return this.fb.nonNullable.control<string>(defaultValue, validators);
-    }
-
-    if (this.isPersonLookupField(field)) {
-      const defaultValue = field.defaultValue != null ? String(field.defaultValue) : '';
-      return this.fb.nonNullable.control<string>(defaultValue, validators);
-    }
-
-    switch (field.type) {
-      case 'boolean':
-        return this.fb.nonNullable.control<boolean>(Boolean(field.defaultValue), validators);
-      case 'number': {
-        const defaultValue = typeof field.defaultValue === 'number' ? field.defaultValue : null;
-        return this.fb.control<number | null>(defaultValue, validators);
-      }
-      case 'date':
-        return this.fb.nonNullable.control<string>(typeof field.defaultValue === 'string' ? field.defaultValue : '', validators);
-      case 'visibility': {
-        const defaultValue =
-          typeof field.defaultValue === 'string' ? coerceVisibilityLevel(field.defaultValue) : DEFAULT_VISIBILITY_LEVEL;
-        return this.fb.nonNullable.control<string>(defaultValue, validators);
-      }
-      default:
-        return this.fb.nonNullable.control<string>(
-          field.defaultValue != null ? String(field.defaultValue) : '',
-          validators
-        );
-    }
-  }
-
-  private buildPayload(): Record<string, unknown> {
-    const payload: Record<string, unknown> = {};
-
-    for (const { field, control } of this.schemaFields()) {
-      const value = control.value;
-      if (this.shouldSkipField(field, value)) {
-        continue;
-      }
-
-      payload[field.key] = this.transformValue(field, value);
-    }
-
-    const rawPayload = this.rawPayloadControl.value.trim();
-    if (rawPayload.length > 0) {
-      try {
-        const parsed = JSON.parse(rawPayload);
-        Object.assign(payload, parsed);
-      } catch {
-        throw new Error(this.translate.instant('entryCreate.errors.invalidRawJson'));
-      }
-    }
-
-    return payload;
-  }
-
-  private shouldSkipField(field: EntrySchemaField, value: string | number | boolean | null): boolean {
-    if (field.required) {
+    if (field.data_type === 'boolean') {
       return false;
     }
 
-    if (field.type === 'boolean') {
-      return value === null;
+    if (field.data_type === 'multi_select' || supportsMultiple(field)) {
+      return [];
     }
 
-    if (field.type === 'number') {
-      if (value === null || value === undefined) {
-        return true;
-      }
-      if (typeof value === 'string') {
-        return value.trim().length === 0;
-      }
-      return false;
-    }
-
-    const stringValue = typeof value === 'string' ? value.trim() : '';
-    return stringValue.length === 0;
+    return '';
   }
 
-  private transformValue(field: EntrySchemaField, value: string | number | boolean | null): unknown {
-    const fieldType = field.type;
-    switch (fieldType) {
+  private normalizeFieldValue(field: SchemaField, value: unknown): unknown {
+    if (value === '' || value === null || value === undefined) {
+      return field.is_required ? value : undefined;
+    }
+
+    switch (field.data_type) {
+      case 'integer':
+        return Number.parseInt(String(value), 10);
+      case 'decimal':
+        return Number.parseFloat(String(value));
       case 'boolean':
         return Boolean(value);
-      case 'number':
-        if (typeof value === 'number') {
-          return value;
-        }
-        return Number(value);
-      case 'date':
-        return this.transformDate(field.dateVariant, value);
-      case 'visibility':
-        return typeof value === 'string' ? coerceVisibilityLevel(value) : DEFAULT_VISIBILITY_LEVEL;
       case 'json':
-        if (typeof value !== 'string') {
-          throw new Error(this.translate.instant('entryCreate.errors.invalidJsonField'));
+        return typeof value === 'string' ? JSON.parse(value) : value;
+      case 'multi_select':
+        return Array.isArray(value) ? value : String(value).split(',').map((item) => item.trim()).filter(Boolean);
+      case 'file':
+      case 'reference':
+        if (supportsMultiple(field)) {
+          return Array.isArray(value) ? value : String(value).split(',').map((item) => item.trim()).filter(Boolean);
         }
-        try {
-          return JSON.parse(value);
-        } catch {
-          throw new Error(this.translate.instant('entryCreate.errors.invalidJsonField'));
-        }
+        return String(value).trim();
       default:
-        if (typeof value === 'string') {
-          return value.trim();
-        }
-        if (value == null) {
-          return '';
-        }
-        return value;
+        return typeof value === 'string' ? value.trim() : value;
     }
-  }
-
-  private transformDate(variant: 'date' | 'datetime' | undefined, value: string | number | boolean | null): string {
-    const normalized = (typeof value === 'string' ? value : String(value ?? '')).trim();
-    if (!normalized) {
-      throw new Error(this.translate.instant('entryCreate.errors.invalidDate'));
-    }
-
-    if ((variant ?? 'datetime') === 'date') {
-      const isValidDate = /^\d{4}-\d{2}-\d{2}$/.test(normalized);
-      if (!isValidDate) {
-        throw new Error(this.translate.instant('entryCreate.errors.invalidDate'));
-      }
-      return normalized;
-    }
-
-    const parsed = Date.parse(normalized);
-    if (Number.isNaN(parsed)) {
-      throw new Error(this.translate.instant('entryCreate.errors.invalidDate'));
-    }
-    return new Date(parsed).toISOString();
-  }
-
-  private extractId(record: unknown): string | null {
-    if (!record || typeof record !== 'object' || Array.isArray(record)) {
-      return null;
-    }
-
-    const candidate = record as Record<string, unknown>;
-    const idValue = candidate['id'] ?? candidate['_id'];
-
-    if (typeof idValue === 'string' && idValue.trim().length > 0) {
-      return idValue.trim();
-    }
-
-    if (typeof idValue === 'number') {
-      return idValue.toString();
-    }
-
-    return null;
   }
 
   private describeError(error: unknown): string {
     if (error instanceof Error) {
       return error.message;
     }
-
-    if (typeof error === 'object' && error && 'message' in error) {
+    if (typeof error === 'object' && error !== null && 'message' in error) {
       return String((error as { message?: unknown }).message ?? '');
     }
-
-    return this.translate.instant('entryCreate.errors.unknown');
-  }
-
-  private humanize(value: string): string {
-    return value
-      .replace(/[_-]+/g, ' ')
-      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .replace(/\b\w/g, (char) => char.toUpperCase());
+    return this.translate.instant('entryCreate.errors.loadFallback');
   }
 }

@@ -2,175 +2,185 @@
   <header class="entry-detail__header">
     <div class="entry-detail__title">
       <a routerLink="/" class="entry-detail__back">{{ 'entryDetail.actions.back' | translate }}</a>
-      <h1>{{ 'entryDetail.title' | translate:{ value: entryTitle() ?? (entryId ?? ('entryDetail.labels.unknownId' | translate)) } }}</h1>
-      <p *ngIf="entryType || entryId">
-        <span *ngIf="entryType">{{ 'entryDetail.labels.type' | translate:{ type: entryType } }}</span>
-        <span *ngIf="entryType && entryId" aria-hidden="true">&nbsp;&middot;&nbsp;</span>
-        <span *ngIf="entryId">{{ 'entryDetail.labels.id' | translate:{ id: entryId } }}</span>
+      <h1>{{ entry() ? entryTitle() : ('entryDetail.labels.unknownId' | translate) }}</h1>
+      <p *ngIf="schema() as currentSchema">
+        {{ 'entryDetail.labels.schemaWithId' | translate:{ schema: currentSchema.name, id: entry()?.id } }}
       </p>
       <p class="entry-detail__meta" *ngIf="entry()">
-        <span *ngIf="createdTimestamp as createdAt">
-          {{ 'entryDetail.labels.createdAt' | translate }}
-          <strong>{{ createdAt | date:'dd/MM/yyyy, HH:mm' }}</strong>
-        </span>
-        <span *ngIf="createdTimestamp && updatedTimestamp" aria-hidden="true">&nbsp;&middot;&nbsp;</span>
-        <span *ngIf="updatedTimestamp as updatedAt">
-          {{ 'entryDetail.labels.updatedAt' | translate }}
-          <strong>{{ updatedAt | date:'dd/MM/yyyy, HH:mm' }}</strong>
-        </span>
+        {{ 'entryDetail.labels.createdAt' | translate }} {{ entry()?.created_at | date:'dd/MM/yyyy, HH:mm' }}
+        <span *ngIf="entry()?.updated_at"> &middot; {{ 'entryDetail.labels.updatedAt' | translate }} {{ entry()?.updated_at | date:'dd/MM/yyyy, HH:mm' }}</span>
       </p>
-      <div class="entry-detail__visibility" *ngIf="entry() && canEditVisibility()">
-        <div class="entry-detail__visibility-info">
-          <span [ngClass]="visibilityBadgeClasses()">
-            {{ visibilityBadgeLabelKey() | translate }}
-          </span>
-          <small>{{ 'entryVisibility.helper' | translate }}</small>
-        </div>
-        <app-value-dropdown
-          class="entry-detail__visibility-control"
-          [formControl]="visibilityControl"
-          [options]="visibilityOptions()"
-          [placeholder]="'entryVisibility.placeholder' | translate"
-        ></app-value-dropdown>
-      </div>
     </div>
     <div class="entry-detail__actions">
-      <div class="entry-detail__view-toggle" *ngIf="canShowDossierToggle()">
-        <button
-          type="button"
-          [class.is-active]="personView() === 'details'"
-          (click)="setPersonView('details')"
-        >
-          {{ 'entryDetail.view.details' | translate }}
-        </button>
-        <button
-          type="button"
-          [class.is-active]="personView() === 'dossier'"
-          (click)="setPersonView('dossier')"
-        >
-          {{ 'dossier.tabLabel' | translate }}
-        </button>
-      </div>
-      <div
-        class="entry-detail__layout-toggle"
-        *ngIf="showPersonRelations() && entryId && personView() === 'details'"
-        role="group"
-        [attr.aria-label]="'entryDetail.relations.layoutLabel' | translate">
-        <label class="entry-detail__layout-option">
-          <input
-            type="radio"
-            name="relationsLayout"
-            value="side"
-            [checked]="relationsLayout() === 'side'"
-            (change)="onRelationsLayoutChange('side')"
-          />
-          <span class="entry-detail__layout-body">
-            <span class="entry-detail__layout-icon entry-detail__layout-icon--side" aria-hidden="true"></span>
-            <span class="sr-only">
-              {{ 'entryDetail.relations.layoutOptionSide' | translate }}
-            </span>
-          </span>
-        </label>
-        <label class="entry-detail__layout-option">
-          <input
-            type="radio"
-            name="relationsLayout"
-            value="stacked"
-            [checked]="relationsLayout() === 'stacked'"
-            (change)="onRelationsLayoutChange('stacked')"
-          />
-          <span class="entry-detail__layout-body">
-            <span class="entry-detail__layout-icon entry-detail__layout-icon--stacked" aria-hidden="true"></span>
-            <span class="sr-only">
-              {{ 'entryDetail.relations.layoutOptionStacked' | translate }}
-            </span>
-          </span>
-        </label>
-      </div>
-      <button
-        *ngIf="canEditEntries() && personView() === 'details'"
-        type="button"
-        class="entry-detail__raw-toggle"
-        (click)="toggleRawView()"
-        [attr.aria-pressed]="showRawView()"
-        [attr.aria-label]="(showRawView() ? 'entryDetail.rawView.hide' : 'entryDetail.rawView.show') | translate">
-        <span class="entry-detail__raw-toggle-track" aria-hidden="true">
-          <span class="entry-detail__raw-toggle-thumb" [class.entry-detail__raw-toggle-thumb--active]="showRawView()"></span>
-        </span>
-        <span class="entry-detail__raw-toggle-label">{{ 'entryDetail.rawView.label' | translate }}</span>
-      </button>
-      <button type="button" class="entry-detail__refresh" (click)="refresh()" [disabled]="isLoading() || isSaving()">
-        <span *ngIf="isLoading(); else refreshLabel">{{ 'entryDetail.status.loading' | translate }}</span>
-        <ng-template #refreshLabel>{{ 'entryDetail.actions.refresh' | translate }}</ng-template>
-      </button>
-      <button *ngIf="canEditEntries() && personView() === 'details'" type="submit" form="entryDetailForm" class="entry-detail__save" [disabled]="!hasChanges() || isSaving()">
-        <span *ngIf="isSaving(); else saveLabel">{{ 'entryDetail.status.saving' | translate }}</span>
-        <ng-template #saveLabel>{{ 'entryDetail.actions.save' | translate }}</ng-template>
-      </button>
-      <button *ngIf="canDeleteEntries() && personView() === 'details'" type="button" class="entry-detail__delete" (click)="openDeleteDialog()" [disabled]="isDeleting()">
-        <span *ngIf="isDeleting(); else deleteLabel">{{ 'entryDetail.status.deleting' | translate }}</span>
-        <ng-template #deleteLabel>{{ 'entryDetail.actions.delete' | translate }}</ng-template>
-      </button>
+      <button type="button" (click)="refresh()" [disabled]="isLoading()">{{ 'entryDetail.actions.refresh' | translate }}</button>
+      <button type="button" *ngIf="canEdit()" (click)="save()" [disabled]="isSaving()">{{ 'entryDetail.actions.save' | translate }}</button>
+      <button type="button" *ngIf="access().delete || access().manage" (click)="deleteEntry()">{{ 'entryDetail.actions.delete' | translate }}</button>
     </div>
-    <p class="entry-detail__readonly" *ngIf="!canEditEntries() && personView() === 'details'">
-      {{ 'entryDetail.status.readOnly' | translate }}
-    </p>
   </header>
 
   <section *ngIf="errorMessage() as error" class="entry-detail__alert entry-detail__alert--error">
-    <p>{{ error }}</p>
+    {{ error }}
   </section>
-
   <section *ngIf="successMessage() as success" class="entry-detail__alert entry-detail__alert--success">
-    <p>{{ success }}</p>
+    {{ success }}
   </section>
 
-  <div
-    *ngIf="personView() === 'details' && entry() as record"
-    class="entry-detail__content"
-    [class.entry-detail__content--stacked]="relationsLayout() === 'stacked'"
-    [class.entry-detail__content--full]="!(showPersonRelations() && entryId)"
-  >
-    <form
-      id="entryDetailForm"
-      class="entry-detail__form"
-      [formGroup]="form"
-      (ngSubmit)="save()"
-    >
-      <app-entry-detail-field-grid
-        [form]="form"
-        [fields]="fields()"
-        [booleanOptions]="booleanOptions()"
-      ></app-entry-detail-field-grid>
+  <section *ngIf="entry(); else loadingState" class="entry-detail__content">
+    <form class="entry-detail__form" [formGroup]="metaForm">
+      <div class="entry-detail__grid">
+        <div class="entry-detail__field">
+          <label for="entry-title">{{ 'entryDetail.meta.title' | translate }}</label>
+          <input id="entry-title" type="text" formControlName="title" />
+        </div>
+        <div class="entry-detail__field">
+          <label for="entry-status">{{ 'entryDetail.meta.status' | translate }}</label>
+          <input id="entry-status" type="text" formControlName="status" />
+        </div>
+        <div class="entry-detail__field">
+          <label for="entry-visibility">{{ 'entryDetail.meta.visibility' | translate }}</label>
+          <select id="entry-visibility" formControlName="visibility_level">
+            <option value="public">public</option>
+            <option value="internal">internal</option>
+            <option value="private">private</option>
+            <option value="restricted">restricted</option>
+          </select>
+        </div>
+        <div class="entry-detail__field">
+          <label for="entry-owner">{{ 'entryDetail.meta.ownerId' | translate }}</label>
+          <input id="entry-owner" type="text" formControlName="owner_id" />
+        </div>
+        <div class="entry-detail__field entry-detail__field--full">
+          <label for="entry-comment">{{ 'entryDetail.meta.comment' | translate }}</label>
+          <textarea id="entry-comment" rows="3" formControlName="comment"></textarea>
+        </div>
+      </div>
     </form>
 
-    <app-entry-detail-relations
-      *ngIf="showPersonRelations() && entryId"
-      [personId]="entryId"
-      [entryTitle]="entryTitle()"
-      [layout]="relationsLayout()"
-      (statusMessage)="successMessage.set($event)"
-    ></app-entry-detail-relations>
-  </div>
+    <form class="entry-detail__form" [formGroup]="form">
+      <div class="entry-detail__grid">
+        <div *ngFor="let item of fields(); trackBy: trackField" class="entry-detail__field">
+          <label [attr.for]="item.field.key">{{ item.field.label || item.field.key }}</label>
+          <small *ngIf="item.field.description">{{ item.field.description }}</small>
 
-  <app-person-dossier
-    *ngIf="personView() === 'dossier' && entryId"
-    [personId]="entryId"
-    [personName]="entryTitle()"
-  ></app-person-dossier>
+          <ng-container [ngSwitch]="item.field.data_type">
+            <textarea *ngSwitchCase="'long_text'" [id]="item.field.key" [formControl]="item.control" rows="5"></textarea>
+            <textarea *ngSwitchCase="'json'" [id]="item.field.key" [formControl]="item.control" rows="8"></textarea>
+            <input *ngSwitchCase="'integer'" type="number" [id]="item.field.key" [formControl]="item.control" step="1" />
+            <input *ngSwitchCase="'decimal'" type="number" [id]="item.field.key" [formControl]="item.control" step="0.01" />
+            <input *ngSwitchCase="'boolean'" type="checkbox" [id]="item.field.key" [formControl]="item.control" />
+            <input *ngSwitchCase="'date'" type="date" [id]="item.field.key" [formControl]="item.control" />
+            <input *ngSwitchCase="'datetime'" type="datetime-local" [id]="item.field.key" [formControl]="item.control" />
+            <input *ngSwitchCase="'email'" type="email" [id]="item.field.key" [formControl]="item.control" />
+            <input *ngSwitchCase="'url'" type="url" [id]="item.field.key" [formControl]="item.control" />
+            <select *ngSwitchCase="'select'" [id]="item.field.key" [formControl]="item.control">
+              <option value="">-</option>
+              <option *ngFor="let option of fieldOptions(item.field)" [value]="option.value">{{ option.label }}</option>
+            </select>
+            <select *ngSwitchCase="'multi_select'" [id]="item.field.key" [formControl]="item.control" [attr.multiple]="true">
+              <option *ngFor="let option of fieldOptions(item.field)" [value]="option.value">{{ option.label }}</option>
+            </select>
+            <ng-container *ngSwitchCase="'reference'">
+              <input type="text" [id]="item.field.key" [formControl]="item.control" />
+              <a *ngIf="referenceLink(item.field) as link" [routerLink]="link">{{ referenceLabel(item.field) }}</a>
+            </ng-container>
+            <input *ngSwitchDefault type="text" [id]="item.field.key" [formControl]="item.control" />
+          </ng-container>
+        </div>
+      </div>
+    </form>
 
-  <section *ngIf="personView() === 'details' && !entry() && !isLoading()" class="entry-detail__state">
-    <p>{{ 'entryDetail.status.empty' | translate }}</p>
+    <section class="entry-detail__panel">
+      <h2>{{ 'entryDetail.sections.formattedData' | translate }}</h2>
+      <div class="entry-detail__summary-grid">
+        <div *ngFor="let item of fields(); trackBy: trackField" class="entry-detail__summary-item">
+          <strong>{{ item.field.label || item.field.key }}</strong>
+          <span>{{ renderFieldValue(item.field) }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="entry-detail__panel" *ngIf="relations().length > 0 || access().manage_relations || access().manage">
+      <h2>{{ 'entryDetail.sections.relations' | translate }}</h2>
+      <p *ngIf="!(access().manage_relations || access().manage) && relations().length === 0">{{ 'entryDetail.status.noRelationAccess' | translate }}</p>
+      <table *ngIf="relations().length > 0">
+        <thead>
+          <tr>
+            <th>{{ 'entryDetail.relations.columns.type' | translate }}</th>
+            <th>{{ 'entryDetail.relations.columns.from' | translate }}</th>
+            <th>{{ 'entryDetail.relations.columns.to' | translate }}</th>
+            <th>{{ 'entryDetail.relations.columns.order' | translate }}</th>
+            <th>{{ 'entryDetail.relations.columns.created' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let relation of relations(); trackBy: trackRelation">
+            <td>{{ relation.relation_type }}</td>
+            <td>{{ relation.from_entry_id }}</td>
+            <td>{{ relation.to_entry_id }}</td>
+            <td>{{ relation.sort_order }}</td>
+            <td>{{ relation.created_at | date:'dd/MM/yyyy, HH:mm' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="entry-detail__panel" *ngIf="attachments().length > 0 || access().manage_attachments || access().manage">
+      <h2>{{ 'entryDetail.sections.attachments' | translate }}</h2>
+      <p *ngIf="!(access().manage_attachments || access().manage) && attachments().length === 0">{{ 'entryDetail.status.noAttachmentAccess' | translate }}</p>
+      <ul>
+        <li *ngFor="let attachment of attachments(); trackBy: trackAttachment">
+          <a *ngIf="attachmentUrl(attachment) as url" [href]="url" target="_blank" rel="noopener">{{ attachment.file_name }}</a>
+          <span *ngIf="!attachmentUrl(attachment)">{{ attachment.file_name }}</span>
+          <span *ngIf="attachment.description"> &middot; {{ attachment.description }}</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="entry-detail__panel" *ngIf="access().view_history || access().manage">
+      <h2>{{ 'entryDetail.sections.history' | translate }}</h2>
+      <div *ngIf="history().length === 0">{{ 'entryDetail.status.noHistory' | translate }}</div>
+      <article *ngFor="let item of history(); trackBy: trackHistory" class="entry-detail__history-item">
+        <header>
+          <strong>{{ item.change_type }}</strong>
+          <span> &middot; {{ item.changed_at | date:'dd/MM/yyyy, HH:mm' }}</span>
+          <span *ngIf="item.changed_by"> &middot; {{ 'entryDetail.history.by' | translate:{ value: item.changed_by } }}</span>
+        </header>
+        <p *ngIf="item.comment">{{ item.comment }}</p>
+        <ul>
+          <li *ngFor="let diff of renderHistoryDiff(item)">{{ diff }}</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="entry-detail__panel" *ngIf="access().manage_permissions || access().manage">
+      <h2>{{ 'entryDetail.sections.permissions' | translate }}</h2>
+      <table *ngIf="permissions().length > 0">
+        <thead>
+          <tr>
+            <th>{{ 'entryDetail.permissions.columns.subjectType' | translate }}</th>
+            <th>{{ 'entryDetail.permissions.columns.subjectId' | translate }}</th>
+            <th>{{ 'entryDetail.permissions.columns.permission' | translate }}</th>
+            <th>{{ 'entryDetail.permissions.columns.createdBy' | translate }}</th>
+            <th>{{ 'entryDetail.permissions.columns.createdAt' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let permission of permissions(); trackBy: trackPermission">
+            <td>{{ permission.subject_type }}</td>
+            <td>{{ permission.subject_id }}</td>
+            <td>{{ permission.permission }}</td>
+            <td>{{ permission.created_by }}</td>
+            <td>{{ permission.created_at | date:'dd/MM/yyyy, HH:mm' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="permissions().length === 0">{{ 'entryDetail.status.noPermissions' | translate }}</p>
+    </section>
   </section>
 
-  <app-entry-detail-raw-view *ngIf="canEditEntries() && personView() === 'details'" [record]="entry()" [activated]="showRawView()"></app-entry-detail-raw-view>
-
-  <app-entry-detail-delete-dialog
-    *ngIf="canDeleteEntries() && personView() === 'details'"
-    [isOpen]="isDeleteDialogOpen()"
-    [isDeleting]="isDeleting()"
-    [securityKey]="deleteSecurityKey"
-    (confirmed)="handleDeleteConfirmed()"
-    (closed)="closeDeleteDialog()"
-  ></app-entry-detail-delete-dialog>
+  <ng-template #loadingState>
+    <section class="entry-detail__state">
+      <p>{{ (isLoading() ? 'entryDetail.status.loadingEntry' : 'entryDetail.status.empty') | translate }}</p>
+    </section>
+  </ng-template>
 </section>

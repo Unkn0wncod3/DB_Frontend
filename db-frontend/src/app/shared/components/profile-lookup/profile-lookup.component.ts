@@ -127,7 +127,7 @@ export class ProfileLookupComponent implements ControlValueAccessor {
         pageSize: 8
       };
       const result = await firstValueFrom(this.entryService.listEntries('profiles', params));
-      const options = (result.items ?? []).map((item) => this.toOption(item));
+      const options = (result.items ?? []).map((item: Record<string, unknown>) => this.toOption(item));
       this.results.set(options);
     } catch (error) {
       const message = error instanceof Error ? error.message : this.translate.instant('entryList.errors.unknown');
@@ -197,7 +197,7 @@ export class ProfileLookupComponent implements ControlValueAccessor {
   private async hydrateSelection(value: string | number): Promise<void> {
     try {
       const result = await firstValueFrom(this.entryService.getEntry('profiles', value.toString()));
-      const option = this.toOption(result as Record<string, unknown>);
+      const option = this.toOption(result as unknown as Record<string, unknown>);
       this.selectedId.set(option.id || null);
       this.searchControl.setValue(option.label, { emitEvent: false });
     } catch {
