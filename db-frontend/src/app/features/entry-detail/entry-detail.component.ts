@@ -614,8 +614,9 @@ export class EntryDetailComponent {
       case 'datetime':
         return typeof value === 'string' && value.length > 0 ? new Date(value).toISOString() : value;
       case 'reference':
+        return this.normalizeIdentifierValue(value, field.is_required);
       case 'file':
-        return String(value).trim();
+        return this.normalizeIdentifierValue(value, field.is_required);
       default:
         return typeof value === 'string' ? value.trim() : value;
     }
@@ -698,6 +699,15 @@ export class EntryDetailComponent {
         .filter((item) => item.length > 0);
     }
     return value == null ? [] : [String(value)];
+  }
+
+  private normalizeIdentifierValue(value: unknown, isRequired: boolean): string | number | undefined {
+    const normalized = String(value ?? '').trim();
+    if (!normalized) {
+      return isRequired ? '' : undefined;
+    }
+
+    return /^\d+$/.test(normalized) ? Number.parseInt(normalized, 10) : normalized;
   }
 
   private toBoolean(value: unknown): boolean {

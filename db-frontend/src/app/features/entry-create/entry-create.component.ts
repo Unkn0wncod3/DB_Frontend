@@ -371,9 +371,11 @@ export class EntryCreateComponent {
       case 'file':
       case 'reference':
         if (supportsMultiple(field)) {
-          return Array.isArray(value) ? value : String(value).split(',').map((item) => item.trim()).filter(Boolean);
+          return (Array.isArray(value) ? value : String(value).split(',').map((item) => item.trim()).filter(Boolean))
+            .map((item) => this.normalizeIdentifierValue(item))
+            .filter((item) => item !== undefined);
         }
-        return String(value).trim();
+        return this.normalizeIdentifierValue(value, field.is_required);
       default:
         return typeof value === 'string' ? value.trim() : value;
     }
@@ -395,5 +397,14 @@ export class EntryCreateComponent {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '_')
       .replace(/^_+|_+$/g, '');
+  }
+
+  private normalizeIdentifierValue(value: unknown, isRequired = false): string | number | undefined {
+    const normalized = String(value ?? '').trim();
+    if (!normalized) {
+      return isRequired ? '' : undefined;
+    }
+
+    return /^\d+$/.test(normalized) ? Number.parseInt(normalized, 10) : normalized;
   }
 }
