@@ -1,8 +1,14 @@
 <section class="user-management">
   <header class="user-management__hero">
-    <p class="user-management__eyebrow">{{ 'userManagement.eyebrow' | translate }}</p>
-    <h1>{{ 'userManagement.title' | translate }}</h1>
-    <p class="user-management__intro">{{ 'userManagement.subtitle' | translate }}</p>
+    <div>
+      <p class="user-management__eyebrow">{{ 'userManagement.eyebrow' | translate }}</p>
+      <h1>{{ 'userManagement.title' | translate }}</h1>
+      <p class="user-management__intro">{{ 'userManagement.subtitle' | translate }}</p>
+    </div>
+    <div class="user-management__hero-stat">
+      <span>{{ 'userManagement.list.title' | translate }}</span>
+      <strong>{{ users().length }}</strong>
+    </div>
   </header>
 
   <section *ngIf="errorMessage() as error" class="user-management__alert user-management__alert--error">
@@ -12,57 +18,69 @@
     <p>{{ success }}</p>
   </section>
 
-  <form class="user-management__form" [formGroup]="createForm" (ngSubmit)="createUser()">
-    <div>
-      <label>{{ 'userManagement.form.username' | translate }}</label>
-      <input type="text" formControlName="username" autocomplete="off" />
+  <section class="user-management__panel">
+    <div class="user-management__panel-header">
+      <div>
+        <h2>{{ 'userManagement.actions.create' | translate }}</h2>
+        <p class="user-management__panel-copy">{{ 'userManagement.subtitle' | translate }}</p>
+      </div>
     </div>
-    <div>
-      <label>{{ 'userManagement.form.password' | translate }}</label>
-      <input type="password" formControlName="password" autocomplete="new-password" />
-    </div>
-    <div>
-      <label>{{ 'userManagement.form.role' | translate }}</label>
-      <select formControlName="role">
-        <option
-          *ngFor="let role of roleOptions"
-          [value]="role"
-          [disabled]="!canSelectRoleOption(role)"
-        >
-          {{ roleLabel(role) }}
-        </option>
-      </select>
-    </div>
-    <div>
-      <label>{{ 'userManagement.form.profilePictureUrl' | translate }}</label>
-      <input
-        type="url"
-        formControlName="profile_picture_url"
-        [placeholder]="'userManagement.form.profilePicturePlaceholder' | translate"
-      />
-    </div>
-    <div class="user-management__form-action">
-      <button
-        type="submit"
-        class="user-management__primary-button"
-        [class.user-management__primary-button--disabled]="createForm.invalid || isCreating()"
-        [disabled]="createForm.invalid || isCreating()"
-      >
-        <span *ngIf="isCreating(); else createLabel">{{ 'userManagement.actions.creating' | translate }}</span>
-        <ng-template #createLabel>{{ 'userManagement.actions.create' | translate }}</ng-template>
-      </button>
-      <p
-        class="user-management__helper"
-        [class.user-management__helper--visible]="createForm.invalid && (createForm.touched || createForm.dirty)"
-      >
-        {{ 'userManagement.form.validationHint' | translate }}
-      </p>
-    </div>
-  </form>
 
-  <section class="user-management__list">
+    <form class="user-management__form" [formGroup]="createForm" (ngSubmit)="createUser()">
+      <div class="user-management__field">
+        <label>{{ 'userManagement.form.username' | translate }}</label>
+        <input type="text" formControlName="username" autocomplete="off" />
+      </div>
+      <div class="user-management__field">
+        <label>{{ 'userManagement.form.password' | translate }}</label>
+        <input type="password" formControlName="password" autocomplete="new-password" />
+      </div>
+      <div class="user-management__field">
+        <label>{{ 'userManagement.form.role' | translate }}</label>
+        <select formControlName="role">
+          <option
+            *ngFor="let role of roleOptions"
+            [value]="role"
+            [disabled]="!canSelectRoleOption(role)"
+          >
+            {{ roleLabel(role) }}
+          </option>
+        </select>
+      </div>
+      <div class="user-management__field user-management__field--wide">
+        <label>{{ 'userManagement.form.profilePictureUrl' | translate }}</label>
+        <input
+          type="url"
+          formControlName="profile_picture_url"
+          [placeholder]="'userManagement.form.profilePicturePlaceholder' | translate"
+        />
+      </div>
+      <div class="user-management__form-action">
+        <button
+          type="submit"
+          class="user-management__primary-button"
+          [class.user-management__primary-button--disabled]="createForm.invalid || isCreating()"
+          [disabled]="createForm.invalid || isCreating()"
+        >
+          <span *ngIf="isCreating(); else createLabel">{{ 'userManagement.actions.creating' | translate }}</span>
+          <ng-template #createLabel>{{ 'userManagement.actions.create' | translate }}</ng-template>
+        </button>
+        <p
+          class="user-management__helper"
+          [class.user-management__helper--visible]="createForm.invalid && (createForm.touched || createForm.dirty)"
+        >
+          {{ 'userManagement.form.validationHint' | translate }}
+        </p>
+      </div>
+    </form>
+  </section>
+
+  <section class="user-management__panel user-management__list">
     <div class="user-management__list-header">
-      <h2>{{ 'userManagement.list.title' | translate }}</h2>
+      <div>
+        <h2>{{ 'userManagement.list.title' | translate }}</h2>
+        <p class="user-management__panel-copy">{{ 'userManagement.list.subtitle' | translate }}</p>
+      </div>
       <button type="button" class="user-management__refresh" (click)="refresh()" [disabled]="isLoading()">
         <svg viewBox="0 0 24 24" aria-hidden="true" [class.is-spinning]="isLoading()">
           <path
@@ -78,7 +96,8 @@
         <ng-template #refreshLabel>{{ 'userManagement.actions.refresh' | translate }}</ng-template>
       </button>
     </div>
-    <table *ngIf="users().length > 0; else emptyState">
+    <div class="user-management__table-wrap" *ngIf="users().length > 0; else emptyState">
+    <table>
       <thead>
         <tr>
           <th>{{ 'userManagement.table.username' | translate }}</th>
@@ -92,10 +111,34 @@
       </thead>
       <tbody>
         <tr *ngFor="let user of users(); trackBy: trackByUser">
-          <td>{{ user.username }}</td>
+          <td>
+            <div class="user-management__identity">
+              <div class="user-management__avatar-shell">
+                <img
+                  class="user-management__avatar"
+                  [src]="profileImageSrc(user)"
+                  [alt]="user.username"
+                  (error)="handleProfileImageError($event)"
+                />
+                <span class="user-management__avatar-fallback">{{ profileInitial(user) }}</span>
+              </div>
+              <div class="user-management__identity-copy">
+                <strong>{{ user.username }}</strong>
+                <span>{{ roleLabel(user.role) }}</span>
+              </div>
+            </div>
+          </td>
           <td class="user-management__avatar-cell">
-            <img *ngIf="user.profile_picture_url; else noAvatar" [src]="user.profile_picture_url" [alt]="user.username" />
-            <ng-template #noAvatar>&mdash;</ng-template>
+            <a
+              *ngIf="user.profile_picture_url; else defaultAvatarLabel"
+              [href]="user.profile_picture_url"
+              target="_blank"
+              rel="noopener"
+              class="user-management__picture-link"
+            >
+              {{ 'userManagement.table.profilePictureLink' | translate }}
+            </a>
+            <ng-template #defaultAvatarLabel>{{ 'userManagement.table.profilePictureDefault' | translate }}</ng-template>
           </td>
           <td class="user-management__preferences-cell">
             <button type="button" class="user-management__preferences-button" (click)="openPreferences(user)" [disabled]="!user.preferences">
@@ -158,6 +201,7 @@
         </tr>
       </tbody>
     </table>
+    </div>
     <ng-template #emptyState>
       <p class="user-management__empty">
         {{ isLoading() ? ('userManagement.list.loading' | translate) : ('userManagement.list.empty' | translate) }}

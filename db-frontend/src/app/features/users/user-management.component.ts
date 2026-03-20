@@ -20,6 +20,8 @@ export class UserManagementComponent {
   private readonly userService = inject(UserService);
   private readonly fb = inject(FormBuilder);
   private readonly translate = inject(TranslateService);
+  readonly defaultProfileImage =
+    'https://media.istockphoto.com/id/1495088043/de/vektor/benutzerprofil-symbol-avatar-oder-personensymbol-profilbild-portr%C3%A4tsymbol-standard.jpg?s=612x612&w=0&k=20&c=mmj93kpr1sFn8VJYI_MUabWE4B86zRD5Uf9fBbTbQqk=';
 
   readonly users = signal<UserAccount[]>([]);
   readonly isLoading = signal(false);
@@ -221,6 +223,26 @@ export class UserManagementComponent {
 
   roleLabel(role: AuthRole): string {
     return this.translate.instant(`userManagement.roles.${role}`);
+  }
+
+  profileImageSrc(user: UserAccount | null): string {
+    const src = user?.profile_picture_url?.trim();
+    return src && src.length > 0 ? src : this.defaultProfileImage;
+  }
+
+  profileInitial(user: UserAccount | null): string {
+    const source = user?.username?.trim() || '?';
+    return source.charAt(0).toUpperCase();
+  }
+
+  handleProfileImageError(event: Event): void {
+    const image = event.target as HTMLImageElement | null;
+    if (!image || image.dataset['fallbackApplied'] === 'true') {
+      return;
+    }
+
+    image.dataset['fallbackApplied'] = 'true';
+    image.src = this.defaultProfileImage;
   }
 
   isProtectedAccount(account: UserAccount): boolean {

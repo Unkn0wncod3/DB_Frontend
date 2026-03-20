@@ -805,6 +805,7 @@
     },
     "list": {
       "title": "Existing users",
+      "subtitle": "Review accounts, roles, status and preference snapshots in one place.",
       "empty": "No users found yet.",
       "loading": "Loading users...",
       "protectedHint": "Core account {{username}} stays available for recovery and cannot be deleted."
@@ -812,6 +813,8 @@
     "table": {
       "username": "Username",
       "profilePicture": "Picture",
+      "profilePictureLink": "Open image",
+      "profilePictureDefault": "Default image",
       "preferences": "Preferences",
       "preferencesButton": "View",
       "role": "Role",

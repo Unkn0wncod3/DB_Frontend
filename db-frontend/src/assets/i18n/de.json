@@ -813,6 +813,7 @@
     },
     "list": {
       "title": "Vorhandene Benutzer",
+      "subtitle": "Accounts, Rollen, Status und Einstellungs-Snapshots an einer Stelle prüfen.",
       "empty": "Noch keine Benutzer vorhanden.",
       "loading": "Benutzer werden geladen...",
       "protectedHint": "Der Kern-Account {{username}} bleibt für Notfälle erhalten und kann nicht gelöscht werden."
@@ -820,6 +821,8 @@
     "table": {
       "username": "Benutzername",
       "profilePicture": "Bild",
+      "profilePictureLink": "Bild öffnen",
+      "profilePictureDefault": "Standardbild",
       "preferences": "Präferenzen",
       "preferencesButton": "Anzeigen",
       "role": "Rolle",
