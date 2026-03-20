@@ -127,23 +127,9 @@
                     <option *ngFor="let option of fieldOptions(item.field)" [value]="option.value">{{ option.label }}</option>
                   </select>
 
-                  <div *ngSwitchCase="'multi_select'" class="entry-detail__multi-select">
-                    <div class="entry-detail__multi-select-options" *ngIf="fieldOptions(item.field).length > 0; else emptyMultiOptions">
-                      <button
-                        *ngFor="let option of fieldOptions(item.field)"
-                        type="button"
-                        class="entry-detail__multi-select-chip"
-                        [class.entry-detail__multi-select-chip--active]="isMultiSelectOptionSelected(item.field, option.value)"
-                        [disabled]="item.control.disabled"
-                        (click)="toggleMultiSelectOption(item.field, option.value)"
-                      >
-                        {{ option.label }}
-                      </button>
-                    </div>
-                    <ng-template #emptyMultiOptions>
-                      <p class="entry-detail__field-help">{{ 'entryDetail.form.noMultiSelectOptions' | translate }}</p>
-                    </ng-template>
-                  </div>
+                  <select *ngSwitchCase="'multi_select'" [id]="fieldControlId(item.field)" [formControl]="item.control" multiple class="entry-detail__multi-select">
+                    <option *ngFor="let option of fieldOptions(item.field)" [value]="option.value">{{ option.label }}</option>
+                  </select>
 
                   <div *ngSwitchCase="'reference'" class="entry-detail__reference-field">
                     <input type="text" [id]="fieldControlId(item.field)" [formControl]="item.control" />

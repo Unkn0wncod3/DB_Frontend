@@ -205,31 +205,6 @@ export class EntryDetailComponent {
     return field.data_type === 'boolean';
   }
 
-  isMultiSelectField(field: SchemaField): boolean {
-    return field.data_type === 'multi_select';
-  }
-
-  isMultiSelectOptionSelected(field: SchemaField, optionValue: string): boolean {
-    const detailField = this.fields().find((item) => item.field.key === field.key);
-    if (!detailField) {
-      return false;
-    }
-    return this.toArrayValue(detailField.control.value).includes(optionValue);
-  }
-
-  toggleMultiSelectOption(field: SchemaField, optionValue: string): void {
-    const detailField = this.fields().find((item) => item.field.key === field.key);
-    if (!detailField || detailField.control.disabled) {
-      return;
-    }
-
-    const current = this.toArrayValue(detailField.control.value);
-    const next = current.includes(optionValue) ? current.filter((value) => value !== optionValue) : [...current, optionValue];
-    detailField.control.setValue(next);
-    detailField.control.markAsDirty();
-    detailField.control.markAsTouched();
-  }
-
   summaryValue(field: SchemaField): string {
     const detailField = this.fields().find((item) => item.field.key === field.key);
     if (!detailField) {

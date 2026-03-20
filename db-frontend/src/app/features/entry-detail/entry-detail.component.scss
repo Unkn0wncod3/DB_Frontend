@@ -35,8 +35,6 @@
 .entry-detail__hero-copy,
 .entry-detail__body,
 .entry-detail__editor-grid,
-.entry-detail__multi-select,
-.entry-detail__multi-select-options,
 .entry-detail__meta-list,
 .entry-detail__timeline {
   display: grid;
@@ -148,22 +146,21 @@
 }
 
 .entry-detail__button,
-.entry-detail__multi-select-chip {
+.entry-detail__multi-select {
   border-radius: 14px;
   color: var(--color-text);
-  cursor: pointer;
-  font-weight: 700;
 }
 
 .entry-detail__button {
   min-height: 2.75rem;
   padding: 0.7rem 1.1rem;
   border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 700;
   transition: border-color 0.2s ease, opacity 0.2s ease;
 }
 
-.entry-detail__button:disabled,
-.entry-detail__multi-select-chip:disabled {
+.entry-detail__button:disabled {
   opacity: 0.6;
   cursor: default;
 }
@@ -174,7 +171,7 @@
 }
 
 .entry-detail__button--primary,
-.entry-detail__multi-select-chip--active {
+.entry-detail__button--primary {
   border-color: transparent;
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-alt));
   color: var(--color-primary-contrast);
@@ -294,18 +291,9 @@
   gap: 0.7rem;
 }
 
-.entry-detail__multi-select-options {
-  grid-template-columns: repeat(auto-fit, minmax(120px, max-content));
-  gap: 0.65rem;
-}
-
-.entry-detail__multi-select-chip {
-  min-height: 2.5rem;
-  padding: 0.6rem 0.9rem;
-  border: 1px solid var(--detail-border-strong);
-  border-radius: 999px;
-  background: var(--detail-input);
-  font-weight: 600;
+.entry-detail__multi-select {
+  min-height: 7.5rem;
+  padding-right: 0.35rem;
 }
 
 .entry-detail__reference-field {
