@@ -54,7 +54,7 @@
       </div>
     </section>
 
-    <section class="entry-create__panel" *ngIf="schema() && formFields().length > 0">
+    <section class="entry-create__panel" *ngIf="schema() && (formFields().length > 0 || auth.canManageSchemas())">
       <header class="entry-create__panel-header">
         <div>
           <h2>{{ 'entryDetail.sections.schemaFieldsNamed' | translate:{ schema: schemaLabel() } }}</h2>

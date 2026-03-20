@@ -93,7 +93,7 @@
         </form>
       </article>
 
-      <article class="entry-detail__panel" *ngIf="fields().length > 0">
+      <article class="entry-detail__panel" *ngIf="schema() && (fields().length > 0 || auth.canManageSchemas())">
         <header class="entry-detail__panel-header">
           <div>
             <h2>{{ schemaFieldsTitle() }}</h2>
