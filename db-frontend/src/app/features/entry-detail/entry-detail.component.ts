@@ -282,6 +282,16 @@ export class EntryDetailComponent {
     }
   }
 
+  async deleteEditingField(): Promise<void> {
+    const field = this.editingField();
+    if (!field) {
+      return;
+    }
+
+    this.isFieldDialogOpen.set(false);
+    await this.deleteField(field);
+  }
+
   fieldDialogTitle(): string {
     return this.editingField()
       ? this.translate.instant('schemaFields.dialog.editTitle')
@@ -342,7 +352,7 @@ export class EntryDetailComponent {
   }
 
   isWideField(field: SchemaField): boolean {
-    return field.data_type === 'long_text' || field.data_type === 'json' || supportsMultiple(field);
+    return field.data_type === 'long_text' || field.data_type === 'json';
   }
 
   isBooleanField(field: SchemaField): boolean {

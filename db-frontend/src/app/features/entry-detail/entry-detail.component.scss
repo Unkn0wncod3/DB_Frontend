@@ -233,36 +233,8 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
-.entry-detail__field-manager {
-  display: grid;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.entry-detail__field-manager-item {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: center;
-  padding: 0.85rem 1rem;
-  border: 1px solid var(--detail-border);
-  border-radius: 0.75rem;
-  background: var(--detail-subtle);
-}
-
-.entry-detail__field-manager-item strong,
-.entry-detail__field-manager-item span {
-  display: block;
-}
-
-.entry-detail__field-manager-item span {
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
-}
-
-.entry-detail__field-manager-actions {
-  display: flex;
-  gap: 0.5rem;
+.entry-detail__field-grid {
+  grid-auto-flow: dense;
 }
 
 .entry-detail__field-card,
@@ -275,6 +247,7 @@
 }
 
 .entry-detail__field-card {
+  position: relative;
   display: grid;
   gap: 0.55rem;
 }
@@ -315,6 +288,53 @@
 
 .entry-detail__field-card--boolean {
   align-content: start;
+}
+
+.entry-detail__field-edit,
+.entry-detail__field-add {
+  border: 1px dashed var(--detail-border-strong);
+  border-radius: 16px;
+  background: var(--detail-subtle);
+  color: var(--color-text);
+}
+
+.entry-detail__field-edit {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  display: inline-grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  border-style: solid;
+  cursor: pointer;
+}
+
+.entry-detail__field-edit svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.entry-detail__field-add {
+  display: grid;
+  place-items: center;
+  gap: 0.55rem;
+  min-height: 12rem;
+  padding: 1.25rem;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.entry-detail__field-add-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid var(--detail-border-strong);
+  border-radius: 999px;
+  font-size: 1.6rem;
+  line-height: 1;
 }
 
 .entry-detail__checkbox {
@@ -490,6 +510,10 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
+}
+
+.entry-detail__button--split {
+  margin-right: auto;
 }
 
 @media (min-width: 1080px) {
