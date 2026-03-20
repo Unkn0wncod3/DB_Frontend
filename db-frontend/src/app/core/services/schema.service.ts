@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { map, Observable, of, tap } from 'rxjs';
+import { concatMap, from, map, Observable, of, switchMap, tap, toArray } from 'rxjs';
 
 import { ApiService } from './api.service';
 import {
@@ -58,6 +58,22 @@ export class SchemaService {
     return this.api.request<EntrySchema>('POST', '/schemas', { body: payload }).pipe(
       map((schema) => this.normalizeSchema(schema)),
       tap((schema) => this.schemas.set([...this.schemas(), schema]))
+    );
+  }
+
+  createSchemaWithFields(payload: CreateSchemaPayload, fields: CreateFieldPayload[]): Observable<EntrySchema> {
+    return this.createSchema(payload).pipe(
+      switchMap((schema) => {
+        if (!fields.length) {
+          return of(schema);
+        }
+
+        return from(fields).pipe(
+          concatMap((field) => this.createField(schema.id, field)),
+          toArray(),
+          switchMap(() => this.getSchema(schema.id))
+        );
+      })
     );
   }
 

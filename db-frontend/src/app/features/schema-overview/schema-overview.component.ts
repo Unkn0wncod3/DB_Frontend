@@ -11,11 +11,12 @@ import { LucideIconsModule } from '../../core/modules/lucide-icons.module';
 import { EntrySchema } from '../../core/models/metadata.models';
 import { SchemaService } from '../../core/services/schema.service';
 import { DashboardSchemaTotal, StatsService } from '../../core/services/stats.service';
+import { SchemaEditorFormComponent, SchemaEditorSubmitPayload } from '../schema-editor-form/schema-editor-form.component';
 
 @Component({
   selector: 'app-schema-overview',
   standalone: true,
-  imports: [NgIf, NgFor, DatePipe, DecimalPipe, RouterLink, TranslateModule, LucideIconsModule, ReactiveFormsModule],
+  imports: [NgIf, NgFor, DatePipe, DecimalPipe, RouterLink, TranslateModule, LucideIconsModule, ReactiveFormsModule, SchemaEditorFormComponent],
   templateUrl: './schema-overview.component.html',
   styleUrl: './schema-overview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -138,6 +139,23 @@ export class SchemaOverviewComponent implements OnInit {
         this.successMessage.set(this.translate.instant('schemaOverview.status.created', { value: payload.name }));
       }
 
+      this.closeSchemaDialog();
+      await this.statsService.loadOverview(true);
+    } catch (error) {
+      this.dialogError.set(this.describeMutationError(error));
+    } finally {
+      this.isSavingSchema.set(false);
+    }
+  }
+
+  async createSchemaFromDialog(payload: SchemaEditorSubmitPayload): Promise<void> {
+    this.isSavingSchema.set(true);
+    this.successMessage.set(null);
+    this.dialogError.set(null);
+
+    try {
+      await firstValueFrom(this.schemaService.createSchemaWithFields(payload.schema, payload.fields));
+      this.successMessage.set(this.translate.instant('schemaOverview.status.created', { value: payload.schema.name }));
       this.closeSchemaDialog();
       await this.statsService.loadOverview(true);
     } catch (error) {

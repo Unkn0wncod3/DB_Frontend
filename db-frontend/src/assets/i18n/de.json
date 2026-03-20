@@ -928,21 +928,33 @@
   },
   "schemaCreate": {
     "title": "Schema erstellen",
-    "subtitle": "Lege ein neues Metadaten-Schema an, das später Felder und Einträge erhalten kann.",
+    "subtitle": "Erstelle die Schema-Basis und richte die ersten Felder direkt im selben Ablauf ein.",
     "actions": {
       "back": "Zurück zum Dashboard",
       "submit": "Schema erstellen"
+    },
+    "sections": {
+      "basicsEyebrow": "Schema-Setup",
+      "basicsTitle": "Schema-Basis",
+      "basicsSubtitle": "Key, Name, Icon und Verfügbarkeit steuern, wie das Schema in der App erscheint.",
+      "fieldsEyebrow": "Feld-Setup",
+      "fieldsTitle": "Erste Felder",
+      "fieldsSubtitle": "Lege die ersten Felddefinitionen an, bevor das Schema gespeichert wird."
     },
     "fields": {
       "key": "Schema-Key",
       "name": "Name",
       "description": "Beschreibung",
       "icon": "Icon",
-      "isActive": "Schema aktiv"
+      "isActive": "Schema verfügbar"
+    },
+    "labels": {
+      "previewKey": "Vorschau-Key"
     },
     "hints": {
       "key": "Verwende nur Kleinbuchstaben, Zahlen und Unterstriche.",
-      "icon": "Nutze einen Lucide-Icon-Namen wie car-front oder user-round."
+      "icon": "Nutze einen Lucide-Icon-Namen wie car-front oder user-round.",
+      "isActive": "Inaktive Schemas bleiben aus normalen Schema- und Entry-Flows ausgeblendet, bis sie wieder aktiviert werden."
     },
     "errors": {
       "loadFallback": "Schema konnte nicht erstellt werden."
@@ -959,13 +971,21 @@
       "create": "Schema erstellen",
       "save": "Schema speichern"
     },
+    "dialog": {
+      "title": "Schema erstellen",
+      "subtitle": "Erstelle ein Schema und lege die ersten Felder direkt mit an.",
+      "editTitle": "Schema bearbeiten",
+      "editSubtitle": "Aktualisiere Key, Name, Beschreibung, Icon und Verfügbarkeit für dieses Schema."
+    },
     "labels": {
       "entries": "Einträge",
       "lastCreatedAt": "Zuletzt erstellt {{ value }}",
       "lastUpdatedAt": "Zuletzt aktualisiert {{ value }}"
     },
     "status": {
-      "empty": "Keine Schemas verfügbar."
+      "empty": "Keine Schemas verfügbar.",
+      "created": "Schema {{ value }} erstellt.",
+      "updated": "Schema {{ value }} aktualisiert."
     },
     "errors": {
       "loadFailed": "Schema-Übersicht konnte nicht geladen werden ({{ status }}): {{ message }}",
@@ -1002,6 +1022,22 @@
     },
     "listTitle": "{{ schema }} Felder",
     "listSubtitle": "Verwalte die Schema-Felddefinitionen für Einträge."
+  },
+  "schemaEditor": {
+    "dialog": {
+      "options": "Optionen",
+      "optionsHint": "Trenne auswählbare Werte mit Kommas.",
+      "referenceSchemaKey": "Referenz-Schema-Key",
+      "referenceSchemaHint": "Optionaler Schema-Key, auf den dieses Feld zeigen soll.",
+      "unique": "Eindeutiges Feld"
+    },
+    "fieldBadges": {
+      "required": "Pflicht",
+      "unique": "eindeutig"
+    },
+    "fieldDrafts": {
+      "noDescription": "Noch keine Beschreibung."
+    }
   },
   "logsHistory": {
     "eyebrow": "Eintrags-Historie",

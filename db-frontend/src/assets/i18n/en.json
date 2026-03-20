@@ -920,21 +920,33 @@
   },
   "schemaCreate": {
     "title": "Create schema",
-    "subtitle": "Add a new metadata schema that can later receive fields and entries.",
+    "subtitle": "Create the schema shell, define its fields right away and keep the whole setup reusable.",
     "actions": {
       "back": "Back to dashboard",
       "submit": "Create schema"
+    },
+    "sections": {
+      "basicsEyebrow": "Schema setup",
+      "basicsTitle": "Schema basics",
+      "basicsSubtitle": "Key, name, icon and availability control how the schema appears across the app.",
+      "fieldsEyebrow": "Field setup",
+      "fieldsTitle": "Initial fields",
+      "fieldsSubtitle": "Prepare the first field definitions before the schema is created."
     },
     "fields": {
       "key": "Schema key",
       "name": "Name",
       "description": "Description",
       "icon": "Icon",
-      "isActive": "Active schema"
+      "isActive": "Available schema"
+    },
+    "labels": {
+      "previewKey": "Preview key"
     },
     "hints": {
       "key": "Use lowercase letters, numbers and underscores.",
-      "icon": "Use a lucide icon name like car-front or user-round."
+      "icon": "Use a lucide icon name like car-front or user-round.",
+      "isActive": "Inactive schemas stay hidden from normal schema and entry flows until they are re-enabled."
     },
     "errors": {
       "loadFallback": "Unable to create schema."
@@ -953,7 +965,7 @@
     },
     "dialog": {
       "title": "Create schema",
-      "subtitle": "Add a new schema with key, name, description, icon and active state.",
+      "subtitle": "Create a schema and prepare its first fields in the same flow.",
       "editTitle": "Edit schema",
       "editSubtitle": "Update key, name, description, icon and active state for this schema."
     },
@@ -1002,6 +1014,22 @@
     },
     "listTitle": "{{ schema }} fields",
     "listSubtitle": "Manage the schema field definitions available for entries."
+  },
+  "schemaEditor": {
+    "dialog": {
+      "options": "Options",
+      "optionsHint": "Separate selectable values with commas.",
+      "referenceSchemaKey": "Reference schema key",
+      "referenceSchemaHint": "Optional schema key that this field should point to.",
+      "unique": "Unique field"
+    },
+    "fieldBadges": {
+      "required": "required",
+      "unique": "unique"
+    },
+    "fieldDrafts": {
+      "noDescription": "No description yet."
+    }
   },
   "logsHistory": {
     "eyebrow": "Entry history",
