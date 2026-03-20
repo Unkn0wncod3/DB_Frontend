@@ -24,7 +24,13 @@
       <button type="button" class="entry-detail__button entry-detail__button--ghost" (click)="refresh()" [disabled]="isLoading()">
         {{ 'entryDetail.actions.refresh' | translate }}
       </button>
-      <button type="button" class="entry-detail__button entry-detail__button--primary" *ngIf="canEdit()" (click)="save()" [disabled]="isSaving()">
+      <button
+        type="button"
+        class="entry-detail__button entry-detail__button--primary"
+        *ngIf="canEdit()"
+        (click)="save()"
+        [disabled]="isSaving() || !hasUnsavedChanges()"
+      >
         {{ 'entryDetail.actions.save' | translate }}
       </button>
       <button type="button" class="entry-detail__button entry-detail__button--danger" *ngIf="canDelete()" (click)="deleteEntry()">

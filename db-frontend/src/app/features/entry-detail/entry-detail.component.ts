@@ -5,6 +5,7 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 import { EntryService } from '../../core/services/entry.service';
@@ -73,6 +74,8 @@ export class EntryDetailComponent {
   readonly permissions = signal<EntryPermissionRecord[]>([]);
   readonly fields = signal<DetailField[]>([]);
   readonly referenceTitles = signal<Record<string, string>>({});
+  readonly originalComparableState = signal('');
+  readonly formRevision = signal(0);
   readonly visibilityLevels: VisibilityLevel[] = ['public', 'internal', 'restricted', 'private'];
   readonly defaultStatusOptions = ['draft', 'review', 'active', 'inactive', 'archived'];
   readonly fieldTypes: FieldDataType[] = ['text', 'long_text', 'integer', 'decimal', 'boolean', 'date', 'datetime', 'email', 'url', 'select', 'multi_select', 'reference', 'file', 'json'];
@@ -87,6 +90,10 @@ export class EntryDetailComponent {
   readonly schemaFieldsTitle = computed(() => {
     const schema = this.schema();
     return schema ? this.translate.instant('entryDetail.sections.schemaFieldsNamed', { schema: schema.name }) : '';
+  });
+  readonly hasUnsavedChanges = computed(() => {
+    this.formRevision();
+    return this.originalComparableState().length > 0 && this.currentComparableState() !== this.originalComparableState();
   });
   readonly statusOptions = computed(() => {
     const current = this.metaForm.controls.status.getRawValue().trim();
@@ -111,8 +118,13 @@ export class EntryDetailComponent {
   form: FormGroup = this.fb.group({});
   private currentSchemaKey: string | null = null;
   private currentEntryId: string | null = null;
+  private formValueSubscription?: Subscription;
 
   constructor() {
+    this.metaForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.formRevision.update((value) => value + 1);
+    });
+
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const schemaKey = params.get('schemaKey');
       const entryId = params.get('id');
@@ -135,7 +147,7 @@ export class EntryDetailComponent {
 
   async save(): Promise<void> {
     const entry = this.entry();
-    if (!entry || !this.canEdit() || this.form.invalid || this.metaForm.invalid) {
+    if (!entry || !this.canEdit() || !this.hasUnsavedChanges() || this.form.invalid || this.metaForm.invalid) {
       return;
     }
 
@@ -483,8 +495,14 @@ export class EntryDetailComponent {
     });
 
     this.fields.set(fields);
+    this.formValueSubscription?.unsubscribe();
     this.form = this.fb.group(controls);
+    this.formValueSubscription = this.form.valueChanges.subscribe(() => {
+      this.formRevision.update((value) => value + 1);
+    });
     this.applyFormAccessState();
+    this.originalComparableState.set(this.serializeComparableState(entry));
+    this.formRevision.update((value) => value + 1);
   }
 
   private applyFormAccessState(): void {
@@ -548,6 +566,32 @@ export class EntryDetailComponent {
       }
       return result;
     }, {});
+  }
+
+  private currentComparableState(): string {
+    const entry = this.entry();
+    if (!entry) {
+      return '';
+    }
+
+    return this.serializeComparableState({
+      ...entry,
+      title: this.metaForm.getRawValue().title.trim(),
+      status: this.metaForm.getRawValue().status.trim() || null,
+      visibility_level: this.metaForm.getRawValue().visibility_level as VisibilityLevel,
+      owner_id: this.normalizeIdentifierValue(this.metaForm.getRawValue().owner_id.trim(), false) ?? null,
+      data_json: this.buildDataJson()
+    });
+  }
+
+  private serializeComparableState(entry: Pick<EntryRecord, 'title' | 'status' | 'visibility_level' | 'owner_id' | 'data_json'>): string {
+    return JSON.stringify({
+      title: entry.title?.trim() ?? '',
+      status: entry.status ?? null,
+      visibility_level: entry.visibility_level ?? 'internal',
+      owner_id: entry.owner_id ?? null,
+      data_json: entry.data_json ?? {}
+    });
   }
 
   private prepareFieldControlValue(entry: EntryRecord, field: SchemaField): unknown {
