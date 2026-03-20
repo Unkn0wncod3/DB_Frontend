@@ -233,6 +233,38 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
+.entry-detail__field-manager {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.entry-detail__field-manager-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--detail-border);
+  border-radius: 0.75rem;
+  background: var(--detail-subtle);
+}
+
+.entry-detail__field-manager-item strong,
+.entry-detail__field-manager-item span {
+  display: block;
+}
+
+.entry-detail__field-manager-item span {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.entry-detail__field-manager-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .entry-detail__field-card,
 .entry-detail__summary-card,
 .entry-detail__entity-card,
@@ -397,6 +429,67 @@
   padding: 0.9rem 1rem;
   border-bottom: 1px solid var(--detail-border);
   text-align: left;
+}
+
+.entry-detail__dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 30;
+}
+
+.entry-detail__dialog {
+  width: min(420px, 100%);
+  padding: 1.5rem;
+  border: 1px solid var(--detail-border);
+  border-radius: 1rem;
+  background: var(--detail-surface);
+  box-shadow: var(--shadow-strong);
+}
+
+.entry-detail__dialog h2 {
+  margin: 0 0 0.5rem;
+}
+
+.entry-detail__dialog p {
+  margin: 0 0 1rem;
+  color: var(--color-text-muted);
+}
+
+.entry-detail__dialog-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.entry-detail__dialog-form label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--color-text-soft);
+  font-weight: 600;
+}
+
+.entry-detail__dialog-form input,
+.entry-detail__dialog-form select {
+  border: 1px solid var(--detail-border-strong);
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  background: var(--detail-input);
+  color: var(--color-text);
+}
+
+.entry-detail__dialog-checkbox {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.entry-detail__dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
 }
 
 @media (min-width: 1080px) {

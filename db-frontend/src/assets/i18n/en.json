@@ -306,7 +306,7 @@
       "connectedItems": "Profiles, notes and activities linked to this person",
       "createdAt": "Created",
       "updatedAt": "Updated",
-      "schemaWithId": "Schema {{schema}} - Entry ID {{id}}"
+      "schemaWithId": "Schema: {{schema}} - Entry ID {{id}}"
     },
     "actions": {
       "back": "Back to dashboard",
@@ -499,7 +499,8 @@
     "meta": {
       "total": "{{ value }} entries",
       "lastUpdated": "Last updated {{ value }}",
-      "schemaDriven": "Schema-driven entry list"
+      "schemaDriven": "Schema-driven entry list",
+      "schemaPrefix": "Schema: {{ value }}"
     },
     "table": {
       "actions": "Actions"
@@ -951,6 +952,37 @@
       "loadFailed": "Unable to load schemas overview ({{ status }}): {{ message }}",
       "generic": "Unexpected error",
       "noStatus": "no status"
+    }
+  },
+  "schemaFields": {
+    "dialog": {
+      "title": "Add field",
+      "subtitle": "Create a new schema field for this schema.",
+      "editTitle": "Edit field",
+      "editSubtitle": "Update the field definition for this schema."
+    },
+    "fields": {
+      "label": "Field name",
+      "key": "Field key",
+      "description": "Description",
+      "type": "Field type",
+      "required": "Required field"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "create": "Add field",
+      "creating": "Saving...",
+      "save": "Save field",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "status": {
+      "created": "Field {{ value }} created.",
+      "updated": "Field {{ value }} updated.",
+      "deleted": "Field {{ value }} deleted."
+    },
+    "listTitle": "{{ schema }} fields",
+    "listSubtitle": "Manage the schema field definitions available for entries."
     }
   }
 }

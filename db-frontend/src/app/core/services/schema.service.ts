@@ -2,7 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { map, Observable, of, tap } from 'rxjs';
 
 import { ApiService } from './api.service';
-import { CreateSchemaPayload, EntrySchema, SchemaEntriesResponse } from '../models/metadata.models';
+import { CreateFieldPayload, CreateSchemaPayload, EntrySchema, SchemaEntriesResponse, SchemaField, UpdateFieldPayload } from '../models/metadata.models';
 import { sortSchemaFields } from '../utils/schema.utils';
 
 @Injectable({ providedIn: 'root' })
@@ -50,6 +50,63 @@ export class SchemaService {
     return this.api.request<EntrySchema>('POST', '/schemas', { body: payload }).pipe(
       map((schema) => this.normalizeSchema(schema)),
       tap((schema) => this.schemas.set([...this.schemas(), schema]))
+    );
+  }
+
+  createField(schemaId: string | number, payload: CreateFieldPayload): Observable<SchemaField> {
+    return this.api.request<SchemaField>('POST', `/schemas/${encodeURIComponent(String(schemaId))}/fields`, { body: payload }).pipe(
+      tap((field) => {
+        const updated = this.schemas().map((schema) =>
+          String(schema.id) === String(schemaId)
+            ? this.normalizeSchema({ ...schema, fields: [...(schema.fields ?? []), field] })
+            : schema
+        );
+        this.schemas.set(updated);
+      })
+    );
+  }
+
+  listFields(schemaId: string | number, includeInactive = true): Observable<SchemaField[]> {
+    return this.api.request<SchemaField[]>('GET', `/schemas/${encodeURIComponent(String(schemaId))}/fields`, {
+      params: { include_inactive: String(includeInactive) }
+    });
+  }
+
+  getField(schemaId: string | number, fieldId: string | number): Observable<SchemaField> {
+    return this.api.request<SchemaField>('GET', `/schemas/${encodeURIComponent(String(schemaId))}/fields/${encodeURIComponent(String(fieldId))}`);
+  }
+
+  updateField(schemaId: string | number, fieldId: string | number, payload: UpdateFieldPayload): Observable<SchemaField> {
+    return this.api.request<SchemaField>('PATCH', `/schemas/${encodeURIComponent(String(schemaId))}/fields/${encodeURIComponent(String(fieldId))}`, {
+      body: payload
+    }).pipe(
+      tap((field) => {
+        const updated = this.schemas().map((schema) =>
+          String(schema.id) === String(schemaId)
+            ? this.normalizeSchema({
+                ...schema,
+                fields: (schema.fields ?? []).map((item) => (String(item.id) === String(fieldId) ? field : item))
+              })
+            : schema
+        );
+        this.schemas.set(updated);
+      })
+    );
+  }
+
+  deleteField(schemaId: string | number, fieldId: string | number): Observable<SchemaField> {
+    return this.api.request<SchemaField>('DELETE', `/schemas/${encodeURIComponent(String(schemaId))}/fields/${encodeURIComponent(String(fieldId))}`).pipe(
+      tap((_field) => {
+        const updated = this.schemas().map((schema) =>
+          String(schema.id) === String(schemaId)
+            ? this.normalizeSchema({
+                ...schema,
+                fields: (schema.fields ?? []).filter((item) => String(item.id) !== String(fieldId))
+              })
+            : schema
+        );
+        this.schemas.set(updated);
+      })
     );
   }
 

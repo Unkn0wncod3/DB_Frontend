@@ -351,7 +351,7 @@
       "connectedItems": "Verbundene Profile, Notizen und Aktivitäten",
       "createdAt": "Erstellt",
       "updatedAt": "Zuletzt geändert",
-      "schemaWithId": "Schema {{schema}} - Eintrags-ID {{id}}"
+      "schemaWithId": "Schema: {{schema}} - Eintrags-ID {{id}}"
     },
     "actions": {
       "back": "Zurück zum Dashboard",
@@ -540,7 +540,8 @@
     "meta": {
       "total": "{{ value }} Einträge",
       "lastUpdated": "Zuletzt aktualisiert {{ value }}",
-      "schemaDriven": "Schema-gesteuerte Eintragsliste"
+      "schemaDriven": "Schema-gesteuerte Eintragsliste",
+      "schemaPrefix": "Schema: {{ value }}"
     },
     "table": {
       "actions": "Aktionen"
@@ -951,6 +952,37 @@
       "loadFailed": "Schema-Übersicht konnte nicht geladen werden ({{ status }}): {{ message }}",
       "generic": "Unerwarteter Fehler",
       "noStatus": "kein Status"
+    }
+  },
+  "schemaFields": {
+    "dialog": {
+      "title": "Feld hinzufügen",
+      "subtitle": "Lege ein neues Schema-Feld für dieses Schema an.",
+      "editTitle": "Feld bearbeiten",
+      "editSubtitle": "Aktualisiere die Felddefinition für dieses Schema."
+    },
+    "fields": {
+      "label": "Feldname",
+      "key": "Feld-Key",
+      "description": "Beschreibung",
+      "type": "Feldtyp",
+      "required": "Pflichtfeld"
+    },
+    "actions": {
+      "cancel": "Abbrechen",
+      "create": "Feld hinzufügen",
+      "creating": "Speichere...",
+      "save": "Feld speichern",
+      "edit": "Bearbeiten",
+      "delete": "Löschen"
+    },
+    "status": {
+      "created": "Feld {{ value }} erstellt.",
+      "updated": "Feld {{ value }} aktualisiert.",
+      "deleted": "Feld {{ value }} gelöscht."
+    },
+    "listTitle": "{{ schema }} Felder",
+    "listSubtitle": "Verwalte die Schema-Felddefinitionen für Einträge."
     }
   }
 }

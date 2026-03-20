@@ -178,6 +178,34 @@ export interface CreateSchemaPayload {
   is_active?: boolean;
 }
 
+export interface CreateFieldPayload {
+  key: string;
+  label: string;
+  description?: string | null;
+  data_type: FieldDataType;
+  is_required?: boolean;
+  is_unique?: boolean;
+  default_value?: unknown;
+  sort_order?: number;
+  is_active?: boolean;
+  validation_json?: Record<string, unknown>;
+  settings_json?: Record<string, unknown>;
+}
+
+export interface UpdateFieldPayload {
+  key?: string;
+  label?: string;
+  description?: string | null;
+  data_type?: FieldDataType;
+  is_required?: boolean;
+  is_unique?: boolean;
+  default_value?: unknown;
+  sort_order?: number;
+  is_active?: boolean;
+  validation_json?: Record<string, unknown>;
+  settings_json?: Record<string, unknown>;
+}
+
 export interface CreateEntryPayload {
   schema_id: string | number;
   title: string;
