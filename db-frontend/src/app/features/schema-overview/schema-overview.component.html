@@ -1,0 +1,54 @@
+<section class="schema-overview">
+  <header class="schema-overview__header">
+    <div>
+      <a routerLink="/" class="schema-overview__back">{{ 'schemaOverview.actions.back' | translate }}</a>
+      <h1>{{ 'schemaOverview.title' | translate }}</h1>
+      <p>{{ 'schemaOverview.subtitle' | translate }}</p>
+    </div>
+    <div class="schema-overview__actions">
+      <button type="button" class="schema-overview__refresh" (click)="refresh()" [disabled]="isLoading()">
+        <span *ngIf="isLoading(); else idleState">{{ 'schemaOverview.actions.refreshing' | translate }}</span>
+        <ng-template #idleState>{{ 'schemaOverview.actions.refresh' | translate }}</ng-template>
+      </button>
+    </div>
+  </header>
+
+  <section *ngIf="errorMessage() as error" class="schema-overview__error">
+    {{ error }}
+  </section>
+
+  <section *ngIf="schemas().length > 0; else emptyState" class="schema-overview__grid">
+    <article *ngFor="let item of schemas(); trackBy: trackSchema" class="schema-overview__card">
+      <a [routerLink]="schemaLink(item)" class="schema-overview__link">
+        <div class="schema-overview__icon" [attr.aria-label]="item.icon || item.schema_name">
+          <lucide-angular *ngIf="resolveLucideIcon(item.icon) as icon; else iconFallback" [img]="icon" [size]="22"></lucide-angular>
+          <ng-template #iconFallback>
+            <span>{{ iconFallbackLabel(item) }}</span>
+          </ng-template>
+        </div>
+        <div class="schema-overview__content">
+          <div class="schema-overview__heading">
+            <h2>{{ item.schema_name }}</h2>
+            <span>{{ item.schema_key }}</span>
+          </div>
+          <div class="schema-overview__stats">
+            <strong>{{ item.total_entries | number }}</strong>
+            <span>{{ 'schemaOverview.labels.entries' | translate }}</span>
+          </div>
+          <p class="schema-overview__meta" *ngIf="item.last_created_at">
+            {{ 'schemaOverview.labels.lastCreatedAt' | translate:{ value: (item.last_created_at | date:'dd/MM/yyyy, HH:mm') } }}
+          </p>
+          <p class="schema-overview__meta" *ngIf="item.last_updated_at">
+            {{ 'schemaOverview.labels.lastUpdatedAt' | translate:{ value: (item.last_updated_at | date:'dd/MM/yyyy, HH:mm') } }}
+          </p>
+        </div>
+      </a>
+    </article>
+  </section>
+
+  <ng-template #emptyState>
+    <section class="schema-overview__empty" *ngIf="!isLoading()">
+      {{ 'schemaOverview.status.empty' | translate }}
+    </section>
+  </ng-template>
+</section>

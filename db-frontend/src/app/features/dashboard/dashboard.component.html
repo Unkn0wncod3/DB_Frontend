@@ -5,6 +5,9 @@
       <p>{{ 'dashboard.subtitle' | translate }}</p>
     </div>
     <div class="dashboard__actions">
+      <a routerLink="/schemas" class="dashboard__schemas-link">
+        {{ 'dashboard.actions.allSchemas' | translate }}
+      </a>
       <button type="button" class="dashboard__refresh" (click)="forceRefresh()" [disabled]="isLoading()">
         <span *ngIf="isLoading(); else idleState">{{ 'dashboard.actions.refreshing' | translate }}</span>
         <ng-template #idleState>{{ 'dashboard.actions.refresh' | translate }}</ng-template>
@@ -131,32 +134,4 @@
     </section>
   </div>
 
-  <section class="dashboard__panel">
-    <header>
-      <h2>{{ 'dashboard.sections.schemaTotals' | translate }}</h2>
-    </header>
-    <div class="dashboard__grid" *ngIf="schemaTotals().length > 0; else schemaTotalsEmpty">
-      <article *ngFor="let item of schemaTotals(); trackBy: trackSchema" class="dashboard__card dashboard__card--linkable">
-        <a [routerLink]="schemaLink(item)" class="dashboard__card-link">
-          <div class="dashboard__card-icon" [attr.aria-label]="item.icon || item.schema_name">
-            <lucide-angular *ngIf="resolveLucideIcon(item.icon) as icon; else iconFallback" [img]="icon" [size]="22"></lucide-angular>
-            <ng-template #iconFallback>
-              <span>{{ iconFallbackLabel(item) }}</span>
-            </ng-template>
-          </div>
-          <h2>{{ item.schema_name }}</h2>
-          <p class="dashboard__value">{{ item.total_entries | number }}</p>
-          <p class="dashboard__recent-meta" *ngIf="item.last_created_at">
-            {{ 'dashboard.labels.lastCreatedAt' | translate:{ value: (item.last_created_at | date:'dd/MM/yyyy, HH:mm') } }}
-          </p>
-          <p class="dashboard__recent-meta" *ngIf="item.last_updated_at">
-            {{ 'dashboard.labels.lastUpdatedAt' | translate:{ value: (item.last_updated_at | date:'dd/MM/yyyy, HH:mm') } }}
-          </p>
-        </a>
-      </article>
-    </div>
-    <ng-template #schemaTotalsEmpty>
-      <p>{{ 'dashboard.status.noSchemaTotals' | translate }}</p>
-    </ng-template>
-  </section>
 </section>

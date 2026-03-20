@@ -211,7 +211,8 @@
       "modeEntry": "Entry",
       "modeSchema": "Schema",
       "createEntryButton": "Create {{ schema }}",
-      "createSchemaButton": "Create schema"
+      "createSchemaButton": "Create schema",
+      "allSchemas": "All schemas"
     },
     "meta": {
       "lastUpdated": "Last updated {{ value }}"
@@ -882,6 +883,28 @@
     },
     "errors": {
       "loadFallback": "Unable to create schema."
+    }
+  },
+  "schemaOverview": {
+    "title": "Schemas",
+    "subtitle": "Browse every schema like a folder overview with entry count and recent activity.",
+    "actions": {
+      "back": "Back to dashboard",
+      "refresh": "Refresh",
+      "refreshing": "Refreshing..."
+    },
+    "labels": {
+      "entries": "entries",
+      "lastCreatedAt": "Last created {{ value }}",
+      "lastUpdatedAt": "Last updated {{ value }}"
+    },
+    "status": {
+      "empty": "No schemas available."
+    },
+    "errors": {
+      "loadFailed": "Unable to load schemas overview ({{ status }}): {{ message }}",
+      "generic": "Unexpected error",
+      "noStatus": "no status"
     }
   }
 }

@@ -252,7 +252,8 @@
       "modeEntry": "Eintrag",
       "modeSchema": "Schema",
       "createEntryButton": "{{ schema }} erstellen",
-      "createSchemaButton": "Schema erstellen"
+      "createSchemaButton": "Schema erstellen",
+      "allSchemas": "Alle Schemas"
     },
     "meta": {
       "lastUpdated": "Zuletzt aktualisiert am {{ value }}"
@@ -882,6 +883,28 @@
     },
     "errors": {
       "loadFallback": "Schema konnte nicht erstellt werden."
+    }
+  },
+  "schemaOverview": {
+    "title": "Schemas",
+    "subtitle": "Zeigt alle Schemas wie eine Ordner?bersicht mit Eintragszahl und letzter Aktivität.",
+    "actions": {
+      "back": "Zurück zum Dashboard",
+      "refresh": "Aktualisieren",
+      "refreshing": "Aktualisiere..."
+    },
+    "labels": {
+      "entries": "Einträge",
+      "lastCreatedAt": "Zuletzt erstellt {{ value }}",
+      "lastUpdatedAt": "Zuletzt aktualisiert {{ value }}"
+    },
+    "status": {
+      "empty": "Keine Schemas verfügbar."
+    },
+    "errors": {
+      "loadFailed": "Schema-Übersicht konnte nicht geladen werden ({{ status }}): {{ message }}",
+      "generic": "Unerwarteter Fehler",
+      "noStatus": "kein Status"
     }
   }
 }
