@@ -22,23 +22,36 @@
       <p>{{ (createMode() === 'entry' ? 'dashboard.actions.createEntryHelp' : 'dashboard.actions.createSchemaHelp') | translate }}</p>
     </div>
     <div class="dashboard__quick-create-controls">
-      <div class="dashboard__quick-create-modes">
+      <div class="dashboard__quick-create-toolbar">
+        <div class="dashboard__quick-create-modes">
+          <button
+            type="button"
+            class="dashboard__quick-create-mode"
+            [class.dashboard__quick-create-mode--active]="createMode() === 'entry'"
+            (click)="selectCreateMode('entry')"
+          >
+            {{ 'dashboard.actions.modeEntry' | translate }}
+          </button>
+          <button
+            type="button"
+            class="dashboard__quick-create-mode"
+            [class.dashboard__quick-create-mode--active]="createMode() === 'schema'"
+            (click)="selectCreateMode('schema')"
+            [disabled]="!auth.canManageSchemas()"
+          >
+            {{ 'dashboard.actions.modeSchema' | translate }}
+          </button>
+        </div>
         <button
           type="button"
-          class="dashboard__quick-create-mode"
-          [class.dashboard__quick-create-mode--active]="createMode() === 'entry'"
-          (click)="selectCreateMode('entry')"
+          class="dashboard__refresh"
+          (click)="startCreate()"
+          [disabled]="(createMode() === 'entry' && !selectedCreateType()) || (createMode() === 'schema' && !auth.canManageSchemas())"
         >
-          {{ 'dashboard.actions.modeEntry' | translate }}
-        </button>
-        <button
-          type="button"
-          class="dashboard__quick-create-mode"
-          [class.dashboard__quick-create-mode--active]="createMode() === 'schema'"
-          (click)="selectCreateMode('schema')"
-          [disabled]="!auth.canManageSchemas()"
-        >
-          {{ 'dashboard.actions.modeSchema' | translate }}
+          {{
+            (createMode() === 'entry' ? 'dashboard.actions.createEntryButton' : 'dashboard.actions.createSchemaButton')
+              | translate:{ schema: selectedCreateTypeLabel() }
+          }}
         </button>
       </div>
       <div class="dashboard__quick-create-options" *ngIf="createMode() === 'entry'">
@@ -52,17 +65,6 @@
           {{ option.label }}
         </button>
       </div>
-      <button
-        type="button"
-        class="dashboard__refresh"
-        (click)="startCreate()"
-        [disabled]="(createMode() === 'entry' && !selectedCreateType()) || (createMode() === 'schema' && !auth.canManageSchemas())"
-      >
-        {{
-          (createMode() === 'entry' ? 'dashboard.actions.createEntryButton' : 'dashboard.actions.createSchemaButton')
-            | translate:{ schema: selectedCreateTypeLabel() }
-        }}
-      </button>
     </div>
   </section>
 

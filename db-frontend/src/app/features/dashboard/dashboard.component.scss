@@ -95,6 +95,15 @@
   gap: 1rem;
 }
 
+.dashboard__quick-create-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
 .dashboard__quick-create-modes {
   display: inline-flex;
   padding: 0.3rem;
@@ -391,6 +400,10 @@
 }
 
 @media (max-width: 720px) {
+  .dashboard__quick-create-toolbar {
+    align-items: stretch;
+  }
+
   .dashboard__latest-grid {
     grid-template-columns: 1fr;
   }
