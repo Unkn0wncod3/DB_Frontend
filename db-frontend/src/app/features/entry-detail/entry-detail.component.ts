@@ -68,6 +68,7 @@ export class EntryDetailComponent {
   readonly fields = signal<DetailField[]>([]);
   readonly referenceTitles = signal<Record<string, string>>({});
   readonly visibilityLevels: VisibilityLevel[] = ['public', 'internal', 'restricted', 'private'];
+  readonly defaultStatusOptions = ['draft', 'review', 'active', 'inactive', 'archived'];
 
   readonly entryTitle = computed(() => {
     const entry = this.entry();
@@ -78,6 +79,10 @@ export class EntryDetailComponent {
   readonly schemaFieldsTitle = computed(() => {
     const schema = this.schema();
     return schema ? this.translate.instant('entryDetail.sections.schemaFieldsNamed', { schema: schema.name }) : '';
+  });
+  readonly statusOptions = computed(() => {
+    const current = this.metaForm.controls.status.getRawValue().trim();
+    return Array.from(new Set([current, ...this.defaultStatusOptions].filter((value) => value.length > 0)));
   });
 
   readonly metaForm = this.fb.nonNullable.group({
@@ -186,6 +191,10 @@ export class EntryDetailComponent {
 
   fieldLabel(field: SchemaField): string {
     return field.label?.trim() || humanizeKey(field.key);
+  }
+
+  metaStatusLabel(value: string): string {
+    return humanizeKey(value);
   }
 
   fieldHint(field: SchemaField): string | null {

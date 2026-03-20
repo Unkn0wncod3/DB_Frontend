@@ -59,7 +59,9 @@
 
           <div class="entry-detail__field-card">
             <label for="entry-status">{{ 'entryDetail.meta.status' | translate }}</label>
-            <input id="entry-status" type="text" formControlName="status" />
+            <select id="entry-status" formControlName="status">
+              <option *ngFor="let option of statusOptions()" [value]="option">{{ metaStatusLabel(option) }}</option>
+            </select>
           </div>
 
           <div class="entry-detail__field-card">
@@ -73,6 +75,7 @@
 
           <div class="entry-detail__field-card">
             <label for="entry-owner">{{ 'entryDetail.meta.ownerId' | translate }}</label>
+            <p class="entry-detail__field-help">{{ 'entryDetail.meta.ownerHelp' | translate }}</p>
             <input id="entry-owner" type="text" formControlName="owner_id" />
           </div>
 

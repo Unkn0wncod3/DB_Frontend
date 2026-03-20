@@ -441,7 +441,8 @@
       "title": "Title",
       "status": "Status",
       "visibility": "Visibility",
-      "ownerId": "Owner",
+      "ownerId": "Owner user ID",
+      "ownerHelp": "References users.id, not a person entry ID.",
       "comment": "Comment",
       "commentHelp": "Optional note stored with the history record for this update."
     },
