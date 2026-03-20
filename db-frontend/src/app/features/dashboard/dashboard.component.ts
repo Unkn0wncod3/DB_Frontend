@@ -1,28 +1,20 @@
-import { AsyncPipe, DatePipe, DecimalPipe, JsonPipe, NgClass, NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
+import { DatePipe, DecimalPipe, NgFor, NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { StatsOverviewRecord, StatsService } from '../../core/services/stats.service';
 import { AuthService } from '../../core/services/auth.service';
-import { ENTRY_SCHEMAS } from '../entry-create/entry-create.schemas';
-
-interface DisplayCard {
-  key: string;
-  label: string;
-  value: number | string;
-}
-
-interface CreateOption {
-  type: string;
-  label: string;
-}
+import {
+  DashboardEntrySummary,
+  DashboardSchemaTotal,
+  StatsService
+} from '../../core/services/stats.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgIf, NgFor, JsonPipe, AsyncPipe, DatePipe, DecimalPipe, TranslateModule, NgClass, RouterLink, NgTemplateOutlet],
+  imports: [NgIf, NgFor, DatePipe, DecimalPipe, TranslateModule, RouterLink],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -37,16 +29,22 @@ export class DashboardComponent implements OnInit {
   readonly overview = this.statsService.overview;
   readonly isLoading = this.statsService.isLoading;
   readonly lastUpdated = this.statsService.lastUpdated;
-  readonly createTypeOptions = signal(this.buildCreateOptions());
-  readonly selectedCreateType = signal(this.createTypeOptions()[0]?.type ?? '');
-  readonly hasCreateOptions = computed(() => this.createTypeOptions().length > 0);
-  readonly recentItems = computed<StatsOverviewRecord[]>(() => {
-    const recent = this.overview()?.recent;
-    if (!Array.isArray(recent) || recent.length === 0) {
-      return [];
-    }
-    return recent.filter((record) => !this.shouldHideRecentRecord(record));
-  });
+
+  readonly totalEntries = computed(() => this.overview()?.total_entries ?? 0);
+  readonly latestCreated = computed(() => this.overview()?.latest_created ?? []);
+  readonly latestUpdated = computed(() => this.overview()?.latest_updated ?? []);
+  readonly schemaTotals = computed(() => this.overview()?.totals_per_schema ?? []);
+  readonly selectedCreateType = signal('');
+  readonly createTypeOptions = computed(() =>
+    this.schemaTotals().map((schema) => ({
+      type: schema.schema_key,
+      label: schema.schema_name
+    }))
+  );
+
+  readonly hasDashboardContent = computed(
+    () => this.totalEntries() > 0 || this.latestCreated().length > 0 || this.latestUpdated().length > 0 || this.schemaTotals().length > 0
+  );
 
   readonly errorMessage = computed(() => {
     const error = this.statsService.error();
@@ -55,46 +53,34 @@ export class DashboardComponent implements OnInit {
     }
 
     const status = error.status || this.translate.instant('dashboard.errors.noStatus');
-    const message = error.message || this.translate.instant('dashboard.errors.generic');
+    const message =
+      (typeof error.error === 'object' && error.error && 'message' in error.error
+        ? String((error.error as { message?: unknown }).message ?? '')
+        : '') ||
+      error.message ||
+      this.translate.instant('dashboard.errors.generic');
 
     return this.translate.instant('dashboard.errors.loadFailed', { status, message });
   });
 
-  readonly totalCards = computed<DisplayCard[]>(() => {
-    const totals = this.overview()?.totals;
-
-    if (!totals) {
-      return [];
-    }
-
-    return Object.entries(totals)
-      .filter(([key]) => !this.shouldHideCollection(key))
-      .map(([key, value]) => ({
-        key,
-        label: this.getTransLabel(`dashboard.totalLabels.${key}`, key),
-        value
-      }));
-  });
-
-  readonly activityCards = computed<DisplayCard[]>(() => {
-    const activity = this.overview()?.activity;
-    if (!activity) {
-      return [];
-    }
-
-    return Object.entries(activity).map(([key, value]) => ({
-      key,
-      label: this.getTransLabel(`dashboard.activity.${key}`, key),
-      value
-    }));
-  });
-
   constructor() {
-    this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.refreshCreateOptions());
+    effect(
+      () => {
+        const options = this.createTypeOptions();
+        const current = this.selectedCreateType();
+        if (!options.some((option) => option.type === current)) {
+          this.selectedCreateType.set(options[0]?.type ?? '');
+        }
+      },
+      { allowSignalWrites: true }
+    );
+
+    this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      // recompute translation-backed labels
+    });
   }
 
   ngOnInit(): void {
-    this.refreshCreateOptions();
     void this.statsService.loadOverview();
   }
 
@@ -102,273 +88,44 @@ export class DashboardComponent implements OnInit {
     void this.statsService.loadOverview(true);
   }
 
-  updateCreateType(type: string): void {
-    this.selectedCreateType.set(type);
-  }
-
   handleCreateTypeChange(event: Event): void {
     const target = event.target as HTMLSelectElement | null;
     if (!target) {
       return;
     }
-    this.updateCreateType(target.value);
+    this.selectedCreateType.set(target.value);
   }
 
   startCreate(): void {
-    const type = this.selectedCreateType();
-    if (!type) {
+    const schemaKey = this.selectedCreateType();
+    if (!schemaKey) {
       return;
     }
 
-    void this.router.navigate(['/entries', type, 'new']);
+    void this.router.navigate(['/entries', schemaKey, 'new']);
   }
 
-  trackByKey(_index: number, item: DisplayCard): string {
-    return item.key;
+  schemaLink(item: DashboardSchemaTotal): string[] {
+    return ['/entries', item.schema_key];
   }
 
-  collectionLink(typeKey: string): string[] | null {
-    const normalized = (typeKey ?? '').toString().trim();
-    if (!normalized || this.shouldHideCollection(normalized)) {
-      return null;
-    }
-
-    return ['/entries', normalized];
+  entryLink(item: DashboardEntrySummary): string[] {
+    return ['/entries', item.schema_key, String(item.id)];
   }
 
-  trackByRecord(index: number, item: StatsOverviewRecord): string {
-    return item.id ?? `${item.title ?? item.name ?? 'entry'}-${index}`;
+  latestTimestamp(item: DashboardEntrySummary, mode: 'created' | 'updated'): string | null {
+    if (mode === 'created') {
+      return item.created_at ?? null;
+    }
+
+    return item.updated_at ?? item.created_at ?? null;
   }
 
-  formatRecordLabel(record: StatsOverviewRecord | undefined, fallbackKey: string): string {
-    if (!record) {
-      return this.translate.instant(fallbackKey);
-    }
-
-    const typeSpecific = this.getTypeSpecificLabel(record);
-    if (typeSpecific) {
-      return typeSpecific;
-    }
-
-    return (
-      record.title ||
-      record.name ||
-      record.summary ||
-      record.id ||
-      this.translate.instant('dashboard.labels.unknownEntry')
-    );
+  trackSchema(_index: number, item: DashboardSchemaTotal): string {
+    return `${item.schema_key}-${item.schema_id}`;
   }
 
-  formatRecordTimestamp(record: StatsOverviewRecord | undefined): string | null {
-    if (!record) {
-      return null;
-    }
-
-    return record.updatedAt || record.timestamp || record.occurredAt || record.createdAt || null;
-  }
-
-  formatRecordType(record: StatsOverviewRecord | undefined): string | null {
-    if (!record) {
-      return null;
-    }
-
-    const rawType = record.type;
-    const rawId = record.id;
-    const type = rawType != null ? String(rawType).trim() : '';
-    const id = rawId != null ? String(rawId).trim() : '';
-    const hasType = type.length > 0;
-    const hasId = id.length > 0;
-    const localizedType = hasType ? this.translateType(type, type) : '';
-
-    if (hasType && hasId) {
-      return this.translate.instant('dashboard.labels.itemTypeWithId', { type: localizedType, id });
-    }
-
-    if (hasType) {
-      return this.translate.instant('dashboard.labels.itemType', { value: localizedType });
-    }
-
-    if (hasId) {
-      return this.translate.instant('dashboard.labels.itemId', { value: id });
-    }
-
-    return null;
-  }
-
-  formatRecordMeta(record: StatsOverviewRecord | undefined): string | null {
-    if (!record) {
-      return null;
-    }
-
-    if (typeof record.summary === 'string' && record.summary.trim().length > 0) {
-      return record.summary.trim();
-    }
-
-    return this.formatRecordType(record);
-  }
-
-  entryLink(record: StatsOverviewRecord | undefined): string[] | null {
-    if (!record) {
-      return null;
-    }
-
-    const type = (record.type ?? '').toString().trim();
-    const id = (record.id ?? '').toString().trim();
-
-    if (!type || !id) {
-      return null;
-    }
-
-    return ['/entries', type, id];
-  }
-  resolveLatestRecord(record: StatsOverviewRecord | undefined, kind: 'created' | 'updated'): StatsOverviewRecord | undefined {
-    if (!record) {
-      return undefined;
-    }
-
-    const recent = this.overview()?.recent;
-    if (!Array.isArray(recent) || recent.length === 0) {
-      return record;
-    }
-
-    const targetType = (record.type ?? '').toString().toLowerCase();
-    const targetTimestamp = this.getTimestampForKind(record, kind);
-
-    if (!targetType || !targetTimestamp) {
-      return record;
-    }
-
-    const match = recent.find((item) => {
-      const itemType = (item.type ?? '').toString().toLowerCase();
-      if (itemType !== targetType) {
-        return false;
-      }
-
-      const itemTimestamp = this.getTimestampForKind(item, kind);
-      return !!itemTimestamp && itemTimestamp === targetTimestamp;
-    });
-
-    return match ?? record;
-  }
-
-  formatRecordTimestampFor(record: StatsOverviewRecord | undefined, kind: 'created' | 'updated'): string | null {
-    if (!record) {
-      return null;
-    }
-
-    return this.getTimestampForKind(record, kind) ?? null;
-  }
-
-  private getTimestampForKind(record: StatsOverviewRecord, kind: 'created' | 'updated'): string | undefined {
-    if (kind === 'created') {
-      return record.createdAt || record.timestamp || record.occurredAt || record.updatedAt || undefined;
-    }
-
-    return record.updatedAt || record.timestamp || record.occurredAt || record.createdAt || undefined;
-  }
-
-  hasRecentItems(): boolean {
-    return this.recentItems().length > 0;
-  }
-
-  private buildCreateOptions(): CreateOption[] {
-    return Object.values(ENTRY_SCHEMAS)
-      .map((schema) => ({
-        type: schema.type,
-        label: this.translateType(schema.type, schema.title ?? this.humanizeKey(schema.type))
-      }))
-      .filter((option) => !!option.type)
-      .sort((a, b) => a.label.localeCompare(b.label));
-  }
-
-  private getTransLabel(translationKey: string, fallbackKey: string): string {
-    const translation = this.translate.instant(translationKey);
-    if (translation && translation !== translationKey) {
-      return translation;
-    }
-
-    return this.humanizeKey(fallbackKey);
-  }
-
-  private shouldHideCollection(key: string): boolean {
-    return key.trim().toLowerCase() === 'users';
-  }
-
-  private shouldHideRecentRecord(record: StatsOverviewRecord | undefined): boolean {
-    if (!record) {
-      return false;
-    }
-    const type = (record.type ?? '').toString().trim().toLowerCase();
-    return type === 'user' || type === 'users';
-  }
-
-  private getTypeSpecificLabel(record: StatsOverviewRecord): string | undefined {
-    const metadata = (record.metadata ?? {}) as Record<string, unknown>;
-    const type = (record.type ?? '').toString().toLowerCase();
-
-    switch (type) {
-      case 'persons':
-      case 'person': {
-        const first = this.selectText(metadata, ['first_name', 'firstname', 'firstName']);
-        const last = this.selectText(metadata, ['last_name', 'lastname', 'lastName']);
-        const fullName = [first, last].filter(Boolean).join(' ').trim();
-        return fullName.length > 0 ? fullName : undefined;
-      }
-      case 'profiles':
-      case 'profile':
-        return this.selectText(metadata, ['username', 'user_name', 'user', 'name']);
-      case 'activities':
-      case 'activity': {
-        const activityType = this.selectText(metadata, ['activity_type', 'type', 'name']);
-        return activityType ? this.humanizeKey(activityType) : undefined;
-      }
-      default:
-        return undefined;
-    }
-  }
-
-  private selectText(source: Record<string, unknown>, keys: string[]): string | undefined {
-    for (const key of keys) {
-      const value = source[key];
-      if (typeof value === 'string' && value.trim().length > 0) {
-        return value.trim();
-      }
-    }
-    return undefined;
-  }
-
-  private humanizeKey(value: string): string {
-    return value
-      .replace(/_/g, ' ')
-      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .replace(/\b\w/g, (char) => char.toUpperCase());
-  }
-
-  private translateType(type: string, fallback?: string): string {
-    const normalized = (type ?? '').toString().trim().toLowerCase();
-    if (!normalized) {
-      return fallback ?? '';
-    }
-    const key = `entryList.types.${normalized}`;
-    const translated = this.translate.instant(key);
-    if (translated && translated !== key) {
-      return translated;
-    }
-    return fallback ?? this.humanizeKey(type);
-  }
-
-  private refreshCreateOptions(): void {
-    const options = this.buildCreateOptions();
-    const previous = this.selectedCreateType();
-    this.createTypeOptions.set(options);
-    if (!options.some((option) => option.type === previous)) {
-      this.selectedCreateType.set(options[0]?.type ?? '');
-    }
+  trackEntry(_index: number, item: DashboardEntrySummary): string {
+    return `${item.schema_key}-${item.id}`;
   }
 }
-
-
-
-

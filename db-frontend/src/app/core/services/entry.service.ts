@@ -12,6 +12,7 @@ import {
   EntryPermission,
   EntryPermissionRecord,
   EntryRecord,
+  EntryRecordWithAccess,
   EntryRelationRecord,
   UpdateEntryPayload
 } from '../models/metadata.models';
@@ -58,19 +59,27 @@ export class EntryService {
     if (typeof typeOrParams === 'string') {
       return this.schemaService.loadSchemas().pipe(
         switchMap((schemas) => {
-          const schema = schemas.find((item) => item.key === typeOrParams) ?? null;
+          const schema = this.schemaService.resolveSchemaByKey(typeOrParams, schemas);
           if (!schema) {
             throw new Error(`Unknown schema: ${typeOrParams}`);
           }
-          return this.listEntries({ schema_id: schema.id }).pipe(
-            map((entries) => ({
-              items: entries as unknown as Record<string, unknown>[],
-              total: entries.length,
-              page: legacyParams?.page ?? 1,
-              pageSize: legacyParams?.pageSize ?? entries.length,
-              hasMore: false,
-              raw: entries
-            }))
+          return this.schemaService.getSchemaEntries(schema.id).pipe(
+            map((response) => {
+              const filtered = this.filterLegacyEntries(response.entries, legacyParams);
+              const page = Math.max(legacyParams?.page ?? 1, 1);
+              const requestedPageSize = legacyParams?.pageSize ?? (filtered.length > 0 ? filtered.length : 1);
+              const pageSize = Math.max(requestedPageSize, 1);
+              const startIndex = (page - 1) * pageSize;
+              const items = filtered.slice(startIndex, startIndex + pageSize);
+              return {
+                items: items.map((entry) => this.flattenLegacyEntry(entry)),
+                total: filtered.length,
+                page,
+                pageSize,
+                hasMore: startIndex + pageSize < filtered.length,
+                raw: response
+              };
+            })
           );
         })
       );
@@ -193,6 +202,89 @@ export class EntryService {
       result[key] = String(value);
       return result;
     }, {});
+  }
+
+  private filterLegacyEntries(entries: EntryRecordWithAccess[], params?: LegacyEntryListParams): EntryRecordWithAccess[] {
+    if (!params?.search && !params?.filters) {
+      return entries;
+    }
+
+    const search = params.search?.trim().toLowerCase() ?? '';
+    const filters = params.filters ?? {};
+
+    return entries.filter((entry) => {
+      if (search) {
+        const haystack = [
+          entry.id,
+          entry.title,
+          entry.status,
+          entry.visibility_level,
+          ...Object.values(entry.data_json ?? {})
+        ]
+          .filter((value) => value != null)
+          .map((value) => (typeof value === 'string' ? value : JSON.stringify(value)))
+          .join(' ')
+          .toLowerCase();
+
+        if (!haystack.includes(search)) {
+          return false;
+        }
+      }
+
+      for (const [key, expected] of Object.entries(filters)) {
+        if (expected == null || expected === '') {
+          continue;
+        }
+        const actual = this.readLegacyField(entry, key);
+        if (actual == null) {
+          return false;
+        }
+        if (String(actual).toLowerCase() !== String(expected).toLowerCase()) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }
+
+  private flattenLegacyEntry(entry: EntryRecordWithAccess): Record<string, unknown> {
+    return {
+      id: entry.id,
+      schema_id: entry.schema_id,
+      title: entry.title,
+      status: entry.status ?? null,
+      visibility_level: entry.visibility_level,
+      owner_id: entry.owner_id ?? null,
+      created_by: entry.created_by ?? null,
+      created_at: entry.created_at ?? null,
+      updated_at: entry.updated_at ?? null,
+      archived_at: entry.archived_at ?? null,
+      deleted_at: entry.deleted_at ?? null,
+      access: entry.access ?? null,
+      ...(entry.data_json ?? {})
+    };
+  }
+
+  private readLegacyField(entry: EntryRecordWithAccess, key: string): unknown {
+    const data = entry.data_json ?? {};
+    const aliases: Record<string, unknown> = {
+      person_id: data['person_id'] ?? data['owner_person_id'],
+      profile_id: data['profile_id'],
+      platform_id: data['platform_id'],
+      notes: data['notes'] ?? data['description'],
+      item: data['summary'] ?? entry.title
+    };
+
+    if (key in aliases) {
+      return aliases[key];
+    }
+
+    if (key in entry) {
+      return (entry as unknown as Record<string, unknown>)[key];
+    }
+
+    return data[key];
   }
 
   private emptyAccessMap(): EntryAccessMap {

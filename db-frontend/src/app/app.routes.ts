@@ -18,7 +18,7 @@ import { editorGuard } from './core/guards/editor.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
-  { path: '', component: DashboardComponent, canActivate: [authGuard] },
+  { path: '', component: DashboardComponent },
   { path: 'entries/:schemaKey/new', component: EntryCreateComponent, canActivate: [authGuard, editorGuard] },
   { path: 'entries/activities/timeline', component: ActivitiesTimelineComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },

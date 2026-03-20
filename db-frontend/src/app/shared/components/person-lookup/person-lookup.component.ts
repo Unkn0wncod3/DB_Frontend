@@ -129,7 +129,7 @@ export class PersonLookupComponent implements ControlValueAccessor {
         page: 1,
         pageSize: 8
       };
-      const result = await firstValueFrom(this.entryService.listEntries('persons', params));
+      const result = await firstValueFrom(this.entryService.listEntries('person', params));
       const options = (result.items ?? []).map((item: Record<string, unknown>) => this.toOption(item));
       this.results.set(options);
     } catch (error) {
@@ -173,7 +173,7 @@ export class PersonLookupComponent implements ControlValueAccessor {
   private toOption(record: Record<string, unknown>): PersonOption {
     const id = this.extractId(record);
     const name = this.composeName(record);
-    const email = typeof record['email'] === 'string' ? record['email'] : undefined;
+    const email = this.readText(record, ['email']);
     const status = typeof record['status'] === 'string' ? record['status'] : undefined;
     return {
       id: id ?? '',
@@ -184,8 +184,8 @@ export class PersonLookupComponent implements ControlValueAccessor {
   }
 
   private composeName(record: Record<string, unknown>): string {
-    const first = typeof record['first_name'] === 'string' ? record['first_name'] : '';
-    const last = typeof record['last_name'] === 'string' ? record['last_name'] : '';
+    const first = this.readText(record, ['first_name']) ?? '';
+    const last = this.readText(record, ['last_name']) ?? '';
     return [first, last].filter((value) => value.length > 0).join(' ').trim();
   }
 
@@ -200,9 +200,23 @@ export class PersonLookupComponent implements ControlValueAccessor {
     return undefined;
   }
 
+  private readText(record: Record<string, unknown>, keys: string[]): string | undefined {
+    const data = record['data_json'];
+    const source = data && typeof data === 'object' ? (data as Record<string, unknown>) : record;
+
+    for (const key of keys) {
+      const value = source[key];
+      if (typeof value === 'string' && value.trim().length > 0) {
+        return value.trim();
+      }
+    }
+
+    return undefined;
+  }
+
   private async hydrateSelection(value: string | number): Promise<void> {
     try {
-      const result = await firstValueFrom(this.entryService.getEntry('persons', value.toString()));
+      const result = await firstValueFrom(this.entryService.getEntry('person', value.toString()));
       const option = this.toOption(result as unknown as Record<string, unknown>);
       this.selectedId.set(option.id || null);
       this.searchControl.setValue(option.label, { emitEvent: false });

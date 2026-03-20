@@ -196,7 +196,7 @@
   },
   "dashboard": {
     "title": "Database Overview",
-    "subtitle": "Schema-driven overview for schemas, entries and recent changes.",
+    "subtitle": "Overview from the dashboard endpoint for visible schemas and entries.",
     "actions": {
       "refresh": "Refresh now",
       "refreshing": "Refreshing...",
@@ -209,7 +209,10 @@
     "sections": {
       "activity": "Activity",
       "latest": "Latest Changes",
-      "recent": "Recent Items"
+      "recent": "Recent Items",
+      "latestCreated": "Latest created",
+      "latestUpdated": "Latest updated",
+      "schemaTotals": "Totals per schema"
     },
     "latest": {
       "created": {
@@ -227,11 +230,17 @@
       "noRecentUpdate": "No recent updates",
       "itemType": "Schema: {{ value }}",
       "itemTypeWithId": "Schema: {{ type }} (Entry ID: {{ id }})",
-      "itemId": "ID: {{ value }}"
+      "itemId": "ID: {{ value }}",
+      "entryMeta": "Schema: {{ schema }} ? Status: {{ status }} ? Visibility: {{ visibility }}",
+      "lastCreatedAt": "Last created {{ value }}",
+      "lastUpdatedAt": "Last updated {{ value }}"
     },
     "status": {
       "noRecent": "No recent items available.",
-      "emptyState": "No structured statistics detected. Raw data below (if available)."
+      "emptyState": "No visible dashboard data available.",
+      "noRecentCreate": "No recently created entries.",
+      "noRecentUpdate": "No recently updated entries.",
+      "noSchemaTotals": "No schema totals available."
     },
     "errors": {
       "loadFailed": "Unable to load dashboard data ({{ status }}): {{ message }}",

@@ -86,6 +86,10 @@ export interface EntryRecord {
   deleted_at?: string | null;
 }
 
+export interface EntryRecordWithAccess extends EntryRecord {
+  access?: EntryAccessMap | null;
+}
+
 export interface EntryHistoryRecord {
   id: string | number;
   entry_id: string | number;
@@ -149,6 +153,11 @@ export interface EntryAccessMap {
 export interface EntryListParams {
   schema_id?: string | number;
   owner_id?: string | number;
+}
+
+export interface SchemaEntriesResponse {
+  schema: EntrySchema;
+  entries: EntryRecordWithAccess[];
 }
 
 export interface CreateEntryPayload {

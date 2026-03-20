@@ -237,7 +237,7 @@
   },
   "dashboard": {
     "title": "Datenbank-Übersicht",
-    "subtitle": "Schema-gesteuerte Übersicht für Schemas, Einträge und letzte Änderungen.",
+    "subtitle": "?bersicht aus dem Dashboard-Endpoint f?r sichtbare Schemas und Eintr?ge.",
     "actions": {
       "refresh": "Jetzt aktualisieren",
       "refreshing": "Aktualisiere...",
@@ -250,7 +250,10 @@
     "sections": {
       "activity": "Aktivität",
       "latest": "Neueste Änderungen",
-      "recent": "Aktuelle Einträge"
+      "recent": "Aktuelle Einträge",
+      "latestCreated": "Zuletzt erstellt",
+      "latestUpdated": "Zuletzt aktualisiert",
+      "schemaTotals": "Totals pro Schema"
     },
     "latest": {
       "created": {
@@ -268,11 +271,17 @@
       "noRecentUpdate": "Keine aktuellen Aktualisierungen",
       "itemType": "Schema: {{ value }}",
       "itemTypeWithId": "Schema: {{ type }} (Eintrags-ID: {{ id }})",
-      "itemId": "ID: {{ value }}"
+      "itemId": "ID: {{ value }}",
+      "entryMeta": "Schema: {{ schema }} ? Status: {{ status }} ? Sichtbarkeit: {{ visibility }}",
+      "lastCreatedAt": "Zuletzt erstellt {{ value }}",
+      "lastUpdatedAt": "Zuletzt aktualisiert {{ value }}"
     },
     "status": {
       "noRecent": "Keine aktuellen Einträge vorhanden.",
-      "emptyState": "Keine strukturierten Statistiken erkannt. Rohdaten siehe unten (falls vorhanden)."
+      "emptyState": "Keine sichtbaren Dashboard-Daten verfügbar.",
+      "noRecentCreate": "Keine zuletzt erstellten Einträge.",
+      "noRecentUpdate": "Keine zuletzt aktualisierten Einträge.",
+      "noSchemaTotals": "Keine Totals pro Schema verfügbar."
     },
     "errors": {
       "loadFailed": "Dashboard-Daten konnten nicht geladen werden ({{ status }}): {{ message }}",

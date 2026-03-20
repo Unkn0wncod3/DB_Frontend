@@ -54,9 +54,11 @@ export class UserService {
       .pipe(map(this.normalizeUser));
   }
 
-  deleteUser(id: string | number): Observable<void> {
+  deleteUser(id: string | number): Observable<UserAccount> {
     const normalized = String(id).trim();
-    return this.api.request<void>('DELETE', `/users/${encodeURIComponent(normalized)}`);
+    return this.api
+      .request<UserAccount>('DELETE', `/users/${encodeURIComponent(normalized)}`)
+      .pipe(map(this.normalizeUser));
   }
 
   updateUserStatus(id: string | number, isActive: boolean): Observable<UserAccount> {
