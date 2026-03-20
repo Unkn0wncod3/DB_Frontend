@@ -78,6 +78,15 @@ export class DashboardComponent implements OnInit {
       { allowSignalWrites: true }
     );
 
+    effect(
+      () => {
+        if (this.createMode() === 'schema' && !this.auth.canManageSchemas()) {
+          this.createMode.set('entry');
+        }
+      },
+      { allowSignalWrites: true }
+    );
+
     this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       // recompute translation-backed labels
     });

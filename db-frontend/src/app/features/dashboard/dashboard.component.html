@@ -33,11 +33,11 @@
             {{ 'dashboard.actions.modeEntry' | translate }}
           </button>
           <button
+            *ngIf="auth.canManageSchemas()"
             type="button"
             class="dashboard__quick-create-mode"
             [class.dashboard__quick-create-mode--active]="createMode() === 'schema'"
             (click)="selectCreateMode('schema')"
-            [disabled]="!auth.canManageSchemas()"
           >
             {{ 'dashboard.actions.modeSchema' | translate }}
           </button>
