@@ -983,6 +983,5 @@
     },
     "listTitle": "{{ schema }} fields",
     "listSubtitle": "Manage the schema field definitions available for entries."
-    }
   }
 }

@@ -983,6 +983,5 @@
     },
     "listTitle": "{{ schema }} Felder",
     "listSubtitle": "Verwalte die Schema-Felddefinitionen für Einträge."
-    }
   }
 }
