@@ -20,7 +20,7 @@
       <div class="schema-editor__grid">
         <label class="schema-editor__field">
           <span>{{ 'schemaCreate.fields.key' | translate }}</span>
-          <input type="text" formControlName="key" />
+          <input type="text" formControlName="key" (input)="onSchemaKeyInput()" />
           <small>{{ 'schemaCreate.hints.key' | translate }}</small>
         </label>
 
@@ -118,7 +118,7 @@
 
         <label class="schema-editor__field">
           <span>{{ 'schemaFields.fields.key' | translate }}</span>
-          <input type="text" formControlName="key" />
+          <input type="text" formControlName="key" (input)="onFieldKeyInput()" />
         </label>
 
         <label class="schema-editor__field">

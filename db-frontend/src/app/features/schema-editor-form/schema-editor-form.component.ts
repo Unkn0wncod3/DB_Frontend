@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -22,6 +23,8 @@ export interface SchemaEditorSubmitPayload {
 export class SchemaEditorFormComponent implements OnChanges {
   private readonly fb = inject(FormBuilder);
   private readonly translate = inject(TranslateService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly defaultSchemaIcon = 'file-text';
 
   @Input() submitLabel = '';
   @Input() submitBusy = false;
@@ -72,16 +75,35 @@ export class SchemaEditorFormComponent implements OnChanges {
   readonly isFieldDialogOpen = signal(false);
   readonly editingFieldIndex = signal<number | null>(null);
   readonly humanizeKey = humanizeKey;
+  private schemaKeyAutoSync = true;
+  private fieldKeyAutoSync = true;
+
+  constructor() {
+    this.resetSchemaFormForCreate();
+
+    this.schemaForm.controls.name.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => this.syncSchemaKeyFromName(value));
+
+    this.fieldForm.controls.label.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => this.syncFieldKeyFromLabel(value));
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['initialSchema']) {
-      this.schemaForm.reset({
-        key: this.initialSchema?.key ?? '',
-        name: this.initialSchema?.name ?? '',
-        description: this.initialSchema?.description ?? '',
-        icon: this.initialSchema?.icon ?? '',
-        is_active: this.initialSchema?.is_active ?? true
-      });
+      if (this.initialSchema) {
+        this.schemaKeyAutoSync = false;
+        this.schemaForm.reset({
+          key: this.initialSchema.key ?? '',
+          name: this.initialSchema.name ?? '',
+          description: this.initialSchema.description ?? '',
+          icon: this.initialSchema.icon ?? this.defaultSchemaIcon,
+          is_active: this.initialSchema.is_active ?? true
+        });
+      } else {
+        this.resetSchemaFormForCreate();
+      }
     }
 
     if (changes['initialFields']) {
@@ -112,6 +134,7 @@ export class SchemaEditorFormComponent implements OnChanges {
   }
 
   openCreateFieldDialog(): void {
+    this.fieldKeyAutoSync = true;
     this.fieldForm.reset({
       label: '',
       key: '',
@@ -131,6 +154,8 @@ export class SchemaEditorFormComponent implements OnChanges {
     if (!field) {
       return;
     }
+
+    this.fieldKeyAutoSync = false;
 
     const options = Array.isArray(field.settings_json?.['options']) ? field.settings_json?.['options'] : [];
     const referenceSchemaKey =
@@ -230,6 +255,18 @@ export class SchemaEditorFormComponent implements OnChanges {
     return translated !== translationKey ? translated : humanizeKey(type);
   }
 
+  onSchemaKeyInput(): void {
+    const currentValue = this.schemaForm.controls.key.value.trim();
+    const generatedValue = this.normalizeKey(this.schemaForm.controls.name.value);
+    this.schemaKeyAutoSync = currentValue.length === 0 || currentValue === generatedValue;
+  }
+
+  onFieldKeyInput(): void {
+    const currentValue = this.fieldForm.controls.key.value.trim();
+    const generatedValue = this.normalizeKey(this.fieldForm.controls.label.value);
+    this.fieldKeyAutoSync = currentValue.length === 0 || currentValue === generatedValue;
+  }
+
   fieldSummary(field: CreateFieldPayload): string {
     const parts = [this.fieldTypeLabel(field.data_type)];
     if (field.is_required) {
@@ -278,6 +315,33 @@ export class SchemaEditorFormComponent implements OnChanges {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '_')
       .replace(/^_+|_+$/g, '');
+  }
+
+  private syncSchemaKeyFromName(value: string): void {
+    if (!this.schemaKeyAutoSync) {
+      return;
+    }
+
+    this.schemaForm.controls.key.setValue(this.normalizeKey(value), { emitEvent: false });
+  }
+
+  private syncFieldKeyFromLabel(value: string): void {
+    if (!this.fieldKeyAutoSync) {
+      return;
+    }
+
+    this.fieldForm.controls.key.setValue(this.normalizeKey(value), { emitEvent: false });
+  }
+
+  private resetSchemaFormForCreate(): void {
+    this.schemaKeyAutoSync = true;
+    this.schemaForm.reset({
+      key: '',
+      name: '',
+      description: '',
+      icon: this.defaultSchemaIcon,
+      is_active: true
+    });
   }
 
   private resolveSortOrder(): number {
