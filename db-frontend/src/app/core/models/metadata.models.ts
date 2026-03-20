@@ -178,6 +178,14 @@ export interface CreateSchemaPayload {
   is_active?: boolean;
 }
 
+export interface UpdateSchemaPayload {
+  key?: string;
+  name?: string;
+  description?: string | null;
+  icon?: string | null;
+  is_active?: boolean;
+}
+
 export interface CreateFieldPayload {
   key: string;
   label: string;

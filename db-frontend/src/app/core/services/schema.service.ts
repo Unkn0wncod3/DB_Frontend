@@ -2,7 +2,15 @@ import { inject, Injectable, signal } from '@angular/core';
 import { map, Observable, of, tap } from 'rxjs';
 
 import { ApiService } from './api.service';
-import { CreateFieldPayload, CreateSchemaPayload, EntrySchema, SchemaEntriesResponse, SchemaField, UpdateFieldPayload } from '../models/metadata.models';
+import {
+  CreateFieldPayload,
+  CreateSchemaPayload,
+  EntrySchema,
+  SchemaEntriesResponse,
+  SchemaField,
+  UpdateFieldPayload,
+  UpdateSchemaPayload
+} from '../models/metadata.models';
 import { sortSchemaFields } from '../utils/schema.utils';
 
 @Injectable({ providedIn: 'root' })
@@ -50,6 +58,16 @@ export class SchemaService {
     return this.api.request<EntrySchema>('POST', '/schemas', { body: payload }).pipe(
       map((schema) => this.normalizeSchema(schema)),
       tap((schema) => this.schemas.set([...this.schemas(), schema]))
+    );
+  }
+
+  updateSchema(schemaId: string | number, payload: UpdateSchemaPayload): Observable<EntrySchema> {
+    return this.api.request<EntrySchema>('PATCH', `/schemas/${encodeURIComponent(String(schemaId))}`, { body: payload }).pipe(
+      map((schema) => this.normalizeSchema(schema)),
+      tap((schema) => {
+        const updated = this.schemas().map((item) => (String(item.id) === String(schemaId) ? schema : item));
+        this.schemas.set(updated);
+      })
     );
   }
 

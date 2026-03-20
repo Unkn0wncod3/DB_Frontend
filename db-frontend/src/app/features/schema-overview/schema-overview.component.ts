@@ -1,27 +1,47 @@
 import { DatePipe, DecimalPipe, NgFor, NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { LucideIconData, icons as lucideIcons } from 'lucide-angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
 
+import { AuthService } from '../../core/services/auth.service';
 import { LucideIconsModule } from '../../core/modules/lucide-icons.module';
+import { EntrySchema } from '../../core/models/metadata.models';
+import { SchemaService } from '../../core/services/schema.service';
 import { DashboardSchemaTotal, StatsService } from '../../core/services/stats.service';
 
 @Component({
   selector: 'app-schema-overview',
   standalone: true,
-  imports: [NgIf, NgFor, DatePipe, DecimalPipe, RouterLink, TranslateModule, LucideIconsModule],
+  imports: [NgIf, NgFor, DatePipe, DecimalPipe, RouterLink, TranslateModule, LucideIconsModule, ReactiveFormsModule],
   templateUrl: './schema-overview.component.html',
   styleUrl: './schema-overview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SchemaOverviewComponent implements OnInit {
+  private readonly fb = inject(FormBuilder);
   private readonly statsService = inject(StatsService);
+  private readonly schemaService = inject(SchemaService);
   private readonly translate = inject(TranslateService);
+  readonly auth = inject(AuthService);
 
   readonly overview = this.statsService.overview;
   readonly isLoading = this.statsService.isLoading;
+  readonly isSavingSchema = signal(false);
+  readonly isSchemaDialogOpen = signal(false);
+  readonly successMessage = signal<string | null>(null);
+  readonly dialogError = signal<string | null>(null);
+  readonly editingSchema = signal<EntrySchema | null>(null);
   readonly schemas = computed(() => this.overview()?.totals_per_schema ?? []);
+  readonly form = this.fb.nonNullable.group({
+    key: ['', [Validators.required, Validators.pattern(/^[a-z0-9_]+$/)]],
+    name: ['', Validators.required],
+    description: [''],
+    icon: [''],
+    is_active: [true]
+  });
 
   readonly errorMessage = computed(() => {
     const error = this.statsService.error();
@@ -46,6 +66,85 @@ export class SchemaOverviewComponent implements OnInit {
 
   refresh(): void {
     void this.statsService.loadOverview(true);
+  }
+
+  openCreateDialog(): void {
+    if (!this.auth.canManageSchemas()) {
+      return;
+    }
+
+    this.editingSchema.set(null);
+    this.form.reset({ key: '', name: '', description: '', icon: '', is_active: true });
+    this.isSchemaDialogOpen.set(true);
+    this.successMessage.set(null);
+    this.dialogError.set(null);
+  }
+
+  async openEditDialog(item: DashboardSchemaTotal): Promise<void> {
+    if (!this.auth.canManageSchemas()) {
+      return;
+    }
+
+    try {
+      const schema = await firstValueFrom(this.schemaService.getSchema(item.schema_id));
+      this.editingSchema.set(schema);
+      this.form.reset({
+        key: schema.key,
+        name: schema.name,
+        description: schema.description ?? '',
+        icon: schema.icon ?? '',
+        is_active: schema.is_active
+      });
+      this.isSchemaDialogOpen.set(true);
+      this.successMessage.set(null);
+      this.dialogError.set(null);
+    } catch (error) {
+      this.dialogError.set(this.describeMutationError(error));
+    }
+  }
+
+  closeSchemaDialog(): void {
+    this.isSchemaDialogOpen.set(false);
+    this.editingSchema.set(null);
+    this.dialogError.set(null);
+  }
+
+  async saveSchema(): Promise<void> {
+    this.form.markAllAsTouched();
+    if (this.form.invalid || this.isSavingSchema()) {
+      return;
+    }
+
+    const raw = this.form.getRawValue();
+    const payload = {
+      key: raw.key.trim(),
+      name: raw.name.trim(),
+      description: raw.description.trim() || null,
+      icon: raw.icon.trim() || null,
+      is_active: raw.is_active
+    };
+
+    this.isSavingSchema.set(true);
+    this.successMessage.set(null);
+    this.dialogError.set(null);
+
+    try {
+      const current = this.editingSchema();
+      if (current) {
+        await firstValueFrom(this.schemaService.updateSchema(current.id, payload));
+        this.successMessage.set(this.translate.instant('schemaOverview.status.updated', { value: payload.name }));
+      } else {
+        await firstValueFrom(this.schemaService.createSchema(payload));
+        this.successMessage.set(this.translate.instant('schemaOverview.status.created', { value: payload.name }));
+      }
+
+      this.closeSchemaDialog();
+      await this.statsService.loadOverview(true);
+    } catch (error) {
+      this.dialogError.set(this.describeMutationError(error));
+    } finally {
+      this.isSavingSchema.set(false);
+    }
   }
 
   trackSchema(_index: number, item: DashboardSchemaTotal): string {
@@ -75,5 +174,33 @@ export class SchemaOverviewComponent implements OnInit {
   iconFallbackLabel(item: DashboardSchemaTotal): string {
     const source = item.schema_name?.trim() || item.schema_key?.trim() || '?';
     return source.charAt(0).toUpperCase();
+  }
+
+  dialogTitle(): string {
+    return this.editingSchema()
+      ? this.translate.instant('schemaOverview.dialog.editTitle')
+      : this.translate.instant('schemaOverview.dialog.title');
+  }
+
+  dialogSubtitle(): string {
+    return this.editingSchema()
+      ? this.translate.instant('schemaOverview.dialog.editSubtitle')
+      : this.translate.instant('schemaOverview.dialog.subtitle');
+  }
+
+  dialogSubmitLabel(): string {
+    return this.editingSchema()
+      ? this.translate.instant('schemaOverview.actions.save')
+      : this.translate.instant('schemaOverview.actions.create');
+  }
+
+  private describeMutationError(error: unknown): string {
+    if (error instanceof Error && error.message) {
+      return error.message;
+    }
+    if (typeof error === 'object' && error !== null && 'message' in error) {
+      return String((error as { message?: unknown }).message ?? '');
+    }
+    return this.translate.instant('schemaOverview.errors.generic');
   }
 }

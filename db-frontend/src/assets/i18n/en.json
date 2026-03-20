@@ -943,7 +943,16 @@
     "actions": {
       "back": "Back to dashboard",
       "refresh": "Refresh",
-      "refreshing": "Refreshing..."
+      "refreshing": "Refreshing...",
+      "edit": "Edit schema",
+      "create": "Create schema",
+      "save": "Save schema"
+    },
+    "dialog": {
+      "title": "Create schema",
+      "subtitle": "Add a new schema with key, name, description, icon and active state.",
+      "editTitle": "Edit schema",
+      "editSubtitle": "Update key, name, description, icon and active state for this schema."
     },
     "labels": {
       "entries": "entries",
@@ -951,7 +960,9 @@
       "lastUpdatedAt": "Last updated {{ value }}"
     },
     "status": {
-      "empty": "No schemas available."
+      "empty": "No schemas available.",
+      "created": "Schema {{ value }} created.",
+      "updated": "Schema {{ value }} updated."
     },
     "errors": {
       "loadFailed": "Unable to load schemas overview ({{ status }}): {{ message }}",

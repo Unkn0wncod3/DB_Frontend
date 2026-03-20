@@ -16,9 +16,32 @@
   <section *ngIf="errorMessage() as error" class="schema-overview__error">
     {{ error }}
   </section>
+  <section *ngIf="successMessage() as success" class="schema-overview__success">
+    {{ success }}
+  </section>
 
   <section *ngIf="schemas().length > 0; else emptyState" class="schema-overview__grid">
     <article *ngFor="let item of schemas(); trackBy: trackSchema" class="schema-overview__card">
+      <button
+        *ngIf="auth.canManageSchemas()"
+        type="button"
+        class="schema-overview__edit"
+        (click)="openEditDialog(item)"
+        [attr.aria-label]="'schemaOverview.actions.edit' | translate"
+        [title]="'schemaOverview.actions.edit' | translate"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 20h9" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+          <path
+            d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5Z"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.8"
+          />
+        </svg>
+      </button>
       <a [routerLink]="schemaLink(item)" class="schema-overview__link">
         <div class="schema-overview__icon" [attr.aria-label]="item.icon || item.schema_name">
           <lucide-angular *ngIf="resolveLucideIcon(item.icon) as icon; else iconFallback" [img]="icon" [size]="22"></lucide-angular>
@@ -44,11 +67,67 @@
         </div>
       </a>
     </article>
+
+    <button
+      *ngIf="auth.canManageSchemas()"
+      type="button"
+      class="schema-overview__card schema-overview__card--add"
+      (click)="openCreateDialog()"
+    >
+      <span class="schema-overview__add-icon">+</span>
+      <span>{{ 'schemaOverview.actions.create' | translate }}</span>
+    </button>
   </section>
 
   <ng-template #emptyState>
     <section class="schema-overview__empty" *ngIf="!isLoading()">
       {{ 'schemaOverview.status.empty' | translate }}
+      <button
+        *ngIf="auth.canManageSchemas()"
+        type="button"
+        class="schema-overview__empty-action"
+        (click)="openCreateDialog()"
+      >
+        {{ 'schemaOverview.actions.create' | translate }}
+      </button>
     </section>
   </ng-template>
+
+  <div class="schema-overview__dialog-backdrop" *ngIf="isSchemaDialogOpen()" (click)="closeSchemaDialog()">
+    <section class="schema-overview__dialog" (click)="$event.stopPropagation()">
+      <h2>{{ dialogTitle() }}</h2>
+      <p>{{ dialogSubtitle() }}</p>
+      <p *ngIf="dialogError() as error" class="schema-overview__dialog-error">{{ error }}</p>
+      <form [formGroup]="form" class="schema-overview__dialog-form" (ngSubmit)="saveSchema()">
+        <label>
+          <span>{{ 'schemaCreate.fields.key' | translate }}</span>
+          <input type="text" formControlName="key" />
+        </label>
+        <label>
+          <span>{{ 'schemaCreate.fields.name' | translate }}</span>
+          <input type="text" formControlName="name" />
+        </label>
+        <label>
+          <span>{{ 'schemaCreate.fields.icon' | translate }}</span>
+          <input type="text" formControlName="icon" />
+        </label>
+        <label class="schema-overview__dialog-field schema-overview__dialog-field--full">
+          <span>{{ 'schemaCreate.fields.description' | translate }}</span>
+          <textarea rows="4" formControlName="description"></textarea>
+        </label>
+        <label class="schema-overview__dialog-toggle">
+          <input type="checkbox" formControlName="is_active" />
+          <span>{{ 'schemaCreate.fields.isActive' | translate }}</span>
+        </label>
+        <div class="schema-overview__dialog-actions">
+          <button type="button" class="schema-overview__button schema-overview__button--ghost" (click)="closeSchemaDialog()">
+            {{ 'schemaFields.actions.cancel' | translate }}
+          </button>
+          <button type="submit" class="schema-overview__button schema-overview__button--primary" [disabled]="form.invalid || isSavingSchema()">
+            {{ isSavingSchema() ? ('schemaFields.actions.creating' | translate) : dialogSubmitLabel() }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
 </section>

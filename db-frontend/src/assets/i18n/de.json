@@ -296,6 +296,12 @@
         "timestamp": "Aktualisiert am {{ value }}"
       }
     },
+    "dialog": {
+      "title": "Schema erstellen",
+      "subtitle": "Lege ein neues Schema mit Key, Name, Beschreibung, Icon und Aktiv-Status an.",
+      "editTitle": "Schema bearbeiten",
+      "editSubtitle": "Aktualisiere Key, Name, Beschreibung, Icon und Aktiv-Status für dieses Schema."
+    },
     "labels": {
       "unknownEntry": "Unbenannter Eintrag",
       "noRecentCreate": "Keine aktuellen Erstellungen",
@@ -308,6 +314,8 @@
       "lastUpdatedAt": "Zuletzt aktualisiert {{ value }}"
     },
     "status": {
+      "created": "Schema {{ value }} erstellt.",
+      "updated": "Schema {{ value }} aktualisiert.",
       "noRecent": "Keine aktuellen Einträge vorhanden.",
       "emptyState": "Keine sichtbaren Dashboard-Daten verfügbar.",
       "noRecentCreate": "Keine zuletzt erstellten Einträge.",
@@ -943,7 +951,10 @@
     "actions": {
       "back": "Zurück zum Dashboard",
       "refresh": "Aktualisieren",
-      "refreshing": "Aktualisiere..."
+      "refreshing": "Aktualisiere...",
+      "edit": "Schema bearbeiten",
+      "create": "Schema erstellen",
+      "save": "Schema speichern"
     },
     "labels": {
       "entries": "Einträge",
