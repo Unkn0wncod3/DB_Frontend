@@ -3,6 +3,7 @@
     "brand": "DB Frontend",
     "nav": {
       "dashboard": "Dashboard",
+      "schemas": "Schemas",
       "profile": "Profil",
       "explorer": "API Explorer",
       "logs": "Protokolle",

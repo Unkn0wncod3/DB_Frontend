@@ -5,9 +5,6 @@
       <p>{{ 'dashboard.subtitle' | translate }}</p>
     </div>
     <div class="dashboard__actions">
-      <a routerLink="/schemas" class="dashboard__schemas-link">
-        {{ 'dashboard.actions.allSchemas' | translate }}
-      </a>
       <button type="button" class="dashboard__refresh" (click)="forceRefresh()" [disabled]="isLoading()">
         <span *ngIf="isLoading(); else idleState">{{ 'dashboard.actions.refreshing' | translate }}</span>
         <ng-template #idleState>{{ 'dashboard.actions.refresh' | translate }}</ng-template>
