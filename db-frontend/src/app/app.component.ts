@@ -1,6 +1,5 @@
 import { Component, DestroyRef, OnDestroy, OnInit } from '@angular/core';
 import { DatePipe, NgFor, NgIf } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { interval, Subscription } from 'rxjs';
@@ -13,7 +12,7 @@ import { ThemeService } from './core/services/theme.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslateModule, NgFor, NgIf, FormsModule, DatePipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslateModule, NgFor, NgIf, DatePipe],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
