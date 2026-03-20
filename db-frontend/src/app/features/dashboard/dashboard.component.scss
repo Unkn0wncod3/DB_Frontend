@@ -276,6 +276,12 @@
   color: var(--color-text-soft);
 }
 
+.dashboard__latest-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .dashboard__latest {
   display: grid;
   gap: 1rem;
@@ -385,6 +391,10 @@
 }
 
 @media (max-width: 720px) {
+  .dashboard__latest-grid {
+    grid-template-columns: 1fr;
+  }
+
   .dashboard__quick-create-controls {
     align-items: stretch;
   }

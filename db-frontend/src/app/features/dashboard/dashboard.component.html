@@ -83,49 +83,51 @@
     <p>{{ 'dashboard.status.emptyState' | translate }}</p>
   </section>
 
-  <section class="dashboard__panel">
-    <header>
-      <h2>{{ 'dashboard.sections.latestCreated' | translate }}</h2>
-    </header>
-    <ul class="dashboard__recent-list" *ngIf="latestCreated().length > 0; else latestCreatedEmpty">
-      <li *ngFor="let item of latestCreated(); trackBy: trackEntry" class="dashboard__recent-item dashboard__recent-item--link">
-        <a [routerLink]="entryLink(item)" class="dashboard__recent-link">
-          <div class="dashboard__recent-content">
-            <strong>{{ item.title || ('dashboard.labels.unknownEntry' | translate) }}</strong>
-            <p class="dashboard__recent-meta">
-              {{ 'dashboard.labels.entryMeta' | translate:{ schema: item.schema_name, status: (item.status || '-'), visibility: item.visibility_level } }}
-            </p>
-          </div>
-          <time *ngIf="latestTimestamp(item, 'created') as ts">{{ ts | date:'dd/MM/yyyy, HH:mm' }}</time>
-        </a>
-      </li>
-    </ul>
-    <ng-template #latestCreatedEmpty>
-      <p>{{ 'dashboard.status.noRecentCreate' | translate }}</p>
-    </ng-template>
-  </section>
+  <div class="dashboard__latest-grid">
+    <section class="dashboard__panel">
+      <header>
+        <h2>{{ 'dashboard.sections.latestCreated' | translate }}</h2>
+      </header>
+      <ul class="dashboard__recent-list" *ngIf="latestCreated().length > 0; else latestCreatedEmpty">
+        <li *ngFor="let item of latestCreated(); trackBy: trackEntry" class="dashboard__recent-item dashboard__recent-item--link">
+          <a [routerLink]="entryLink(item)" class="dashboard__recent-link">
+            <div class="dashboard__recent-content">
+              <strong>{{ item.title || ('dashboard.labels.unknownEntry' | translate) }}</strong>
+              <p class="dashboard__recent-meta">
+                {{ 'dashboard.labels.entryMeta' | translate:{ schema: item.schema_name, status: (item.status || '-'), visibility: item.visibility_level } }}
+              </p>
+            </div>
+            <time *ngIf="latestTimestamp(item, 'created') as ts">{{ ts | date:'dd/MM/yyyy, HH:mm' }}</time>
+          </a>
+        </li>
+      </ul>
+      <ng-template #latestCreatedEmpty>
+        <p>{{ 'dashboard.status.noRecentCreate' | translate }}</p>
+      </ng-template>
+    </section>
 
-  <section class="dashboard__panel">
-    <header>
-      <h2>{{ 'dashboard.sections.latestUpdated' | translate }}</h2>
-    </header>
-    <ul class="dashboard__recent-list" *ngIf="latestUpdated().length > 0; else latestUpdatedEmpty">
-      <li *ngFor="let item of latestUpdated(); trackBy: trackEntry" class="dashboard__recent-item dashboard__recent-item--link">
-        <a [routerLink]="entryLink(item)" class="dashboard__recent-link">
-          <div class="dashboard__recent-content">
-            <strong>{{ item.title || ('dashboard.labels.unknownEntry' | translate) }}</strong>
-            <p class="dashboard__recent-meta">
-              {{ 'dashboard.labels.entryMeta' | translate:{ schema: item.schema_name, status: (item.status || '-'), visibility: item.visibility_level } }}
-            </p>
-          </div>
-          <time *ngIf="latestTimestamp(item, 'updated') as ts">{{ ts | date:'dd/MM/yyyy, HH:mm' }}</time>
-        </a>
-      </li>
-    </ul>
-    <ng-template #latestUpdatedEmpty>
-      <p>{{ 'dashboard.status.noRecentUpdate' | translate }}</p>
-    </ng-template>
-  </section>
+    <section class="dashboard__panel">
+      <header>
+        <h2>{{ 'dashboard.sections.latestUpdated' | translate }}</h2>
+      </header>
+      <ul class="dashboard__recent-list" *ngIf="latestUpdated().length > 0; else latestUpdatedEmpty">
+        <li *ngFor="let item of latestUpdated(); trackBy: trackEntry" class="dashboard__recent-item dashboard__recent-item--link">
+          <a [routerLink]="entryLink(item)" class="dashboard__recent-link">
+            <div class="dashboard__recent-content">
+              <strong>{{ item.title || ('dashboard.labels.unknownEntry' | translate) }}</strong>
+              <p class="dashboard__recent-meta">
+                {{ 'dashboard.labels.entryMeta' | translate:{ schema: item.schema_name, status: (item.status || '-'), visibility: item.visibility_level } }}
+              </p>
+            </div>
+            <time *ngIf="latestTimestamp(item, 'updated') as ts">{{ ts | date:'dd/MM/yyyy, HH:mm' }}</time>
+          </a>
+        </li>
+      </ul>
+      <ng-template #latestUpdatedEmpty>
+        <p>{{ 'dashboard.status.noRecentUpdate' | translate }}</p>
+      </ng-template>
+    </section>
+  </div>
 
   <section class="dashboard__panel">
     <header>
