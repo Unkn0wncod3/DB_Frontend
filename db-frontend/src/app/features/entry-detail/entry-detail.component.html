@@ -29,7 +29,7 @@
         class="entry-detail__button entry-detail__button--primary"
         *ngIf="canEdit()"
         (click)="save()"
-        [disabled]="isSaving() || !hasUnsavedChanges()"
+        [disabled]="!canSave()"
       >
         {{ 'entryDetail.actions.save' | translate }}
       </button>

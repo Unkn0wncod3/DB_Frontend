@@ -108,9 +108,17 @@ export class EntryDetailComponent {
     const schema = this.schema();
     return schema ? this.translate.instant('entryDetail.sections.schemaFieldsNamed', { schema: schema.name }) : '';
   });
+  readonly hasCommentDraft = computed(() => {
+    this.formRevision();
+    return this.metaForm.getRawValue().comment.trim().length > 0;
+  });
   readonly hasUnsavedChanges = computed(() => {
     this.formRevision();
     return this.originalComparableState().length > 0 && this.currentComparableState() !== this.originalComparableState();
+  });
+  readonly canSave = computed(() => {
+    this.formRevision();
+    return this.canEdit() && !this.isSaving() && !this.form.invalid && !this.metaForm.invalid && (this.hasUnsavedChanges() || this.hasCommentDraft());
   });
   readonly statusOptions = computed(() => {
     const current = this.metaForm.controls.status.getRawValue().trim();
@@ -253,7 +261,7 @@ export class EntryDetailComponent {
 
   async save(): Promise<void> {
     const entry = this.entry();
-    if (!entry || !this.canEdit() || !this.hasUnsavedChanges() || this.form.invalid || this.metaForm.invalid) {
+    if (!entry || !this.canSave()) {
       return;
     }
 
