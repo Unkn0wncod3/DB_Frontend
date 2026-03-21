@@ -164,6 +164,7 @@
     <section class="entry-create__dialog" (click)="$event.stopPropagation()">
       <h2>{{ fieldDialogTitle() }}</h2>
       <p>{{ fieldDialogSubtitle() }}</p>
+      <p *ngIf="createFieldError() as error" class="entry-create__dialog-error">{{ error }}</p>
       <form [formGroup]="createFieldForm" class="entry-create__dialog-form" (ngSubmit)="createField()">
         <label>
           <span>{{ 'schemaFields.fields.label' | translate }}</span>
@@ -171,7 +172,20 @@
         </label>
         <label>
           <span>{{ 'schemaFields.fields.key' | translate }}</span>
-          <input type="text" formControlName="key" />
+          <input
+            type="text"
+            formControlName="key"
+            [readOnly]="isCreateFieldKeyAuto()"
+            [class.entry-create__input--readonly]="isCreateFieldKeyAuto()"
+            [attr.placeholder]="isCreateFieldKeyAuto() ? ('schemaFields.fields.keyAutoPlaceholder' | translate) : null"
+            (input)="onCreateFieldKeyInput()"
+          />
+          <small class="entry-create__hint">
+            {{ (isCreateFieldKeyAuto() ? 'schemaFields.fields.keyAutoHelp' : 'schemaFields.fields.keyManualHelp') | translate }}
+          </small>
+          <button *ngIf="isCreateFieldKeyAuto()" type="button" class="entry-create__dialog-link" (click)="enableManualCreateFieldKey()">
+            {{ 'schemaFields.actions.editKey' | translate }}
+          </button>
         </label>
         <label>
           <span>{{ 'schemaFields.fields.description' | translate }}</span>

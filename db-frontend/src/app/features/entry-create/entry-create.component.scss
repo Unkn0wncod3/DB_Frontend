@@ -266,6 +266,11 @@
   color: var(--color-text-muted);
 }
 
+.entry-create__dialog-error {
+  margin: 0 0 1rem;
+  color: var(--color-error-text);
+}
+
 .entry-create__dialog-form {
   display: grid;
   gap: 1rem;
@@ -285,6 +290,20 @@
   padding: 0.65rem 0.85rem;
   background: var(--create-input);
   color: var(--color-text);
+}
+
+.entry-create__input--readonly {
+  opacity: 0.72;
+}
+
+.entry-create__dialog-link {
+  justify-self: start;
+  border: none;
+  background: transparent;
+  color: var(--color-link);
+  padding: 0;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .entry-create__dialog-checkbox {

@@ -62,7 +62,7 @@ export class SchemaEditorFormComponent implements OnChanges {
 
   readonly fieldForm = this.fb.nonNullable.group({
     label: ['', Validators.required],
-    key: ['', [Validators.required, Validators.pattern(/^[a-z0-9_]+$/)]],
+    key: ['', [Validators.pattern(/^[a-z0-9_]+$/)]],
     description: [''],
     data_type: ['text' as FieldDataType, Validators.required],
     is_required: [false],
@@ -73,6 +73,7 @@ export class SchemaEditorFormComponent implements OnChanges {
 
   readonly fieldDrafts = signal<CreateFieldPayload[]>([]);
   readonly isFieldDialogOpen = signal(false);
+  readonly fieldDialogError = signal<string | null>(null);
   readonly editingFieldIndex = signal<number | null>(null);
   readonly humanizeKey = humanizeKey;
   private schemaKeyAutoSync = true;
@@ -145,6 +146,7 @@ export class SchemaEditorFormComponent implements OnChanges {
       options: '',
       reference_schema_key: ''
     });
+    this.fieldDialogError.set(null);
     this.editingFieldIndex.set(null);
     this.isFieldDialogOpen.set(true);
   }
@@ -171,6 +173,7 @@ export class SchemaEditorFormComponent implements OnChanges {
       options: options.map((item) => String(item)).join(', '),
       reference_schema_key: referenceSchemaKey
     });
+    this.fieldDialogError.set(null);
     this.editingFieldIndex.set(index);
     this.isFieldDialogOpen.set(true);
   }
@@ -178,6 +181,16 @@ export class SchemaEditorFormComponent implements OnChanges {
   closeFieldDialog(): void {
     this.isFieldDialogOpen.set(false);
     this.editingFieldIndex.set(null);
+    this.fieldDialogError.set(null);
+  }
+
+  isFieldKeyAuto(): boolean {
+    return this.fieldKeyAutoSync && this.editingFieldIndex() === null;
+  }
+
+  enableManualFieldKey(): void {
+    this.fieldKeyAutoSync = false;
+    this.fieldDialogError.set(null);
   }
 
   saveFieldDraft(): void {
@@ -188,6 +201,22 @@ export class SchemaEditorFormComponent implements OnChanges {
 
     const raw = this.fieldForm.getRawValue();
     const normalizedKey = this.normalizeKey(raw.key || raw.label);
+    const editingIndex = this.editingFieldIndex();
+
+    if (!normalizedKey) {
+      this.fieldDialogError.set(this.translate.instant('schemaFields.errors.keyGenerateFailed'));
+      this.fieldKeyAutoSync = false;
+      return;
+    }
+
+    if (this.fieldDrafts().some((field, index) => field.key === normalizedKey && index !== editingIndex)) {
+      this.fieldDialogError.set(this.translate.instant('schemaFields.errors.keyConflict', { key: normalizedKey }));
+      this.fieldForm.controls.key.setValue(normalizedKey);
+      this.fieldKeyAutoSync = false;
+      return;
+    }
+
+    this.fieldDialogError.set(null);
     const settingsJson: Record<string, unknown> = {};
 
     if (raw.data_type === 'select' || raw.data_type === 'multi_select') {
@@ -219,7 +248,7 @@ export class SchemaEditorFormComponent implements OnChanges {
       settings_json: Object.keys(settingsJson).length > 0 ? settingsJson : {}
     };
 
-    const index = this.editingFieldIndex();
+    const index = editingIndex;
     if (index === null) {
       this.fieldDrafts.set([...this.fieldDrafts(), nextField]);
     } else {
@@ -265,6 +294,7 @@ export class SchemaEditorFormComponent implements OnChanges {
     const currentValue = this.fieldForm.controls.key.value.trim();
     const generatedValue = this.normalizeKey(this.fieldForm.controls.label.value);
     this.fieldKeyAutoSync = currentValue.length === 0 || currentValue === generatedValue;
+    this.fieldDialogError.set(null);
   }
 
   fieldSummary(field: CreateFieldPayload): string {

@@ -1101,6 +1101,9 @@
     "fields": {
       "label": "Feldname",
       "key": "Feld-Key",
+      "keyAutoPlaceholder": "Wird automatisch aus dem Namen erzeugt",
+      "keyAutoHelp": "Wird automatisch aus dem Feldnamen generiert.",
+      "keyManualHelp": "Nur bei Bedarf manuell überschreiben.",
       "description": "Beschreibung",
       "type": "Feldtyp",
       "required": "Pflichtfeld"
@@ -1110,6 +1113,7 @@
       "create": "Feld hinzufügen",
       "creating": "Speichere...",
       "save": "Feld speichern",
+      "editKey": "Key bearbeiten",
       "edit": "Bearbeiten",
       "delete": "Löschen"
     },
@@ -1117,6 +1121,11 @@
       "created": "Feld {{ value }} erstellt.",
       "updated": "Feld {{ value }} aktualisiert.",
       "deleted": "Feld {{ value }} gelöscht."
+    },
+    "errors": {
+      "keyGenerateFailed": "Es konnte kein gültiger Feld-Key erzeugt werden. Bitte gib ihn manuell ein.",
+      "keyConflict": "Der erzeugte Feld-Key \"{{ key }}\" existiert bereits. Bitte wähle einen anderen Key.",
+      "keyGeneric": "Das Feld konnte nicht gespeichert werden. {{ message }}"
     },
     "listTitle": "{{ schema }} Felder",
     "listSubtitle": "Verwalte die Schema-Felddefinitionen für Einträge."

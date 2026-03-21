@@ -39,6 +39,7 @@ export class EntryCreateComponent {
   readonly isCreatingField = signal(false);
   readonly isDeletingField = signal(false);
   readonly isFieldDialogOpen = signal(false);
+  readonly createFieldError = signal<string | null>(null);
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
   readonly schema = signal<EntrySchema | null>(null);
@@ -70,8 +71,16 @@ export class EntryCreateComponent {
 
   form: FormGroup = this.fb.group({});
   private currentSchemaKey: string | null = null;
+  private createFieldKeyAutoSync = true;
 
   constructor() {
+    this.createFieldForm.controls.label.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((value) => {
+      if (!this.createFieldKeyAutoSync || this.editingField()) {
+        return;
+      }
+      this.createFieldForm.controls.key.setValue(this.toFieldKey(value), { emitEvent: false });
+    });
+
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const schemaKey = params.get('schemaKey');
       if (!schemaKey || schemaKey === this.currentSchemaKey) {
@@ -127,7 +136,9 @@ export class EntryCreateComponent {
       return;
     }
     this.editingField.set(null);
+    this.createFieldKeyAutoSync = true;
     this.createFieldForm.reset({ label: '', key: '', description: '', data_type: 'text', is_required: false });
+    this.createFieldError.set(null);
     this.isFieldDialogOpen.set(true);
   }
 
@@ -136,6 +147,7 @@ export class EntryCreateComponent {
       return;
     }
     this.editingField.set(field);
+    this.createFieldKeyAutoSync = false;
     this.createFieldForm.reset({
       label: field.label ?? '',
       key: field.key ?? '',
@@ -143,12 +155,30 @@ export class EntryCreateComponent {
       data_type: field.data_type,
       is_required: field.is_required
     });
+    this.createFieldError.set(null);
     this.isFieldDialogOpen.set(true);
   }
 
   closeFieldDialog(): void {
     this.isFieldDialogOpen.set(false);
     this.editingField.set(null);
+    this.createFieldError.set(null);
+  }
+
+  isCreateFieldKeyAuto(): boolean {
+    return this.createFieldKeyAutoSync && !this.editingField();
+  }
+
+  enableManualCreateFieldKey(): void {
+    this.createFieldKeyAutoSync = false;
+    this.createFieldError.set(null);
+  }
+
+  onCreateFieldKeyInput(): void {
+    const currentValue = this.createFieldForm.controls.key.value.trim();
+    const generatedValue = this.toFieldKey(this.createFieldForm.controls.label.value);
+    this.createFieldKeyAutoSync = currentValue.length === 0 || currentValue === generatedValue;
+    this.createFieldError.set(null);
   }
 
   async createField(): Promise<void> {
@@ -163,12 +193,26 @@ export class EntryCreateComponent {
     const raw = this.createFieldForm.getRawValue();
     const label = raw.label.trim();
     const editingField = this.editingField();
+    const normalizedKey = raw.key.trim() || this.toFieldKey(label);
+
+    if (!normalizedKey) {
+      this.createFieldError.set(this.translate.instant('schemaFields.errors.keyGenerateFailed'));
+      this.createFieldKeyAutoSync = false;
+      return;
+    }
+
+    if ((this.schema()?.fields ?? []).some((field) => field.key === normalizedKey && String(field.id) !== String(editingField?.id ?? ''))) {
+      this.createFieldError.set(this.translate.instant('schemaFields.errors.keyConflict', { key: normalizedKey }));
+      this.createFieldForm.controls.key.setValue(normalizedKey);
+      this.createFieldKeyAutoSync = false;
+      return;
+    }
 
     try {
       if (editingField) {
         await firstValueFrom(
           this.schemaService.updateField(schema.id, editingField.id, {
-            key: raw.key.trim(),
+            key: normalizedKey,
             label,
             description: raw.description.trim() || null,
             data_type: raw.data_type,
@@ -178,7 +222,7 @@ export class EntryCreateComponent {
       } else {
         await firstValueFrom(
           this.schemaService.createField(schema.id, {
-            key: raw.key.trim() || this.toFieldKey(label),
+            key: normalizedKey,
             label,
             description: raw.description.trim() || null,
             data_type: raw.data_type,
@@ -198,7 +242,15 @@ export class EntryCreateComponent {
         this.translate.instant(editingField ? 'schemaFields.status.updated' : 'schemaFields.status.created', { value: label })
       );
     } catch (error) {
-      this.errorMessage.set(this.describeError(error));
+      const message = this.describeError(error);
+      const normalizedMessage = message.toLowerCase();
+      this.createFieldError.set(
+        normalizedMessage.includes('key') && (normalizedMessage.includes('exist') || normalizedMessage.includes('duplicate') || normalizedMessage.includes('unique'))
+          ? this.translate.instant('schemaFields.errors.keyConflict', { key: normalizedKey })
+          : this.translate.instant('schemaFields.errors.keyGeneric', { message })
+      );
+      this.createFieldForm.controls.key.setValue(normalizedKey);
+      this.createFieldKeyAutoSync = false;
     } finally {
       this.isCreatingField.set(false);
     }

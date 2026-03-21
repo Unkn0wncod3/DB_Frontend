@@ -1093,6 +1093,9 @@
     "fields": {
       "label": "Field name",
       "key": "Field key",
+      "keyAutoPlaceholder": "Auto-generated from label",
+      "keyAutoHelp": "Generated automatically from the field name.",
+      "keyManualHelp": "Override the generated key only if needed.",
       "description": "Description",
       "type": "Field type",
       "required": "Required field"
@@ -1102,6 +1105,7 @@
       "create": "Add field",
       "creating": "Saving...",
       "save": "Save field",
+      "editKey": "Edit key",
       "edit": "Edit",
       "delete": "Delete"
     },
@@ -1109,6 +1113,11 @@
       "created": "Field {{ value }} created.",
       "updated": "Field {{ value }} updated.",
       "deleted": "Field {{ value }} deleted."
+    },
+    "errors": {
+      "keyGenerateFailed": "No valid field key could be generated. Please enter one manually.",
+      "keyConflict": "The generated field key \"{{ key }}\" already exists. Please choose a different key.",
+      "keyGeneric": "The field could not be saved. {{ message }}"
     },
     "listTitle": "{{ schema }} fields",
     "listSubtitle": "Manage the schema field definitions available for entries."

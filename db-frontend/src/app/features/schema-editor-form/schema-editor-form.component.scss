@@ -131,6 +131,20 @@
   min-height: 7rem;
 }
 
+.schema-editor__input--readonly {
+  opacity: 0.72;
+}
+
+.schema-editor__text-button {
+  justify-self: start;
+  border: none;
+  background: transparent;
+  color: var(--color-link);
+  padding: 0;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .schema-editor__toggle-card {
   display: flex;
   gap: 0.85rem;

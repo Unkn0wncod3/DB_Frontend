@@ -520,6 +520,11 @@
   color: var(--color-text-muted);
 }
 
+.entry-detail__dialog-error {
+  margin: 0 0 1rem;
+  color: var(--color-error-text) !important;
+}
+
 .entry-detail__dialog-form {
   display: grid;
   gap: 1rem;
@@ -550,6 +555,20 @@
 .entry-detail__dialog-form textarea {
   min-height: 8rem;
   resize: vertical;
+}
+
+.entry-detail__input--readonly {
+  opacity: 0.72;
+}
+
+.entry-detail__dialog-link {
+  justify-self: start;
+  border: none;
+  background: transparent;
+  color: var(--color-link);
+  padding: 0;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .entry-detail__relation-candidate-list {

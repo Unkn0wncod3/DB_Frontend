@@ -109,6 +109,9 @@
           <p>{{ editingFieldIndex() === null ? ('schemaFields.dialog.subtitle' | translate) : ('schemaFields.dialog.editSubtitle' | translate) }}</p>
         </div>
       </div>
+      <section *ngIf="fieldDialogError() as error" class="schema-editor__alert">
+        {{ error }}
+      </section>
 
       <form [formGroup]="fieldForm" class="schema-editor__modal-form" (ngSubmit)="saveFieldDraft()">
         <label class="schema-editor__field">
@@ -118,7 +121,18 @@
 
         <label class="schema-editor__field">
           <span>{{ 'schemaFields.fields.key' | translate }}</span>
-          <input type="text" formControlName="key" (input)="onFieldKeyInput()" />
+          <input
+            type="text"
+            formControlName="key"
+            [readOnly]="isFieldKeyAuto()"
+            [class.schema-editor__input--readonly]="isFieldKeyAuto()"
+            [attr.placeholder]="isFieldKeyAuto() ? ('schemaFields.fields.keyAutoPlaceholder' | translate) : null"
+            (input)="onFieldKeyInput()"
+          />
+          <small>{{ (isFieldKeyAuto() ? 'schemaFields.fields.keyAutoHelp' : 'schemaFields.fields.keyManualHelp') | translate }}</small>
+          <button *ngIf="isFieldKeyAuto()" type="button" class="schema-editor__text-button" (click)="enableManualFieldKey()">
+            {{ 'schemaFields.actions.editKey' | translate }}
+          </button>
         </label>
 
         <label class="schema-editor__field">
