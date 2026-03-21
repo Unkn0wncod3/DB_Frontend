@@ -4,6 +4,7 @@
     "nav": {
       "dashboard": "Dashboard",
       "schemas": "Schemas",
+      "myEntries": "Meine Einträge",
       "profile": "Profil",
       "explorer": "API Explorer",
       "logs": "Protokolle",
@@ -589,6 +590,10 @@
       "searchPlaceholder": "Suchbegriff eingeben...",
       "pageSizeLabel": "Seitengröße"
     },
+    "scope": {
+      "all": "Alle",
+      "mine": "Meine"
+    },
     "meta": {
       "total": "{{ value }} Einträge",
       "lastUpdated": "Zuletzt aktualisiert {{ value }}",
@@ -633,6 +638,36 @@
       "toDate": "Bis-Datum",
       "reset": "Filter zurücksetzen",
       "personLabel": "Person {{ value }}"
+    }
+  },
+  "myEntries": {
+    "title": "Meine Einträge",
+    "subtitle": "Schemaübergreifende Liste aller Einträge mit deiner Owner-ID.",
+    "actions": {
+      "back": "Zurück zum Dashboard",
+      "refresh": "Aktualisieren",
+      "refreshing": "Aktualisiere...",
+      "view": "Eintrag öffnen"
+    },
+    "meta": {
+      "lastUpdated": "Zuletzt aktualisiert {{ value }}",
+      "total": "{{ value }} Einträge"
+    },
+    "table": {
+      "schema": "Schema",
+      "title": "Titel",
+      "status": "Status",
+      "visibility": "Sichtbarkeit",
+      "updated": "Aktualisiert",
+      "actions": "Aktionen"
+    },
+    "status": {
+      "loading": "Deine Einträge werden geladen...",
+      "empty": "Dir sind noch keine Einträge zugeordnet."
+    },
+    "errors": {
+      "missingUser": "Kein angemeldeter Benutzer gefunden.",
+      "loadFallback": "Deine Einträge konnten nicht geladen werden."
     }
   },
   "entryCreate": {

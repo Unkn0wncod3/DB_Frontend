@@ -14,6 +14,24 @@
       </p>
     </div>
     <div class="entry-list__actions">
+      <div class="entry-list__scope-tabs" *ngIf="hasOwnEntriesFilter()">
+        <button
+          type="button"
+          class="entry-list__scope-tab"
+          [class.entry-list__scope-tab--active]="selectedScope() === 'all'"
+          (click)="setScope('all')"
+        >
+          {{ 'entryList.scope.all' | translate }}
+        </button>
+        <button
+          type="button"
+          class="entry-list__scope-tab"
+          [class.entry-list__scope-tab--active]="selectedScope() === 'mine'"
+          (click)="setScope('mine')"
+        >
+          {{ 'entryList.scope.mine' | translate }}
+        </button>
+      </div>
       <a *ngIf="createLink() as create" [routerLink]="create" class="entry-list__create">
         {{ 'entryList.actions.create' | translate }}
       </a>
@@ -37,13 +55,13 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries(); trackBy: trackByEntry" class="entry-list__row--clickable" (click)="openEntry(entry)">
-          <td *ngFor="let column of columns(); trackBy: trackByColumn">
+          <td *ngFor="let column of columns(); trackBy: trackByColumn" [attr.data-label]="column.label">
             <ng-container *ngIf="isDateColumn(column); else plainCell">
               {{ formatCell(entry, column) | date:'dd/MM/yyyy, HH:mm' }}
             </ng-container>
             <ng-template #plainCell>{{ formatCell(entry, column) }}</ng-template>
           </td>
-          <td class="entry-list__table-actions">
+          <td class="entry-list__table-actions" [attr.data-label]="'entryList.table.actions' | translate">
             <button type="button" (click)="$event.stopPropagation(); openEntry(entry)">
               {{ 'entryList.actions.view' | translate }}
             </button>

@@ -8,6 +8,9 @@
       <a routerLink="/schemas" routerLinkActive="is-active">
         {{ 'layout.nav.schemas' | translate }}
       </a>
+      <a routerLink="/entries/mine" routerLinkActive="is-active">
+        {{ 'layout.nav.myEntries' | translate }}
+      </a>
       <a *ngIf="auth.isAdmin()" routerLink="/explorer" routerLinkActive="is-active">
         {{ 'layout.nav.explorer' | translate }}
       </a>

@@ -4,6 +4,7 @@
     "nav": {
       "dashboard": "Dashboard",
       "schemas": "Schemas",
+      "myEntries": "My entries",
       "profile": "Profile",
       "explorer": "API Explorer",
       "logs": "Logs",
@@ -540,6 +541,10 @@
       "searchPlaceholder": "Type to filter entries...",
       "pageSizeLabel": "Page size"
     },
+    "scope": {
+      "all": "All",
+      "mine": "Mine"
+    },
     "meta": {
       "total": "{{ value }} entries",
       "lastUpdated": "Last updated {{ value }}",
@@ -584,6 +589,36 @@
       "toDate": "To date",
       "reset": "Reset filters",
       "personLabel": "Person {{ value }}"
+    }
+  },
+  "myEntries": {
+    "title": "My entries",
+    "subtitle": "Cross-schema list of entries where you are the owner.",
+    "actions": {
+      "back": "Back to dashboard",
+      "refresh": "Refresh",
+      "refreshing": "Refreshing...",
+      "view": "Open entry"
+    },
+    "meta": {
+      "lastUpdated": "Last updated {{ value }}",
+      "total": "{{ value }} entries"
+    },
+    "table": {
+      "schema": "Schema",
+      "title": "Title",
+      "status": "Status",
+      "visibility": "Visibility",
+      "updated": "Updated",
+      "actions": "Actions"
+    },
+    "status": {
+      "loading": "Loading your entries...",
+      "empty": "You do not own any entries yet."
+    },
+    "errors": {
+      "missingUser": "No authenticated user found.",
+      "loadFallback": "Unable to load your entries."
     }
   },
   "personLookup": {
