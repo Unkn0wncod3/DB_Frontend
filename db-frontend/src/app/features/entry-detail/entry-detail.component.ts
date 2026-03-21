@@ -506,9 +506,6 @@ export class EntryDetailComponent {
       return;
     }
 
-    this.isCreatingField.set(true);
-    this.errorMessage.set(null);
-    this.successMessage.set(null);
     const raw = this.createFieldForm.getRawValue();
     const label = raw.label.trim();
     const editingField = this.editingField();
@@ -526,6 +523,10 @@ export class EntryDetailComponent {
       this.createFieldKeyAutoSync = false;
       return;
     }
+
+    this.isCreatingField.set(true);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
 
     try {
       if (editingField) {
