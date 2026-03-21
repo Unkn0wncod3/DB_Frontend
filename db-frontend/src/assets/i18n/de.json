@@ -244,7 +244,7 @@
       "newPassword": "Neues Passwort",
       "confirmPassword": "Passwort bestätigen",
       "confirmPlaceholder": "Neues Passwort wiederholen",
-      "passwordHint": "Mindestens 8 Zeichen verwenden.",
+      "passwordHint": "Du kannst auch ein Passwort mit weniger als 8 Zeichen verwenden.",
       "mismatch": "Die Passwörter stimmen nicht überein.",
       "show": "Anzeigen",
       "hide": "Verbergen",

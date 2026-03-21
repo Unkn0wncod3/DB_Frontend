@@ -203,7 +203,7 @@
       "newPassword": "New password",
       "confirmPassword": "Confirm password",
       "confirmPlaceholder": "Repeat the new password",
-      "passwordHint": "Use at least 8 characters.",
+      "passwordHint": "Enter any password length you want.",
       "mismatch": "The passwords do not match.",
       "show": "Show",
       "hide": "Hide",

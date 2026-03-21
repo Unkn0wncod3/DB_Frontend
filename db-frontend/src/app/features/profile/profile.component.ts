@@ -41,7 +41,7 @@ export class ProfileComponent {
     push_notifications: [false]
   });
   readonly passwordForm = this.fb.nonNullable.group({
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    password: ['', [Validators.required]],
     confirm_password: ['', [Validators.required]]
   });
 

@@ -127,7 +127,7 @@
     <p class="profile__loading">{{ 'profile.status.loading' | translate }}</p>
   </ng-template>
 
-  <div class="profile__dialog-backdrop" *ngIf="isPasswordDialogOpen()" (click)="closePasswordDialog()">
+  <div class="profile__dialog-backdrop" *ngIf="isPasswordDialogOpen()">
     <section class="profile__dialog" (click)="$event.stopPropagation()">
       <header class="profile__dialog-header">
         <div>
