@@ -2,7 +2,6 @@ import { Component, DestroyRef, OnDestroy, OnInit } from '@angular/core';
 import { DatePipe, NgFor, NgIf } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { interval, Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ApiStatusService } from './core/services/api-status.service';
@@ -22,7 +21,6 @@ export class AppComponent implements OnInit, OnDestroy {
     'https://media.istockphoto.com/id/1495088043/de/vektor/benutzerprofil-symbol-avatar-oder-personensymbol-profilbild-portr%C3%A4tsymbol-standard.jpg?s=612x612&w=0&k=20&c=mmj93kpr1sFn8VJYI_MUabWE4B86zRD5Uf9fBbTbQqk=';
   currentLang: string;
   readonly githubUrl = 'https://github.com/Unkn0wncod3';
-  private statusIntervalSub?: Subscription;
 
   constructor(
     private readonly translate: TranslateService,
@@ -62,12 +60,11 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.apiStatus.refreshStatus();
-    this.statusIntervalSub = interval(3600000).subscribe(() => this.apiStatus.refreshStatus());
+    // API status is admin-only and checked on demand from the footer.
   }
 
   ngOnDestroy(): void {
-    this.statusIntervalSub?.unsubscribe();
+    // no-op
   }
 
   refreshApiStatus(): void {
