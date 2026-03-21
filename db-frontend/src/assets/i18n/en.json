@@ -451,7 +451,11 @@
       "hide": "Hide raw data"
     },
     "unsavedChanges": {
-      "confirmLeave": "You have unsaved changes. Leave this page anyway?"
+      "confirmLeave": "You have unsaved changes. Leave this page anyway?",
+      "title": "Unsaved changes",
+      "body": "There are unsaved changes on this page. If you leave now, they will be lost.",
+      "stay": "Stay",
+      "leave": "Leave without saving"
     },
     "form": {
       "selectPlaceholder": "Choose a value",

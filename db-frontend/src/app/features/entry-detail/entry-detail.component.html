@@ -530,4 +530,19 @@
       </form>
     </section>
   </div>
+
+  <div class="entry-detail__dialog-backdrop" *ngIf="isLeaveDialogOpen()" (click)="stayOnPage()">
+    <section class="entry-detail__dialog" (click)="$event.stopPropagation()">
+      <h2>{{ 'entryDetail.unsavedChanges.title' | translate }}</h2>
+      <p>{{ 'entryDetail.unsavedChanges.body' | translate }}</p>
+      <div class="entry-detail__dialog-actions">
+        <button type="button" class="entry-detail__button entry-detail__button--ghost" (click)="stayOnPage()">
+          {{ 'entryDetail.unsavedChanges.stay' | translate }}
+        </button>
+        <button type="button" class="entry-detail__button entry-detail__button--danger" (click)="leaveWithoutSaving()">
+          {{ 'entryDetail.unsavedChanges.leave' | translate }}
+        </button>
+      </div>
+    </section>
+  </div>
 </section>

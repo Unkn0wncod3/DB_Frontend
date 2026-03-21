@@ -500,7 +500,11 @@
       "hide": "Rohdaten ausblenden"
     },
     "unsavedChanges": {
-      "confirmLeave": "Du hast ungespeicherte Änderungen. Willst du die Seite wirklich verlassen?"
+      "confirmLeave": "Du hast ungespeicherte Änderungen. Willst du die Seite wirklich verlassen?",
+      "title": "Ungespeicherte Änderungen",
+      "body": "Auf dieser Seite gibt es ungespeicherte Änderungen. Wenn du jetzt gehst, gehen sie verloren.",
+      "stay": "Hier bleiben",
+      "leave": "Ohne Speichern verlassen"
     },
     "form": {
       "selectPlaceholder": "Wert auswählen",

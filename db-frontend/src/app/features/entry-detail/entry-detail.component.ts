@@ -71,6 +71,7 @@ export class EntryDetailComponent {
   readonly isDeletingField = signal(false);
   readonly isFieldDialogOpen = signal(false);
   readonly isRelationDialogOpen = signal(false);
+  readonly isLeaveDialogOpen = signal(false);
   readonly isSavingRelation = signal(false);
   readonly isDeletingRelation = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -233,6 +234,7 @@ export class EntryDetailComponent {
   private currentSchemaKey: string | null = null;
   private currentEntryId: string | null = null;
   private formValueSubscription?: Subscription;
+  private pendingLeaveResolver: ((allow: boolean) => void) | null = null;
 
   constructor() {
     this.metaForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
@@ -263,12 +265,17 @@ export class EntryDetailComponent {
     return this.canEdit() && (this.hasUnsavedChanges() || this.hasCommentDraft());
   }
 
-  confirmDiscardChanges(): boolean {
+  confirmDiscardChanges(): boolean | Promise<boolean> {
     if (!this.hasPendingChanges()) {
       return true;
     }
 
-    return window.confirm(this.translate.instant('entryDetail.unsavedChanges.confirmLeave'));
+    this.pendingLeaveResolver?.(false);
+    this.isLeaveDialogOpen.set(true);
+
+    return new Promise<boolean>((resolve) => {
+      this.pendingLeaveResolver = resolve;
+    });
   }
 
   @HostListener('window:beforeunload', ['$event'])
@@ -279,6 +286,14 @@ export class EntryDetailComponent {
 
     event.preventDefault();
     event.returnValue = '';
+  }
+
+  stayOnPage(): void {
+    this.resolveLeaveDecision(false);
+  }
+
+  leaveWithoutSaving(): void {
+    this.resolveLeaveDecision(true);
   }
 
   async save(): Promise<void> {
@@ -782,7 +797,7 @@ export class EntryDetailComponent {
       this.formRevision.update((value) => value + 1);
     });
     this.applyFormAccessState();
-    this.originalComparableState.set(this.serializeComparableState(entry));
+    this.originalComparableState.set(this.serializeComparableState(entry, schema));
     this.formRevision.update((value) => value + 1);
   }
 
@@ -873,6 +888,7 @@ export class EntryDetailComponent {
 
   private currentComparableState(): string {
     const entry = this.entry();
+    const schema = this.schema();
     if (!entry) {
       return '';
     }
@@ -884,17 +900,43 @@ export class EntryDetailComponent {
       visibility_level: this.metaForm.getRawValue().visibility_level as VisibilityLevel,
       owner_id: this.normalizeIdentifierValue(this.metaForm.getRawValue().owner_id.trim(), false) ?? null,
       data_json: this.buildDataJson()
-    });
+    }, schema);
   }
 
-  private serializeComparableState(entry: Pick<EntryRecord, 'title' | 'status' | 'visibility_level' | 'owner_id' | 'data_json'>): string {
+  private serializeComparableState(
+    entry: Pick<EntryRecord, 'title' | 'status' | 'visibility_level' | 'owner_id' | 'data_json'>,
+    schema: EntrySchema | null
+  ): string {
     return JSON.stringify({
       title: entry.title?.trim() ?? '',
       status: entry.status ?? null,
       visibility_level: entry.visibility_level ?? 'internal',
       owner_id: entry.owner_id ?? null,
-      data_json: entry.data_json ?? {}
+      data_json: this.normalizeComparableDataJson(entry, schema)
     });
+  }
+
+  private normalizeComparableDataJson(
+    entry: Pick<EntryRecord, 'data_json'>,
+    schema: EntrySchema | null
+  ): Record<string, unknown> {
+    if (!schema) {
+      return entry.data_json ?? {};
+    }
+
+    return sortSchemaFields(schema.fields ?? []).reduce<Record<string, unknown>>((result, field) => {
+      const prepared = this.prepareFieldControlValue(
+        {
+          data_json: entry.data_json ?? {}
+        } as EntryRecord,
+        field
+      );
+      const normalized = this.normalizeFieldValue(field, prepared);
+      if (normalized !== undefined) {
+        result[field.key] = normalized;
+      }
+      return result;
+    }, {});
   }
 
   private prepareFieldControlValue(entry: EntryRecord, field: SchemaField): unknown {
@@ -1114,5 +1156,12 @@ export class EntryDetailComponent {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '_')
       .replace(/^_+|_+$/g, '');
+  }
+
+  private resolveLeaveDecision(allow: boolean): void {
+    const resolver = this.pendingLeaveResolver;
+    this.pendingLeaveResolver = null;
+    this.isLeaveDialogOpen.set(false);
+    resolver?.(allow);
   }
 }
