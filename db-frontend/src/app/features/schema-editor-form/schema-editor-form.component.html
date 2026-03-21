@@ -19,12 +19,6 @@
 
       <div class="schema-editor__grid">
         <label class="schema-editor__field">
-          <span>{{ 'schemaCreate.fields.key' | translate }}</span>
-          <input type="text" formControlName="key" (input)="onSchemaKeyInput()" />
-          <small>{{ 'schemaCreate.hints.key' | translate }}</small>
-        </label>
-
-        <label class="schema-editor__field">
           <span>{{ 'schemaCreate.fields.name' | translate }}</span>
           <input type="text" formControlName="name" />
         </label>
@@ -33,6 +27,27 @@
           <span>{{ 'schemaCreate.fields.icon' | translate }}</span>
           <input type="text" formControlName="icon" />
           <small>{{ 'schemaCreate.hints.icon' | translate }}</small>
+        </label>
+
+        <label class="schema-editor__field">
+          <span>{{ 'schemaCreate.fields.key' | translate }}</span>
+          <input
+            type="text"
+            formControlName="key"
+            [readOnly]="isSchemaKeyAuto()"
+            [class.schema-editor__input--readonly]="isSchemaKeyAuto()"
+            [attr.placeholder]="isSchemaKeyAuto() ? ('schemaCreate.fields.keyAutoPlaceholder' | translate) : null"
+            (input)="onSchemaKeyInput()"
+          />
+          <small>{{ (isSchemaKeyAuto() ? 'schemaCreate.hints.keyAuto' : 'schemaCreate.hints.keyManual') | translate }}</small>
+          <button
+            *ngIf="isSchemaKeyAuto()"
+            type="button"
+            class="schema-editor__text-button"
+            (click)="enableManualSchemaKey()"
+          >
+            {{ 'schemaCreate.actions.editKey' | translate }}
+          </button>
         </label>
 
         <label class="schema-editor__toggle-card">

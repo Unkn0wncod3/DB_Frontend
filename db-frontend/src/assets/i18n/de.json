@@ -1017,7 +1017,8 @@
     "subtitle": "Erstelle die Schema-Basis und richte die ersten Felder direkt im selben Ablauf ein.",
     "actions": {
       "back": "Zurück zum Dashboard",
-      "submit": "Schema erstellen"
+      "submit": "Schema erstellen",
+      "editKey": "Key bearbeiten"
     },
     "sections": {
       "basicsEyebrow": "Schema-Setup",
@@ -1029,6 +1030,7 @@
     },
     "fields": {
       "key": "Schema-Key",
+      "keyAutoPlaceholder": "Wird automatisch aus dem Namen erzeugt",
       "name": "Name",
       "description": "Beschreibung",
       "icon": "Icon",
@@ -1039,6 +1041,8 @@
     },
     "hints": {
       "key": "Verwende nur Kleinbuchstaben, Zahlen und Unterstriche.",
+      "keyAuto": "Wird automatisch aus dem Schema-Namen generiert.",
+      "keyManual": "Nur bei Bedarf manuell überschreiben.",
       "icon": "Nutze einen Lucide-Icon-Namen wie car-front oder user-round.",
       "isActive": "Inaktive Schemas bleiben aus normalen Schema- und Entry-Flows ausgeblendet, bis sie wieder aktiviert werden."
     },

@@ -184,6 +184,14 @@ export class SchemaEditorFormComponent implements OnChanges {
     this.fieldDialogError.set(null);
   }
 
+  isSchemaKeyAuto(): boolean {
+    return this.schemaKeyAutoSync && !this.initialSchema;
+  }
+
+  enableManualSchemaKey(): void {
+    this.schemaKeyAutoSync = false;
+  }
+
   isFieldKeyAuto(): boolean {
     return this.fieldKeyAutoSync && this.editingFieldIndex() === null;
   }

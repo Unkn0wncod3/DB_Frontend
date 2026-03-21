@@ -1009,7 +1009,8 @@
     "subtitle": "Create the schema shell, define its fields right away and keep the whole setup reusable.",
     "actions": {
       "back": "Back to dashboard",
-      "submit": "Create schema"
+      "submit": "Create schema",
+      "editKey": "Edit key"
     },
     "sections": {
       "basicsEyebrow": "Schema setup",
@@ -1021,6 +1022,7 @@
     },
     "fields": {
       "key": "Schema key",
+      "keyAutoPlaceholder": "Auto-generated from name",
       "name": "Name",
       "description": "Description",
       "icon": "Icon",
@@ -1031,6 +1033,8 @@
     },
     "hints": {
       "key": "Use lowercase letters, numbers and underscores.",
+      "keyAuto": "Generated automatically from the schema name.",
+      "keyManual": "Override the generated key only if needed.",
       "icon": "Use a lucide icon name like car-front or user-round.",
       "isActive": "Inactive schemas stay hidden from normal schema and entry flows until they are re-enabled."
     },
