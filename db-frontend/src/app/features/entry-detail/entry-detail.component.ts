@@ -218,8 +218,7 @@ export class EntryDetailComponent {
   readonly relationForm = this.fb.nonNullable.group({
     to_entry_id: ['', Validators.required],
     relation_type: ['references'],
-    sort_order: [0],
-    metadata_json: ['{}']
+    sort_order: [0]
   });
 
   form: FormGroup = this.fb.group({});
@@ -343,16 +342,14 @@ export class EntryDetailComponent {
       this.relationForm.reset({
         to_entry_id: String(relation.to_entry_id),
         relation_type: relation.relation_type,
-        sort_order: relation.sort_order ?? 0,
-        metadata_json: relation.metadata_json ? JSON.stringify(relation.metadata_json, null, 2) : '{}'
+        sort_order: relation.sort_order ?? 0
       });
     } else {
       this.editingRelation.set(null);
       this.relationForm.reset({
         to_entry_id: '',
         relation_type: 'references',
-        sort_order: 0,
-        metadata_json: '{}'
+        sort_order: 0
       });
     }
 
@@ -382,7 +379,7 @@ export class EntryDetailComponent {
         to_entry_id: Number.parseInt(raw.to_entry_id, 10),
         relation_type: raw.relation_type,
         sort_order: Number(raw.sort_order || 0),
-        metadata_json: this.parseRelationMetadata(raw.metadata_json)
+        metadata_json: {}
       };
 
       const editingRelation = this.editingRelation();
@@ -647,10 +644,6 @@ export class EntryDetailComponent {
     return candidate && candidate.trim().length > 0 ? candidate : null;
   }
 
-  relationMetadata(relation: EntryRelationRecord): string {
-    return relation.metadata_json ? JSON.stringify(relation.metadata_json, null, 2) : '';
-  }
-
   relationCounterpart(relation: EntryRelationRecord): RelationLookupItem | null {
     const currentEntryId = String(this.entry()?.id ?? '');
     const counterpartId =
@@ -837,15 +830,6 @@ export class EntryDetailComponent {
     this.relationEntries.set(items);
   }
 
-  private parseRelationMetadata(value: string): Record<string, unknown> {
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return {};
-    }
-
-    const parsed = JSON.parse(trimmed);
-    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Record<string, unknown> : {};
-  }
 
   private buildDataJson(): Record<string, unknown> {
     return this.fields().reduce<Record<string, unknown>>((result, item) => {

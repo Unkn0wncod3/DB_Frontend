@@ -289,7 +289,6 @@
               {{ 'schemaFields.actions.delete' | translate }}
             </button>
           </div>
-          <pre class="entry-detail__code-block" *ngIf="relation.metadata_json">{{ relationMetadata(relation) }}</pre>
         </article>
       </div>
     </section>
@@ -514,11 +513,6 @@
             <span>{{ relationCandidateSubtitle(item) }}</span>
           </button>
         </div>
-
-        <label class="entry-detail__dialog-field entry-detail__dialog-field--full">
-          <span>{{ 'entryDetail.relations.fields.metadata' | translate }}</span>
-          <textarea rows="5" formControlName="metadata_json"></textarea>
-        </label>
 
         <div class="entry-detail__dialog-actions">
           <button
