@@ -39,12 +39,14 @@
     </div>
   </header>
 
-  <section *ngIf="errorMessage() as error" class="entry-detail__alert entry-detail__alert--error">
-    {{ error }}
-  </section>
-  <section *ngIf="successMessage() as success" class="entry-detail__alert entry-detail__alert--success">
-    {{ success }}
-  </section>
+  <div class="entry-detail__toast-stack" *ngIf="errorMessage() || successMessage()">
+    <section *ngIf="errorMessage() as error" class="entry-detail__alert entry-detail__alert--error">
+      {{ error }}
+    </section>
+    <section *ngIf="successMessage() as success" class="entry-detail__alert entry-detail__alert--success">
+      {{ success }}
+    </section>
+  </div>
 
   <section *ngIf="entry(); else loadingState" class="entry-detail__body">
     <div class="entry-detail__editor-grid">
