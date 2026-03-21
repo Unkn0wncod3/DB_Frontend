@@ -499,6 +499,9 @@
       "show": "Rohdaten anzeigen",
       "hide": "Rohdaten ausblenden"
     },
+    "unsavedChanges": {
+      "confirmLeave": "Du hast ungespeicherte Änderungen. Willst du die Seite wirklich verlassen?"
+    },
     "form": {
       "selectPlaceholder": "Wert auswählen",
       "noMultiSelectOptions": "Für dieses Feld sind keine Optionen vorhanden."

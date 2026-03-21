@@ -1,5 +1,5 @@
 import { DatePipe, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, HostListener, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -257,6 +257,28 @@ export class EntryDetailComponent {
 
   async refresh(): Promise<void> {
     await this.load();
+  }
+
+  hasPendingChanges(): boolean {
+    return this.canEdit() && (this.hasUnsavedChanges() || this.hasCommentDraft());
+  }
+
+  confirmDiscardChanges(): boolean {
+    if (!this.hasPendingChanges()) {
+      return true;
+    }
+
+    return window.confirm(this.translate.instant('entryDetail.unsavedChanges.confirmLeave'));
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  handleBeforeUnload(event: BeforeUnloadEvent): void {
+    if (!this.hasPendingChanges()) {
+      return;
+    }
+
+    event.preventDefault();
+    event.returnValue = '';
   }
 
   async save(): Promise<void> {

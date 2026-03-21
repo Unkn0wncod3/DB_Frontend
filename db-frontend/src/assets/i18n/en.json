@@ -450,6 +450,9 @@
       "show": "Show raw data",
       "hide": "Hide raw data"
     },
+    "unsavedChanges": {
+      "confirmLeave": "You have unsaved changes. Leave this page anyway?"
+    },
     "form": {
       "selectPlaceholder": "Choose a value",
       "noMultiSelectOptions": "No options available for this field."

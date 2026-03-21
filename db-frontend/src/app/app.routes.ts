@@ -17,6 +17,7 @@ import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
 import { editorGuard } from './core/guards/editor.guard';
 import { managerGuard } from './core/guards/manager.guard';
+import { pendingEntryChangesGuard } from './core/guards/pending-changes.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -28,7 +29,7 @@ export const routes: Routes = [
   { path: 'entries/activities/timeline', component: ActivitiesTimelineComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'entries/:schemaKey', component: EntryListComponent },
-  { path: 'entries/:schemaKey/:id', component: EntryDetailComponent },
+  { path: 'entries/:schemaKey/:id', component: EntryDetailComponent, canDeactivate: [pendingEntryChangesGuard] },
   { path: 'explorer', component: ApiExplorerComponent, canActivate: [authGuard, adminGuard] },
   { path: 'admin/users', component: UserManagementComponent, canActivate: [authGuard, adminGuard] },
   { path: 'admin/logs', component: AuditLogsComponent, canActivate: [authGuard, adminGuard] },
