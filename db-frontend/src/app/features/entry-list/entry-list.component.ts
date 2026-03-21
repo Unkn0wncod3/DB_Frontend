@@ -39,7 +39,6 @@ export class EntryListComponent {
   readonly entries = signal<EntryRecord[]>([]);
   readonly schema = signal<EntrySchema | null>(null);
   readonly lastUpdatedAt = signal<number | null>(null);
-  readonly selectedScope = signal<'all' | 'mine'>('all');
   readonly schemaLabel = computed(() => this.schema()?.name ?? humanizeKey(this.currentSchemaKey ?? 'entries'));
   readonly columns = computed(() => this.buildColumns(this.schema()));
 
@@ -64,15 +63,6 @@ export class EntryListComponent {
   }
 
   async refresh(): Promise<void> {
-    await this.load();
-  }
-
-  async setScope(scope: 'all' | 'mine'): Promise<void> {
-    if (scope === this.selectedScope()) {
-      return;
-    }
-
-    this.selectedScope.set(scope);
     await this.load();
   }
 
@@ -112,8 +102,9 @@ export class EntryListComponent {
     return column.key === '__updated' || column.field?.data_type === 'date' || column.field?.data_type === 'datetime';
   }
 
-  hasOwnEntriesFilter(): boolean {
-    return this.auth.user()?.id != null;
+  isOwnedByCurrentUser(entry: EntryRecord): boolean {
+    const currentUserId = this.auth.user()?.id;
+    return currentUserId != null && entry.owner_id != null && String(entry.owner_id) === String(currentUserId);
   }
 
   private async load(): Promise<void> {
@@ -135,13 +126,7 @@ export class EntryListComponent {
       }
 
       this.schema.set(schema);
-      const ownerId = this.selectedScope() === 'mine' ? this.auth.user()?.id : undefined;
-      const entries = await firstValueFrom(
-        this.entryService.listEntries({
-          schema_id: schema.id,
-          owner_id: ownerId
-        })
-      );
+      const entries = await firstValueFrom(this.entryService.listEntries({ schema_id: schema.id }));
       this.entries.set(entries.filter((entry) => !entry.deleted_at));
       this.lastUpdatedAt.set(Date.now());
     } catch (error) {

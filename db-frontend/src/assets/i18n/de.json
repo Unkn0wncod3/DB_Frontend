@@ -597,9 +597,8 @@
       "searchPlaceholder": "Suchbegriff eingeben...",
       "pageSizeLabel": "Seitengröße"
     },
-    "scope": {
-      "all": "Alle",
-      "mine": "Meine"
+    "badges": {
+      "mine": "Mein"
     },
     "meta": {
       "total": "{{ value }} Einträge",

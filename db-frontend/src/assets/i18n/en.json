@@ -548,8 +548,7 @@
       "searchPlaceholder": "Type to filter entries...",
       "pageSizeLabel": "Page size"
     },
-    "scope": {
-      "all": "All",
+    "badges": {
       "mine": "Mine"
     },
     "meta": {
