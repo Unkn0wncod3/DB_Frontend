@@ -276,10 +276,6 @@
               <dt>{{ 'entryDetail.relations.columns.targetId' | translate }}</dt>
               <dd>{{ relationCounterpart(relation)?.id || relation.to_entry_id }}</dd>
             </div>
-            <div>
-              <dt>{{ 'entryDetail.relations.columns.order' | translate }}</dt>
-              <dd>{{ relation.sort_order ?? 0 }}</dd>
-            </div>
           </dl>
           <div class="entry-detail__entity-actions" *ngIf="access().manage_relations || access().manage">
             <button type="button" class="entry-detail__button entry-detail__button--ghost" (click)="openRelationDialog(relation)">
