@@ -25,6 +25,15 @@ import {
   VisibilityLevel
 } from '../../core/models/metadata.models';
 import {
+  buildCreateSchemaFieldPayload,
+  buildUpdateSchemaFieldPayload,
+  createSchemaFieldDialogForm,
+  normalizeSchemaFieldKey,
+  patchSchemaFieldDialogForm,
+  resetSchemaFieldDialogForm,
+  shouldShowSchemaFieldOptionsInput
+} from '../../core/utils/schema-field-dialog.utils';
+import {
   formatFieldValue,
   getFieldOptions,
   getFieldValue,
@@ -221,15 +230,7 @@ export class EntryDetailComponent {
     owner_id: [''],
     comment: ['']
   });
-  readonly createFieldForm = this.fb.nonNullable.group({
-    label: ['', [Validators.required]],
-    key: [''],
-    description: [''],
-    data_type: ['text' as FieldDataType, [Validators.required]],
-    options: [''],
-    default_value: [''],
-    is_required: [false]
-  });
+  readonly createFieldForm = createSchemaFieldDialogForm(this.fb);
   readonly relationForm = this.fb.nonNullable.group({
     to_entry_id: ['', Validators.required],
     relation_type: ['references'],
@@ -373,7 +374,7 @@ export class EntryDetailComponent {
     }
     this.editingField.set(null);
     this.createFieldKeyAutoSync = true;
-    this.createFieldForm.reset({ label: '', key: '', description: '', data_type: 'text', options: '', default_value: '', is_required: false });
+    resetSchemaFieldDialogForm(this.createFieldForm);
     this.createFieldError.set(null);
     this.isFieldDialogOpen.set(true);
   }
@@ -384,17 +385,7 @@ export class EntryDetailComponent {
     }
     this.editingField.set(field);
     this.createFieldKeyAutoSync = false;
-    this.createFieldForm.reset({
-      label: field.label ?? '',
-      key: field.key ?? '',
-      description: field.description ?? '',
-      data_type: field.data_type,
-      options: getFieldOptions(field)
-        .map((option) => option.value)
-        .join(', '),
-      default_value: this.serializeDefaultValueForFieldForm(field),
-      is_required: field.is_required
-    });
+    patchSchemaFieldDialogForm(this.createFieldForm, field);
     this.createFieldError.set(null);
     this.isFieldDialogOpen.set(true);
   }
@@ -562,35 +553,16 @@ export class EntryDetailComponent {
     this.successMessage.set(null);
 
     try {
-      const validationJson = this.buildCreateFieldValidationJson();
-      const defaultValue = this.buildCreateFieldDefaultValue(editingField != null);
       if (editingField) {
         await firstValueFrom(
-          this.schemaService.updateField(schema.id, editingField.id, {
-            key: normalizedKey,
-            label,
-            description: raw.description.trim() || null,
-            data_type: raw.data_type,
-            is_required: raw.is_required,
-            default_value: defaultValue,
-            validation_json: validationJson
-          })
+          this.schemaService.updateField(schema.id, editingField.id, buildUpdateSchemaFieldPayload(raw, normalizedKey))
         );
       } else {
         await firstValueFrom(
-          this.schemaService.createField(schema.id, {
-            key: normalizedKey,
-            label,
-            description: raw.description.trim() || null,
-            data_type: raw.data_type,
-            is_required: raw.is_required,
-            is_unique: false,
-            sort_order: (schema.fields?.length ?? 0) * 10 + 10,
-            is_active: true,
-            default_value: defaultValue,
-            validation_json: validationJson,
-            settings_json: {}
-          })
+          this.schemaService.createField(
+            schema.id,
+            buildCreateSchemaFieldPayload(raw, normalizedKey, (schema.fields?.length ?? 0) * 10 + 10)
+          )
         );
       }
       this.isFieldDialogOpen.set(false);
@@ -663,8 +635,7 @@ export class EntryDetailComponent {
   }
 
   shouldShowCreateFieldOptionsInput(): boolean {
-    const dataType = this.createFieldForm.controls.data_type.getRawValue();
-    return dataType === 'select' || dataType === 'multi_select';
+    return shouldShowSchemaFieldOptionsInput(this.createFieldForm.controls.data_type.getRawValue());
   }
 
   trackField(_index: number, item: DetailField): string {
@@ -1307,75 +1278,8 @@ export class EntryDetailComponent {
     return this.auth.isAuthenticated() && error instanceof HttpErrorResponse && error.status === 404;
   }
 
-  private buildCreateFieldValidationJson(): Record<string, unknown> {
-    const raw = this.createFieldForm.getRawValue();
-    const validationJson: Record<string, unknown> = {};
-
-    if (raw.data_type === 'select' || raw.data_type === 'multi_select') {
-      const options = raw.options
-        .split(',')
-        .map((item) => item.trim())
-        .filter((item) => item.length > 0);
-
-      if (options.length > 0) {
-        validationJson['options'] = options;
-      }
-    }
-
-    return validationJson;
-  }
-
-  private buildCreateFieldDefaultValue(clearWhenEmpty: boolean): unknown {
-    const raw = this.createFieldForm.getRawValue();
-    const value = raw.default_value.trim();
-
-    if (!value) {
-      return clearWhenEmpty ? null : undefined;
-    }
-
-    switch (raw.data_type) {
-      case 'integer':
-        return Number.parseInt(value, 10);
-      case 'decimal':
-        return Number.parseFloat(value);
-      case 'boolean':
-        return this.toBoolean(value);
-      case 'json':
-        return JSON.parse(value);
-      case 'multi_select':
-        return value
-          .split(',')
-          .map((item) => item.trim())
-          .filter((item) => item.length > 0);
-      default:
-        return value;
-    }
-  }
-
-  private serializeDefaultValueForFieldForm(field: SchemaField): string {
-    const value = field.default_value;
-
-    if (value == null) {
-      return '';
-    }
-
-    if (Array.isArray(value)) {
-      return value.map((item) => String(item)).join(', ');
-    }
-
-    if (typeof value === 'object') {
-      return this.stringifyJson(value);
-    }
-
-    return String(value);
-  }
-
   private toFieldKey(label: string): string {
-    return label
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '_')
-      .replace(/^_+|_+$/g, '');
+    return normalizeSchemaFieldKey(label);
   }
 
   private setBodyScrollLock(locked: boolean): void {

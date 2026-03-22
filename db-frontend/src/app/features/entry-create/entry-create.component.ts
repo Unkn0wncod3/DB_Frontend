@@ -10,6 +10,15 @@ import { AuthService } from '../../core/services/auth.service';
 import { EntryService } from '../../core/services/entry.service';
 import { SchemaService } from '../../core/services/schema.service';
 import { CreateEntryPayload, EntrySchema, FieldDataType, SchemaField, VisibilityLevel } from '../../core/models/metadata.models';
+import {
+  buildCreateSchemaFieldPayload,
+  buildUpdateSchemaFieldPayload,
+  createSchemaFieldDialogForm,
+  normalizeSchemaFieldKey,
+  patchSchemaFieldDialogForm,
+  resetSchemaFieldDialogForm,
+  shouldShowSchemaFieldOptionsInput
+} from '../../core/utils/schema-field-dialog.utils';
 import { getFieldOptions, humanizeKey, sortSchemaFields, supportsMultiple } from '../../core/utils/schema.utils';
 
 interface FormField {
@@ -61,13 +70,7 @@ export class EntryCreateComponent {
     owner_id: [''],
     comment: ['']
   });
-  readonly createFieldForm = this.fb.nonNullable.group({
-    label: ['', [Validators.required]],
-    key: [''],
-    description: [''],
-    data_type: ['text' as FieldDataType, [Validators.required]],
-    is_required: [false]
-  });
+  readonly createFieldForm = createSchemaFieldDialogForm(this.fb);
 
   form: FormGroup = this.fb.group({});
   private currentSchemaKey: string | null = null;
@@ -137,7 +140,7 @@ export class EntryCreateComponent {
     }
     this.editingField.set(null);
     this.createFieldKeyAutoSync = true;
-    this.createFieldForm.reset({ label: '', key: '', description: '', data_type: 'text', is_required: false });
+    resetSchemaFieldDialogForm(this.createFieldForm);
     this.createFieldError.set(null);
     this.isFieldDialogOpen.set(true);
   }
@@ -148,13 +151,7 @@ export class EntryCreateComponent {
     }
     this.editingField.set(field);
     this.createFieldKeyAutoSync = false;
-    this.createFieldForm.reset({
-      label: field.label ?? '',
-      key: field.key ?? '',
-      description: field.description ?? '',
-      data_type: field.data_type,
-      is_required: field.is_required
-    });
+    patchSchemaFieldDialogForm(this.createFieldForm, field);
     this.createFieldError.set(null);
     this.isFieldDialogOpen.set(true);
   }
@@ -212,28 +209,14 @@ export class EntryCreateComponent {
     try {
       if (editingField) {
         await firstValueFrom(
-          this.schemaService.updateField(schema.id, editingField.id, {
-            key: normalizedKey,
-            label,
-            description: raw.description.trim() || null,
-            data_type: raw.data_type,
-            is_required: raw.is_required
-          })
+          this.schemaService.updateField(schema.id, editingField.id, buildUpdateSchemaFieldPayload(raw, normalizedKey))
         );
       } else {
         await firstValueFrom(
-          this.schemaService.createField(schema.id, {
-            key: normalizedKey,
-            label,
-            description: raw.description.trim() || null,
-            data_type: raw.data_type,
-            is_required: raw.is_required,
-            is_unique: false,
-            sort_order: (schema.fields?.length ?? 0) * 10 + 10,
-            is_active: true,
-            validation_json: {},
-            settings_json: {}
-          })
+          this.schemaService.createField(
+            schema.id,
+            buildCreateSchemaFieldPayload(raw, normalizedKey, (schema.fields?.length ?? 0) * 10 + 10)
+          )
         );
       }
 
@@ -307,6 +290,10 @@ export class EntryCreateComponent {
     return this.editingField()
       ? this.translate.instant('schemaFields.actions.save')
       : this.translate.instant('schemaFields.actions.create');
+  }
+
+  shouldShowCreateFieldOptionsInput(): boolean {
+    return shouldShowSchemaFieldOptionsInput(this.createFieldForm.controls.data_type.getRawValue());
   }
 
   async submit(): Promise<void> {
@@ -445,11 +432,7 @@ export class EntryCreateComponent {
   }
 
   private toFieldKey(label: string): string {
-    return label
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '_')
-      .replace(/^_+|_+$/g, '');
+    return normalizeSchemaFieldKey(label);
   }
 
   private normalizeIdentifierValue(value: unknown, isRequired = false): string | number | undefined {
