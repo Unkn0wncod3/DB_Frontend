@@ -48,6 +48,11 @@
   color: var(--color-text);
 }
 
+.schema-field-card option {
+  color: var(--color-text);
+  background: var(--schema-field-input);
+}
+
 .schema-field-card textarea {
   min-height: 8rem;
   resize: vertical;
@@ -184,6 +189,11 @@
 .schema-field-card__multi-select {
   min-height: 8.75rem;
   padding-right: 0.35rem;
+  overflow-y: auto;
+}
+
+.schema-field-card__multi-select option {
+  padding: 0.35rem 0.2rem;
 }
 
 .schema-field-card__reference-field {

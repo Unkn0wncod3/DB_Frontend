@@ -19,11 +19,13 @@ export function humanizeKey(value: string): string {
 }
 
 export function getFieldOptions(field: SchemaField): SelectOption[] {
+  const settings = asRecord(field.settings_json);
+  const validation = asRecord(field.validation_json);
   const optionSources = [
-    field.settings_json?.['options'],
-    field.validation_json?.['options'],
-    field.settings_json?.['choices'],
-    field.validation_json?.['choices']
+    settings?.['options'],
+    validation?.['options'],
+    settings?.['choices'],
+    validation?.['choices']
   ];
 
   for (const source of optionSources) {
@@ -37,14 +39,17 @@ export function getFieldOptions(field: SchemaField): SelectOption[] {
 }
 
 export function supportsMultiple(field: SchemaField): boolean {
-  return Boolean(field.settings_json?.['multiple']);
+  const settings = asRecord(field.settings_json);
+  return Boolean(settings?.['multiple']) || field.data_type === 'multi_select';
 }
 
 export function getReferenceSchemaKey(field: SchemaField): string | null {
+  const settings = asRecord(field.settings_json);
+  const validation = asRecord(field.validation_json);
   const candidate =
-    field.settings_json?.['reference_schema_key'] ??
-    field.settings_json?.['schema_key'] ??
-    field.validation_json?.['reference_schema_key'];
+    settings?.['reference_schema_key'] ??
+    settings?.['schema_key'] ??
+    validation?.['reference_schema_key'];
   return typeof candidate === 'string' && candidate.trim().length > 0 ? candidate.trim() : null;
 }
 
@@ -105,6 +110,23 @@ export function coerceFieldInputType(field: SchemaField): FieldDataType {
 }
 
 function parseOptions(source: unknown): SelectOption[] {
+  if (typeof source === 'string') {
+    const trimmed = source.trim();
+    if (!trimmed) {
+      return [];
+    }
+
+    try {
+      return parseOptions(JSON.parse(trimmed));
+    } catch {
+      return trimmed
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0)
+        .map((item) => ({ label: item, value: item }));
+    }
+  }
+
   if (!Array.isArray(source)) {
     return [];
   }
@@ -128,6 +150,23 @@ function parseOptions(source: unknown): SelectOption[] {
       return null;
     })
     .filter((item): item is SelectOption => item !== null);
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  if (!value) {
+    return null;
+  }
+
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value);
+      return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? (parsed as Record<string, unknown>) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  return typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : null;
 }
 
 function stringifyJson(value: unknown): string {

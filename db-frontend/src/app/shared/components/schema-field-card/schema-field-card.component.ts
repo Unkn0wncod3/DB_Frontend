@@ -1,4 +1,4 @@
-import { NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -10,7 +10,7 @@ import { getFieldOptions, supportsMultiple } from '../../../core/utils/schema.ut
 @Component({
   selector: 'app-schema-field-card',
   standalone: true,
-  imports: [NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterLink, TranslateModule],
+  imports: [NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterLink, TranslateModule],
   templateUrl: './schema-field-card.component.html',
   styleUrl: './schema-field-card.component.scss',
   host: {
