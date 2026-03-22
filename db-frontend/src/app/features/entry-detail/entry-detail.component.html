@@ -139,10 +139,23 @@
                 </svg>
               </button>
               <ng-container *ngIf="item.field.data_type === 'boolean'; else defaultField">
-                <label class="entry-detail__checkbox" [attr.for]="fieldControlId(item.field)">
-                  <input type="checkbox" [id]="fieldControlId(item.field)" [formControl]="item.control" />
-                  <span>{{ fieldLabel(item.field) }}</span>
-                </label>
+                <div class="entry-detail__boolean-header">
+                  <div class="entry-detail__boolean-copy">
+                    <label class="entry-detail__boolean-label" [attr.for]="fieldControlId(item.field)">{{ fieldLabel(item.field) }}</label>
+                    <span
+                      class="entry-detail__boolean-state"
+                      [class.entry-detail__boolean-state--active]="item.control.value"
+                    >
+                      {{ item.control.value ? ('entryDetail.status.enabled' | translate) : ('entryDetail.status.disabled' | translate) }}
+                    </span>
+                  </div>
+                  <label class="entry-detail__switch" [attr.for]="fieldControlId(item.field)">
+                    <input type="checkbox" [id]="fieldControlId(item.field)" [formControl]="item.control" />
+                    <span class="entry-detail__switch-track" aria-hidden="true">
+                      <span class="entry-detail__switch-thumb"></span>
+                    </span>
+                  </label>
+                </div>
                 <p class="entry-detail__field-help" *ngIf="fieldHint(item.field) as hint">{{ hint }}</p>
               </ng-container>
 

@@ -386,7 +386,9 @@
       "loadingEntry": "Eintrag wird geladen...",
       "readOnlyShort": "Nur Lesen",
       "noAttachments": "Keine Anhänge vorhanden.",
-      "noValue": "Kein Wert"
+      "noValue": "Kein Wert",
+      "enabled": "Aktiv",
+      "disabled": "Inaktiv"
     },
     "sections": {
       "raw": "Rohdaten",
