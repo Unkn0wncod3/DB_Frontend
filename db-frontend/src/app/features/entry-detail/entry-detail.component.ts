@@ -1,4 +1,5 @@
 import { DatePipe, DOCUMENT, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, DestroyRef, HostListener, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -823,6 +824,14 @@ export class EntryDetailComponent {
         this.relationEntries.set([]);
       });
     } catch (error) {
+      if (this.shouldRedirectGuestToLogin(error)) {
+        this.auth.handleUnauthorized();
+        return;
+      }
+      if (this.shouldRedirectMissingEntry(error)) {
+        await this.router.navigate(['/']);
+        return;
+      }
       this.errorMessage.set(this.describeError(error, 'load'));
     } finally {
       this.isLoading.set(false);
@@ -1272,6 +1281,14 @@ export class EntryDetailComponent {
     }
 
     return this.translate.instant(`entryDetail.errors.${action}Failed`, { message });
+  }
+
+  private shouldRedirectGuestToLogin(error: unknown): boolean {
+    return !this.auth.isAuthenticated() && error instanceof HttpErrorResponse && (error.status === 403 || error.status === 404);
+  }
+
+  private shouldRedirectMissingEntry(error: unknown): boolean {
+    return this.auth.isAuthenticated() && error instanceof HttpErrorResponse && error.status === 404;
   }
 
   private toFieldKey(label: string): string {
