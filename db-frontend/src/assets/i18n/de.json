@@ -729,6 +729,10 @@
   "myEntries": {
     "title": "Meine Einträge",
     "subtitle": "Schemaübergreifende Liste aller Einträge mit deiner Owner-ID.",
+    "search": {
+      "label": "Einträge durchsuchen",
+      "placeholder": "Nach Schema, Titel, Status, Sichtbarkeit oder ID suchen"
+    },
     "actions": {
       "back": "Zurück zum Dashboard",
       "refresh": "Aktualisieren",
@@ -1125,6 +1129,10 @@
   "schemaOverview": {
     "title": "Schemas",
     "subtitle": "Zeigt alle Schemas wie eine Ordner?bersicht mit Eintragszahl und letzter Aktivität.",
+    "search": {
+      "label": "Schemas durchsuchen",
+      "placeholder": "Nach Name, Key, Beschreibung oder Icon suchen"
+    },
     "actions": {
       "back": "Zurück zum Dashboard",
       "refresh": "Aktualisieren",

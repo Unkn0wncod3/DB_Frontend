@@ -43,23 +43,37 @@ export class SchemaOverviewComponent implements OnInit {
   readonly editingSchema = signal<EntrySchema | null>(null);
   readonly showInactive = signal(false);
   readonly schemaList = signal<EntrySchema[]>([]);
+  readonly searchQuery = signal('');
   readonly schemas = computed<SchemaOverviewCard[]>(() => {
     const totals = new Map((this.overview()?.totals_per_schema ?? []).map((item) => [String(item.schema_id), item]));
+    const query = this.searchQuery().trim().toLowerCase();
 
-    return this.schemaList().map((schema) => {
-      const total = totals.get(String(schema.id));
-      return {
-        schema_id: schema.id,
-        schema_key: schema.key,
-        schema_name: schema.name,
-        icon: schema.icon ?? null,
-        total_entries: total?.total_entries ?? 0,
-        last_created_at: total?.last_created_at ?? null,
-        last_updated_at: total?.last_updated_at ?? null,
-        is_active: schema.is_active,
-        description: schema.description ?? null
-      };
-    });
+    return this.schemaList()
+      .map((schema) => {
+        const total = totals.get(String(schema.id));
+        return {
+          schema_id: schema.id,
+          schema_key: schema.key,
+          schema_name: schema.name,
+          icon: schema.icon ?? null,
+          total_entries: total?.total_entries ?? 0,
+          last_created_at: total?.last_created_at ?? null,
+          last_updated_at: total?.last_updated_at ?? null,
+          is_active: schema.is_active,
+          description: schema.description ?? null
+        };
+      })
+      .filter((schema) => {
+        if (!query) {
+          return true;
+        }
+
+        return [schema.schema_name, schema.schema_key, schema.description, schema.icon]
+          .filter((value) => value != null)
+          .join(' ')
+          .toLowerCase()
+          .includes(query);
+      });
   });
   readonly form = this.fb.nonNullable.group({
     key: ['', [Validators.required, Validators.pattern(/^[a-z0-9_]+$/)]],
@@ -247,6 +261,10 @@ export class SchemaOverviewComponent implements OnInit {
     return this.showInactive()
       ? this.translate.instant('schemaOverview.actions.hideInactive')
       : this.translate.instant('schemaOverview.actions.showInactive');
+  }
+
+  onSearchInput(value: string): void {
+    this.searchQuery.set((value || '').trim());
   }
 
   private async reloadData(forceRefresh = false): Promise<void> {

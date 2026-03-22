@@ -98,11 +98,32 @@
 
 .schema-overview__error,
 .schema-overview__success,
+.schema-overview__search,
 .schema-overview__empty {
   padding: 1.2rem 1.4rem;
   border-radius: 16px;
   background: var(--color-panel);
   color: var(--color-text-soft);
+}
+
+.schema-overview__search {
+  padding: 1rem 1.4rem;
+}
+
+.schema-overview__search-field {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--color-text-soft);
+  font-weight: 600;
+}
+
+.schema-overview__search-field input {
+  width: min(34rem, 100%);
+  border: 1px solid var(--schema-border-strong);
+  border-radius: 14px;
+  padding: 0.8rem 1rem;
+  background: var(--schema-input);
+  color: var(--color-text);
 }
 
 .schema-overview__empty {

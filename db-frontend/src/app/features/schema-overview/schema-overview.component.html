@@ -30,6 +30,18 @@
     {{ success }}
   </section>
 
+  <section class="schema-overview__search">
+    <label class="schema-overview__search-field">
+      <span>{{ 'schemaOverview.search.label' | translate }}</span>
+      <input
+        type="search"
+        [value]="searchQuery()"
+        (input)="onSearchInput(($any($event.target).value || ''))"
+        [placeholder]="'schemaOverview.search.placeholder' | translate"
+      />
+    </label>
+  </section>
+
   <section *ngIf="schemas().length > 0; else emptyState" class="schema-overview__grid">
     <article *ngFor="let item of schemas(); trackBy: trackSchema" class="schema-overview__card">
       <button

@@ -23,7 +23,19 @@
     <p>{{ error }}</p>
   </section>
 
-  <section class="my-entries__content" *ngIf="items().length > 0; else emptyState">
+  <section class="my-entries__search">
+    <label class="my-entries__search-field">
+      <span>{{ 'myEntries.search.label' | translate }}</span>
+      <input
+        type="search"
+        [value]="searchQuery()"
+        (input)="onSearchInput(($any($event.target).value || ''))"
+        [placeholder]="'myEntries.search.placeholder' | translate"
+      />
+    </label>
+  </section>
+
+  <section class="my-entries__content" *ngIf="filteredItems().length > 0; else emptyState">
     <table class="my-entries__table">
       <thead>
         <tr>
@@ -36,7 +48,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let item of items(); trackBy: trackByEntry" class="my-entries__row--clickable" (click)="openEntry(item)">
+        <tr *ngFor="let item of filteredItems(); trackBy: trackByEntry" class="my-entries__row--clickable" (click)="openEntry(item)">
           <td [attr.data-label]="'myEntries.table.schema' | translate">{{ item.schema?.name ?? item.entry.schema_id }}</td>
           <td [attr.data-label]="'myEntries.table.title' | translate">{{ entryTitle(item) }}</td>
           <td [attr.data-label]="'myEntries.table.status' | translate">{{ item.entry.status || '—' }}</td>

@@ -65,6 +65,29 @@
   color: var(--color-error-text);
 }
 
+.my-entries__search {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: var(--color-panel);
+  box-shadow: var(--shadow-elevated);
+}
+
+.my-entries__search-field {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--color-text-soft);
+  font-weight: 600;
+}
+
+.my-entries__search-field input {
+  width: min(34rem, 100%);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0.75rem;
+  padding: 0.8rem 1rem;
+  background: var(--color-input-bg);
+  color: var(--color-text);
+}
+
 .my-entries__content {
   background: var(--color-panel);
   border-radius: 0.75rem;

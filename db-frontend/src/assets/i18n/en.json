@@ -680,6 +680,10 @@
   "myEntries": {
     "title": "My entries",
     "subtitle": "Cross-schema list of entries where you are the owner.",
+    "search": {
+      "label": "Search entries",
+      "placeholder": "Search by schema, title, status, visibility or ID"
+    },
     "actions": {
       "back": "Back to dashboard",
       "refresh": "Refresh",
@@ -1117,6 +1121,10 @@
   "schemaOverview": {
     "title": "Schemas",
     "subtitle": "Browse every schema like a folder overview with entry count and recent activity.",
+    "search": {
+      "label": "Search schemas",
+      "placeholder": "Search by name, key, description or icon"
+    },
     "actions": {
       "back": "Back to dashboard",
       "refresh": "Refresh",

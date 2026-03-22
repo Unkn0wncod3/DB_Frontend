@@ -34,7 +34,30 @@ export class MyEntriesComponent {
   readonly errorMessage = signal<string | null>(null);
   readonly lastUpdatedAt = signal<number | null>(null);
   readonly items = signal<MyEntryListItem[]>([]);
-  readonly total = computed(() => this.items().length);
+  readonly searchQuery = signal('');
+  readonly filteredItems = computed(() => {
+    const query = this.searchQuery().trim().toLowerCase();
+
+    return this.items().filter((item) => {
+      if (!query) {
+        return true;
+      }
+
+      return [
+        item.schema?.name,
+        item.schema?.key,
+        this.entryTitle(item),
+        item.entry.status,
+        item.entry.visibility_level,
+        item.entry.id
+      ]
+        .filter((value) => value != null)
+        .join(' ')
+        .toLowerCase()
+        .includes(query);
+    });
+  });
+  readonly total = computed(() => this.filteredItems().length);
 
   constructor() {
     void this.load();
@@ -42,6 +65,10 @@ export class MyEntriesComponent {
 
   async refresh(): Promise<void> {
     await this.load(true);
+  }
+
+  onSearchInput(value: string): void {
+    this.searchQuery.set((value || '').trim());
   }
 
   openEntry(item: MyEntryListItem): void {
