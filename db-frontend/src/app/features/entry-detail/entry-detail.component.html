@@ -540,7 +540,11 @@
             {{ 'schemaFields.actions.cancel' | translate }}
           </button>
           <button type="submit" class="entry-detail__button entry-detail__button--primary" [disabled]="relationForm.invalid || isSavingRelation()">
-            {{ isSavingRelation() ? ('schemaFields.actions.creating' | translate) : (editingRelation() ? ('schemaFields.actions.save' | translate) : ('entryDetail.relations.actions.create' | translate)) }}
+            {{
+              isSavingRelation()
+                ? ('entryDetail.relations.actions.saving' | translate)
+                : (editingRelation() ? ('entryDetail.relations.actions.save' | translate) : ('entryDetail.relations.actions.create' | translate))
+            }}
           </button>
         </div>
       </form>

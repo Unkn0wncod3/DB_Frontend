@@ -434,7 +434,9 @@
         "created": "Erstellt"
       },
       "actions": {
-        "create": "Relation erstellen"
+        "create": "Relation erstellen",
+        "save": "Relation speichern",
+        "saving": "Speichere..."
       },
       "dialog": {
         "createTitle": "Relation erstellen",

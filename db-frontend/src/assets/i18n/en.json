@@ -385,7 +385,9 @@
         "created": "Created"
       },
       "actions": {
-        "create": "Create relation"
+        "create": "Create relation",
+        "save": "Save relation",
+        "saving": "Saving..."
       },
       "dialog": {
         "createTitle": "Create relation",
