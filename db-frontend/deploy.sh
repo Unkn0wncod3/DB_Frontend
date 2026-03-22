@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-cd /opt/DB_Frontend-main/db-frontend
+cd /opt/DB_Frontend/db-frontend
 
 echo "==> Building frontend"
 npm run build
