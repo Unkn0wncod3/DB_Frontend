@@ -34,20 +34,14 @@
           {{ label() }}
           <span *ngIf="showRequiredMarker() && field().is_required" class="schema-field-card__required">*</span>
         </label>
-        <span
-          class="schema-field-card__boolean-state"
-          [class.schema-field-card__boolean-state--active]="control().value"
-        >
-          {{ control().value ? ('schemaFields.boolean.enabled' | translate) : ('schemaFields.boolean.disabled' | translate) }}
-        </span>
       </div>
-      <label class="schema-field-card__switch" [attr.for]="fieldId()">
-        <input type="checkbox" [id]="fieldId()" [formControl]="control()" />
-        <span class="schema-field-card__switch-track" aria-hidden="true">
-          <span class="schema-field-card__switch-thumb"></span>
-        </span>
-      </label>
     </div>
+    <label class="schema-field-card__switch schema-field-card__switch--stacked" [attr.for]="fieldId()">
+      <input type="checkbox" [id]="fieldId()" [formControl]="control()" />
+      <span class="schema-field-card__switch-track" aria-hidden="true">
+        <span class="schema-field-card__switch-thumb"></span>
+      </span>
+    </label>
     <p class="schema-field-card__hint" *ngIf="hint() as helpText">{{ helpText }}</p>
   </ng-container>
 
