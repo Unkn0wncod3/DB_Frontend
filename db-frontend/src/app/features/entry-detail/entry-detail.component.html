@@ -527,15 +527,6 @@
         </div>
 
         <div class="entry-detail__dialog-actions">
-          <button
-            *ngIf="editingRelation()"
-            type="button"
-            class="entry-detail__button entry-detail__button--danger entry-detail__button--split"
-            (click)="deleteRelation()"
-            [disabled]="isDeletingRelation()"
-          >
-            {{ 'schemaFields.actions.delete' | translate }}
-          </button>
           <button type="button" class="entry-detail__button entry-detail__button--ghost" (click)="closeRelationDialog()">
             {{ 'schemaFields.actions.cancel' | translate }}
           </button>
@@ -545,6 +536,15 @@
                 ? ('entryDetail.relations.actions.saving' | translate)
                 : (editingRelation() ? ('entryDetail.relations.actions.save' | translate) : ('entryDetail.relations.actions.create' | translate))
             }}
+          </button>
+          <button
+            *ngIf="editingRelation()"
+            type="button"
+            class="entry-detail__button entry-detail__button--danger"
+            (click)="deleteRelation()"
+            [disabled]="isDeletingRelation()"
+          >
+            {{ 'schemaFields.actions.delete' | translate }}
           </button>
         </div>
       </form>
