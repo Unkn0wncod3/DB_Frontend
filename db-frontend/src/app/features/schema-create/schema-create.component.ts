@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
@@ -39,6 +40,18 @@ export class SchemaCreateComponent {
   }
 
   private describeError(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      if (error.status === 409) {
+        const schemaKey = this.extractConflictingSchemaKey(error);
+        return this.translate.instant('schemaCreate.errors.keyConflict', { key: schemaKey });
+      }
+
+      const detail = this.extractErrorDetail(error);
+      if (detail) {
+        return this.translate.instant('schemaCreate.errors.generic', { message: detail });
+      }
+    }
+
     if (error instanceof Error) {
       return error.message;
     }
@@ -46,5 +59,35 @@ export class SchemaCreateComponent {
       return String((error as { message?: unknown }).message ?? '');
     }
     return this.translate.instant('schemaCreate.errors.loadFallback');
+  }
+
+  private extractConflictingSchemaKey(error: HttpErrorResponse): string {
+    const payload = error.error;
+    const detail = this.extractErrorDetail(error);
+    const fromPayload =
+      typeof payload === 'object' && payload !== null && 'key' in payload ? String((payload as { key?: unknown }).key ?? '') : '';
+
+    return fromPayload || this.extractKeyFromText(detail) || 'schema_key';
+  }
+
+  private extractErrorDetail(error: HttpErrorResponse): string {
+    const payload = error.error;
+    if (typeof payload === 'string') {
+      return payload;
+    }
+    if (typeof payload === 'object' && payload !== null) {
+      if ('detail' in payload && payload.detail != null) {
+        return String((payload as { detail?: unknown }).detail);
+      }
+      if ('message' in payload && payload.message != null) {
+        return String((payload as { message?: unknown }).message);
+      }
+    }
+    return error.message ?? '';
+  }
+
+  private extractKeyFromText(value: string): string | null {
+    const match = value.match(/["']?([a-z0-9_]+)["']?/i);
+    return match?.[1] ?? null;
   }
 }

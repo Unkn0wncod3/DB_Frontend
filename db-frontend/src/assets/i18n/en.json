@@ -1040,6 +1040,8 @@
       "isActive": "Inactive schemas stay hidden from normal schema and entry flows until they are re-enabled."
     },
     "errors": {
+      "keyConflict": "The schema key \"{{ key }}\" already exists. Please choose a different key.",
+      "generic": "The schema could not be created. {{ message }}",
       "loadFallback": "Unable to create schema."
     }
   },

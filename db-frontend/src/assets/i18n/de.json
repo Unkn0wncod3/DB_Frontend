@@ -1048,6 +1048,8 @@
       "isActive": "Inaktive Schemas bleiben aus normalen Schema- und Entry-Flows ausgeblendet, bis sie wieder aktiviert werden."
     },
     "errors": {
+      "keyConflict": "Der Schema-Key \"{{ key }}\" existiert bereits. Bitte wähle einen anderen Key.",
+      "generic": "Schema konnte nicht erstellt werden. {{ message }}",
       "loadFallback": "Schema konnte nicht erstellt werden."
     }
   },
