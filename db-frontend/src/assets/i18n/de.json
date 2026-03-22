@@ -621,6 +621,11 @@
         "save": "Berechtigung speichern",
         "saving": "Speichere..."
       },
+      "subjectTypes": {
+        "user": "Benutzer",
+        "role": "Rolle",
+        "group": "Gruppe"
+      },
       "columns": {
         "subjectType": "Subjekttyp",
         "subjectId": "Subjekt-ID",
@@ -638,14 +643,22 @@
       "fields": {
         "subjectType": "Subjekttyp",
         "subjectId": "Subjekt-ID",
-        "permission": "Berechtigung"
+        "permission": "Berechtigung",
+        "userSearch": "Benutzer",
+        "userSearchHelp": "Suche und waehle ein vorhandenes Benutzerkonto aus."
+      },
+      "placeholders": {
+        "selectRole": "Rolle auswaehlen",
+        "userSearch": "Nach Benutzername, Rolle oder ID suchen"
       },
       "status": {
         "loading": "Berechtigungen werden geladen...",
+        "loadingUsers": "Benutzer werden geladen...",
         "created": "Berechtigung erstellt.",
         "updated": "Berechtigung aktualisiert.",
         "deleted": "Berechtigung gelöscht."
       },
+      "userMeta": "Rolle: {{ role }}",
       "confirmDelete": "Berechtigung \"{{ value }}\" löschen?"
     }
   },

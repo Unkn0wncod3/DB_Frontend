@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { EntryService } from '../../core/services/entry.service';
 import { SchemaService } from '../../core/services/schema.service';
+import { UserAccount, UserService } from '../../core/services/user.service';
 import {
   AttachmentRecord,
   EntryAccessMap,
@@ -66,6 +67,7 @@ export class EntryDetailComponent {
   private readonly fb = inject(FormBuilder);
   private readonly entryService = inject(EntryService);
   private readonly schemaService = inject(SchemaService);
+  private readonly userService = inject(UserService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly translate = inject(TranslateService);
   private readonly document = inject(DOCUMENT);
@@ -87,6 +89,7 @@ export class EntryDetailComponent {
   readonly isPermissionDialogOpen = signal(false);
   readonly isSavingPermission = signal(false);
   readonly isLoadingPermissions = signal(false);
+  readonly isLoadingPermissionUsers = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
   readonly attachmentError = signal<string | null>(null);
@@ -103,9 +106,11 @@ export class EntryDetailComponent {
   readonly referenceTitles = signal<Record<string, string>>({});
   readonly relationEntries = signal<EntryRelationTargetRecord[]>([]);
   readonly relationLookupEntries = signal<EntryRelationTargetRecord[]>([]);
+  readonly permissionUsers = signal<UserAccount[]>([]);
   readonly relationSearch = signal('');
   readonly relationTypeFilter = signal<'all' | string>('all');
   readonly relationSchemaFilter = signal<'all' | string>('all');
+  readonly permissionUserSearch = signal('');
   readonly originalComparableState = signal('');
   readonly formRevision = signal(0);
   readonly visibilityLevels: VisibilityLevel[] = ['public', 'internal', 'restricted', 'private'];
@@ -124,7 +129,14 @@ export class EntryDetailComponent {
     'delete',
     'manage'
   ];
-  readonly permissionSubjectTypes: EntryPermissionRecord['subject_type'][] = ['user', 'role', 'group'];
+  readonly permissionSubjectTypes: Array<'user' | 'role'> = ['user', 'role'];
+  readonly permissionRoleOptions: Array<'head_admin' | 'admin' | 'manager' | 'editor' | 'reader'> = [
+    'head_admin',
+    'admin',
+    'manager',
+    'editor',
+    'reader'
+  ];
   readonly editingField = signal<SchemaField | null>(null);
   readonly editingRelation = signal<EntryRelationRecord | null>(null);
   readonly editingAttachment = signal<AttachmentRecord | null>(null);
@@ -244,6 +256,33 @@ export class EntryDetailComponent {
       return true;
     });
   });
+  readonly filteredPermissionUsers = computed(() => {
+    const term = this.permissionUserSearch().trim().toLowerCase();
+    const selectedId = this.permissionForm.controls.subject_id.getRawValue().trim();
+
+    return [...this.permissionUsers()]
+      .filter((user) => {
+        if (!term) {
+          return true;
+        }
+
+        return [user.username, user.role, user.id]
+          .filter((value) => value != null)
+          .join(' ')
+          .toLowerCase()
+          .includes(term);
+      })
+      .sort((left, right) => {
+        const leftSelected = String(left.id) === selectedId;
+        const rightSelected = String(right.id) === selectedId;
+        if (leftSelected !== rightSelected) {
+          return leftSelected ? -1 : 1;
+        }
+
+        return left.username.localeCompare(right.username);
+      })
+      .slice(0, 24);
+  });
 
   readonly metaForm = this.fb.nonNullable.group({
     title: ['', Validators.required],
@@ -293,6 +332,9 @@ export class EntryDetailComponent {
     });
     this.attachmentForm.controls.file_size.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.syncAttachmentDerivedFields();
+    });
+    this.permissionForm.controls.subject_type.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((value) => {
+      this.handlePermissionSubjectTypeChange(value);
     });
 
     this.createFieldForm.controls.label.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((value) => {
@@ -674,7 +716,7 @@ export class EntryDetailComponent {
     if (permission) {
       this.editingPermission.set(permission);
       this.permissionForm.reset({
-        subject_type: permission.subject_type,
+        subject_type: permission.subject_type === 'group' ? 'role' : permission.subject_type,
         subject_id: permission.subject_id ?? '',
         permission: permission.permission
       });
@@ -687,6 +729,8 @@ export class EntryDetailComponent {
       });
     }
 
+    this.permissionUserSearch.set('');
+    void this.ensurePermissionUsersLoaded();
     this.isPermissionDialogOpen.set(true);
   }
 
@@ -694,6 +738,7 @@ export class EntryDetailComponent {
     this.isPermissionDialogOpen.set(false);
     this.editingPermission.set(null);
     this.permissionError.set(null);
+    this.permissionUserSearch.set('');
   }
 
   async savePermission(): Promise<void> {
@@ -1048,6 +1093,46 @@ export class EntryDetailComponent {
       : this.translate.instant('entryDetail.permissions.dialog.createSubtitle');
   }
 
+  permissionSubjectTypeLabel(value: EntryPermissionRecord['subject_type']): string {
+    return this.translate.instant(`entryDetail.permissions.subjectTypes.${value}`);
+  }
+
+  permissionSubjectDisplay(permission: EntryPermissionRecord): string {
+    if (permission.subject_type === 'role') {
+      return this.translate.instant(`layout.roles.${permission.subject_id}`);
+    }
+
+    if (permission.subject_type === 'user') {
+      const match = this.permissionUsers().find((user) => String(user.id) === String(permission.subject_id));
+      return match ? `${match.username} (#${match.id})` : permission.subject_id;
+    }
+
+    return permission.subject_id;
+  }
+
+  permissionUserOptionLabel(user: UserAccount): string {
+    return `${user.username} (#${user.id})`;
+  }
+
+  permissionUserOptionMeta(user: UserAccount): string {
+    return this.translate.instant('entryDetail.permissions.userMeta', {
+      role: this.translate.instant(`layout.roles.${user.role}`)
+    });
+  }
+
+  onPermissionUserSearchInput(value: string): void {
+    this.permissionUserSearch.set((value || '').trim());
+  }
+
+  selectPermissionUser(user: UserAccount): void {
+    this.permissionForm.controls.subject_id.setValue(String(user.id));
+    this.permissionUserSearch.set(user.username);
+  }
+
+  isSelectedPermissionUser(user: UserAccount): boolean {
+    return String(user.id) === this.permissionForm.controls.subject_id.getRawValue().trim();
+  }
+
   relationCounterpart(relation: EntryRelationRecord): EntryRelationTargetRecord | null {
     const counterpartId = this.relationCounterpartId(relation);
     return this.relationEntries().find((item) => String(item.id) === counterpartId) ?? null;
@@ -1175,6 +1260,32 @@ export class EntryDetailComponent {
       this.permissionError.set(this.describeError(error, 'load'));
     } finally {
       this.isLoadingPermissions.set(false);
+    }
+  }
+
+  private handlePermissionSubjectTypeChange(value: 'user' | 'role' | 'group'): void {
+    this.permissionForm.controls.subject_id.setValue('', { emitEvent: false });
+    this.permissionUserSearch.set('');
+
+    if (value === 'user') {
+      void this.ensurePermissionUsersLoaded();
+    }
+  }
+
+  private async ensurePermissionUsersLoaded(): Promise<void> {
+    if (this.permissionUsers().length > 0 || this.isLoadingPermissionUsers()) {
+      return;
+    }
+
+    this.isLoadingPermissionUsers.set(true);
+
+    try {
+      const users = await firstValueFrom(this.userService.listUsers(200, 0));
+      this.permissionUsers.set(users ?? []);
+    } catch (error) {
+      this.permissionError.set(this.describeError(error, 'load'));
+    } finally {
+      this.isLoadingPermissionUsers.set(false);
     }
   }
 

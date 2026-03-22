@@ -572,6 +572,11 @@
         "save": "Save permission",
         "saving": "Saving..."
       },
+      "subjectTypes": {
+        "user": "User",
+        "role": "Role",
+        "group": "Group"
+      },
       "columns": {
         "subjectType": "Subject type",
         "subjectId": "Subject ID",
@@ -589,14 +594,22 @@
       "fields": {
         "subjectType": "Subject type",
         "subjectId": "Subject ID",
-        "permission": "Permission"
+        "permission": "Permission",
+        "userSearch": "User",
+        "userSearchHelp": "Search and select an existing user account."
+      },
+      "placeholders": {
+        "selectRole": "Select a role",
+        "userSearch": "Search by username, role or ID"
       },
       "status": {
         "loading": "Loading permissions...",
+        "loadingUsers": "Loading users...",
         "created": "Permission created.",
         "updated": "Permission updated.",
         "deleted": "Permission deleted."
       },
+      "userMeta": "Role: {{ role }}",
       "confirmDelete": "Delete permission \"{{ value }}\"?"
     }
   },

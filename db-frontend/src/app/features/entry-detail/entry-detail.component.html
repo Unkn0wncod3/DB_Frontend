@@ -342,8 +342,8 @@
           </thead>
           <tbody>
             <tr *ngFor="let permission of permissions(); trackBy: trackPermission">
-              <td>{{ permission.subject_type }}</td>
-              <td>{{ permission.subject_id }}</td>
+              <td>{{ permissionSubjectTypeLabel(permission.subject_type) }}</td>
+              <td>{{ permissionSubjectDisplay(permission) }}</td>
               <td>{{ permission.permission }}</td>
               <td>{{ permission.created_by ?? '-' }}</td>
               <td>{{ permission.created_at ? (permission.created_at | date:'dd/MM/yyyy, HH:mm') : '-' }}</td>
@@ -578,13 +578,50 @@
         <label>
           <span>{{ 'entryDetail.permissions.fields.subjectType' | translate }}</span>
           <select formControlName="subject_type">
-            <option *ngFor="let type of permissionSubjectTypes" [value]="type">{{ type }}</option>
+            <option *ngFor="let type of permissionSubjectTypes" [value]="type">{{ permissionSubjectTypeLabel(type) }}</option>
           </select>
         </label>
-        <label>
+
+        <label *ngIf="permissionForm.controls.subject_type.getRawValue() === 'role'">
           <span>{{ 'entryDetail.permissions.fields.subjectId' | translate }}</span>
-          <input type="text" formControlName="subject_id" />
+          <select formControlName="subject_id">
+            <option value="">{{ 'entryDetail.permissions.placeholders.selectRole' | translate }}</option>
+            <option *ngFor="let role of permissionRoleOptions" [value]="role">
+              {{ ('layout.roles.' + role) | translate }}
+            </option>
+          </select>
         </label>
+
+        <label *ngIf="permissionForm.controls.subject_type.getRawValue() === 'user'" class="entry-detail__dialog-field--full">
+          <span>{{ 'entryDetail.permissions.fields.userSearch' | translate }}</span>
+          <input
+            type="text"
+            [value]="permissionUserSearch()"
+            (input)="onPermissionUserSearchInput(($any($event.target).value || '').trim())"
+            [placeholder]="'entryDetail.permissions.placeholders.userSearch' | translate"
+          />
+          <small class="entry-detail__field-help">{{ 'entryDetail.permissions.fields.userSearchHelp' | translate }}</small>
+        </label>
+
+        <label *ngIf="permissionForm.controls.subject_type.getRawValue() === 'user'" class="entry-detail__dialog-field--full">
+          <span>{{ 'entryDetail.permissions.fields.subjectId' | translate }}</span>
+          <input type="text" formControlName="subject_id" readonly class="entry-detail__input--readonly" />
+        </label>
+
+        <div *ngIf="permissionForm.controls.subject_type.getRawValue() === 'user'" class="entry-detail__relation-candidate-list entry-detail__dialog-field--full">
+          <p class="entry-detail__field-help" *ngIf="isLoadingPermissionUsers()">{{ 'entryDetail.permissions.status.loadingUsers' | translate }}</p>
+          <button
+            type="button"
+            *ngFor="let user of filteredPermissionUsers()"
+            class="entry-detail__relation-candidate"
+            [class.entry-detail__relation-candidate--active]="isSelectedPermissionUser(user)"
+            (click)="selectPermissionUser(user)"
+          >
+            <strong>{{ permissionUserOptionLabel(user) }}</strong>
+            <span>{{ permissionUserOptionMeta(user) }}</span>
+          </button>
+        </div>
+
         <label class="entry-detail__dialog-field--full">
           <span>{{ 'entryDetail.permissions.fields.permission' | translate }}</span>
           <select formControlName="permission">
