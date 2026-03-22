@@ -11,6 +11,8 @@ import {
   EntryHistoryRecord,
   GlobalHistoryListParams,
   GlobalHistoryListResponse,
+  EntryLookupParams,
+  EntryLookupRecord,
   EntryListParams,
   EntryPermission,
   EntryPermissionRecord,
@@ -146,6 +148,10 @@ export class EntryService {
 
   getRelations(entryId: string | number): Observable<EntryRelationRecord[]> {
     return this.api.request<EntryRelationRecord[]>('GET', `/entries/${encodeURIComponent(String(entryId))}/relations`);
+  }
+
+  lookupEntries(params: EntryLookupParams = {}): Observable<EntryLookupRecord[]> {
+    return this.api.request<EntryLookupRecord[]>('GET', '/entries/lookup', { params: this.compactParams(params) });
   }
 
   createRelation(entryId: string | number, payload: Partial<EntryRelationRecord>): Observable<EntryRelationRecord> {

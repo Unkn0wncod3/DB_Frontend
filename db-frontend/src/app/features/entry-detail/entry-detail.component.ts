@@ -88,6 +88,7 @@ export class EntryDetailComponent {
   readonly fields = signal<DetailField[]>([]);
   readonly referenceTitles = signal<Record<string, string>>({});
   readonly relationEntries = signal<RelationLookupItem[]>([]);
+  readonly relationLookupEntries = signal<RelationLookupItem[]>([]);
   readonly relationSearch = signal('');
   readonly relationTypeFilter = signal<'all' | string>('all');
   readonly relationSchemaFilter = signal<'all' | string>('all');
@@ -174,7 +175,7 @@ export class EntryDetailComponent {
     const currentEntryId = String(this.entry()?.id ?? '');
     const selectedId = String(this.relationForm.controls.to_entry_id.getRawValue() ?? '');
 
-    return this.relationEntries()
+    return this.relationLookupEntries()
       .filter((item) => {
         if (String(item.id) === currentEntryId) {
           return false;
@@ -201,7 +202,7 @@ export class EntryDetailComponent {
   });
   readonly relationSchemaOptions = computed(() => {
     const seen = new Set<string>();
-    return this.relationEntries().filter((item) => {
+    return this.relationLookupEntries().filter((item) => {
       const key = String(item.schema_id);
       if (seen.has(key)) {
         return false;
@@ -410,7 +411,6 @@ export class EntryDetailComponent {
 
     this.errorMessage.set(null);
     this.successMessage.set(null);
-    await this.loadRelationEntries();
 
     if (relation) {
       this.editingRelation.set(relation);
@@ -430,12 +430,27 @@ export class EntryDetailComponent {
 
     this.relationSearch.set('');
     this.relationSchemaFilter.set('all');
+    await this.loadRelationLookupEntries();
+    this.ensureSelectedRelationLookupTarget();
     this.isRelationDialogOpen.set(true);
   }
 
   closeRelationDialog(): void {
     this.isRelationDialogOpen.set(false);
     this.editingRelation.set(null);
+    this.relationLookupEntries.set([]);
+  }
+
+  async onRelationLookupSearchInput(value: string): Promise<void> {
+    this.relationSearch.set((value || '').trim());
+    await this.loadRelationLookupEntries();
+    this.ensureSelectedRelationLookupTarget();
+  }
+
+  async onRelationLookupSchemaFilterChange(value: string): Promise<void> {
+    this.relationSchemaFilter.set(value || 'all');
+    await this.loadRelationLookupEntries();
+    this.ensureSelectedRelationLookupTarget();
   }
 
   async saveRelation(): Promise<void> {
@@ -778,7 +793,7 @@ export class EntryDetailComponent {
 
   selectedRelationTarget(): RelationLookupItem | null {
     const selectedId = String(this.relationForm.controls.to_entry_id.getRawValue() ?? '');
-    return this.relationEntries().find((item) => String(item.id) === selectedId) ?? null;
+    return this.relationLookupEntries().find((item) => String(item.id) === selectedId) ?? this.relationEntries().find((item) => String(item.id) === selectedId) ?? null;
   }
 
   private async load(): Promise<void> {
@@ -926,6 +941,49 @@ export class EntryDetailComponent {
     });
 
     this.relationEntries.set(items);
+  }
+
+  private async loadRelationLookupEntries(): Promise<void> {
+    const schemaFilter = this.relationSchemaFilter();
+    const lookupEntries = await firstValueFrom(
+      this.entryService.lookupEntries({
+        q: this.relationSearch().trim() || undefined,
+        schema_id: schemaFilter !== 'all' ? schemaFilter : undefined,
+        limit: 24
+      })
+    );
+
+    const currentEntryId = String(this.entry()?.id ?? '');
+    this.relationLookupEntries.set(
+      lookupEntries
+        .filter((item) => String(item.id) !== currentEntryId)
+        .map<RelationLookupItem>((item) => ({
+          id: item.id,
+          title: item.title,
+          schema_id: item.schema_id,
+          schema_key: item.schema_key,
+          schema_name: item.schema_name
+        }))
+    );
+  }
+
+  private ensureSelectedRelationLookupTarget(): void {
+    const selectedId = String(this.relationForm.controls.to_entry_id.getRawValue() ?? '');
+    if (!selectedId) {
+      return;
+    }
+
+    const existsInLookup = this.relationLookupEntries().some((item) => String(item.id) === selectedId);
+    if (existsInLookup) {
+      return;
+    }
+
+    const fallback = this.relationEntries().find((item) => String(item.id) === selectedId);
+    if (!fallback) {
+      return;
+    }
+
+    this.relationLookupEntries.set([fallback, ...this.relationLookupEntries()]);
   }
 
 

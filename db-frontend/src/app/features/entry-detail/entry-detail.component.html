@@ -480,14 +480,14 @@
           <input
             type="text"
             [value]="relationSearch()"
-            (input)="relationSearch.set(($any($event.target).value || '').trim())"
+            (input)="onRelationLookupSearchInput(($any($event.target).value || '').trim())"
             [placeholder]="'entryDetail.relations.searchPlaceholder' | translate"
           />
         </label>
 
         <label class="entry-detail__dialog-field">
           <span>{{ 'entryDetail.relations.fields.schemaFilter' | translate }}</span>
-          <select [value]="relationSchemaFilter()" (change)="relationSchemaFilter.set($any($event.target).value)">
+          <select [value]="relationSchemaFilter()" (change)="onRelationLookupSchemaFilterChange($any($event.target).value)">
             <option value="all">{{ 'entryDetail.relations.filters.allSchemas' | translate }}</option>
             <option *ngFor="let item of relationSchemaOptions()" [value]="item.schema_id">{{ item.schema_name }}</option>
           </select>

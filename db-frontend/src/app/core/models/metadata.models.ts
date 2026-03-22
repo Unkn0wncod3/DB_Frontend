@@ -193,6 +193,20 @@ export interface EntryListParams {
   owner_id?: string | number;
 }
 
+export interface EntryLookupParams {
+  q?: string;
+  schema_id?: string | number;
+  limit?: number;
+}
+
+export interface EntryLookupRecord {
+  id: string | number;
+  title: string;
+  schema_id: string | number;
+  schema_key: string;
+  schema_name: string;
+}
+
 export interface SchemaEntriesResponse {
   schema: EntrySchema;
   entries: EntryRecordWithAccess[];
