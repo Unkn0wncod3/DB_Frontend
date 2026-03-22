@@ -1061,7 +1061,8 @@ export class EntryDetailComponent {
 
   private prepareFieldControlValue(entry: EntryRecord, field: SchemaField): unknown {
     const value = getFieldValue(entry, field);
-    if (value == null) {
+    const resolvedValue = value ?? field.default_value;
+    if (resolvedValue == null) {
       if (field.data_type === 'boolean') {
         return false;
       }
@@ -1072,26 +1073,26 @@ export class EntryDetailComponent {
     }
 
     if (field.data_type === 'json') {
-      return this.stringifyJson(value);
+      return this.stringifyJson(resolvedValue);
     }
 
     if (field.data_type === 'date') {
-      return this.toDateInputValue(value);
+      return this.toDateInputValue(resolvedValue);
     }
 
     if (field.data_type === 'datetime') {
-      return this.toDateTimeInputValue(value);
+      return this.toDateTimeInputValue(resolvedValue);
     }
 
     if (field.data_type === 'boolean') {
-      return this.toBoolean(value);
+      return this.toBoolean(resolvedValue);
     }
 
     if (field.data_type === 'multi_select' || ((field.data_type === 'reference' || field.data_type === 'file') && supportsMultiple(field))) {
-      return this.toArrayValue(value);
+      return this.toArrayValue(resolvedValue);
     }
 
-    return value;
+    return resolvedValue;
   }
 
   private normalizeFieldValue(field: SchemaField, value: unknown): unknown {

@@ -378,7 +378,7 @@ export class EntryCreateComponent {
 
   private defaultFieldValue(field: SchemaField): unknown {
     if (field.default_value !== undefined && field.default_value !== null) {
-      return field.default_value;
+      return this.prepareFieldControlValue(field.default_value, field);
     }
 
     if (field.data_type === 'boolean') {
@@ -403,7 +403,7 @@ export class EntryCreateComponent {
       case 'decimal':
         return Number.parseFloat(String(value));
       case 'boolean':
-        return Boolean(value);
+        return this.toBoolean(value);
       case 'json':
         return typeof value === 'string' ? JSON.parse(value) : value;
       case 'multi_select':
@@ -421,6 +421,30 @@ export class EntryCreateComponent {
     }
   }
 
+  private prepareFieldControlValue(value: unknown, field: SchemaField): unknown {
+    if (field.data_type === 'json') {
+      return this.stringifyJson(value);
+    }
+
+    if (field.data_type === 'date') {
+      return this.toDateInputValue(value);
+    }
+
+    if (field.data_type === 'datetime') {
+      return this.toDateTimeInputValue(value);
+    }
+
+    if (field.data_type === 'boolean') {
+      return this.toBoolean(value);
+    }
+
+    if (field.data_type === 'multi_select' || ((field.data_type === 'reference' || field.data_type === 'file') && supportsMultiple(field))) {
+      return this.toArrayValue(value);
+    }
+
+    return value;
+  }
+
   private describeError(error: unknown): string {
     if (error instanceof Error) {
       return error.message;
@@ -433,6 +457,61 @@ export class EntryCreateComponent {
 
   private toFieldKey(label: string): string {
     return normalizeSchemaFieldKey(label);
+  }
+
+  private toDateInputValue(value: unknown): string {
+    const parsed = new Date(String(value));
+    if (Number.isNaN(parsed.getTime())) {
+      return String(value);
+    }
+    return parsed.toISOString().slice(0, 10);
+  }
+
+  private toDateTimeInputValue(value: unknown): string {
+    const parsed = new Date(String(value));
+    if (Number.isNaN(parsed.getTime())) {
+      return String(value);
+    }
+    const year = parsed.getFullYear();
+    const month = `${parsed.getMonth() + 1}`.padStart(2, '0');
+    const day = `${parsed.getDate()}`.padStart(2, '0');
+    const hours = `${parsed.getHours()}`.padStart(2, '0');
+    const minutes = `${parsed.getMinutes()}`.padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  private toArrayValue(value: unknown): string[] {
+    if (Array.isArray(value)) {
+      return value.map((item) => String(item)).filter((item) => item.trim().length > 0);
+    }
+    if (typeof value === 'string') {
+      return value
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0);
+    }
+    return value == null ? [] : [String(value)];
+  }
+
+  private toBoolean(value: unknown): boolean {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+    if (typeof value === 'number') {
+      return value !== 0;
+    }
+    if (typeof value === 'string') {
+      return ['true', '1', 'yes', 'on'].includes(value.trim().toLowerCase());
+    }
+    return false;
+  }
+
+  private stringifyJson(value: unknown): string {
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch {
+      return String(value);
+    }
   }
 
   private normalizeIdentifierValue(value: unknown, isRequired = false): string | number | undefined {
