@@ -254,7 +254,7 @@
   },
   "dashboard": {
     "title": "Datenbank-Übersicht",
-    "subtitle": "?bersicht aus dem Dashboard-Endpoint f?r sichtbare Schemas und Eintr?ge.",
+    "subtitle": "Übersicht aus dem Dashboard-Endpoint für sichtbare Schemas und Einträge.",
     "actions": {
       "refresh": "Jetzt aktualisieren",
       "refreshing": "Aktualisiere...",
