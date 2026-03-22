@@ -454,6 +454,16 @@
             <option *ngFor="let type of fieldTypes" [value]="type">{{ type }}</option>
           </select>
         </label>
+        <label *ngIf="shouldShowCreateFieldOptionsInput()" class="entry-detail__dialog-field--full">
+          <span>{{ 'schemaEditor.dialog.options' | translate }}</span>
+          <input type="text" formControlName="options" />
+          <small class="entry-detail__field-help">{{ 'schemaEditor.dialog.optionsHint' | translate }}</small>
+        </label>
+        <label class="entry-detail__dialog-field--full">
+          <span>{{ 'schemaFields.fields.defaultValue' | translate }}</span>
+          <input type="text" formControlName="default_value" />
+          <small class="entry-detail__field-help">{{ 'schemaFields.fields.defaultValueHint' | translate }}</small>
+        </label>
         <label class="entry-detail__dialog-checkbox">
           <input type="checkbox" formControlName="is_required" />
           <span>{{ 'schemaFields.fields.required' | translate }}</span>

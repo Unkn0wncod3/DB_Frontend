@@ -1107,6 +1107,8 @@
       "keyManualHelp": "Override the generated key only if needed.",
       "description": "Description",
       "type": "Field type",
+      "defaultValue": "Default value",
+      "defaultValueHint": "Optional fallback saved as default_value. For multiple values, separate entries with commas.",
       "required": "Required field"
     },
     "actions": {

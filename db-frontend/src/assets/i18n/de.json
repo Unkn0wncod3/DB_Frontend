@@ -1115,6 +1115,8 @@
       "keyManualHelp": "Nur bei Bedarf manuell überschreiben.",
       "description": "Beschreibung",
       "type": "Feldtyp",
+      "defaultValue": "Standardwert",
+      "defaultValueHint": "Optionaler Fallback, der als default_value gespeichert wird. Bei mehreren Werten mit Kommas trennen.",
       "required": "Pflichtfeld"
     },
     "actions": {

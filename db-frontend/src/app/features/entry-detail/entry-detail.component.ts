@@ -226,6 +226,8 @@ export class EntryDetailComponent {
     key: [''],
     description: [''],
     data_type: ['text' as FieldDataType, [Validators.required]],
+    options: [''],
+    default_value: [''],
     is_required: [false]
   });
   readonly relationForm = this.fb.nonNullable.group({
@@ -371,7 +373,7 @@ export class EntryDetailComponent {
     }
     this.editingField.set(null);
     this.createFieldKeyAutoSync = true;
-    this.createFieldForm.reset({ label: '', key: '', description: '', data_type: 'text', is_required: false });
+    this.createFieldForm.reset({ label: '', key: '', description: '', data_type: 'text', options: '', default_value: '', is_required: false });
     this.createFieldError.set(null);
     this.isFieldDialogOpen.set(true);
   }
@@ -387,6 +389,10 @@ export class EntryDetailComponent {
       key: field.key ?? '',
       description: field.description ?? '',
       data_type: field.data_type,
+      options: getFieldOptions(field)
+        .map((option) => option.value)
+        .join(', '),
+      default_value: this.serializeDefaultValueForFieldForm(field),
       is_required: field.is_required
     });
     this.createFieldError.set(null);
@@ -556,6 +562,8 @@ export class EntryDetailComponent {
     this.successMessage.set(null);
 
     try {
+      const validationJson = this.buildCreateFieldValidationJson();
+      const defaultValue = this.buildCreateFieldDefaultValue(editingField != null);
       if (editingField) {
         await firstValueFrom(
           this.schemaService.updateField(schema.id, editingField.id, {
@@ -563,7 +571,9 @@ export class EntryDetailComponent {
             label,
             description: raw.description.trim() || null,
             data_type: raw.data_type,
-            is_required: raw.is_required
+            is_required: raw.is_required,
+            default_value: defaultValue,
+            validation_json: validationJson
           })
         );
       } else {
@@ -577,7 +587,8 @@ export class EntryDetailComponent {
             is_unique: false,
             sort_order: (schema.fields?.length ?? 0) * 10 + 10,
             is_active: true,
-            validation_json: {},
+            default_value: defaultValue,
+            validation_json: validationJson,
             settings_json: {}
           })
         );
@@ -649,6 +660,11 @@ export class EntryDetailComponent {
     return this.editingField()
       ? this.translate.instant('schemaFields.actions.save')
       : this.translate.instant('schemaFields.actions.create');
+  }
+
+  shouldShowCreateFieldOptionsInput(): boolean {
+    const dataType = this.createFieldForm.controls.data_type.getRawValue();
+    return dataType === 'select' || dataType === 'multi_select';
   }
 
   trackField(_index: number, item: DetailField): string {
@@ -1289,6 +1305,69 @@ export class EntryDetailComponent {
 
   private shouldRedirectMissingEntry(error: unknown): boolean {
     return this.auth.isAuthenticated() && error instanceof HttpErrorResponse && error.status === 404;
+  }
+
+  private buildCreateFieldValidationJson(): Record<string, unknown> {
+    const raw = this.createFieldForm.getRawValue();
+    const validationJson: Record<string, unknown> = {};
+
+    if (raw.data_type === 'select' || raw.data_type === 'multi_select') {
+      const options = raw.options
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0);
+
+      if (options.length > 0) {
+        validationJson['options'] = options;
+      }
+    }
+
+    return validationJson;
+  }
+
+  private buildCreateFieldDefaultValue(clearWhenEmpty: boolean): unknown {
+    const raw = this.createFieldForm.getRawValue();
+    const value = raw.default_value.trim();
+
+    if (!value) {
+      return clearWhenEmpty ? null : undefined;
+    }
+
+    switch (raw.data_type) {
+      case 'integer':
+        return Number.parseInt(value, 10);
+      case 'decimal':
+        return Number.parseFloat(value);
+      case 'boolean':
+        return this.toBoolean(value);
+      case 'json':
+        return JSON.parse(value);
+      case 'multi_select':
+        return value
+          .split(',')
+          .map((item) => item.trim())
+          .filter((item) => item.length > 0);
+      default:
+        return value;
+    }
+  }
+
+  private serializeDefaultValueForFieldForm(field: SchemaField): string {
+    const value = field.default_value;
+
+    if (value == null) {
+      return '';
+    }
+
+    if (Array.isArray(value)) {
+      return value.map((item) => String(item)).join(', ');
+    }
+
+    if (typeof value === 'object') {
+      return this.stringifyJson(value);
+    }
+
+    return String(value);
   }
 
   private toFieldKey(label: string): string {
