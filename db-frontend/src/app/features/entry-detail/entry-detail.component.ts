@@ -819,7 +819,9 @@ export class EntryDetailComponent {
       const bundle = await firstValueFrom(this.entryService.getEntryBundle(this.currentEntryId));
       this.applyBundle(bundle);
       await this.loadReferenceTitles(bundle.entry, bundle.schema);
-      await this.loadRelationEntries();
+      await this.loadRelationEntries().catch(() => {
+        this.relationEntries.set([]);
+      });
     } catch (error) {
       this.errorMessage.set(this.describeError(error, 'load'));
     } finally {
