@@ -283,6 +283,10 @@
   font-weight: 600;
 }
 
+.entry-create__dialog-field--full {
+  grid-column: 1 / -1;
+}
+
 .entry-create__dialog-form input,
 .entry-create__dialog-form select {
   border: 1px solid var(--create-border-strong);

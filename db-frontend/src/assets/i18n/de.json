@@ -1101,6 +1101,10 @@
     }
   },
   "schemaFields": {
+    "boolean": {
+      "enabled": "Aktiv",
+      "disabled": "Inaktiv"
+    },
     "dialog": {
       "title": "Feld hinzufügen",
       "subtitle": "Lege ein neues Schema-Feld für dieses Schema an.",

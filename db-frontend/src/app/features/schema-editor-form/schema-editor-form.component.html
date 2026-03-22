@@ -168,6 +168,12 @@
           <small>{{ 'schemaEditor.dialog.optionsHint' | translate }}</small>
         </label>
 
+        <label class="schema-editor__field schema-editor__field--full">
+          <span>{{ 'schemaFields.fields.defaultValue' | translate }}</span>
+          <input type="text" formControlName="default_value" />
+          <small>{{ 'schemaFields.fields.defaultValueHint' | translate }}</small>
+        </label>
+
         <label *ngIf="shouldShowReferenceSchemaInput()" class="schema-editor__field schema-editor__field--full">
           <span>{{ 'schemaEditor.dialog.referenceSchemaKey' | translate }}</span>
           <input type="text" formControlName="reference_schema_key" />

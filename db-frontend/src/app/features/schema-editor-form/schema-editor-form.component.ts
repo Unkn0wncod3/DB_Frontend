@@ -68,6 +68,7 @@ export class SchemaEditorFormComponent implements OnChanges {
     is_required: [false],
     is_unique: [false],
     options: [''],
+    default_value: [''],
     reference_schema_key: ['']
   });
 
@@ -144,6 +145,7 @@ export class SchemaEditorFormComponent implements OnChanges {
       is_required: false,
       is_unique: false,
       options: '',
+      default_value: '',
       reference_schema_key: ''
     });
     this.fieldDialogError.set(null);
@@ -159,7 +161,11 @@ export class SchemaEditorFormComponent implements OnChanges {
 
     this.fieldKeyAutoSync = false;
 
-    const options = Array.isArray(field.settings_json?.['options']) ? field.settings_json?.['options'] : [];
+    const options = Array.isArray(field.validation_json?.['options'])
+      ? field.validation_json['options']
+      : Array.isArray(field.settings_json?.['options'])
+        ? field.settings_json['options']
+        : [];
     const referenceSchemaKey =
       typeof field.settings_json?.['reference_schema_key'] === 'string' ? field.settings_json['reference_schema_key'] : '';
 
@@ -171,6 +177,7 @@ export class SchemaEditorFormComponent implements OnChanges {
       is_required: field.is_required ?? false,
       is_unique: field.is_unique ?? false,
       options: options.map((item) => String(item)).join(', '),
+      default_value: this.serializeDefaultValue(field.default_value),
       reference_schema_key: referenceSchemaKey
     });
     this.fieldDialogError.set(null);
@@ -226,6 +233,7 @@ export class SchemaEditorFormComponent implements OnChanges {
 
     this.fieldDialogError.set(null);
     const settingsJson: Record<string, unknown> = {};
+    const validationJson: Record<string, unknown> = {};
 
     if (raw.data_type === 'select' || raw.data_type === 'multi_select') {
       const options = raw.options
@@ -233,7 +241,7 @@ export class SchemaEditorFormComponent implements OnChanges {
         .map((item) => item.trim())
         .filter((item) => item.length > 0);
       if (options.length > 0) {
-        settingsJson['options'] = options;
+        validationJson['options'] = options;
       }
     }
 
@@ -251,8 +259,10 @@ export class SchemaEditorFormComponent implements OnChanges {
       data_type: raw.data_type,
       is_required: raw.is_required,
       is_unique: raw.is_unique,
+      default_value: this.parseDefaultValue(raw.data_type, raw.default_value),
       is_active: true,
       sort_order: this.resolveSortOrder(),
+      validation_json: Object.keys(validationJson).length > 0 ? validationJson : {},
       settings_json: Object.keys(settingsJson).length > 0 ? settingsJson : {}
     };
 
@@ -328,6 +338,52 @@ export class SchemaEditorFormComponent implements OnChanges {
 
   shouldShowReferenceSchemaInput(): boolean {
     return this.fieldForm.controls.data_type.value === 'reference';
+  }
+
+  private parseDefaultValue(dataType: FieldDataType, value: string): unknown {
+    const normalized = value.trim();
+
+    if (!normalized) {
+      return undefined;
+    }
+
+    switch (dataType) {
+      case 'integer':
+        return Number.parseInt(normalized, 10);
+      case 'decimal':
+        return Number.parseFloat(normalized);
+      case 'boolean':
+        return ['true', '1', 'yes', 'on'].includes(normalized.toLowerCase());
+      case 'json':
+        return JSON.parse(normalized);
+      case 'multi_select':
+        return normalized
+          .split(',')
+          .map((item) => item.trim())
+          .filter((item) => item.length > 0);
+      default:
+        return normalized;
+    }
+  }
+
+  private serializeDefaultValue(value: unknown): string {
+    if (value == null) {
+      return '';
+    }
+
+    if (Array.isArray(value)) {
+      return value.map((item) => String(item)).join(', ');
+    }
+
+    if (typeof value === 'object') {
+      try {
+        return JSON.stringify(value, null, 2);
+      } catch {
+        return String(value);
+      }
+    }
+
+    return String(value);
   }
 
   onLabelBlur(): void {

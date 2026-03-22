@@ -1093,6 +1093,10 @@
     }
   },
   "schemaFields": {
+    "boolean": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
     "dialog": {
       "title": "Add field",
       "subtitle": "Create a new schema field for this schema.",

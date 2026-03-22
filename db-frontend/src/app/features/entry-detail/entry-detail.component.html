@@ -105,98 +105,18 @@
 
         <form class="entry-detail__form" [formGroup]="form">
           <div class="entry-detail__field-grid">
-            <div
+            <app-schema-field-card
               *ngFor="let item of fields(); trackBy: trackField"
-              class="entry-detail__field-card"
-              [class.entry-detail__field-card--full]="isWideField(item.field)"
-              [class.entry-detail__field-card--boolean]="isBooleanField(item.field)"
-            >
-              <button
-                *ngIf="auth.canManageSchemas()"
-                type="button"
-                class="entry-detail__field-edit"
-                (click)="editField(item.field)"
-                [attr.aria-label]="'schemaFields.actions.edit' | translate"
-                [title]="'schemaFields.actions.edit' | translate"
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    d="M12 20h9"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.8"
-                  />
-                  <path
-                    d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5Z"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.8"
-                  />
-                </svg>
-              </button>
-              <ng-container *ngIf="item.field.data_type === 'boolean'; else defaultField">
-                <div class="entry-detail__boolean-header">
-                  <div class="entry-detail__boolean-copy">
-                    <label class="entry-detail__boolean-label" [attr.for]="fieldControlId(item.field)">{{ fieldLabel(item.field) }}</label>
-                    <span
-                      class="entry-detail__boolean-state"
-                      [class.entry-detail__boolean-state--active]="item.control.value"
-                    >
-                      {{ item.control.value ? ('entryDetail.status.enabled' | translate) : ('entryDetail.status.disabled' | translate) }}
-                    </span>
-                  </div>
-                  <label class="entry-detail__switch" [attr.for]="fieldControlId(item.field)">
-                    <input type="checkbox" [id]="fieldControlId(item.field)" [formControl]="item.control" />
-                    <span class="entry-detail__switch-track" aria-hidden="true">
-                      <span class="entry-detail__switch-thumb"></span>
-                    </span>
-                  </label>
-                </div>
-                <p class="entry-detail__field-help" *ngIf="fieldHint(item.field) as hint">{{ hint }}</p>
-              </ng-container>
-
-              <ng-template #defaultField>
-                <label [attr.for]="fieldControlId(item.field)">{{ fieldLabel(item.field) }}</label>
-                <p class="entry-detail__field-help" *ngIf="fieldHint(item.field) as hint">{{ hint }}</p>
-
-                <ng-container [ngSwitch]="item.field.data_type">
-                  <textarea *ngSwitchCase="'long_text'" [id]="fieldControlId(item.field)" [formControl]="item.control" rows="6"></textarea>
-                  <textarea *ngSwitchCase="'json'" [id]="fieldControlId(item.field)" [formControl]="item.control" rows="8"></textarea>
-                  <input *ngSwitchCase="'integer'" type="number" [id]="fieldControlId(item.field)" [formControl]="item.control" step="1" />
-                  <input *ngSwitchCase="'decimal'" type="number" [id]="fieldControlId(item.field)" [formControl]="item.control" step="0.01" />
-                  <input *ngSwitchCase="'date'" type="date" [id]="fieldControlId(item.field)" [formControl]="item.control" />
-                  <input *ngSwitchCase="'datetime'" type="datetime-local" [id]="fieldControlId(item.field)" [formControl]="item.control" />
-                  <input *ngSwitchCase="'email'" type="email" [id]="fieldControlId(item.field)" [formControl]="item.control" />
-                  <input *ngSwitchCase="'url'" type="url" [id]="fieldControlId(item.field)" [formControl]="item.control" />
-
-                  <select *ngSwitchCase="'select'" [id]="fieldControlId(item.field)" [formControl]="item.control">
-                    <option value="">{{ 'entryDetail.form.selectPlaceholder' | translate }}</option>
-                    <option *ngFor="let option of fieldOptions(item.field)" [value]="option.value">{{ option.label }}</option>
-                  </select>
-
-                  <select *ngSwitchCase="'multi_select'" [id]="fieldControlId(item.field)" [formControl]="item.control" multiple class="entry-detail__multi-select">
-                    <option *ngFor="let option of fieldOptions(item.field)" [value]="option.value">{{ option.label }}</option>
-                  </select>
-
-                  <div *ngSwitchCase="'reference'" class="entry-detail__reference-field">
-                    <input type="text" [id]="fieldControlId(item.field)" [formControl]="item.control" />
-                    <a
-                      *ngIf="referenceLink(item.field, item.control.value) as link"
-                      class="entry-detail__reference-link"
-                      [routerLink]="link"
-                    >
-                      {{ referenceLabel(item.control.value) }}
-                    </a>
-                  </div>
-
-                  <input *ngSwitchDefault type="text" [id]="fieldControlId(item.field)" [formControl]="item.control" />
-                </ng-container>
-              </ng-template>
-            </div>
+              [field]="item.field"
+              [control]="item.control"
+              [fieldId]="fieldControlId(item.field)"
+              [label]="fieldLabel(item.field)"
+              [hint]="fieldHint(item.field)"
+              [canEditSchema]="auth.canManageSchemas()"
+              [referenceLink]="referenceLink(item.field, item.control.value)"
+              [referenceLabel]="referenceLabel(item.control.value)"
+              (editRequested)="editField($event)"
+            ></app-schema-field-card>
 
             <button
               *ngIf="auth.canManageSchemas()"

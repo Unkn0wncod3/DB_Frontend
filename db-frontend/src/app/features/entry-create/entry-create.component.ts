@@ -19,6 +19,7 @@ import {
   resetSchemaFieldDialogForm,
   shouldShowSchemaFieldOptionsInput
 } from '../../core/utils/schema-field-dialog.utils';
+import { SchemaFieldCardComponent } from '../../shared/components/schema-field-card/schema-field-card.component';
 import { getFieldOptions, humanizeKey, sortSchemaFields, supportsMultiple } from '../../core/utils/schema.utils';
 
 interface FormField {
@@ -29,7 +30,7 @@ interface FormField {
 @Component({
   selector: 'app-entry-create',
   standalone: true,
-  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterLink, TranslateModule],
+  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterLink, TranslateModule, SchemaFieldCardComponent],
   templateUrl: './entry-create.component.html',
   styleUrl: './entry-create.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

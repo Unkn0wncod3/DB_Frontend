@@ -33,6 +33,7 @@ import {
   resetSchemaFieldDialogForm,
   shouldShowSchemaFieldOptionsInput
 } from '../../core/utils/schema-field-dialog.utils';
+import { SchemaFieldCardComponent } from '../../shared/components/schema-field-card/schema-field-card.component';
 import {
   formatFieldValue,
   getFieldOptions,
@@ -60,7 +61,7 @@ interface RelationLookupItem {
 @Component({
   selector: 'app-entry-detail',
   standalone: true,
-  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterModule, DatePipe, TranslateModule],
+  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterModule, DatePipe, TranslateModule, SchemaFieldCardComponent],
   templateUrl: './entry-detail.component.html',
   styleUrls: ['./entry-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
