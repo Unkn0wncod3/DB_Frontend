@@ -73,9 +73,78 @@
         <option *ngFor="let option of fieldOptions()" [value]="option.value">{{ option.label }}</option>
       </select>
 
-      <select *ngSwitchCase="'multi_select'" [id]="fieldId()" [formControl]="control()" multiple size="5" class="schema-field-card__multi-select">
-        <option *ngFor="let option of fieldOptions()" [value]="option.value">{{ option.label }}</option>
-      </select>
+      <div *ngSwitchCase="'multi_select'" class="schema-field-card__multi-select">
+        <div class="schema-field-card__multi-summary" *ngIf="selectedMultiOptions().length > 0">
+          {{ multiSelectSummary() }}
+        </div>
+        <button
+          type="button"
+          class="schema-field-card__multi-open"
+          [attr.aria-expanded]="multiSelectOpen"
+          [attr.aria-controls]="fieldId() + '-modal'"
+          (click)="toggleMultiSelectPanel()"
+        >
+          Select
+        </button>
+
+        <div
+          *ngIf="multiSelectOpen"
+          class="schema-field-card__multi-modal-backdrop"
+          (click)="closeMultiSelectPanel()"
+        >
+          <div
+            class="schema-field-card__multi-modal"
+            [id]="fieldId() + '-modal'"
+            (click)="$event.stopPropagation()"
+          >
+            <div class="schema-field-card__multi-modal-header">
+              <div class="schema-field-card__multi-modal-copy">
+                <h3>Select tags</h3>
+                <p>Choose one or more options for this field.</p>
+              </div>
+              <button
+                type="button"
+                class="schema-field-card__multi-close"
+                (click)="closeMultiSelectPanel()"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div class="schema-field-card__multi-modal-list">
+              <button
+                *ngFor="let option of fieldOptions()"
+                type="button"
+                class="schema-field-card__multi-panel-option"
+                [class.schema-field-card__multi-panel-option--selected]="isMultiSelectOptionSelected(option.value)"
+                (click)="toggleMultiSelectOption(option.value)"
+              >
+                <span class="schema-field-card__multi-check" aria-hidden="true"></span>
+                <span class="schema-field-card__multi-option-copy">
+                  <span>{{ option.label }}</span>
+                  <span class="schema-field-card__multi-option-state">
+                    {{ isMultiSelectOptionSelected(option.value) ? 'Selected' : 'Select' }}
+                  </span>
+                </span>
+              </button>
+            </div>
+
+            <div class="schema-field-card__multi-modal-footer">
+              <div class="schema-field-card__multi-trigger-meta">
+                {{ selectedMultiOptions().length }} selected
+              </div>
+              <button
+                type="button"
+                class="schema-field-card__multi-done"
+                (click)="closeMultiSelectPanel()"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div *ngSwitchCase="'reference'" class="schema-field-card__reference-field">
         <input type="text" [id]="fieldId()" [formControl]="control()" />
