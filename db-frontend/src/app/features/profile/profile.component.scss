@@ -178,6 +178,30 @@
   font-weight: 500;
 }
 
+.profile__admin-preferences {
+  display: grid;
+  gap: 0.45rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.profile__admin-preferences > span {
+  font-weight: 600;
+}
+
+.profile__admin-preferences > p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.profile__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 500;
+}
+
 .profile__meta dl {
   margin: 0;
   display: flex;

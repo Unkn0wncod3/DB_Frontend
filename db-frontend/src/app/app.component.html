@@ -11,7 +11,7 @@
       <a routerLink="/entries/mine" routerLinkActive="is-active">
         {{ 'layout.nav.myEntries' | translate }}
       </a>
-      <a *ngIf="auth.isAdmin()" routerLink="/explorer" routerLinkActive="is-active">
+      <a *ngIf="auth.canAccessApiExplorer()" routerLink="/explorer" routerLinkActive="is-active">
         {{ 'layout.nav.explorer' | translate }}
       </a>
       <a *ngIf="auth.isAdmin()" routerLink="/admin/logs" routerLinkActive="is-active">

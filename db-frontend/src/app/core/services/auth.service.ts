@@ -150,6 +150,25 @@ export class AuthService {
     return this.isAtLeast('admin');
   }
 
+  canAccessApiExplorer(): boolean {
+    if (!this.isAdmin()) {
+      return false;
+    }
+
+    const preferences = this.user()?.preferences;
+    if (!preferences || typeof preferences !== 'object') {
+      return true;
+    }
+
+    const adminPreferences = preferences['admin_preferences'];
+    if (!adminPreferences || typeof adminPreferences !== 'object') {
+      return false;
+    }
+
+    const value = (adminPreferences as Record<string, unknown>)['show_api_explorer'];
+    return typeof value === 'boolean' ? value : false;
+  }
+
   canViewAdminVisibility(): boolean {
     return this.isAdmin();
   }

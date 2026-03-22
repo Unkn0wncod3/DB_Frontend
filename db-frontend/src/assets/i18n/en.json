@@ -162,10 +162,18 @@
         "en": "English",
         "de": "German"
       },
+      "contactEmail": {
+        "label": "Email",
+        "placeholder": "name@example.com"
+      },
       "notifications": {
         "label": "Notifications",
-        "email": "Email updates",
-        "push": "Push notifications"
+        "email": "Email updates"
+      },
+      "admin": {
+        "title": "Admin Preferences",
+        "hint": "Control which admin areas stay visible in your navigation.",
+        "showApiExplorer": "Show API Explorer"
       }
     },
     "actions": {
@@ -188,10 +196,13 @@
       "profilePicture": "Profile picture",
       "theme": "Theme",
       "language": "Language",
-      "notifications": "Notifications"
+      "contactEmail": "Email",
+      "notifications": "Notifications",
+      "adminPreferences": "Admin Preferences"
     },
     "errors": {
       "usernameRequired": "Username is required.",
+      "invalidEmail": "Please enter a valid email address.",
       "unauthorized": "Your session expired. Please log in again.",
       "validation": "Please check the entered values.",
       "conflict": "That username is already taken.",

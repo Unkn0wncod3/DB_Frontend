@@ -203,10 +203,18 @@
         "en": "Englisch",
         "de": "Deutsch"
       },
+      "contactEmail": {
+        "label": "E-Mail",
+        "placeholder": "name@example.com"
+      },
       "notifications": {
         "label": "Benachrichtigungen",
-        "email": "E-Mail-Updates",
-        "push": "Push-Benachrichtigungen"
+        "email": "E-Mail-Updates"
+      },
+      "admin": {
+        "title": "Admin Preferences",
+        "hint": "Steuere, welche Admin-Bereiche in deiner Navigation sichtbar sind.",
+        "showApiExplorer": "API Explorer anzeigen"
       }
     },
     "actions": {
@@ -229,10 +237,13 @@
       "profilePicture": "Profilbild",
       "theme": "Darstellung",
       "language": "Sprache",
-      "notifications": "Benachrichtigungen"
+      "contactEmail": "E-Mail",
+      "notifications": "Benachrichtigungen",
+      "adminPreferences": "Admin Preferences"
     },
     "errors": {
       "usernameRequired": "Benutzername ist erforderlich.",
+      "invalidEmail": "Bitte eine gueltige E-Mail-Adresse eingeben.",
       "unauthorized": "Deine Sitzung ist abgelaufen. Bitte erneut anmelden.",
       "validation": "Bitte Eingaben prüfen.",
       "conflict": "Dieser Benutzername ist bereits vergeben.",

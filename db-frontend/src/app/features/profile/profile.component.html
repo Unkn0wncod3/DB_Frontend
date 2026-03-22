@@ -52,15 +52,33 @@
           </select>
         </div>
 
+        <label class="profile__field">
+          <span>{{ 'profile.preferences.contactEmail.label' | translate }}</span>
+          <input
+            type="email"
+            formControlName="contact_email"
+            [placeholder]="'profile.preferences.contactEmail.placeholder' | translate"
+            autocomplete="email"
+          />
+          <small class="profile__error" *ngIf="form.controls.contact_email.invalid && form.controls.contact_email.touched">
+            {{ 'profile.errors.invalidEmail' | translate }}
+          </small>
+        </label>
+
         <div class="profile__notifications">
           <span>{{ 'profile.preferences.notifications.label' | translate }}</span>
           <label>
             <input type="checkbox" formControlName="email_notifications" />
             {{ 'profile.preferences.notifications.email' | translate }}
           </label>
-          <label>
-            <input type="checkbox" formControlName="push_notifications" />
-            {{ 'profile.preferences.notifications.push' | translate }}
+        </div>
+
+        <div class="profile__admin-preferences" *ngIf="showAdminPreferences()">
+          <span>{{ 'profile.preferences.admin.title' | translate }}</span>
+          <p>{{ 'profile.preferences.admin.hint' | translate }}</p>
+          <label class="profile__toggle">
+            <input type="checkbox" formControlName="show_api_explorer" />
+            <span>{{ 'profile.preferences.admin.showApiExplorer' | translate }}</span>
           </label>
         </div>
       </fieldset>
@@ -108,13 +126,22 @@
           <dd>{{ ('profile.preferences.language.' + prefs.language) | translate }}</dd>
         </div>
         <div>
+          <dt>{{ 'profile.meta.contactEmail' | translate }}</dt>
+          <dd>{{ prefs.contact_email || '—' }}</dd>
+        </div>
+        <div>
           <dt>{{ 'profile.meta.notifications' | translate }}</dt>
           <dd>
             <span class="profile__meta-chip" [class.profile__meta-chip--active]="prefs.notifications.email">
               {{ 'profile.preferences.notifications.email' | translate }}
             </span>
-            <span class="profile__meta-chip" [class.profile__meta-chip--active]="prefs.notifications.push">
-              {{ 'profile.preferences.notifications.push' | translate }}
+          </dd>
+        </div>
+        <div *ngIf="showAdminPreferences()">
+          <dt>{{ 'profile.meta.adminPreferences' | translate }}</dt>
+          <dd>
+            <span class="profile__meta-chip" [class.profile__meta-chip--active]="prefs.admin_preferences.show_api_explorer">
+              {{ 'profile.preferences.admin.showApiExplorer' | translate }}
             </span>
           </dd>
         </div>

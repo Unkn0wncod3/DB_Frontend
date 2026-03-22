@@ -13,8 +13,9 @@ type PreferenceTheme = 'system' | 'light' | 'dark';
 interface ProfileFormPreferences {
   theme: PreferenceTheme;
   language: string;
+  contact_email: string;
   email_notifications: boolean;
-  push_notifications: boolean;
+  show_api_explorer: boolean;
 }
 
 @Component({
@@ -37,8 +38,9 @@ export class ProfileComponent {
     profile_picture_url: [''],
     theme: ['system' as PreferenceTheme],
     language: ['en'],
+    contact_email: ['', [Validators.email]],
     email_notifications: [false],
-    push_notifications: [false]
+    show_api_explorer: [false]
   });
   readonly passwordForm = this.fb.nonNullable.group({
     password: ['', [Validators.required]],
@@ -60,6 +62,10 @@ export class ProfileComponent {
 
   preferencesDisplay(user: AuthenticatedUser | null) {
     return this.normalizePreferences(user?.preferences);
+  }
+
+  showAdminPreferences(): boolean {
+    return this.auth.isAdmin();
   }
 
   passwordMismatch(): boolean {
@@ -215,18 +221,24 @@ export class ProfileComponent {
       profile_picture_url: user.profile_picture_url ?? '',
       theme: normalizedPreferences.theme,
       language: normalizedPreferences.language,
+      contact_email: normalizedPreferences.contact_email,
       email_notifications: normalizedPreferences.notifications.email,
-      push_notifications: normalizedPreferences.notifications.push
+      show_api_explorer: normalizedPreferences.admin_preferences.show_api_explorer
     });
   }
 
   private buildPreferencesFromForm(formValue: Record<string, any>): Record<string, unknown> {
+    const contactEmail = String(formValue['contact_email'] ?? '').trim();
+
     return {
       theme: formValue['theme'] as PreferenceTheme,
       language: formValue['language'] as string,
+      contact_email: contactEmail.length > 0 ? contactEmail : null,
       notifications: {
-        email: !!formValue['email_notifications'],
-        push: !!formValue['push_notifications']
+        email: !!formValue['email_notifications']
+      },
+      admin_preferences: {
+        show_api_explorer: !!formValue['show_api_explorer']
       }
     };
   }
@@ -234,31 +246,50 @@ export class ProfileComponent {
   private normalizePreferences(preferences: Record<string, unknown> | null | undefined): {
     theme: PreferenceTheme;
     language: string;
-    notifications: { email: boolean; push: boolean };
+    contact_email: string;
+    notifications: { email: boolean };
+    admin_preferences: { show_api_explorer: boolean };
   } {
     const defaultPrefs: ProfileFormPreferences = {
       theme: 'system',
       language: 'en',
+      contact_email: '',
       email_notifications: false,
-      push_notifications: false
+      show_api_explorer: false
     };
 
     if (!preferences || typeof preferences !== 'object') {
-      return { theme: defaultPrefs.theme, language: defaultPrefs.language, notifications: { email: false, push: false } };
+      return {
+        theme: defaultPrefs.theme,
+        language: defaultPrefs.language,
+        contact_email: defaultPrefs.contact_email,
+        notifications: { email: false },
+        admin_preferences: { show_api_explorer: defaultPrefs.show_api_explorer }
+      };
     }
 
     const theme = (preferences['theme'] as PreferenceTheme) ?? defaultPrefs.theme;
     const language = (preferences['language'] as string) ?? defaultPrefs.language;
+    const contactEmail = typeof preferences['contact_email'] === 'string' ? (preferences['contact_email'] as string) : defaultPrefs.contact_email;
     const notifications = preferences['notifications'];
+    const adminPreferences = preferences['admin_preferences'];
     const email = typeof notifications === 'object' && notifications !== null ? Boolean((notifications as Record<string, unknown>)['email']) : false;
-    const push = typeof notifications === 'object' && notifications !== null ? Boolean((notifications as Record<string, unknown>)['push']) : false;
+    const showApiExplorer =
+      typeof adminPreferences === 'object' && adminPreferences !== null
+        ? typeof (adminPreferences as Record<string, unknown>)['show_api_explorer'] === 'boolean'
+          ? Boolean((adminPreferences as Record<string, unknown>)['show_api_explorer'])
+          : defaultPrefs.show_api_explorer
+        : defaultPrefs.show_api_explorer;
 
     return {
       theme,
       language,
+      contact_email: contactEmail,
       notifications: {
-        email,
-        push
+        email
+      },
+      admin_preferences: {
+        show_api_explorer: showApiExplorer
       }
     };
   }
