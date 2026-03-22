@@ -11,7 +11,6 @@ import { LucideIconsModule } from '../../core/modules/lucide-icons.module';
 import { EntrySchema } from '../../core/models/metadata.models';
 import { SchemaService } from '../../core/services/schema.service';
 import { DashboardSchemaTotal, StatsService } from '../../core/services/stats.service';
-import { SchemaEditorFormComponent, SchemaEditorSubmitPayload } from '../schema-editor-form/schema-editor-form.component';
 
 interface SchemaOverviewCard extends DashboardSchemaTotal {
   is_active: boolean;
@@ -21,7 +20,7 @@ interface SchemaOverviewCard extends DashboardSchemaTotal {
 @Component({
   selector: 'app-schema-overview',
   standalone: true,
-  imports: [NgIf, NgFor, DatePipe, DecimalPipe, RouterLink, TranslateModule, LucideIconsModule, ReactiveFormsModule, SchemaEditorFormComponent],
+  imports: [NgIf, NgFor, DatePipe, DecimalPipe, RouterLink, TranslateModule, LucideIconsModule, ReactiveFormsModule],
   templateUrl: './schema-overview.component.html',
   styleUrl: './schema-overview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -98,18 +97,6 @@ export class SchemaOverviewComponent implements OnInit {
   toggleInactiveVisibility(): void {
     this.showInactive.update((value) => !value);
     void this.reloadData(true);
-  }
-
-  openCreateDialog(): void {
-    if (!this.auth.canManageSchemas()) {
-      return;
-    }
-
-    this.editingSchema.set(null);
-    this.form.reset({ key: '', name: '', description: '', icon: '', is_active: true });
-    this.isSchemaDialogOpen.set(true);
-    this.successMessage.set(null);
-    this.dialogError.set(null);
   }
 
   async openEditDialog(item: DashboardSchemaTotal): Promise<void> {
@@ -191,23 +178,6 @@ export class SchemaOverviewComponent implements OnInit {
     }
   }
 
-  async createSchemaFromDialog(payload: SchemaEditorSubmitPayload): Promise<void> {
-    this.isSavingSchema.set(true);
-    this.successMessage.set(null);
-    this.dialogError.set(null);
-
-    try {
-      await firstValueFrom(this.schemaService.createSchemaWithFields(payload.schema, payload.fields));
-      this.successMessage.set(this.translate.instant('schemaOverview.status.created', { value: payload.schema.name }));
-      this.closeSchemaDialog();
-      await this.reloadData(true);
-    } catch (error) {
-      this.dialogError.set(this.describeMutationError(error));
-    } finally {
-      this.isSavingSchema.set(false);
-    }
-  }
-
   async deleteSchema(): Promise<void> {
     const schema = this.editingSchema();
     if (!schema || this.isDeletingSchema()) {
@@ -262,21 +232,15 @@ export class SchemaOverviewComponent implements OnInit {
   }
 
   dialogTitle(): string {
-    return this.editingSchema()
-      ? this.translate.instant('schemaOverview.dialog.editTitle')
-      : this.translate.instant('schemaOverview.dialog.title');
+    return this.translate.instant('schemaOverview.dialog.editTitle');
   }
 
   dialogSubtitle(): string {
-    return this.editingSchema()
-      ? this.translate.instant('schemaOverview.dialog.editSubtitle')
-      : this.translate.instant('schemaOverview.dialog.subtitle');
+    return this.translate.instant('schemaOverview.dialog.editSubtitle');
   }
 
   dialogSubmitLabel(): string {
-    return this.editingSchema()
-      ? this.translate.instant('schemaOverview.actions.save')
-      : this.translate.instant('schemaOverview.actions.create');
+    return this.translate.instant('schemaOverview.actions.save');
   }
 
   inactiveToggleLabel(): string {
