@@ -583,18 +583,70 @@
       "noFieldChanges": "Keine Feld-Änderungen protokolliert."
     },
     "attachments": {
+      "actions": {
+        "create": "Anhang anlegen",
+        "edit": "Bearbeiten",
+        "save": "Anhang speichern",
+        "saving": "Speichere..."
+      },
+      "dialog": {
+        "createTitle": "Anhang anlegen",
+        "createSubtitle": "Lege einen verlinkten Anhang direkt ueber den Entry-Endpunkt an.",
+        "editTitle": "Anhang bearbeiten",
+        "editSubtitle": "Aktualisiere die verlinkte Ressource und ihre Metadaten fuer diesen Eintrag."
+      },
+      "fields": {
+        "fileName": "Dateiname",
+        "externalUrl": "Externe URL",
+        "mimeType": "MIME-Typ",
+        "fileSize": "Dateigröße",
+        "checksum": "Prüfsumme",
+        "description": "Beschreibung"
+      },
+      "status": {
+        "loading": "Anhänge werden geladen...",
+        "created": "Anhang erstellt.",
+        "updated": "Anhang aktualisiert.",
+        "deleted": "Anhang gelöscht."
+      },
+      "confirmDelete": "Anhang \"{{ value }}\" löschen?",
       "mimeType": "MIME-Typ",
-      "fileSize": "Dateigroesse",
+      "fileSize": "Dateigröße",
       "uploadedBy": "Hochgeladen von"
     },
     "permissions": {
+      "actions": {
+        "create": "Berechtigung anlegen",
+        "edit": "Bearbeiten",
+        "save": "Berechtigung speichern",
+        "saving": "Speichere..."
+      },
       "columns": {
         "subjectType": "Subjekttyp",
         "subjectId": "Subjekt-ID",
         "permission": "Berechtigung",
         "createdBy": "Erstellt von",
-        "createdAt": "Erstellt am"
-      }
+        "createdAt": "Erstellt am",
+        "actions": "Aktionen"
+      },
+      "dialog": {
+        "createTitle": "Berechtigung anlegen",
+        "createSubtitle": "Vergib eine explizite Berechtigung fuer diesen Eintrag.",
+        "editTitle": "Berechtigung bearbeiten",
+        "editSubtitle": "Aktualisiere Subjekt oder Berechtigung dieser Freigabe."
+      },
+      "fields": {
+        "subjectType": "Subjekttyp",
+        "subjectId": "Subjekt-ID",
+        "permission": "Berechtigung"
+      },
+      "status": {
+        "loading": "Berechtigungen werden geladen...",
+        "created": "Berechtigung erstellt.",
+        "updated": "Berechtigung aktualisiert.",
+        "deleted": "Berechtigung gelöscht."
+      },
+      "confirmDelete": "Berechtigung \"{{ value }}\" löschen?"
     }
   },
   "entryList": {

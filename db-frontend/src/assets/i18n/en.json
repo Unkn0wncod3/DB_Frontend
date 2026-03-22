@@ -534,18 +534,70 @@
       "noFieldChanges": "No field changes recorded."
     },
     "attachments": {
+      "actions": {
+        "create": "Add attachment",
+        "edit": "Edit",
+        "save": "Save attachment",
+        "saving": "Saving..."
+      },
+      "dialog": {
+        "createTitle": "Add attachment",
+        "createSubtitle": "Create a linked attachment for this entry using the entry-specific endpoint.",
+        "editTitle": "Edit attachment",
+        "editSubtitle": "Update the linked resource and metadata for this entry."
+      },
+      "fields": {
+        "fileName": "File name",
+        "externalUrl": "External URL",
+        "mimeType": "MIME type",
+        "fileSize": "File size",
+        "checksum": "Checksum",
+        "description": "Description"
+      },
+      "status": {
+        "loading": "Loading attachments...",
+        "created": "Attachment created.",
+        "updated": "Attachment updated.",
+        "deleted": "Attachment deleted."
+      },
+      "confirmDelete": "Delete attachment \"{{ value }}\"?",
       "mimeType": "MIME type",
       "fileSize": "File size",
       "uploadedBy": "Uploaded by"
     },
     "permissions": {
+      "actions": {
+        "create": "Add permission",
+        "edit": "Edit",
+        "save": "Save permission",
+        "saving": "Saving..."
+      },
       "columns": {
         "subjectType": "Subject type",
         "subjectId": "Subject ID",
         "permission": "Permission",
         "createdBy": "Created by",
-        "createdAt": "Created at"
-      }
+        "createdAt": "Created at",
+        "actions": "Actions"
+      },
+      "dialog": {
+        "createTitle": "Add permission",
+        "createSubtitle": "Grant an explicit permission for this entry.",
+        "editTitle": "Edit permission",
+        "editSubtitle": "Update the subject or permission for this explicit grant."
+      },
+      "fields": {
+        "subjectType": "Subject type",
+        "subjectId": "Subject ID",
+        "permission": "Permission"
+      },
+      "status": {
+        "loading": "Loading permissions...",
+        "created": "Permission created.",
+        "updated": "Permission updated.",
+        "deleted": "Permission deleted."
+      },
+      "confirmDelete": "Delete permission \"{{ value }}\"?"
     }
   },
   "entryList": {

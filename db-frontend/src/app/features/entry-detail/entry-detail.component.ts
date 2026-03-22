@@ -16,6 +16,7 @@ import {
   EntryAccessMap,
   EntryBundle,
   EntryHistoryRecord,
+  EntryPermission,
   EntryPermissionRecord,
   EntryRelationTargetRecord,
   EntryRecord,
@@ -80,8 +81,16 @@ export class EntryDetailComponent {
   readonly isLeaveDialogOpen = signal(false);
   readonly isSavingRelation = signal(false);
   readonly isDeletingRelation = signal(false);
+  readonly isAttachmentDialogOpen = signal(false);
+  readonly isSavingAttachment = signal(false);
+  readonly isLoadingAttachments = signal(false);
+  readonly isPermissionDialogOpen = signal(false);
+  readonly isSavingPermission = signal(false);
+  readonly isLoadingPermissions = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
+  readonly attachmentError = signal<string | null>(null);
+  readonly permissionError = signal<string | null>(null);
 
   readonly entry = signal<EntryRecord | null>(null);
   readonly schema = signal<EntrySchema | null>(null);
@@ -103,8 +112,23 @@ export class EntryDetailComponent {
   readonly defaultStatusOptions = ['draft', 'review', 'active', 'inactive', 'archived'];
   readonly fieldTypes: FieldDataType[] = ['text', 'long_text', 'integer', 'decimal', 'boolean', 'date', 'datetime', 'email', 'url', 'select', 'multi_select', 'reference', 'file', 'json'];
   readonly relationTypes = ['belongs_to', 'parent_of', 'references', 'assigned_to', 'contains', 'related_to'] as const;
+  readonly permissionOptions: EntryPermission[] = [
+    'read',
+    'view_history',
+    'edit',
+    'edit_status',
+    'edit_visibility',
+    'manage_relations',
+    'manage_attachments',
+    'manage_permissions',
+    'delete',
+    'manage'
+  ];
+  readonly permissionSubjectTypes: EntryPermissionRecord['subject_type'][] = ['user', 'role', 'group'];
   readonly editingField = signal<SchemaField | null>(null);
   readonly editingRelation = signal<EntryRelationRecord | null>(null);
+  readonly editingAttachment = signal<AttachmentRecord | null>(null);
+  readonly editingPermission = signal<EntryPermissionRecord | null>(null);
 
   readonly entryTitle = computed(() => {
     const entry = this.entry();
@@ -112,6 +136,10 @@ export class EntryDetailComponent {
   });
   readonly canEdit = computed(() => this.access().manage || this.access().edit);
   readonly canDelete = computed(() => this.access().manage || this.access().delete);
+  readonly canManageAttachments = computed(() => this.access().manage_attachments || this.access().manage);
+  readonly canManagePermissions = computed(() => this.access().manage_permissions || this.access().manage);
+  readonly isAttachmentsBusy = computed(() => this.isLoadingAttachments() || this.isSavingAttachment());
+  readonly isPermissionsBusy = computed(() => this.isLoadingPermissions() || this.isSavingPermission());
   readonly schemaFieldsTitle = computed(() => {
     const schema = this.schema();
     return schema ? this.translate.instant('entryDetail.sections.schemaFieldsNamed', { schema: schema.name }) : '';
@@ -230,6 +258,19 @@ export class EntryDetailComponent {
     relation_type: ['references'],
     sort_order: [0]
   });
+  readonly attachmentForm = this.fb.nonNullable.group({
+    file_name: ['', Validators.required],
+    external_url: ['', Validators.required],
+    mime_type: [''],
+    file_size: [''],
+    checksum: [''],
+    description: ['']
+  });
+  readonly permissionForm = this.fb.nonNullable.group({
+    subject_type: ['role' as EntryPermissionRecord['subject_type'], Validators.required],
+    subject_id: ['', Validators.required],
+    permission: ['read' as EntryPermission, Validators.required]
+  });
 
   form: FormGroup = this.fb.group({});
   private currentSchemaKey: string | null = null;
@@ -242,6 +283,16 @@ export class EntryDetailComponent {
   constructor() {
     this.metaForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.formRevision.update((value) => value + 1);
+    });
+
+    this.attachmentForm.controls.file_name.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.syncAttachmentDerivedFields();
+    });
+    this.attachmentForm.controls.external_url.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.syncAttachmentDerivedFields();
+    });
+    this.attachmentForm.controls.file_size.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.syncAttachmentDerivedFields();
     });
 
     this.createFieldForm.controls.label.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((value) => {
@@ -267,7 +318,12 @@ export class EntryDetailComponent {
     });
 
     effect(() => {
-      const hasOpenDialog = this.isFieldDialogOpen() || this.isRelationDialogOpen() || this.isLeaveDialogOpen();
+      const hasOpenDialog =
+        this.isFieldDialogOpen() ||
+        this.isRelationDialogOpen() ||
+        this.isAttachmentDialogOpen() ||
+        this.isPermissionDialogOpen() ||
+        this.isLeaveDialogOpen();
       this.setBodyScrollLock(hasOpenDialog);
     });
 
@@ -490,6 +546,224 @@ export class EntryDetailComponent {
       this.errorMessage.set(this.describeError(error, 'save'));
     } finally {
       this.isSavingRelation.set(false);
+    }
+  }
+
+  openAttachmentDialog(attachment?: AttachmentRecord): void {
+    if (!this.entry() || !this.canManageAttachments()) {
+      return;
+    }
+
+    this.attachmentError.set(null);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
+    if (attachment) {
+      this.editingAttachment.set(attachment);
+      this.attachmentForm.reset({
+        file_name: attachment.file_name ?? '',
+        external_url: attachment.stored_path ?? attachment.external_url ?? '',
+        mime_type: attachment.mime_type ?? '',
+        file_size: attachment.file_size != null ? String(attachment.file_size) : '0',
+        checksum: '',
+        description: attachment.description ?? ''
+      });
+    } else {
+      this.editingAttachment.set(null);
+      this.attachmentForm.reset({
+        file_name: '',
+        external_url: '',
+        mime_type: '',
+        file_size: '0',
+        checksum: '',
+        description: ''
+      });
+    }
+
+    this.syncAttachmentDerivedFields();
+    this.isAttachmentDialogOpen.set(true);
+  }
+
+  closeAttachmentDialog(): void {
+    this.isAttachmentDialogOpen.set(false);
+    this.editingAttachment.set(null);
+    this.attachmentError.set(null);
+  }
+
+  async saveAttachment(): Promise<void> {
+    const entry = this.entry();
+    if (!entry || this.attachmentForm.invalid || this.isSavingAttachment()) {
+      return;
+    }
+
+    this.isSavingAttachment.set(true);
+    this.attachmentError.set(null);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
+    try {
+      const raw = this.attachmentForm.getRawValue();
+      const payload = {
+        file_name: raw.file_name.trim(),
+        external_url: raw.external_url.trim(),
+        mime_type: null,
+        file_size: this.parseOptionalNumber(raw.file_size) ?? 0,
+        checksum: this.buildAttachmentChecksum(raw.file_name, raw.external_url, raw.file_size),
+        description: raw.description.trim() || null
+      };
+
+      const editingAttachment = this.editingAttachment();
+      if (editingAttachment) {
+        await firstValueFrom(this.entryService.updateAttachment(entry.id, editingAttachment.id, payload));
+        this.successMessage.set(this.translate.instant('entryDetail.attachments.status.updated'));
+      } else {
+        await firstValueFrom(this.entryService.createAttachment(entry.id, payload));
+        this.successMessage.set(this.translate.instant('entryDetail.attachments.status.created'));
+      }
+
+      this.closeAttachmentDialog();
+      await this.reloadAttachments();
+    } catch (error) {
+      this.attachmentError.set(this.describeError(error, 'save'));
+    } finally {
+      this.isSavingAttachment.set(false);
+    }
+  }
+
+  async deleteAttachment(attachment: AttachmentRecord): Promise<void> {
+    const entry = this.entry();
+    if (!entry || !this.canManageAttachments()) {
+      return;
+    }
+
+    const confirmed = globalThis.confirm(
+      this.translate.instant('entryDetail.attachments.confirmDelete', { value: attachment.file_name || `#${attachment.id}` })
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    this.isSavingAttachment.set(true);
+    this.attachmentError.set(null);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
+    try {
+      await firstValueFrom(this.entryService.deleteAttachment(entry.id, attachment.id));
+      this.successMessage.set(this.translate.instant('entryDetail.attachments.status.deleted'));
+      if (this.editingAttachment() && String(this.editingAttachment()?.id) === String(attachment.id)) {
+        this.closeAttachmentDialog();
+      }
+      await this.reloadAttachments();
+    } catch (error) {
+      this.attachmentError.set(this.describeError(error, 'delete'));
+    } finally {
+      this.isSavingAttachment.set(false);
+    }
+  }
+
+  openPermissionDialog(permission?: EntryPermissionRecord): void {
+    if (!this.entry() || !this.canManagePermissions()) {
+      return;
+    }
+
+    this.permissionError.set(null);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
+    if (permission) {
+      this.editingPermission.set(permission);
+      this.permissionForm.reset({
+        subject_type: permission.subject_type,
+        subject_id: permission.subject_id ?? '',
+        permission: permission.permission
+      });
+    } else {
+      this.editingPermission.set(null);
+      this.permissionForm.reset({
+        subject_type: 'role',
+        subject_id: '',
+        permission: 'read'
+      });
+    }
+
+    this.isPermissionDialogOpen.set(true);
+  }
+
+  closePermissionDialog(): void {
+    this.isPermissionDialogOpen.set(false);
+    this.editingPermission.set(null);
+    this.permissionError.set(null);
+  }
+
+  async savePermission(): Promise<void> {
+    const entry = this.entry();
+    if (!entry || this.permissionForm.invalid || this.isSavingPermission()) {
+      return;
+    }
+
+    this.isSavingPermission.set(true);
+    this.permissionError.set(null);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
+    try {
+      const raw = this.permissionForm.getRawValue();
+      const payload = {
+        subject_type: raw.subject_type,
+        subject_id: raw.subject_id.trim(),
+        permission: raw.permission
+      };
+
+      const editingPermission = this.editingPermission();
+      if (editingPermission) {
+        await firstValueFrom(this.entryService.updatePermission(entry.id, editingPermission.id, payload));
+        this.successMessage.set(this.translate.instant('entryDetail.permissions.status.updated'));
+      } else {
+        await firstValueFrom(this.entryService.createPermission(entry.id, payload));
+        this.successMessage.set(this.translate.instant('entryDetail.permissions.status.created'));
+      }
+
+      this.closePermissionDialog();
+      await this.reloadPermissions();
+    } catch (error) {
+      this.permissionError.set(this.describeError(error, 'save'));
+    } finally {
+      this.isSavingPermission.set(false);
+    }
+  }
+
+  async deletePermission(permission: EntryPermissionRecord): Promise<void> {
+    const entry = this.entry();
+    if (!entry || !this.canManagePermissions()) {
+      return;
+    }
+
+    const confirmed = globalThis.confirm(
+      this.translate.instant('entryDetail.permissions.confirmDelete', {
+        value: `${permission.subject_type}:${permission.subject_id} · ${permission.permission}`
+      })
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    this.isSavingPermission.set(true);
+    this.permissionError.set(null);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
+    try {
+      await firstValueFrom(this.entryService.deletePermission(entry.id, permission.id));
+      this.successMessage.set(this.translate.instant('entryDetail.permissions.status.deleted'));
+      if (this.editingPermission() && String(this.editingPermission()?.id) === String(permission.id)) {
+        this.closePermissionDialog();
+      }
+      await this.reloadPermissions();
+    } catch (error) {
+      this.permissionError.set(this.describeError(error, 'delete'));
+    } finally {
+      this.isSavingPermission.set(false);
     }
   }
 
@@ -746,8 +1020,32 @@ export class EntryDetailComponent {
   }
 
   attachmentUrl(attachment: AttachmentRecord): string | null {
-    const candidate = attachment.external_url ?? attachment.stored_path ?? null;
+    const candidate = attachment.stored_path ?? attachment.external_url ?? null;
     return candidate && candidate.trim().length > 0 ? candidate : null;
+  }
+
+  attachmentDialogTitle(): string {
+    return this.editingAttachment()
+      ? this.translate.instant('entryDetail.attachments.dialog.editTitle')
+      : this.translate.instant('entryDetail.attachments.dialog.createTitle');
+  }
+
+  attachmentDialogSubtitle(): string {
+    return this.editingAttachment()
+      ? this.translate.instant('entryDetail.attachments.dialog.editSubtitle')
+      : this.translate.instant('entryDetail.attachments.dialog.createSubtitle');
+  }
+
+  permissionDialogTitle(): string {
+    return this.editingPermission()
+      ? this.translate.instant('entryDetail.permissions.dialog.editTitle')
+      : this.translate.instant('entryDetail.permissions.dialog.createTitle');
+  }
+
+  permissionDialogSubtitle(): string {
+    return this.editingPermission()
+      ? this.translate.instant('entryDetail.permissions.dialog.editSubtitle')
+      : this.translate.instant('entryDetail.permissions.dialog.createSubtitle');
   }
 
   relationCounterpart(relation: EntryRelationRecord): EntryRelationTargetRecord | null {
@@ -840,6 +1138,44 @@ export class EntryDetailComponent {
     const bundle = await firstValueFrom(this.entryService.getEntryBundle(entry.id));
     this.relations.set(bundle.relations ?? []);
     this.relationEntries.set(bundle.relation_targets ?? []);
+  }
+
+  private async reloadAttachments(): Promise<void> {
+    const entry = this.entry();
+    if (!entry) {
+      return;
+    }
+
+    this.isLoadingAttachments.set(true);
+    this.attachmentError.set(null);
+
+    try {
+      const attachments = await firstValueFrom(this.entryService.getAttachments(entry.id));
+      this.attachments.set(attachments ?? []);
+    } catch (error) {
+      this.attachmentError.set(this.describeError(error, 'load'));
+    } finally {
+      this.isLoadingAttachments.set(false);
+    }
+  }
+
+  private async reloadPermissions(): Promise<void> {
+    const entry = this.entry();
+    if (!entry) {
+      return;
+    }
+
+    this.isLoadingPermissions.set(true);
+    this.permissionError.set(null);
+
+    try {
+      const permissions = await firstValueFrom(this.entryService.getPermissions(entry.id));
+      this.permissions.set(permissions ?? []);
+    } catch (error) {
+      this.permissionError.set(this.describeError(error, 'load'));
+    } finally {
+      this.isLoadingPermissions.set(false);
+    }
   }
 
   private rebuildForms(entry: EntryRecord, schema: EntrySchema | null): void {
@@ -1210,6 +1546,41 @@ export class EntryDetailComponent {
       return ['true', '1', 'yes', 'on'].includes(value.trim().toLowerCase());
     }
     return false;
+  }
+
+  private parseOptionalNumber(value: string): number | null {
+    const normalized = String(value ?? '').trim();
+    if (!normalized) {
+      return null;
+    }
+
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  private syncAttachmentDerivedFields(): void {
+    const raw = this.attachmentForm.getRawValue();
+    const normalizedSize = this.parseOptionalNumber(raw.file_size);
+    const nextSize = normalizedSize == null ? '0' : String(normalizedSize);
+    if (raw.file_size !== nextSize) {
+      this.attachmentForm.controls.file_size.setValue(nextSize, { emitEvent: false });
+    }
+
+    const checksum = this.buildAttachmentChecksum(raw.file_name, raw.external_url, nextSize);
+    if (raw.checksum !== checksum) {
+      this.attachmentForm.controls.checksum.setValue(checksum, { emitEvent: false });
+    }
+  }
+
+  private buildAttachmentChecksum(fileName: string, externalUrl: string, fileSize: string): string {
+    const source = `${fileName.trim()}|${externalUrl.trim()}|${String(fileSize ?? '').trim() || '0'}`;
+    let hash = 0;
+
+    for (let index = 0; index < source.length; index += 1) {
+      hash = (hash * 31 + source.charCodeAt(index)) >>> 0;
+    }
+
+    return `link-${hash.toString(16).padStart(8, '0')}`;
   }
 
   private stringifyJson(value: unknown): string {

@@ -230,8 +230,15 @@
           <h2>{{ 'entryDetail.sections.attachments' | translate }}</h2>
           <p>{{ 'entryDetail.sections.attachmentsHelp' | translate }}</p>
         </div>
+        <div class="entry-detail__entity-actions" *ngIf="canManageAttachments()">
+          <button type="button" class="entry-detail__button entry-detail__button--primary" (click)="openAttachmentDialog()" [disabled]="isAttachmentsBusy()">
+            {{ 'entryDetail.attachments.actions.create' | translate }}
+          </button>
+        </div>
       </header>
 
+      <p class="entry-detail__dialog-error" *ngIf="attachmentError() as error">{{ error }}</p>
+      <p class="entry-detail__field-help" *ngIf="isLoadingAttachments()">{{ 'entryDetail.attachments.status.loading' | translate }}</p>
       <p class="entry-detail__empty" *ngIf="attachments().length === 0">{{ 'entryDetail.status.noAttachments' | translate }}</p>
 
       <div class="entry-detail__entity-grid" *ngIf="attachments().length > 0">
@@ -260,6 +267,14 @@
               <dd>{{ attachment.uploaded_by }}</dd>
             </div>
           </dl>
+          <div class="entry-detail__entity-actions" *ngIf="canManageAttachments()">
+            <button type="button" class="entry-detail__button entry-detail__button--ghost" (click)="openAttachmentDialog(attachment)" [disabled]="isAttachmentsBusy()">
+              {{ 'entryDetail.attachments.actions.edit' | translate }}
+            </button>
+            <button type="button" class="entry-detail__button entry-detail__button--danger" (click)="deleteAttachment(attachment)" [disabled]="isAttachmentsBusy()">
+              {{ 'schemaFields.actions.delete' | translate }}
+            </button>
+          </div>
         </article>
       </div>
     </section>
@@ -296,14 +311,21 @@
       </div>
     </section>
 
-    <section class="entry-detail__panel" *ngIf="access().manage_permissions || access().manage">
+    <section class="entry-detail__panel" *ngIf="permissions().length > 0 || access().manage_permissions || access().manage">
       <header class="entry-detail__panel-header">
         <div>
           <h2>{{ 'entryDetail.sections.permissions' | translate }}</h2>
           <p>{{ 'entryDetail.sections.permissionsHelp' | translate }}</p>
         </div>
+        <div class="entry-detail__entity-actions" *ngIf="canManagePermissions()">
+          <button type="button" class="entry-detail__button entry-detail__button--primary" (click)="openPermissionDialog()" [disabled]="isPermissionsBusy()">
+            {{ 'entryDetail.permissions.actions.create' | translate }}
+          </button>
+        </div>
       </header>
 
+      <p class="entry-detail__dialog-error" *ngIf="permissionError() as error">{{ error }}</p>
+      <p class="entry-detail__field-help" *ngIf="isLoadingPermissions()">{{ 'entryDetail.permissions.status.loading' | translate }}</p>
       <p class="entry-detail__empty" *ngIf="permissions().length === 0">{{ 'entryDetail.status.noPermissions' | translate }}</p>
 
       <div class="entry-detail__table-wrap" *ngIf="permissions().length > 0">
@@ -315,6 +337,7 @@
               <th>{{ 'entryDetail.permissions.columns.permission' | translate }}</th>
               <th>{{ 'entryDetail.permissions.columns.createdBy' | translate }}</th>
               <th>{{ 'entryDetail.permissions.columns.createdAt' | translate }}</th>
+              <th *ngIf="canManagePermissions()">{{ 'entryDetail.permissions.columns.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -324,6 +347,16 @@
               <td>{{ permission.permission }}</td>
               <td>{{ permission.created_by ?? '-' }}</td>
               <td>{{ permission.created_at ? (permission.created_at | date:'dd/MM/yyyy, HH:mm') : '-' }}</td>
+              <td *ngIf="canManagePermissions()">
+                <div class="entry-detail__entity-actions">
+                  <button type="button" class="entry-detail__button entry-detail__button--ghost" (click)="openPermissionDialog(permission)" [disabled]="isPermissionsBusy()">
+                    {{ 'entryDetail.permissions.actions.edit' | translate }}
+                  </button>
+                  <button type="button" class="entry-detail__button entry-detail__button--danger" (click)="deletePermission(permission)" [disabled]="isPermissionsBusy()">
+                    {{ 'schemaFields.actions.delete' | translate }}
+                  </button>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -488,6 +521,86 @@
             [disabled]="isDeletingRelation()"
           >
             {{ 'schemaFields.actions.delete' | translate }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="entry-detail__dialog-backdrop" *ngIf="isAttachmentDialogOpen()" (click)="closeAttachmentDialog()">
+    <section class="entry-detail__dialog" (click)="$event.stopPropagation()">
+      <h2>{{ attachmentDialogTitle() }}</h2>
+      <p>{{ attachmentDialogSubtitle() }}</p>
+      <p *ngIf="attachmentError() as error" class="entry-detail__dialog-error">{{ error }}</p>
+      <form [formGroup]="attachmentForm" class="entry-detail__dialog-form" (ngSubmit)="saveAttachment()">
+        <label>
+          <span>{{ 'entryDetail.attachments.fields.fileName' | translate }}</span>
+          <input type="text" formControlName="file_name" />
+        </label>
+        <label class="entry-detail__dialog-field--full">
+          <span>{{ 'entryDetail.attachments.fields.externalUrl' | translate }}</span>
+          <input type="url" formControlName="external_url" />
+        </label>
+        <label>
+          <span>{{ 'entryDetail.attachments.fields.fileSize' | translate }}</span>
+          <input type="number" min="0" formControlName="file_size" />
+        </label>
+        <label class="entry-detail__dialog-field--full">
+          <span>{{ 'entryDetail.attachments.fields.checksum' | translate }}</span>
+          <input type="text" formControlName="checksum" readonly class="entry-detail__input--readonly" />
+        </label>
+        <label class="entry-detail__dialog-field--full">
+          <span>{{ 'entryDetail.attachments.fields.description' | translate }}</span>
+          <textarea formControlName="description"></textarea>
+        </label>
+        <div class="entry-detail__dialog-actions">
+          <button type="button" class="entry-detail__button entry-detail__button--ghost" (click)="closeAttachmentDialog()">
+            {{ 'schemaFields.actions.cancel' | translate }}
+          </button>
+          <button type="submit" class="entry-detail__button entry-detail__button--primary" [disabled]="attachmentForm.invalid || isSavingAttachment()">
+            {{
+              isSavingAttachment()
+                ? ('entryDetail.attachments.actions.saving' | translate)
+                : (editingAttachment() ? ('entryDetail.attachments.actions.save' | translate) : ('entryDetail.attachments.actions.create' | translate))
+            }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="entry-detail__dialog-backdrop" *ngIf="isPermissionDialogOpen()" (click)="closePermissionDialog()">
+    <section class="entry-detail__dialog" (click)="$event.stopPropagation()">
+      <h2>{{ permissionDialogTitle() }}</h2>
+      <p>{{ permissionDialogSubtitle() }}</p>
+      <p *ngIf="permissionError() as error" class="entry-detail__dialog-error">{{ error }}</p>
+      <form [formGroup]="permissionForm" class="entry-detail__dialog-form" (ngSubmit)="savePermission()">
+        <label>
+          <span>{{ 'entryDetail.permissions.fields.subjectType' | translate }}</span>
+          <select formControlName="subject_type">
+            <option *ngFor="let type of permissionSubjectTypes" [value]="type">{{ type }}</option>
+          </select>
+        </label>
+        <label>
+          <span>{{ 'entryDetail.permissions.fields.subjectId' | translate }}</span>
+          <input type="text" formControlName="subject_id" />
+        </label>
+        <label class="entry-detail__dialog-field--full">
+          <span>{{ 'entryDetail.permissions.fields.permission' | translate }}</span>
+          <select formControlName="permission">
+            <option *ngFor="let option of permissionOptions" [value]="option">{{ option }}</option>
+          </select>
+        </label>
+        <div class="entry-detail__dialog-actions">
+          <button type="button" class="entry-detail__button entry-detail__button--ghost" (click)="closePermissionDialog()">
+            {{ 'schemaFields.actions.cancel' | translate }}
+          </button>
+          <button type="submit" class="entry-detail__button entry-detail__button--primary" [disabled]="permissionForm.invalid || isSavingPermission()">
+            {{
+              isSavingPermission()
+                ? ('entryDetail.permissions.actions.saving' | translate)
+                : (editingPermission() ? ('entryDetail.permissions.actions.save' | translate) : ('entryDetail.permissions.actions.create' | translate))
+            }}
           </button>
         </div>
       </form>

@@ -185,6 +185,21 @@ export class EntryService {
     });
   }
 
+  updatePermission(entryId: string | number, permissionId: string | number, payload: Partial<EntryPermissionRecord>): Observable<EntryPermissionRecord> {
+    return this.api.request<EntryPermissionRecord>(
+      'PATCH',
+      `/entries/${encodeURIComponent(String(entryId))}/permissions/${encodeURIComponent(String(permissionId))}`,
+      { body: payload }
+    );
+  }
+
+  deletePermission(entryId: string | number, permissionId: string | number): Observable<EntryPermissionRecord> {
+    return this.api.request<EntryPermissionRecord>(
+      'DELETE',
+      `/entries/${encodeURIComponent(String(entryId))}/permissions/${encodeURIComponent(String(permissionId))}`
+    );
+  }
+
   getAttachments(entryId: string | number): Observable<AttachmentRecord[]> {
     return this.api.request<AttachmentRecord[]>('GET', `/entries/${encodeURIComponent(String(entryId))}/attachments`);
   }
@@ -193,6 +208,21 @@ export class EntryService {
     return this.api.request<AttachmentRecord>('POST', `/entries/${encodeURIComponent(String(entryId))}/attachments`, {
       body: payload
     });
+  }
+
+  updateAttachment(entryId: string | number, attachmentId: string | number, payload: Partial<AttachmentRecord>): Observable<AttachmentRecord> {
+    return this.api.request<AttachmentRecord>(
+      'PATCH',
+      `/entries/${encodeURIComponent(String(entryId))}/attachments/${encodeURIComponent(String(attachmentId))}`,
+      { body: payload }
+    );
+  }
+
+  deleteAttachment(entryId: string | number, attachmentId: string | number): Observable<AttachmentRecord> {
+    return this.api.request<AttachmentRecord>(
+      'DELETE',
+      `/entries/${encodeURIComponent(String(entryId))}/attachments/${encodeURIComponent(String(attachmentId))}`
+    );
   }
 
   checkAccess(entryId: string | number, permission: EntryPermission): Observable<boolean> {
