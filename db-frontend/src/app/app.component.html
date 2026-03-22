@@ -1,0 +1,92 @@
+<div class="app-shell">
+  <header class="app-shell__header">
+    <a class="app-shell__brand" routerLink="/" (click)="scrollToTop()">{{ 'layout.brand' | translate }}</a>
+    <nav class="app-shell__nav" *ngIf="auth.isAuthenticated()">
+      <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
+        {{ 'layout.nav.dashboard' | translate }}
+      </a>
+      <a routerLink="/schemas" routerLinkActive="is-active">
+        {{ 'layout.nav.schemas' | translate }}
+      </a>
+      <a routerLink="/entries/mine" routerLinkActive="is-active">
+        {{ 'layout.nav.myEntries' | translate }}
+      </a>
+      <a *ngIf="auth.isAdmin()" routerLink="/explorer" routerLinkActive="is-active">
+        {{ 'layout.nav.explorer' | translate }}
+      </a>
+      <a *ngIf="auth.isAdmin()" routerLink="/admin/logs" routerLinkActive="is-active">
+        {{ 'layout.nav.logs' | translate }}
+      </a>
+      <a *ngIf="auth.canManageUsers()" routerLink="/admin/users" routerLinkActive="is-active">
+        {{ 'layout.nav.users' | translate }}
+      </a>
+    </nav>
+    <div class="app-shell__user-controls">
+    <button
+      type="button"
+      class="app-shell__theme-toggle"
+      (click)="toggleTheme()"
+      [attr.aria-label]="themeToggleLabelKey() | translate"
+    >
+      <span class="app-shell__theme-icon" aria-hidden="true">
+        <span *ngIf="theme.isDarkTheme(); else moonIcon">☀️</span>
+        <ng-template #moonIcon>🌙</ng-template>
+      </span>
+      <span class="app-shell__theme-label">
+        {{ themeToggleLabelKey() | translate }}
+      </span>
+    </button>
+    <div class="app-shell__auth">
+        <ng-container *ngIf="auth.isAuthenticated(); else loginLink">
+          <a *ngIf="auth.user() as currentUser" class="app-shell__user-link" routerLink="/profile">
+            <div class="app-shell__user-meta">
+              <img
+                class="app-shell__user-avatar"
+                [src]="profileImageSrc(currentUser)"
+                [alt]="currentUser.username"
+                (error)="handleProfileImageError($event)"
+              />
+              <div class="app-shell__user-text">
+                <span class="app-shell__user-name">{{ currentUser.username }}</span>
+                <span class="app-shell__user-role">{{ ('layout.roles.' + currentUser.role) | translate }}</span>
+              </div>
+            </div>
+          </a>
+          <button type="button" (click)="logout()">{{ 'auth.logout' | translate }}</button>
+        </ng-container>
+        <ng-template #loginLink>
+          <a routerLink="/login" class="app-shell__login">{{ 'auth.login.title' | translate }}</a>
+        </ng-template>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-shell__content">
+    <router-outlet />
+  </main>
+
+  <footer class="app-shell__footer">
+    <div class="app-shell__footer-links">
+      <a [href]="githubUrl" target="_blank" rel="noopener">{{ 'footer.github' | translate }}</a>
+      <a routerLink="/contact">{{ 'footer.contact' | translate }}</a>
+      <a routerLink="/imprint">{{ 'footer.imprint' | translate }}</a>
+    </div>
+    <div class="app-shell__footer-status" *ngIf="auth.canViewAdminVisibility()">
+      <span class="status-chip"
+            [class.status-chip--online]="apiStatus.status() === 'online'"
+            [class.status-chip--offline]="apiStatus.status() === 'offline'">
+        {{ ('footer.status.' + apiStatus.status()) | translate }}
+      </span>
+      <span class="footer-last-checked">
+        <ng-container *ngIf="apiStatus.lastChecked() as timestamp; else noStatus">
+          {{ 'footer.checkedAt' | translate:{ value: (timestamp | date:'HH:mm:ss') } }}
+        </ng-container>
+        <ng-template #noStatus>{{ 'footer.neverChecked' | translate }}</ng-template>
+      </span>
+      <button type="button" (click)="refreshApiStatus()" [disabled]="apiStatus.isChecking()">
+        <span *ngIf="apiStatus.isChecking(); else apiRefreshLabel">{{ 'footer.refreshing' | translate }}</span>
+        <ng-template #apiRefreshLabel>{{ 'footer.refresh' | translate }}</ng-template>
+      </button>
+    </div>
+  </footer>
+</div>

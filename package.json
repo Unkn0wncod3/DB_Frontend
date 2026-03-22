@@ -1,0 +1,14 @@
+{
+  "name": "db-frontend-repo",
+  "private": true,
+  "workspaces": [
+    "db-frontend"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace db-frontend",
+    "start": "npm start --workspace db-frontend",
+    "dev": "npm run dev --workspace db-frontend",
+    "preview": "npm run preview --workspace db-frontend"
+  }
+}
+

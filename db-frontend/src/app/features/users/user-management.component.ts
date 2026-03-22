@@ -1,0 +1,332 @@
+import { CommonModule } from '@angular/common';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+import { AuthRole, AuthenticatedUser, AuthService } from '../../core/services/auth.service';
+import { CreateUserPayload, UserAccount, UserService } from '../../core/services/user.service';
+
+@Component({
+  selector: 'app-user-management',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule, FormsModule],
+  templateUrl: './user-management.component.html',
+  styleUrl: './user-management.component.scss'
+})
+export class UserManagementComponent {
+  private readonly userService = inject(UserService);
+  private readonly fb = inject(FormBuilder);
+  private readonly translate = inject(TranslateService);
+  readonly defaultProfileImage =
+    'https://media.istockphoto.com/id/1495088043/de/vektor/benutzerprofil-symbol-avatar-oder-personensymbol-profilbild-portr%C3%A4tsymbol-standard.jpg?s=612x612&w=0&k=20&c=mmj93kpr1sFn8VJYI_MUabWE4B86zRD5Uf9fBbTbQqk=';
+
+  readonly users = signal<UserAccount[]>([]);
+  readonly isLoading = signal(false);
+  readonly isCreating = signal(false);
+  readonly isDeleting = signal(false);
+  readonly errorMessage = signal<string | null>(null);
+  readonly successMessage = signal<string | null>(null);
+  readonly pendingDeletion = signal<UserAccount | null>(null);
+  readonly protectedUsername = 'core_admin_01';
+  readonly viewingPreferences = signal<UserAccount | null>(null);
+  readonly roleUpdatingId = signal<string | number | null>(null);
+  readonly statusUpdatingId = signal<string | number | null>(null);
+  readonly currentUser = signal<AuthenticatedUser | null>(null);
+  readonly roleOptions: AuthRole[] = ['head_admin', 'admin', 'manager', 'editor', 'reader'];
+
+  readonly createForm = this.fb.nonNullable.group({
+    username: ['', [Validators.required, Validators.minLength(3)]],
+    password: ['', [Validators.required]],
+    role: ['reader' as AuthRole, Validators.required],
+    profile_picture_url: ['']
+  });
+
+  private readonly auth = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  constructor() {
+    this.currentUser.set(this.auth.user());
+    this.auth
+      .userChanges()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((user) => this.currentUser.set(user));
+    void this.refresh();
+  }
+
+  async refresh(): Promise<void> {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+    try {
+      const result = await firstValueFrom(this.userService.listUsers());
+      this.users.set(result);
+    } catch (error) {
+      this.errorMessage.set(this.describeError(error));
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  async createUser(): Promise<void> {
+    this.createForm.markAllAsTouched();
+    if (this.createForm.invalid) {
+      return;
+    }
+
+    const raw = this.createForm.getRawValue();
+    const trimmedUsername = raw.username.trim();
+    const payload: CreateUserPayload = {
+      username: trimmedUsername,
+      password: raw.password,
+      role: raw.role
+    };
+
+    const trimmedPicture = raw.profile_picture_url?.trim();
+    if (trimmedPicture) {
+      payload.profile_picture_url = trimmedPicture;
+    }
+
+    if (!this.auth.canAssignRole(payload.role)) {
+      this.errorMessage.set(this.translate.instant('userManagement.status.roleRestricted'));
+      return;
+    }
+
+    this.isCreating.set(true);
+    this.errorMessage.set(null);
+    try {
+      await firstValueFrom(this.userService.createUser(payload));
+      this.successMessage.set(this.translate.instant('userManagement.status.created'));
+      this.createForm.reset({
+        username: '',
+        password: '',
+        role: 'reader',
+        profile_picture_url: ''
+      });
+      await this.refresh();
+    } catch (error) {
+      this.errorMessage.set(this.describeError(error));
+    } finally {
+      this.isCreating.set(false);
+    }
+  }
+
+  requestDeletion(account: UserAccount): void {
+    if (this.isProtectedAccount(account) || this.isCurrentUser(account)) {
+      return;
+    }
+    this.pendingDeletion.set(account);
+    this.errorMessage.set(null);
+  }
+
+  async confirmDeletion(): Promise<void> {
+    const account = this.pendingDeletion();
+    if (!account) {
+      return;
+    }
+
+    this.isDeleting.set(true);
+    try {
+      await firstValueFrom(this.userService.deleteUser(account.id));
+      this.successMessage.set(this.translate.instant('userManagement.status.deleted', { username: account.username }));
+      await this.refresh();
+      this.pendingDeletion.set(null);
+    } catch (error) {
+      this.errorMessage.set(this.describeError(error));
+    } finally {
+      this.isDeleting.set(false);
+    }
+  }
+
+  cancelDeletion(): void {
+    this.pendingDeletion.set(null);
+  }
+
+  openPreferences(user: UserAccount): void {
+    this.viewingPreferences.set(user);
+  }
+
+  closePreferences(): void {
+    this.viewingPreferences.set(null);
+  }
+
+  preferencesSummary(user: UserAccount | null): { theme: string; language: string; notifications: { email: boolean; push: boolean } } {
+    const defaults = { theme: 'system', language: 'en', notifications: { email: false, push: false } };
+    if (!user?.preferences || typeof user.preferences !== 'object') {
+      return defaults;
+    }
+    const prefs = user.preferences as Record<string, unknown>;
+    const notifications = prefs['notifications'];
+    return {
+      theme: (prefs['theme'] as string) ?? defaults.theme,
+      language: (prefs['language'] as string) ?? defaults.language,
+      notifications: {
+        email: typeof notifications === 'object' && notifications !== null ? Boolean((notifications as Record<string, unknown>)['email']) : false,
+        push: typeof notifications === 'object' && notifications !== null ? Boolean((notifications as Record<string, unknown>)['push']) : false
+      }
+    };
+  }
+
+  async changeRole(user: UserAccount, newRole: AuthRole): Promise<void> {
+    if (newRole === user.role) {
+      return;
+    }
+    if (!this.canEditRoleTarget(user, newRole)) {
+      this.errorMessage.set(this.translate.instant('userManagement.status.roleRestricted'));
+      return;
+    }
+    if (!this.auth.canAssignRole(newRole)) {
+      this.errorMessage.set(this.translate.instant('userManagement.status.roleRestricted'));
+      return;
+    }
+
+    this.roleUpdatingId.set(user.id);
+    this.errorMessage.set(null);
+    try {
+      await firstValueFrom(this.userService.updateUser(user.id, { role: newRole }));
+      this.successMessage.set(this.translate.instant('userManagement.status.roleUpdated', { username: user.username }));
+      await this.refresh();
+    } catch (error) {
+      this.errorMessage.set(this.describeError(error));
+    } finally {
+      this.roleUpdatingId.set(null);
+    }
+  }
+
+  onRoleChange(user: UserAccount, value: string): void {
+    const newRole = value as AuthRole;
+    void this.changeRole(user, newRole);
+  }
+
+  async toggleStatus(user: UserAccount): Promise<void> {
+    const desiredState = !user.is_active;
+    await this.setAccountStatus(user, desiredState);
+  }
+
+  canToggleStatus(account: UserAccount): boolean {
+    if (this.isProtectedAccount(account) || this.isCurrentUser(account)) {
+      return false;
+    }
+    if (!this.auth.canManageUsers()) {
+      return false;
+    }
+    if (this.isHeadAdminUser()) {
+      return true;
+    }
+    return account.role !== 'admin' && account.role !== 'head_admin';
+  }
+
+  trackByUser(_index: number, user: UserAccount): string | number {
+    return user.id;
+  }
+
+  roleLabel(role: AuthRole): string {
+    return this.translate.instant(`userManagement.roles.${role}`);
+  }
+
+  profileImageSrc(user: UserAccount | null): string {
+    const src = user?.profile_picture_url?.trim();
+    return src && src.length > 0 ? src : this.defaultProfileImage;
+  }
+
+  profileInitial(user: UserAccount | null): string {
+    const source = user?.username?.trim() || '?';
+    return source.charAt(0).toUpperCase();
+  }
+
+  handleProfileImageError(event: Event): void {
+    const image = event.target as HTMLImageElement | null;
+    if (!image || image.dataset['fallbackApplied'] === 'true') {
+      return;
+    }
+
+    image.dataset['fallbackApplied'] = 'true';
+    image.src = this.defaultProfileImage;
+  }
+
+  isProtectedAccount(account: UserAccount): boolean {
+    return account.username === this.protectedUsername;
+  }
+
+  isCurrentUser(account: UserAccount): boolean {
+    return this.currentUser()?.id === account.id;
+  }
+
+  canEditUserRole(account: UserAccount): boolean {
+    if (this.isProtectedAccount(account) || this.isCurrentUser(account)) {
+      return false;
+    }
+    if (!this.auth.canManageUsers()) {
+      return false;
+    }
+    if (!this.isHeadAdminUser() && (account.role === 'admin' || account.role === 'head_admin')) {
+      return false;
+    }
+    return true;
+  }
+
+  canSelectRoleOption(option: AuthRole): boolean {
+    return this.auth.canAssignRole(option);
+  }
+
+  private canEditRoleTarget(account: UserAccount, targetRole: AuthRole): boolean {
+    if (this.isProtectedAccount(account) || this.isCurrentUser(account)) {
+      return false;
+    }
+    if (!this.auth.canManageUsers()) {
+      return false;
+    }
+    if (
+      !this.isHeadAdminUser() &&
+      (account.role === 'admin' ||
+        account.role === 'head_admin' ||
+        targetRole === 'admin' ||
+        targetRole === 'head_admin')
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  private isHeadAdminUser(): boolean {
+    const current = this.currentUser();
+    if (!current) {
+      return false;
+    }
+    return current.role === 'head_admin';
+  }
+
+  private async setAccountStatus(user: UserAccount, isActive: boolean): Promise<void> {
+    if (user.is_active === isActive) {
+      return;
+    }
+    if (!this.canToggleStatus(user)) {
+      this.errorMessage.set(this.translate.instant('userManagement.status.statusRestricted'));
+      return;
+    }
+
+    this.statusUpdatingId.set(user.id);
+    this.errorMessage.set(null);
+    try {
+      await firstValueFrom(this.userService.updateUserStatus(user.id, isActive));
+      const key = isActive ? 'userManagement.status.activated' : 'userManagement.status.deactivated';
+      this.successMessage.set(this.translate.instant(key, { username: user.username }));
+      await this.refresh();
+    } catch (error) {
+      this.errorMessage.set(this.describeError(error));
+    } finally {
+      this.statusUpdatingId.set(null);
+    }
+  }
+
+  private describeError(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+    if (typeof error === 'object' && error !== null && 'message' in error) {
+      return String((error as { message?: unknown }).message ?? '');
+    }
+    return this.translate.instant('userManagement.status.genericError');
+  }
+}

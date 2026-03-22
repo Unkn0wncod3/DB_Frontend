@@ -1,0 +1,126 @@
+:host {
+  display: block;
+  padding: 2rem 0;
+}
+
+.intro {
+  max-width: 720px;
+  margin: 0 auto 2rem;
+  padding: 1.5rem;
+  background: var(--color-panel);
+  color: var(--color-text);
+  border-radius: 12px;
+  box-shadow: var(--shadow-strong);
+
+  h1 {
+    margin-bottom: 0.75rem;
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: 600;
+  }
+
+  code {
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    background: var(--color-muted-bg);
+    color: var(--color-link);
+  }
+}
+
+.api-form {
+  display: grid;
+  gap: 1.25rem;
+  margin: 0 auto;
+  max-width: 720px;
+  background: var(--color-panel);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-strong);
+}
+
+.field {
+  display: grid;
+  gap: 0.25rem;
+
+  label {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  select,
+  input,
+  textarea {
+    border: 1px solid var(--color-input-border);
+    border-radius: 8px;
+    padding: 0.625rem 0.75rem;
+    font: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background: var(--color-input-bg);
+    color: var(--color-text);
+
+    &:focus {
+      border-color: var(--color-primary);
+      outline: none;
+      box-shadow: 0 0 0 3px var(--color-focus-ring);
+    }
+  }
+
+  small {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+}
+
+button[type='submit'] {
+  justify-self: flex-start;
+  border: none;
+  border-radius: 999px;
+  padding: 0.65rem 1.75rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-alt));
+  color: var(--color-primary-contrast);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 25px -15px rgba(45, 66, 118, 0.8);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
+.status {
+  max-width: 720px;
+  margin: 1.5rem auto 0;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  background: var(--color-panel-muted);
+  border: 1px solid var(--color-border);
+
+  &--info {
+    background: rgba(14, 165, 233, 0.15);
+    border-color: rgba(14, 165, 233, 0.4);
+    color: var(--color-link);
+  }
+
+  &--error {
+    background: var(--color-error-bg);
+    border-color: var(--color-error-text);
+    color: var(--color-error-text);
+  }
+
+  &--success {
+    background: var(--color-success-bg);
+    border-color: var(--color-success-text);
+    color: var(--color-success-text);
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+  }
+}

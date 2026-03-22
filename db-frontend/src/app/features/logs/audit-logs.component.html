@@ -1,0 +1,81 @@
+<section class="logs-history">
+  <header class="logs-history__header">
+    <div>
+      <p class="logs-history__eyebrow">{{ 'logsHistory.eyebrow' | translate }}</p>
+      <h1>{{ 'logsHistory.title' | translate }}</h1>
+      <p class="logs-history__subtitle">{{ 'logsHistory.subtitle' | translate }}</p>
+    </div>
+    <button type="button" class="logs-history__refresh" (click)="refresh()" [disabled]="isLoading()">
+      {{ (isLoading() ? 'logsHistory.actions.refreshing' : 'logsHistory.actions.refresh') | translate }}
+    </button>
+  </header>
+
+  <section *ngIf="errorMessage() as error" class="logs-history__alert logs-history__alert--error">
+    {{ error }}
+  </section>
+
+  <section class="logs-history__panel">
+    <form class="logs-history__toolbar" [formGroup]="filtersForm" (ngSubmit)="refresh()">
+      <label class="logs-history__search">
+        <span>{{ 'logsHistory.search.label' | translate }}</span>
+        <input
+          type="text"
+          formControlName="search"
+          [placeholder]="'logsHistory.search.placeholder' | translate"
+        />
+      </label>
+      <button type="submit" class="logs-history__refresh" [disabled]="isLoading()">
+        {{ (isLoading() ? 'logsHistory.actions.refreshing' : 'logsHistory.actions.search') | translate }}
+      </button>
+      <button type="button" class="logs-history__reset" (click)="resetSearch()">
+        {{ 'logsHistory.actions.reset' | translate }}
+      </button>
+    </form>
+
+    <div class="logs-history__summary">
+      <strong>{{ rows().length }}</strong>
+      <span>{{ 'logsHistory.labels.visibleRows' | translate:{ value: total() } }}</span>
+    </div>
+
+    <div class="logs-history__table-wrap" *ngIf="rows().length > 0; else emptyState">
+      <table class="logs-history__table">
+        <thead>
+          <tr>
+            <th>{{ 'logsHistory.columns.changedAt' | translate }}</th>
+            <th>{{ 'logsHistory.columns.schema' | translate }}</th>
+            <th>{{ 'logsHistory.columns.entry' | translate }}</th>
+            <th>{{ 'logsHistory.columns.changeType' | translate }}</th>
+            <th>{{ 'logsHistory.columns.changedBy' | translate }}</th>
+            <th>{{ 'logsHistory.columns.visibility' | translate }}</th>
+            <th>{{ 'logsHistory.columns.summary' | translate }}</th>
+            <th>{{ 'logsHistory.columns.comment' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of rows(); trackBy: trackRow">
+            <td>{{ row.changedAt | date:'dd/MM/yyyy, HH:mm' }}</td>
+            <td>
+              <strong>{{ row.schemaName }}</strong>
+              <div class="logs-history__muted">{{ row.schemaKey }}</div>
+            </td>
+            <td>
+              <a [routerLink]="entryLink(row)" class="logs-history__entry-link">{{ row.entryTitle }}</a>
+              <div class="logs-history__muted">#{{ row.entryId }}</div>
+            </td>
+            <td>{{ row.changeType }}</td>
+            <td>{{ row.changedBy }}</td>
+            <td>{{ row.visibility }}</td>
+            <td>{{ row.summary }}</td>
+            <td>{{ row.comment || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <ng-template #emptyState>
+    <section class="logs-history__empty">
+      {{ (isLoading() ? 'logsHistory.status.loading' : 'logsHistory.status.empty') | translate }}
+    </section>
+  </ng-template>
+</section>

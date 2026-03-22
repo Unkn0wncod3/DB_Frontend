@@ -1,0 +1,37 @@
+<div class="person-lookup" [class.person-lookup--open]="isOpen()">
+  <div class="person-lookup__control">
+    <input
+      type="text"
+      [formControl]="searchControl"
+      (focus)="openSearch()"
+      [attr.aria-label]="'personLookup.accessibleLabel' | translate"
+      [placeholder]="'personLookup.placeholder' | translate"
+      autocomplete="off"
+    />
+    <button
+      type="button"
+      (click)="clearSelection()"
+      *ngIf="(searchControl.value || '').length > 0"
+      class="person-lookup__clear"
+      [attr.aria-label]="'personLookup.clear' | translate"
+    >
+      &times;
+    </button>
+  </div>
+
+  <div class="person-lookup__dropdown" *ngIf="isOpen()">
+    <p *ngIf="isLoading()" class="person-lookup__state">{{ 'personLookup.loading' | translate }}</p>
+    <ul *ngIf="!isLoading()">
+      <li *ngFor="let option of results(); trackBy: trackByOption" (click)="selectOption(option)">
+        <strong>{{ option.label }}</strong>
+        <span class="person-lookup__id" *ngIf="option.id">{{ 'personLookup.optionId' | translate:{ value: option.id } }}</span>
+        <span *ngIf="option.email">{{ option.email }}</span>
+        <span *ngIf="option.status" class="person-lookup__status">{{ option.status }}</span>
+      </li>
+      <li *ngIf="results().length === 0" class="person-lookup__state">
+        {{ 'personLookup.noResults' | translate }}
+      </li>
+    </ul>
+    <button type="button" class="person-lookup__close" (click)="closeSearch()">{{ 'personLookup.close' | translate }}</button>
+  </div>
+</div>

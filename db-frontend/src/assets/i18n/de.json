@@ -1,0 +1,1189 @@
+﻿{
+  "layout": {
+    "brand": "DB Frontend",
+    "nav": {
+      "dashboard": "Dashboard",
+      "schemas": "Schemas",
+      "myEntries": "Meine Einträge",
+      "profile": "Profil",
+      "explorer": "API Explorer",
+      "logs": "Protokolle",
+      "users": "Benutzer"
+    },
+    "language": "Sprache",
+    "languages": {
+      "en": "Englisch",
+      "de": "Deutsch"
+    },
+    "theme": {
+      "dark": "Dunkelmodus",
+      "light": "Hellmodus"
+    },
+    "roles": {
+      "head_admin": "Head Admin",
+      "admin": "Admin",
+      "editor": "Editor",
+      "manager": "Manager",
+      "reader": "Leser"
+    }
+  },
+  "logs": {
+    "eyebrow": "Sicherheitsübersicht",
+    "title": "Audit-Logs",
+    "subtitle": "Zeigt sicherheitsrelevante Aktivitäten chronologisch an. Nach Nutzer, Aktion oder Ressource filtern, um Vorfälle schneller zu prüfen.",
+    "meta": {
+      "visible": "Sichtbare Einträge"
+    },
+    "actions": {
+      "refresh": "Aktualisieren",
+      "refreshing": "Aktualisiere...",
+      "apply": "Filter anwenden",
+      "applying": "Wende an...",
+      "reset": "Zurücksetzen",
+      "loadMore": "Mehr laden",
+      "loadingMore": "Lade...",
+      "refreshTimeline": "Timeline aktualisieren",
+      "clear": "Logs löschen",
+      "clearing": "Lösche..."
+    },
+    "filters": {
+      "userId": "Benutzer-ID",
+      "action": "Aktion",
+      "resource": "Ressource",
+      "search": "In Ergebnissen suchen",
+      "searchPlaceholder": "Payload, Benutzername, IP...",
+      "limit": "Limit"
+    },
+    "insights": {
+      "actions": "Häufigste Aktionen",
+      "resources": "Aktivste Ressourcen",
+      "users": "Aktivste Nutzer",
+      "events": "{{ value }} Ereignisse",
+      "userLabel": "{{user}} · {{ value }} Aktionen",
+      "actionLabels": {
+        "generic": "{{resource}} aufgerufen",
+        "read": "{{resource}} angezeigt",
+        "write": "{{resource}} bearbeitet",
+        "delete": "{{resource}} gelöscht",
+        "login": "Anmeldeversuche",
+        "loginSuccess": "Erfolgreiche Anmeldungen",
+        "loginFailure": "Fehlgeschlagene Anmeldungen"
+      }
+    },
+    "timeline": {
+      "title": "Chronologische Ansicht",
+      "subtitle": "Neueste Ereignisse zuerst. Filter anpassen, um gezielt zu analysieren.",
+      "justNow": "gerade eben",
+      "minutesAgo": "vor {{ value }} Min.",
+      "hoursAgo": "vor {{ value }} Std.",
+      "daysAgo": "vor {{ value }} Tagen",
+      "byUser": "von {{ value }}",
+      "resource": "Ressource: {{ value }}",
+      "unknownUser": "Unbekannter Nutzer",
+      "summary": {
+        "generic": "{{user}} hat {{resource}} geöffnet",
+        "read": "{{user}} hat {{resource}} angezeigt",
+        "write": "{{user}} hat {{resource}} bearbeitet",
+        "delete": "{{user}} hat {{resource}} gelöscht",
+        "login": "{{user}} hat versucht, sich anzumelden",
+        "loginSuccess": "{{user}} hat sich erfolgreich angemeldet",
+        "loginFailure": "{{user}} konnte sich nicht anmelden",
+        "unknownAction": "eine Aktion"
+      },
+      "details": {
+        "role": "Rolle: {{ value }}",
+        "resource": "Ressource: {{ value }}",
+        "status": "Status: {{ value }}",
+        "ip": "IP: {{ value }}",
+        "query": "Abfrage: {{ value }}"
+      },
+      "resources": {
+        "unknown": "diese Ressource",
+        "generic": "{{ value }}",
+        "personList": "die Personenliste",
+        "personDetail": "Person #{{id}}",
+        "personProfiles": "Profile zu Person #{{id}}",
+        "personNotes": "Notizen zu Person #{{id}}",
+        "personActivities": "Aktivitäten zu Person #{{id}}",
+        "notesByPerson": "Notizen für Person #{{id}}",
+        "noteList": "die Notizenliste",
+        "noteDetail": "Notiz #{{id}}",
+        "profileList": "die Profilübersicht",
+        "profileDetail": "Profil #{{id}}",
+        "activities": "die Aktivitätsübersicht",
+        "users": "die Benutzerverwaltung",
+        "userDetail": "Benutzer #{{id}}",
+        "auditLogs": "die Audit-Historie",
+        "statsOverview": "die Statistikübersicht",
+        "authMe": "das eigene Profil",
+        "authLogin": "den Login-Bereich",
+        "platforms": "die Plattformliste",
+        "platformDetail": "Plattform #{{id}}",
+        "entriesList": "die Eintragsliste des Schemas {{type}}",
+        "entriesDetail": "Eintrag {{id}} des Schemas {{type}}"
+      }
+    },
+    "events": {
+      "audit_logs_cleared": "{{actor}} hat die Audit-Historie geleert.",
+      "user_created": "{{actor}} hat den Benutzer {{target}} erstellt.",
+      "user_updated": "{{actor}} hat den Benutzer {{target}} aktualisiert ({{fields}}).",
+      "user_status_changed": "{{actor}} hat {{state}} Benutzer {{target}}.",
+      "user_deleted": "{{actor}} hat den Benutzer {{target}} gelöscht.",
+      "person_created": "{{actor}} hat die Person {{target}} mit Sichtbarkeit {{visibility}} angelegt.",
+      "person_updated": "{{actor}} hat die Person {{target}} aktualisiert ({{fields}}).",
+      "person_deleted": "{{actor}} hat die Person {{target}} entfernt.",
+      "profile_created": "{{actor}} hat das Profil {{target}} auf Plattform {{platform}} erstellt.",
+      "profile_updated": "{{actor}} hat das Profil {{target}} aktualisiert ({{fields}}).",
+      "profile_deleted": "{{actor}} hat das Profil {{target}} von Plattform {{platform}} gelöscht.",
+      "profile_linked": "{{actor}} hat das Profil {{profile}} mit {{person}} verknüpft{{note}}.",
+      "profile_unlinked": "{{actor}} hat das Profil {{profile}} von {{person}} getrennt.",
+      "note_created": "{{actor}} hat die Notiz {{note}} für {{person}} erstellt{{pinned}}.",
+      "note_updated": "{{actor}} hat die Notiz {{note}} aktualisiert ({{fields}}){{pinned}}.",
+      "note_deleted": "{{actor}} hat die Notiz {{note}} für {{person}} gelöscht.",
+      "activity_created": "{{actor}} hat die Aktivität {{activity}} ({{type}}) für {{person}} erfasst.",
+      "activity_updated": "{{actor}} hat die Aktivität {{activity}} aktualisiert ({{fields}}).",
+      "activity_deleted": "{{actor}} hat die Aktivität {{activity}} ({{type}}) gelöscht.",
+      "states": {
+        "activated": "aktiviert",
+        "deactivated": "deaktiviert",
+        "pinned": "angeheftet",
+        "unpinned": "gelöst"
+      },
+      "targets": {
+        "user": "dieser Benutzer",
+        "person": "diese Person",
+        "profile": "dieses Profil",
+        "note": "diese Notiz",
+        "activity": "diese Aktivität"
+      },
+      "fields": {
+        "unknown": "mehrere Felder"
+      },
+      "visibility": {
+        "unknown": "unbekannte Sichtbarkeit"
+      },
+      "noteSuffix": " (Notiz: {{ value }})"
+    },
+    "status": {
+      "loading": "Logs werden geladen...",
+      "empty": "Keine Logs entsprechen den Filtern.",
+      "genericError": "Logs konnten nicht geladen werden.",
+      "cleared": "Alle Logs wurden gelöscht."
+    },
+    "modal": {
+      "title": "Alle Logs löschen?",
+      "body": "Dadurch werden sämtliche Audit-Einträge dauerhaft entfernt. Dieser Vorgang kann nicht rückgängig gemacht werden.",
+      "confirm": "Logs löschen",
+      "cancel": "Abbrechen"
+    }
+  },
+  "profile": {
+    "title": "Mein Profil",
+    "subtitle": "Hier kannst du deine Kontodaten und dein Passwort anpassen.",
+    "fields": {
+      "username": "Benutzername",
+      "password": "Neues Passwort",
+      "passwordPlaceholder": "Neues Passwort eingeben",
+      "passwordHint": "Leer lassen, um das aktuelle Passwort zu behalten.",
+      "profilePictureUrl": "Profilbild-URL",
+      "profilePicturePlaceholder": "https://example.com/avatar.png",
+      "profilePictureHint": "Direkte Bild-URL angeben (optional)."
+    },
+    "preferences": {
+      "title": "Einstellungen",
+      "theme": {
+        "label": "Darstellung",
+        "system": "Systemstandard",
+        "light": "Hell",
+        "dark": "Dunkel",
+        "hint": "Bestimme, wie die Oberfläche nach der Anmeldung aussehen soll."
+      },
+      "language": {
+        "label": "Sprache",
+        "en": "Englisch",
+        "de": "Deutsch"
+      },
+      "notifications": {
+        "label": "Benachrichtigungen",
+        "email": "E-Mail-Updates",
+        "push": "Push-Benachrichtigungen"
+      }
+    },
+    "actions": {
+      "save": "Änderungen speichern",
+      "saving": "Speichere...",
+      "changePassword": "Passwort ändern"
+    },
+    "status": {
+      "loading": "Profil wird geladen...",
+      "updated": "Profil aktualisiert.",
+      "noChanges": "Keine Änderungen erforderlich.",
+      "passwordUpdated": "Passwort aktualisiert."
+    },
+    "meta": {
+      "title": "Kontodetails",
+      "username": "Aktueller Benutzername",
+      "role": "Rolle",
+      "id": "Konto-ID",
+      "createdAt": "Erstellt am",
+      "profilePicture": "Profilbild",
+      "theme": "Darstellung",
+      "language": "Sprache",
+      "notifications": "Benachrichtigungen"
+    },
+    "errors": {
+      "usernameRequired": "Benutzername ist erforderlich.",
+      "unauthorized": "Deine Sitzung ist abgelaufen. Bitte erneut anmelden.",
+      "validation": "Bitte Eingaben prüfen.",
+      "conflict": "Dieser Benutzername ist bereits vergeben.",
+      "generic": "Profil konnte nicht aktualisiert werden."
+    },
+    "passwordDialog": {
+      "title": "Passwort ändern",
+      "subtitle": "Bitte das neue Passwort zur Bestätigung zweimal eingeben.",
+      "newPassword": "Neues Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "confirmPlaceholder": "Neues Passwort wiederholen",
+      "passwordHint": "Du kannst auch ein Passwort mit weniger als 8 Zeichen verwenden.",
+      "mismatch": "Die Passwörter stimmen nicht überein.",
+      "show": "Anzeigen",
+      "hide": "Verbergen",
+      "cancel": "Abbrechen",
+      "confirm": "Passwort aktualisieren"
+    }
+  },
+  "dashboard": {
+    "title": "Datenbank-Übersicht",
+    "subtitle": "?bersicht aus dem Dashboard-Endpoint f?r sichtbare Schemas und Eintr?ge.",
+    "actions": {
+      "refresh": "Jetzt aktualisieren",
+      "refreshing": "Aktualisiere...",
+      "createLabel": "Neuen Eintrag erstellen für",
+      "createButton": "{{ schema }} erstellen",
+      "createTitle": "Create",
+      "createEntryTitle": "Eintrag erstellen",
+      "createHelp": "Wähle direkt ein Schema aus und starte ohne Dropdown in einen neuen Eintrag.",
+      "createSchemaTitle": "Schema erstellen",
+      "createEntryHelp": "Wähle direkt ein Schema aus und starte einen neuen Eintrag.",
+      "createSchemaHelp": "Erstelle zuerst ein neues Schema, bevor du Felder und Einträge anlegst.",
+      "modeEntry": "Eintrag",
+      "modeSchema": "Schema",
+      "createEntryButton": "{{ schema }} erstellen",
+      "createSchemaButton": "Schema erstellen",
+      "allSchemas": "Alle Schemas"
+    },
+    "meta": {
+      "lastUpdated": "Zuletzt aktualisiert am {{ value }}"
+    },
+    "sections": {
+      "metadata": "Eintrags-Metadaten",
+      "metadataHelp": "Kernfelder, Besitz und Kommentar für die Historie.",
+      "schemaFieldsNamed": "{{ schema }} Felder",
+      "schemaFieldsHelp": "Diese Eingaben werden direkt aus den Felddefinitionen im Bundle erzeugt.",
+      "activity": "Aktivität",
+      "latest": "Neueste Änderungen",
+      "recent": "Aktuelle Einträge",
+      "latestCreated": "Zuletzt erstellt",
+      "latestUpdated": "Zuletzt aktualisiert",
+      "schemaTotals": "Totals pro Schema"
+    },
+    "latest": {
+      "created": {
+        "title": "Zuletzt erstellt",
+        "timestamp": "Erstellt am {{ value }}"
+      },
+      "updated": {
+        "title": "Zuletzt aktualisiert",
+        "timestamp": "Aktualisiert am {{ value }}"
+      }
+    },
+    "dialog": {
+      "title": "Schema erstellen",
+      "subtitle": "Lege ein neues Schema mit Key, Name, Beschreibung, Icon und Aktiv-Status an.",
+      "editTitle": "Schema bearbeiten",
+      "editSubtitle": "Aktualisiere Key, Name, Beschreibung, Icon und Aktiv-Status für dieses Schema."
+    },
+    "labels": {
+      "unknownEntry": "Unbenannter Eintrag",
+      "noRecentCreate": "Keine aktuellen Erstellungen",
+      "noRecentUpdate": "Keine aktuellen Aktualisierungen",
+      "itemType": "Schema: {{ value }}",
+      "itemTypeWithId": "Schema: {{ type }} (Eintrags-ID: {{ id }})",
+      "itemId": "ID: {{ value }}",
+      "entryMeta": "Schema: {{ schema }} - Status: {{ status }} - Sichtbarkeit: {{ visibility }}",
+      "lastCreatedAt": "Zuletzt erstellt {{ value }}",
+      "lastUpdatedAt": "Zuletzt aktualisiert {{ value }}"
+    },
+    "status": {
+      "created": "Schema {{ value }} erstellt.",
+      "updated": "Schema {{ value }} aktualisiert.",
+      "noRecent": "Keine aktuellen Einträge vorhanden.",
+      "emptyState": "Keine sichtbaren Dashboard-Daten verfügbar.",
+      "noRecentCreate": "Keine zuletzt erstellten Einträge.",
+      "noRecentUpdate": "Keine zuletzt aktualisierten Einträge.",
+      "noSchemaTotals": "Keine Totals pro Schema verfügbar."
+    },
+    "errors": {
+      "loadFailed": "Dashboard-Daten konnten nicht geladen werden ({{ status }}): {{ message }}",
+      "noStatus": "kein Status",
+      "generic": "Unerwarteter Fehler"
+    },
+    "totals": {
+      "entries": "Gesamtanzahl Einträge",
+      "collections": "Schemas",
+      "users": "Benutzer"
+    },
+    "activity": {
+      "last24Hours": "Änderungen in den letzten 24 Stunden",
+      "last7Days": "Änderungen in den letzten 7 Tagen",
+      "last30Days": "Änderungen in den letzten 30 Tagen"
+    },
+    "totalLabels": {
+      "entries": "Einträge",
+      "collections": "Schemas",
+      "users": "Benutzer",
+      "persons": "Personen",
+      "profiles": "Profile",
+      "activities": "Aktivitäten",
+      "vehicles": "Fahrzeuge",
+      "platforms": "Plattformen",
+      "notes": "Notizen"
+    }
+  },
+  "entryDetail": {
+    "title": "{{ value }}",
+    "labels": {
+      "unknownId": "Unbekannter Eintrag",
+      "type": "Schema: {{ type }}",
+      "id": "ID: {{ id }}",
+      "relationships": "Verknüpfte Daten",
+      "connectedItems": "Verbundene Profile, Notizen und Aktivitäten",
+      "createdAt": "Erstellt",
+      "updatedAt": "Zuletzt geändert",
+      "schemaWithId": "Schema: {{schema}} - Eintrags-ID {{id}}"
+    },
+    "actions": {
+      "back": "Zurück zum Dashboard",
+      "refresh": "Neu laden",
+      "save": "Speichern",
+      "delete": "Löschen"
+    },
+    "status": {
+      "loading": "Lade...",
+      "saving": "Speichere...",
+      "deleting": "Lösche...",
+      "saved": "Änderungen gespeichert.",
+      "deleted": "Eintrag gelöscht.",
+      "noChanges": "Keine Änderungen erkannt.",
+      "empty": "Keine Daten für diesen Eintrag verfügbar.",
+      "loadingRelations": "Verknüpfungen werden geladen...",
+      "noRelations": "Keine verknüpften Einträge gefunden.",
+      "readOnly": "Nur-Lese-Rolle: Du kannst Daten ansehen, aber keine Änderungen speichern.",
+      "noRelationAccess": "Kein Zugriff auf Relationen.",
+      "noAttachmentAccess": "Kein Zugriff auf Anhänge.",
+      "noHistory": "Keine Historieneinträge vorhanden.",
+      "noPermissions": "Keine expliziten Berechtigungen vorhanden.",
+      "loadingEntry": "Eintrag wird geladen...",
+      "readOnlyShort": "Nur Lesen",
+      "noAttachments": "Keine Anhänge vorhanden.",
+      "noValue": "Kein Wert"
+    },
+    "sections": {
+      "raw": "Rohdaten",
+      "formattedData": "Formatierte Daten",
+      "formattedDataHelp": "Lesbare Werte auf Basis der Schema-Felddefinitionen.",
+      "relations": "Relationen",
+      "relationsHelp": "Verknuepfte Eintraege und Metadaten der Relation.",
+      "attachments": "Anhänge",
+      "attachmentsHelp": "Externe Dateien und verlinkte Ressourcen zu diesem Eintrag.",
+      "history": "Historie",
+      "historyHelp": "Aenderungen, Kommentare und Feld-Diffs.",
+      "permissions": "Berechtigungen",
+      "permissionsHelp": "Explizite Freigaben fuer diesen Eintrag."
+    },
+    "visibility": {
+      "public": "Öffentlich",
+      "internal": "Intern",
+      "restricted": "Eingeschränkt",
+      "private": "Privat"
+    },
+    "relations": {
+      "searchPlaceholder": "Verknüpfte Einträge oder Relationstyp suchen",
+      "profiles": "Profile",
+      "notes": "Notizen",
+      "activities": "Aktivitäten",
+      "viewAll": "Alle anzeigen",
+      "linkProfile": "Profil verknüpfen",
+      "unlinkProfile": "Verknüpfung lösen",
+      "profileIdLabel": "Profil-ID",
+      "profileNoteLabel": "Notiz",
+      "profileNotePlaceholder": "Optionale Notiz zu dieser Verknüpfung",
+      "profileLinked": "Profil wurde mit dieser Person verknüpft.",
+      "profileUnlinked": "Verknüpfung entfernt.",
+      "profileLinkInvalid": "Bitte eine gültige Profil-ID angeben.",
+      "layoutLabel": "Position der Beziehungen",
+      "layoutOptionSide": "Rechts daneben",
+      "layoutOptionStacked": "Unter dem Formular",
+      "columns": {
+        "type": "Typ",
+        "from": "Von",
+        "to": "Nach",
+        "target": "Ziel-Schema",
+        "targetId": "Ziel-Eintrag",
+        "order": "Reihenfolge",
+        "created": "Erstellt"
+      },
+      "actions": {
+        "create": "Relation erstellen"
+      },
+      "dialog": {
+        "createTitle": "Relation erstellen",
+        "createSubtitle": "Suche einen sichtbaren Eintrag, wähle den Relationstyp und speichere die Verknüpfung.",
+        "editTitle": "Relation bearbeiten",
+        "editSubtitle": "Aktualisiere Ziel-Eintrag, Relationstyp, Reihenfolge oder Metadaten."
+      },
+      "fields": {
+        "search": "Eintrag suchen",
+        "schemaFilter": "Schema-Filter",
+        "type": "Relationstyp",
+        "sortOrder": "Sortierung",
+        "target": "Ziel-Eintrag-ID",
+        "metadata": "Metadaten-JSON"
+      },
+      "filters": {
+        "allTypes": "Alle Relationstypen",
+        "allSchemas": "Alle Schemas"
+      },
+      "direction": {
+        "outgoing": "Vom aktuellen Eintrag",
+        "incoming": "Zum aktuellen Eintrag"
+      },
+      "labels": {
+        "entryFallback": "Eintrag #{{ id }}"
+      },
+      "types": {
+        "belongs_to": "Gehört zu",
+        "parent_of": "Ist Elternteil von",
+        "references": "Referenziert",
+        "assigned_to": "Zugewiesen an",
+        "contains": "Enthält",
+        "related_to": "Verknüpft mit"
+      },
+      "status": {
+        "created": "Relation erstellt.",
+        "updated": "Relation aktualisiert.",
+        "deleted": "Relation gelöscht."
+      }
+    },
+    "delete": {
+      "dialogTitle": "Löschen bestätigen",
+      "confirm": "Bist du sicher, dass du diesen Eintrag löschen möchtest? Das kann nicht rückgängig gemacht werden.",
+      "passcodeLabel": "Sicherheitsschlüssel",
+      "passcodePlaceholder": "Schlüssel eingeben",
+      "confirmButton": "Eintrag löschen",
+      "cancelButton": "Abbrechen",
+      "passcodeInvalid": "Sicherheitsschlüssel stimmt nicht. Eintrag wurde nicht gelöscht."
+    },
+    "errors": {
+      "missingParams": "Eintragsparameter fehlen.",
+      "loadFailed": "Eintrag konnte nicht geladen werden: {{ message }}",
+      "saveFailed": "Eintrag konnte nicht gespeichert werden: {{ message }}",
+      "deleteFailed": "Eintrag konnte nicht gelöscht werden: {{ message }}",
+      "invalidPayload": "Die API hat eine unerwartete Antwort geliefert.",
+      "unknown": "Unbekannter Fehler",
+      "hiddenFromUser": "Dieser Eintrag ist nur für Admins sichtbar.",
+      "loadFallback": "Eintrag konnte nicht geladen werden."
+    },
+    "rawView": {
+      "label": "Rohdaten",
+      "show": "Rohdaten anzeigen",
+      "hide": "Rohdaten ausblenden"
+    },
+    "unsavedChanges": {
+      "confirmLeave": "Du hast ungespeicherte Änderungen. Willst du die Seite wirklich verlassen?",
+      "title": "Ungespeicherte Änderungen",
+      "body": "Auf dieser Seite gibt es ungespeicherte Änderungen. Wenn du jetzt gehst, gehen sie verloren.",
+      "stay": "Hier bleiben",
+      "leave": "Ohne Speichern verlassen"
+    },
+    "form": {
+      "selectPlaceholder": "Wert auswählen",
+      "noMultiSelectOptions": "Für dieses Feld sind keine Optionen vorhanden."
+    },
+    "selectOptions": {
+      "gender": {
+        "unspecified": "Nicht festgelegt",
+        "female": "Weiblich",
+        "male": "Männlich",
+        "nonBinary": "Nicht-binär",
+        "other": "Sonstige"
+      },
+      "status": {
+        "active": "Aktiv",
+        "inactive": "Inaktiv",
+        "suspended": "Gesperrt",
+        "archived": "Archiviert",
+        "pending": "Ausstehend"
+      },
+      "risk": {
+        "low": "Niedrig",
+        "medium": "Mittel",
+        "high": "Hoch",
+        "critical": "Kritisch",
+        "unknown": "Nicht angegeben"
+      },
+      "energy": {
+        "gasoline": "Benzin",
+        "diesel": "Diesel",
+        "hybrid": "Hybrid",
+        "electric": "Elektrisch",
+        "hydrogen": "Wasserstoff",
+        "other": "Sonstige"
+      },
+      "vehicleType": {
+        "sedan": "Limousine",
+        "suv": "SUV",
+        "truck": "Lkw",
+        "motorcycle": "Motorrad",
+        "van": "Transporter",
+        "bus": "Bus",
+        "other": "Sonstige"
+      }
+    },
+    "view": {
+      "details": "Details"
+    },
+    "meta": {
+      "title": "Titel",
+      "status": "Status",
+      "visibility": "Sichtbarkeit",
+      "ownerId": "Owner-User-ID",
+      "ownerHelp": "Verweist auf users.id und nicht auf die ID eines Person-Eintrags.",
+      "comment": "Kommentar",
+      "commentHelp": "Optionale Notiz, die zusammen mit der Änderung in der Historie gespeichert wird."
+    },
+    "history": {
+      "by": "von {{value}}",
+      "visibility": "Sichtbarkeit",
+      "noFieldChanges": "Keine Feld-Änderungen protokolliert."
+    },
+    "attachments": {
+      "mimeType": "MIME-Typ",
+      "fileSize": "Dateigroesse",
+      "uploadedBy": "Hochgeladen von"
+    },
+    "permissions": {
+      "columns": {
+        "subjectType": "Subjekttyp",
+        "subjectId": "Subjekt-ID",
+        "permission": "Berechtigung",
+        "createdBy": "Erstellt von",
+        "createdAt": "Erstellt am"
+      }
+    }
+  },
+  "entryList": {
+    "title": "{{ schema }} Einträge",
+    "actions": {
+      "back": "Zurück zum Dashboard",
+      "create": "Neuer Eintrag",
+      "refresh": "Aktualisieren",
+      "refreshing": "Aktualisiere...",
+      "view": "Eintrag öffnen",
+      "timeline": "Timeline öffnen"
+    },
+    "filters": {
+      "searchLabel": "Suche",
+      "searchPlaceholder": "Suchbegriff eingeben...",
+      "pageSizeLabel": "Seitengröße"
+    },
+    "badges": {
+      "mine": "Mein"
+    },
+    "meta": {
+      "total": "{{ value }} Einträge",
+      "lastUpdated": "Zuletzt aktualisiert {{ value }}",
+      "schemaDriven": "Schema-gesteuerte Eintragsliste",
+      "schemaPrefix": "Schema: {{ value }}"
+    },
+    "table": {
+      "actions": "Aktionen"
+    },
+    "status": {
+      "loading": "Einträge werden geladen...",
+      "empty": "Keine Einträge gefunden."
+    },
+    "pagination": {
+      "previous": "Zurück",
+      "next": "Weiter",
+      "page": "Seite {{ page }} - {{ pageSize }} pro Seite"
+    },
+    "errors": {
+      "missingType": "Schema-Key fehlt.",
+      "loadFailed": "Einträge konnten nicht geladen werden: {{ message }}",
+      "unknown": "Unbekannter Fehler",
+      "loadFallback": "Einträge konnten nicht geladen werden.",
+      "unknownSchema": "Unbekanntes Schema: {{ schema }}"
+    },
+    "types": {
+      "persons": "Personen",
+      "profiles": "Profile",
+      "activities": "Aktivitäten",
+      "vehicles": "Fahrzeuge",
+      "notes": "Notizen",
+      "platforms": "Plattformen",
+      "collections": "Schemas",
+      "users": "Benutzer"
+    },
+    "timeline": {
+      "title": "Aktivitäten-Timeline",
+      "subtitle": "Zeigt Aktivitäten chronologisch mit optionalen Filtern.",
+      "personFilter": "Name",
+      "personFilterId": "ID: {{ value }}",
+      "fromDate": "Von-Datum",
+      "toDate": "Bis-Datum",
+      "reset": "Filter zurücksetzen",
+      "personLabel": "Person {{ value }}"
+    }
+  },
+  "myEntries": {
+    "title": "Meine Einträge",
+    "subtitle": "Schemaübergreifende Liste aller Einträge mit deiner Owner-ID.",
+    "actions": {
+      "back": "Zurück zum Dashboard",
+      "refresh": "Aktualisieren",
+      "refreshing": "Aktualisiere...",
+      "view": "Eintrag öffnen"
+    },
+    "meta": {
+      "lastUpdated": "Zuletzt aktualisiert {{ value }}",
+      "total": "{{ value }} Einträge"
+    },
+    "table": {
+      "schema": "Schema",
+      "title": "Titel",
+      "status": "Status",
+      "visibility": "Sichtbarkeit",
+      "updated": "Aktualisiert",
+      "actions": "Aktionen"
+    },
+    "status": {
+      "loading": "Deine Einträge werden geladen...",
+      "empty": "Dir sind noch keine Einträge zugeordnet."
+    },
+    "errors": {
+      "missingUser": "Kein angemeldeter Benutzer gefunden.",
+      "loadFallback": "Deine Einträge konnten nicht geladen werden."
+    }
+  },
+  "entryCreate": {
+    "title": "Eintrag für {{ schema }} erstellen",
+    "subtitle": "Schema-Felder und Eintrags-Metadaten ausfüllen, um einen neuen Eintrag zu erstellen.",
+    "actions": {
+      "back": "Zurück zur Liste",
+      "submit": "Eintrag erstellen",
+      "cancel": "Abbrechen"
+    },
+    "form": {
+      "booleanTrue": "Wahr",
+      "booleanFalse": "Falsch",
+      "booleanPlaceholder": "Bitte auswählen",
+      "rawPayloadTitle": "Zusätzliche Daten (JSON)",
+      "rawPayloadHint": "Optionales JSON, das nach den Feldern in den Request übernommen wird."
+    },
+    "status": {
+      "submitting": "Erstelle...",
+      "created": "Eintrag erfolgreich erstellt.",
+      "noSchema": "Für diesen Schema-Key ist noch kein Schema hinterlegt.",
+      "schemaHelp": "Diese Ansicht liest die Felddefinitionen direkt aus den Backend-Schemas."
+    },
+    "errors": {
+      "missingType": "Schema-Key fehlt.",
+      "invalidPayload": "Payload ungültig: {{ message }}",
+      "emptyPayload": "Bitte mindestens ein Feld oder ein JSON angeben.",
+      "createFailed": "Eintrag konnte nicht erstellt werden: {{ message }}",
+      "invalidRawJson": "Zusätzliche Daten müssen gültiges JSON sein.",
+      "invalidJsonField": "JSON-Felder müssen gültiges JSON enthalten.",
+      "invalidDate": "Datum benötigt einen gültigen ISO-Zeitstempel.",
+      "requireOneOf": "Bitte mindestens eines der folgenden Felder ausfüllen: {{ fields }}.",
+      "requiredField": "Dieses Feld ist erforderlich.",
+      "unknown": "Unbekannter Fehler",
+      "unknownSchema": "Unbekanntes Schema: {{ schema }}",
+      "loadFallback": "Eintrag konnte nicht erstellt werden."
+    },
+    "meta": {
+      "title": "Eintrags-Metadaten",
+      "help": "Kernfelder, Besitz und Standardstatus für den neuen Eintrag.",
+      "fields": {
+        "title": "Titel",
+        "status": "Status",
+        "visibility": "Sichtbarkeit",
+        "ownerId": "Owner-User-ID",
+        "ownerHelp": "Standardmäßig deine aktuelle users.id und relevant für die Besitz-Zuordnung."
+      }
+    },
+    "sections": {
+      "schemaFieldsHelp": "Diese Eingaben werden direkt aus den aktiven Schema-Felddefinitionen erzeugt."
+    }
+  },
+  "apiExplorer": {
+    "title": "DB API Explorer",
+    "baseUrl": "Basis-URL:",
+    "intro": "Konfiguriere Pfad und optionale Daten, um mit deiner Railway API zu sprechen.",
+    "form": {
+      "methodLabel": "HTTP-Methode",
+      "endpointLabel": "Endpoint",
+      "endpointHint": "Pfad relativ zur Basis-URL.",
+      "endpointPlaceholder": "/",
+      "bodyLabel": "Request Body (JSON)",
+      "bodyPlaceholder": "{\n  \"example\": true\n}",
+      "headersLabel": "Header (JSON)",
+      "headersPlaceholder": "{\n  \"Authorization\": \"Bearer ...\"\n}",
+      "submit": "Anfrage senden"
+    },
+    "status": {
+      "loading": "Anfrage wird gesendet...",
+      "errorTitle": "Fehler",
+      "successTitle": "Antwort"
+    },
+    "errors": {
+      "invalidJson": "{{field}} muss gültiges JSON enthalten.",
+      "unknown": "Unbekannter Fehler",
+      "status": " (Status {{status}})",
+      "http": "{{message}}{{status}}"
+    }
+  },
+  "personLookup": {
+    "accessibleLabel": "Personensuche",
+    "placeholder": "Name tippen oder ID eingeben",
+    "clear": "Auswahl löschen",
+    "selectedId": "Ausgewählte ID: {{ value }}",
+    "loading": "Suche...",
+    "noResults": "Keine passenden Personen",
+    "close": "Liste schliessen",
+    "optionId": "ID {{ value }}",
+    "unknown": "Unbekannte Person"
+  },
+  "profileLookup": {
+    "accessibleLabel": "Profilsuche",
+    "placeholder": "Profilnamen tippen oder ID eingeben",
+    "clear": "Auswahl loeschen",
+    "loading": "Profile werden geladen...",
+    "noResults": "Keine passenden Profile",
+    "close": "Liste schliessen",
+    "optionId": "ID {{ value }}",
+    "platformId": "Plattform {{ value }}",
+    "unknown": "Unbekanntes Profil",
+    "unknownPlatform": "Unbekannte Plattform"
+  },
+  "platformLookup": {
+    "accessibleLabel": "Plattformsuche",
+    "placeholder": "Plattformnamen tippen oder ID eingeben",
+    "clear": "Auswahl löschen",
+    "selectedId": "Ausgewählte Plattform-ID: {{ value }}",
+    "loading": "Suche...",
+    "noResults": "Keine passenden Plattformen",
+    "close": "Liste schliessen",
+    "optionId": "ID {{ value }}",
+    "inactive": "Inaktiv",
+    "unknown": "Unbekannte Plattform",
+    "error": "Plattformen konnten nicht geladen werden"
+  },
+  "footer": {
+    "github": "GitHub",
+    "contact": "Kontakt",
+    "imprint": "Impressum",
+    "refresh": "Status aktualisieren",
+    "refreshing": "Prüfe...",
+    "neverChecked": "Noch nicht geprüft",
+    "checkedAt": "Geprüft um {{ value }}",
+    "status": {
+      "online": "API online",
+      "offline": "API offline",
+      "unknown": "Status unbekannt"
+    }
+  },
+  "contact": {
+    "title": "Kontakt zum DB-Frontend",
+    "intro": "Ich arbeite alleine an diesem Projekt. Am besten erreichst du mich per E-Mail, die direkt bei mir landet.",
+    "email": {
+      "label": "E-Mail",
+      "address": "team@example.com",
+      "button": "Schreib mir eine E-Mail",
+      "response": "In der Regel antworte ich innerhalb eines Werktags."
+    },
+    "availability": "Keine Telefon- oder Chatzeiten - derzeit nur per E-Mail. Dringende Themen einfach im Betreff vermerken."
+  },
+  "imprint": {
+    "title": "Impressum",
+    "company": {
+      "title": "Betreiber",
+      "value": "DB Frontend Labs GmbH"
+    },
+    "address": {
+      "title": "Adresse",
+      "value": "Beispielstraße 123\n12345 Musterstadt"
+    },
+    "contact": {
+      "title": "Kontakt",
+      "value": "Telefon: +49 123 456 789\nE-Mail: info@example.com"
+    },
+    "role": {
+      "title": "Geschäftsführung",
+      "value": "Mas Mustermann"
+    },
+    "registration": {
+      "title": "Handelsregister",
+      "value": "Registergericht: Amtsgericht Musterstadt\nRegisternummer: HRB 123456"
+    },
+    "vat": {
+      "title": "USt-IdNr.",
+      "value": "DE123456789"
+    },
+    "supervisory": {
+      "title": "Aufsichtsbehörde",
+      "value": "Muster Datenschutzbehörde\nCompliance-Straße 12\n12345 Musterstadt"
+    },
+    "liability": {
+      "title": "Haftungshinweis",
+      "value": "Inhalte werden sorgfältig geprüft, für externe Links sind die jeweiligen Betreiber verantwortlich."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Anmelden",
+      "subtitle": "Bitte Zugangsdaten eingeben, um fortzufahren.",
+      "username": "Benutzername",
+      "password": "Passwort",
+      "showPassword": "Anzeigen",
+      "hidePassword": "Verbergen",
+      "submit": "Anmelden",
+      "loading": "Melde an..."
+    },
+    "errors": {
+      "invalidCredentials": "Benutzername oder Passwort falsch.",
+      "disabled": "Ihr Account wurde deaktiviert. Melden Sie sich bei einem Head Admin.",
+      "validation": "Bitte Eingaben prüfen.",
+      "generic": "Anmeldung fehlgeschlagen. Bitte erneut versuchen."
+    },
+    "logout": "Abmelden"
+  },
+  "userManagement": {
+    "eyebrow": "Admin-Werkzeuge",
+    "title": "Benutzerverwaltung",
+    "subtitle": "Interne Accounts anlegen oder prüfen. Admins verwalten Accounts; nur Head-Admins dürfen hohe Rollen vergeben oder entziehen.",
+    "form": {
+      "username": "Benutzername",
+      "password": "Passwort",
+      "role": "Rolle",
+      "profilePictureUrl": "Profilbild-URL",
+      "profilePicturePlaceholder": "https://example.com/avatar.png",
+      "validationHint": "Benutzername, Passwort und Rolle auswählen, dann wird der Button aktiv."
+    },
+    "actions": {
+      "create": "Benutzer erstellen",
+      "creating": "Erstelle...",
+      "refresh": "Liste aktualisieren",
+      "refreshing": "Aktualisiere...",
+      "delete": "Löschen",
+      "confirmDelete": "{{username}} wirklich entfernen?",
+      "close": "Schliessen",
+      "locked": "Geschützt",
+      "cancel": "Abbrechen",
+      "confirmDeleteCta": "Benutzer entfernen",
+      "deleting": "Lösche...",
+      "deactivate": "Deaktivieren",
+      "activate": "Aktivieren",
+      "updatingStatus": "Aktualisiere..."
+    },
+    "list": {
+      "title": "Vorhandene Benutzer",
+      "subtitle": "Accounts, Rollen, Status und Einstellungs-Snapshots an einer Stelle prüfen.",
+      "empty": "Noch keine Benutzer vorhanden.",
+      "loading": "Benutzer werden geladen...",
+      "protectedHint": "Der Kern-Account {{username}} bleibt für Notfälle erhalten und kann nicht gelöscht werden."
+    },
+    "table": {
+      "username": "Benutzername",
+      "profilePicture": "Bild",
+      "profilePictureLink": "Bild öffnen",
+      "profilePictureDefault": "Standardbild",
+      "preferences": "Präferenzen",
+      "preferencesButton": "Anzeigen",
+      "role": "Rolle",
+      "status": "Status",
+      "created": "Angelegt am",
+      "actions": "Aktionen"
+    },
+    "status": {
+      "created": "Benutzer erfolgreich angelegt.",
+      "deleted": "{{username}} wurde entfernt.",
+      "roleUpdated": "Rolle für {{username}} aktualisiert.",
+      "roleRestricted": "Nur Head-Admins dürfen Admin-Rollen ändern.",
+      "genericError": "Aktion fehlgeschlagen. Bitte später erneut versuchen.",
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "updating": "Aktualisiere...",
+      "statusRestricted": "Du darfst den Status dieses Accounts nicht ändern.",
+      "deactivated": "{{username}} wurde deaktiviert.",
+      "activated": "{{username}} wurde reaktiviert."
+    },
+    "roles": {
+      "head_admin": "Head Admin",
+      "admin": "Admin",
+      "editor": "Editor",
+      "manager": "Manager",
+      "reader": "Leser"
+    },
+    "modal": {
+      "title": "Account löschen?",
+      "body": "Möchten Sie {{username}} wirklich entfernen? Diese Aktion kann nicht rückgängig gemacht werden."
+    },
+    "preferences": {
+      "title": "{{username}} - Einstellungen"
+    }
+  },
+  "entryVisibility": {
+    "columnLabel": "Sichtbarkeit",
+    "placeholder": "Sichtbarkeit wählen",
+    "helper": "Steuert, wer diesen Eintrag in der Oberfläche sehen darf.",
+    "options": {
+      "user": "Alle Nutzer",
+      "admin": "Nur Admins"
+    },
+    "badge": {
+      "user": "Alle Nutzer",
+      "admin": "Nur Admins"
+    }
+  },
+  "dossier": {
+    "tabLabel": "Dossier",
+    "title": "Dossier-Ansicht",
+    "subtitle": "Verdichtete Leseansicht dieser Person.",
+    "actions": {
+      "refresh": "Dossier aktualisieren",
+      "refreshing": "Aktualisiere...",
+      "downloadPdf": "PDF herunterladen",
+      "downloadingPdf": "PDF wird erstellt..."
+    },
+    "status": {
+      "loading": "Dossier wird geladen..."
+    },
+    "sections": {
+      "profiles": "Profile",
+      "notes": "Notizen",
+      "activities": "Aktivitäten",
+      "subtitle": "Zeigt bis zu {{ value }} Einträge"
+    },
+    "limits": {
+      "profiles": "Profil-Limit",
+      "notes": "Notiz-Limit",
+      "activities": "Aktivitäts-Limit",
+      "hint": "Zeigt bis zu {{ value }}"
+    },
+    "meta": {
+      "person": "Person",
+      "visibility": "Sichtbarkeit",
+      "lastActivity": "Letzte Aktivität",
+      "adminVisible": "Enthält Admin-Daten",
+      "userLimited": "Einige Bereiche sind ausgeblendet, da du keine Admin-Sicht hast.",
+      "none": "Keine",
+      "unknown": "Unbekannt",
+      "at": "am {{ value }}"
+    },
+    "stats": {
+      "updated": "Aktualisiert {{ value }}"
+    },
+    "audit": {
+      "created": "Angelegt",
+      "updated": "Zuletzt aktualisiert: {{ value }}"
+    },
+    "empty": {
+      "profiles": "Keine Profile in deinem Sichtbarkeitsbereich.",
+      "notes": "Keine Notizen in deinem Sichtbarkeitsbereich.",
+      "activities": "Keine Aktivitäten in deinem Sichtbarkeitsbereich."
+    },
+    "errors": {
+      "generic": "Dossier konnte nicht geladen werden."
+    },
+    "rawView": {
+      "show": "Rohdaten anzeigen",
+      "hide": "Rohdaten ausblenden"
+    }
+  },
+  "schemaCreate": {
+    "title": "Schema erstellen",
+    "subtitle": "Erstelle die Schema-Basis und richte die ersten Felder direkt im selben Ablauf ein.",
+    "actions": {
+      "back": "Zurück zum Dashboard",
+      "submit": "Schema erstellen",
+      "editKey": "Key bearbeiten"
+    },
+    "sections": {
+      "basicsEyebrow": "Schema-Setup",
+      "basicsTitle": "Schema-Basis",
+      "basicsSubtitle": "Key, Name, Icon und Verfügbarkeit steuern, wie das Schema in der App erscheint.",
+      "fieldsEyebrow": "Feld-Setup",
+      "fieldsTitle": "Erste Felder",
+      "fieldsSubtitle": "Lege die ersten Felddefinitionen an, bevor das Schema gespeichert wird."
+    },
+    "fields": {
+      "key": "Schema-Key",
+      "keyAutoPlaceholder": "Wird automatisch aus dem Namen erzeugt",
+      "name": "Name",
+      "description": "Beschreibung",
+      "icon": "Icon",
+      "isActive": "Schema verfügbar"
+    },
+    "labels": {
+      "previewKey": "Vorschau-Key"
+    },
+    "hints": {
+      "key": "Verwende nur Kleinbuchstaben, Zahlen und Unterstriche.",
+      "keyAuto": "Wird automatisch aus dem Schema-Namen generiert.",
+      "keyManual": "Nur bei Bedarf manuell überschreiben.",
+      "icon": "Nutze einen Lucide-Icon-Namen wie car-front oder user-round.",
+      "isActive": "Inaktive Schemas bleiben aus normalen Schema- und Entry-Flows ausgeblendet, bis sie wieder aktiviert werden."
+    },
+    "errors": {
+      "loadFallback": "Schema konnte nicht erstellt werden."
+    }
+  },
+  "schemaOverview": {
+    "title": "Schemas",
+    "subtitle": "Zeigt alle Schemas wie eine Ordner?bersicht mit Eintragszahl und letzter Aktivität.",
+    "actions": {
+      "back": "Zurück zum Dashboard",
+      "refresh": "Aktualisieren",
+      "refreshing": "Aktualisiere...",
+      "showInactive": "Inaktive Schemas einblenden",
+      "hideInactive": "Inaktive Schemas ausblenden",
+      "edit": "Schema bearbeiten",
+      "create": "Schema erstellen",
+      "save": "Schema speichern",
+      "delete": "Schema löschen",
+      "deleting": "Lösche...",
+      "confirmDelete": "Schema löschen"
+    },
+    "dialog": {
+      "title": "Schema erstellen",
+      "subtitle": "Erstelle ein Schema und lege die ersten Felder direkt mit an.",
+      "editTitle": "Schema bearbeiten",
+      "editSubtitle": "Aktualisiere Key, Name, Beschreibung, Icon und Verfügbarkeit für dieses Schema."
+    },
+    "labels": {
+      "entries": "Einträge",
+      "inactive": "Inaktiv",
+      "lastCreatedAt": "Zuletzt erstellt {{ value }}",
+      "lastUpdatedAt": "Zuletzt aktualisiert {{ value }}"
+    },
+    "status": {
+      "empty": "Keine Schemas verfügbar.",
+      "created": "Schema {{ value }} erstellt.",
+      "updated": "Schema {{ value }} aktualisiert.",
+      "deleted": "Schema {{ value }} gelöscht."
+    },
+    "deleteDialog": {
+      "title": "Schema löschen?",
+      "body": "Möchtest du das Schema {{ name }} ({{ key }}) wirklich löschen?",
+      "warning": "Dabei werden auch alle Einträge gelöscht, die zu diesem Schema gehören."
+    },
+    "errors": {
+      "loadFailed": "Schema-Übersicht konnte nicht geladen werden ({{ status }}): {{ message }}",
+      "generic": "Unerwarteter Fehler",
+      "noStatus": "kein Status"
+    }
+  },
+  "schemaFields": {
+    "dialog": {
+      "title": "Feld hinzufügen",
+      "subtitle": "Lege ein neues Schema-Feld für dieses Schema an.",
+      "editTitle": "Feld bearbeiten",
+      "editSubtitle": "Aktualisiere die Felddefinition für dieses Schema."
+    },
+    "fields": {
+      "label": "Feldname",
+      "key": "Feld-Key",
+      "keyAutoPlaceholder": "Wird automatisch aus dem Namen erzeugt",
+      "keyAutoHelp": "Wird automatisch aus dem Feldnamen generiert.",
+      "keyManualHelp": "Nur bei Bedarf manuell überschreiben.",
+      "description": "Beschreibung",
+      "type": "Feldtyp",
+      "required": "Pflichtfeld"
+    },
+    "actions": {
+      "cancel": "Abbrechen",
+      "create": "Feld hinzufügen",
+      "creating": "Speichere...",
+      "save": "Feld speichern",
+      "editKey": "Key bearbeiten",
+      "edit": "Bearbeiten",
+      "delete": "Löschen"
+    },
+    "status": {
+      "created": "Feld {{ value }} erstellt.",
+      "updated": "Feld {{ value }} aktualisiert.",
+      "deleted": "Feld {{ value }} gelöscht."
+    },
+    "errors": {
+      "keyGenerateFailed": "Es konnte kein gültiger Feld-Key erzeugt werden. Bitte gib ihn manuell ein.",
+      "keyConflict": "Der erzeugte Feld-Key \"{{ key }}\" existiert bereits. Bitte wähle einen anderen Key.",
+      "keyGeneric": "Das Feld konnte nicht gespeichert werden. {{ message }}"
+    },
+    "listTitle": "{{ schema }} Felder",
+    "listSubtitle": "Verwalte die Schema-Felddefinitionen für Einträge."
+  },
+  "schemaEditor": {
+    "dialog": {
+      "options": "Optionen",
+      "optionsHint": "Trenne auswählbare Werte mit Kommas.",
+      "referenceSchemaKey": "Referenz-Schema-Key",
+      "referenceSchemaHint": "Optionaler Schema-Key, auf den dieses Feld zeigen soll.",
+      "unique": "Eindeutiges Feld"
+    },
+    "fieldBadges": {
+      "required": "Pflicht",
+      "unique": "eindeutig"
+    },
+    "fieldDrafts": {
+      "noDescription": "Noch keine Beschreibung."
+    }
+  },
+  "logsHistory": {
+    "eyebrow": "Eintrags-Historie",
+    "title": "Logs",
+    "subtitle": "Durchsuche Entry-History-EintrÃ¤ge Ã¼ber alle Schemas hinweg.",
+    "actions": {
+      "refresh": "Aktualisieren",
+      "refreshing": "Aktualisiere...",
+      "search": "Suchen",
+      "reset": "Zurücksetzen"
+    },
+    "search": {
+      "label": "Suche",
+      "placeholder": "Schema, Eintrag, Kommentar, User oder geÃ¤nderte Felder suchen"
+    },
+    "labels": {
+      "visibleRows": "sichtbare Zeilen von {{ value }}"
+    },
+    "columns": {
+      "changedAt": "Geändert am",
+      "schema": "Schema",
+      "entry": "Eintrag",
+      "changeType": "Änderungstyp",
+      "changedBy": "Geändert von",
+      "visibility": "Sichtbarkeit",
+      "summary": "Geänderte Felder",
+      "comment": "Kommentar"
+    },
+    "status": {
+      "loading": "Entry-History wird geladen...",
+      "empty": "Keine History-Einträge gefunden."
+    },
+    "errors": {
+      "loadFallback": "Entry-History konnte nicht geladen werden."
+    },
+    "visibilityOnly": "Nur Sichtbarkeit geändert",
+    "noFieldChanges": "Keine Feldänderungen"
+  }
+}

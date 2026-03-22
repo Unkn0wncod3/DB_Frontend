@@ -1,0 +1,20 @@
+<section class="contact-page">
+  <div class="contact-card contact-card--hero">
+    <p class="contact-card__eyebrow">{{ 'contact.email.label' | translate }}</p>
+    <h1>{{ 'contact.title' | translate }}</h1>
+    <p class="contact-card__lead">{{ 'contact.intro' | translate }}</p>
+
+    <a class="contact-card__address"
+       [href]="'mailto:' + ('contact.email.address' | translate)">
+      {{ 'contact.email.address' | translate }}
+    </a>
+
+    <a class="contact-card__button"
+       [href]="'mailto:' + ('contact.email.address' | translate)">
+      {{ 'contact.email.button' | translate }}
+    </a>
+
+    <p class="contact-card__response">{{ 'contact.email.response' | translate }}</p>
+    <p class="contact-card__note">{{ 'contact.availability' | translate }}</p>
+  </div>
+</section>

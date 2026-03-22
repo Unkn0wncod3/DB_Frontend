@@ -1,0 +1,207 @@
+<section class="schema-editor">
+  <section *ngIf="submitError" class="schema-editor__alert">
+    {{ submitError }}
+  </section>
+
+  <form class="schema-editor__form" [formGroup]="schemaForm" (ngSubmit)="submit()">
+    <section class="schema-editor__panel">
+      <div class="schema-editor__panel-header">
+        <div>
+          <p class="schema-editor__eyebrow">{{ 'schemaCreate.sections.basicsEyebrow' | translate }}</p>
+          <h2>{{ 'schemaCreate.sections.basicsTitle' | translate }}</h2>
+          <p>{{ 'schemaCreate.sections.basicsSubtitle' | translate }}</p>
+        </div>
+        <div class="schema-editor__key-preview">
+          <span>{{ 'schemaCreate.labels.previewKey' | translate }}</span>
+          <strong>{{ keyPreview() }}</strong>
+        </div>
+      </div>
+
+      <div class="schema-editor__grid">
+        <label class="schema-editor__field">
+          <span>{{ 'schemaCreate.fields.name' | translate }}</span>
+          <input type="text" formControlName="name" />
+        </label>
+
+        <label class="schema-editor__field">
+          <span>{{ 'schemaCreate.fields.icon' | translate }}</span>
+          <input type="text" formControlName="icon" />
+          <small>{{ 'schemaCreate.hints.icon' | translate }}</small>
+        </label>
+
+        <label class="schema-editor__field">
+          <span>{{ 'schemaCreate.fields.key' | translate }}</span>
+          <input
+            type="text"
+            formControlName="key"
+            [readOnly]="isSchemaKeyAuto()"
+            [class.schema-editor__input--readonly]="isSchemaKeyAuto()"
+            [attr.placeholder]="isSchemaKeyAuto() ? ('schemaCreate.fields.keyAutoPlaceholder' | translate) : null"
+            (input)="onSchemaKeyInput()"
+          />
+          <small>{{ (isSchemaKeyAuto() ? 'schemaCreate.hints.keyAuto' : 'schemaCreate.hints.keyManual') | translate }}</small>
+          <button
+            *ngIf="isSchemaKeyAuto()"
+            type="button"
+            class="schema-editor__text-button"
+            (click)="enableManualSchemaKey()"
+          >
+            {{ 'schemaCreate.actions.editKey' | translate }}
+          </button>
+        </label>
+
+        <label class="schema-editor__toggle-card">
+          <input type="checkbox" formControlName="is_active" />
+          <div>
+            <strong>{{ 'schemaCreate.fields.isActive' | translate }}</strong>
+            <p>{{ 'schemaCreate.hints.isActive' | translate }}</p>
+          </div>
+        </label>
+
+        <label class="schema-editor__field schema-editor__field--full">
+          <span>{{ 'schemaCreate.fields.description' | translate }}</span>
+          <textarea rows="4" formControlName="description"></textarea>
+        </label>
+      </div>
+    </section>
+
+    <section *ngIf="allowFieldDrafts" class="schema-editor__panel">
+      <div class="schema-editor__panel-header">
+        <div>
+          <p class="schema-editor__eyebrow">{{ 'schemaCreate.sections.fieldsEyebrow' | translate }}</p>
+          <h2>{{ 'schemaCreate.sections.fieldsTitle' | translate }}</h2>
+          <p>{{ 'schemaCreate.sections.fieldsSubtitle' | translate }}</p>
+        </div>
+      </div>
+
+      <div class="schema-editor__field-grid">
+        <article *ngFor="let field of fieldDrafts(); let index = index" class="schema-editor__field-card">
+          <button
+            type="button"
+            class="schema-editor__field-edit"
+            (click)="openEditFieldDialog(index)"
+            [attr.aria-label]="'schemaFields.actions.edit' | translate"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 20h9" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+              <path
+                d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5Z"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.8"
+              />
+            </svg>
+          </button>
+          <div class="schema-editor__field-card-head">
+            <h3>{{ field.label }}</h3>
+            <span>{{ humanizeKey(field.key) }}</span>
+          </div>
+          <p class="schema-editor__field-card-meta">{{ fieldSummary(field) }}</p>
+          <p class="schema-editor__field-card-description">{{ fieldCardDescription(field) }}</p>
+        </article>
+
+        <button type="button" class="schema-editor__add-card" (click)="openCreateFieldDialog()">
+          <span class="schema-editor__add-icon">+</span>
+          <strong>{{ 'schemaFields.actions.create' | translate }}</strong>
+        </button>
+      </div>
+    </section>
+
+    <div class="schema-editor__actions">
+      <button type="submit" class="schema-editor__submit" [disabled]="submitBusy">
+        {{ submitLabel }}
+      </button>
+    </div>
+  </form>
+
+  <div class="schema-editor__modal-backdrop" *ngIf="isFieldDialogOpen()" (click)="closeFieldDialog()">
+    <section class="schema-editor__modal" (click)="$event.stopPropagation()">
+      <div class="schema-editor__modal-header">
+        <div>
+          <h3>{{ editingFieldIndex() === null ? ('schemaFields.dialog.title' | translate) : ('schemaFields.dialog.editTitle' | translate) }}</h3>
+          <p>{{ editingFieldIndex() === null ? ('schemaFields.dialog.subtitle' | translate) : ('schemaFields.dialog.editSubtitle' | translate) }}</p>
+        </div>
+      </div>
+      <section *ngIf="fieldDialogError() as error" class="schema-editor__alert">
+        {{ error }}
+      </section>
+
+      <form [formGroup]="fieldForm" class="schema-editor__modal-form" (ngSubmit)="saveFieldDraft()">
+        <label class="schema-editor__field">
+          <span>{{ 'schemaFields.fields.label' | translate }}</span>
+          <input type="text" formControlName="label" (blur)="onLabelBlur()" />
+        </label>
+
+        <label class="schema-editor__field">
+          <span>{{ 'schemaFields.fields.key' | translate }}</span>
+          <input
+            type="text"
+            formControlName="key"
+            [readOnly]="isFieldKeyAuto()"
+            [class.schema-editor__input--readonly]="isFieldKeyAuto()"
+            [attr.placeholder]="isFieldKeyAuto() ? ('schemaFields.fields.keyAutoPlaceholder' | translate) : null"
+            (input)="onFieldKeyInput()"
+          />
+          <small>{{ (isFieldKeyAuto() ? 'schemaFields.fields.keyAutoHelp' : 'schemaFields.fields.keyManualHelp') | translate }}</small>
+          <button *ngIf="isFieldKeyAuto()" type="button" class="schema-editor__text-button" (click)="enableManualFieldKey()">
+            {{ 'schemaFields.actions.editKey' | translate }}
+          </button>
+        </label>
+
+        <label class="schema-editor__field">
+          <span>{{ 'schemaFields.fields.type' | translate }}</span>
+          <select formControlName="data_type">
+            <option *ngFor="let type of dataTypeOptions" [value]="type">{{ fieldTypeLabel(type) }}</option>
+          </select>
+        </label>
+
+        <label class="schema-editor__field schema-editor__field--full">
+          <span>{{ 'schemaFields.fields.description' | translate }}</span>
+          <textarea rows="3" formControlName="description"></textarea>
+        </label>
+
+        <label *ngIf="shouldShowOptionsInput()" class="schema-editor__field schema-editor__field--full">
+          <span>{{ 'schemaEditor.dialog.options' | translate }}</span>
+          <input type="text" formControlName="options" />
+          <small>{{ 'schemaEditor.dialog.optionsHint' | translate }}</small>
+        </label>
+
+        <label *ngIf="shouldShowReferenceSchemaInput()" class="schema-editor__field schema-editor__field--full">
+          <span>{{ 'schemaEditor.dialog.referenceSchemaKey' | translate }}</span>
+          <input type="text" formControlName="reference_schema_key" />
+          <small>{{ 'schemaEditor.dialog.referenceSchemaHint' | translate }}</small>
+        </label>
+
+        <div class="schema-editor__checkbox-row">
+          <label class="schema-editor__checkbox">
+            <input type="checkbox" formControlName="is_required" />
+            <span>{{ 'schemaFields.fields.required' | translate }}</span>
+          </label>
+          <label class="schema-editor__checkbox">
+            <input type="checkbox" formControlName="is_unique" />
+            <span>{{ 'schemaEditor.dialog.unique' | translate }}</span>
+          </label>
+        </div>
+
+        <div class="schema-editor__modal-actions">
+          <button
+            *ngIf="editingFieldIndex() !== null"
+            type="button"
+            class="schema-editor__button schema-editor__button--danger"
+            (click)="deleteEditingField()"
+          >
+            {{ 'schemaFields.actions.delete' | translate }}
+          </button>
+          <button type="button" class="schema-editor__button schema-editor__button--ghost" (click)="closeFieldDialog()">
+            {{ 'schemaFields.actions.cancel' | translate }}
+          </button>
+          <button type="submit" class="schema-editor__button schema-editor__button--primary">
+            {{ editingFieldIndex() === null ? ('schemaFields.actions.create' | translate) : ('schemaFields.actions.save' | translate) }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+</section>

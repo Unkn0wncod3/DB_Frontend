@@ -1,0 +1,133 @@
+import { NgFor, NgIf } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges, forwardRef, inject } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+
+export interface ValueDropdownOption {
+  label: string;
+  value: string | number | boolean | null;
+}
+
+@Component({
+  selector: 'app-value-dropdown',
+  standalone: true,
+  imports: [NgIf, NgFor],
+  templateUrl: './value-dropdown.component.html',
+  styleUrl: './value-dropdown.component.scss',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => ValueDropdownComponent),
+      multi: true
+    }
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class ValueDropdownComponent implements ControlValueAccessor, OnChanges {
+  @Input() options: ValueDropdownOption[] = [];
+  @Input() placeholder = '';
+
+  selectedIndex = '';
+  isDisabled = false;
+
+  private readonly cdr = inject(ChangeDetectorRef);
+  private currentValue: ValueDropdownOption['value'] = null;
+  private onChange: (value: ValueDropdownOption['value']) => void = () => {};
+  private onTouched: () => void = () => {};
+
+  ngOnChanges(_changes: SimpleChanges): void {
+    this.selectedIndex = this.findSelectedIndex(this.currentValue);
+    this.cdr.markForCheck();
+  }
+
+  writeValue(value: ValueDropdownOption['value']): void {
+    this.currentValue = value;
+    this.selectedIndex = this.findSelectedIndex(value);
+    this.cdr.markForCheck();
+  }
+
+  registerOnChange(fn: (value: ValueDropdownOption['value']) => void): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.isDisabled = isDisabled;
+    this.cdr.markForCheck();
+  }
+
+  handleChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const value = target.value;
+
+    if (value === '') {
+      this.currentValue = null;
+      this.selectedIndex = '';
+      this.onChange(null);
+      this.onTouched();
+      return;
+    }
+
+    const index = Number(value);
+    const option = Number.isNaN(index) ? undefined : this.options[index];
+    const nextValue = option ? option.value : null;
+
+    this.currentValue = nextValue;
+    this.selectedIndex = value;
+    this.onChange(nextValue);
+    this.onTouched();
+    this.cdr.markForCheck();
+  }
+
+  handleBlur(): void {
+    this.onTouched();
+  }
+
+  private findSelectedIndex(value: ValueDropdownOption['value']): string {
+    if (value === null || value === undefined) {
+      return '';
+    }
+
+    const index = this.options.findIndex((option) => this.areValuesEqual(option.value, value));
+    return index >= 0 ? String(index) : '';
+  }
+
+  private areValuesEqual(a: ValueDropdownOption['value'], b: ValueDropdownOption['value']): boolean {
+    if (typeof a === 'number' || typeof b === 'number') {
+      return Number(a) === Number(b);
+    }
+    if (typeof a === 'boolean' || typeof b === 'boolean') {
+      return this.normalizeBoolean(a) === this.normalizeBoolean(b);
+    }
+    if (typeof a === 'string' || typeof b === 'string') {
+      return String(a ?? '').trim() === String(b ?? '').trim();
+    }
+    return a === b;
+  }
+
+  private normalizeBoolean(value: ValueDropdownOption['value']): boolean | null {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+    if (typeof value === 'number') {
+      if (value === 1) {
+        return true;
+      }
+      if (value === 0) {
+        return false;
+      }
+    }
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      if (['true', '1', 'yes', 'on'].includes(normalized)) {
+        return true;
+      }
+      if (['false', '0', 'no', 'off'].includes(normalized)) {
+        return false;
+      }
+    }
+    return null;
+  }
+}

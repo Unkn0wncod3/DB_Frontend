@@ -1,0 +1,85 @@
+.imprint-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem;
+  background: var(--color-panel);
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-strong);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.imprint-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.imprint-hero__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.imprint-hero__subtitle {
+  font-size: 1.15rem;
+  color: var(--color-text-soft);
+  margin: 0;
+}
+
+.imprint-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.imprint-card {
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  background: var(--color-panel-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-elevated);
+}
+
+.imprint-card--highlight {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-alt));
+  color: var(--color-primary-contrast);
+  border: none;
+}
+
+.imprint-card--full {
+  grid-column: 1 / -1;
+}
+
+.imprint-card--muted {
+  background: var(--color-muted-bg);
+  color: var(--color-text);
+  border: none;
+}
+
+.imprint-card__label {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.imprint-card__value {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.4;
+  white-space: pre-line;
+}
+
+@media (max-width: 640px) {
+  .imprint-page {
+    padding: 2rem;
+  }
+}

@@ -1,0 +1,27 @@
+.schema-create {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.schema-create__header {
+  display: grid;
+  gap: 0.5rem;
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 2.4rem);
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-text-soft);
+  }
+}
+
+.schema-create__back {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}

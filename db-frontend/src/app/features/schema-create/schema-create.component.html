@@ -1,0 +1,15 @@
+<section class="schema-create">
+  <header class="schema-create__header">
+    <a routerLink="/" class="schema-create__back">{{ 'schemaCreate.actions.back' | translate }}</a>
+    <div>
+      <h1>{{ 'schemaCreate.title' | translate }}</h1>
+      <p>{{ 'schemaCreate.subtitle' | translate }}</p>
+    </div>
+  </header>
+  <app-schema-editor-form
+    [submitLabel]="'schemaCreate.actions.submit' | translate"
+    [submitBusy]="isSubmitting()"
+    [submitError]="errorMessage()"
+    (submitted)="submit($event)"
+  />
+</section>

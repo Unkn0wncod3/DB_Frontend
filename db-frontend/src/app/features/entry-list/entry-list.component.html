@@ -1,0 +1,76 @@
+<section class="entry-list">
+  <header class="entry-list__header">
+    <div class="entry-list__title">
+      <a routerLink="/" class="entry-list__back">{{ 'entryList.actions.back' | translate }}</a>
+      <h1>{{ 'entryList.title' | translate:{ schema: schemaLabel() } }}</h1>
+      <p *ngIf="schema() as currentSchema" class="entry-list__meta">
+        {{ 'entryList.meta.schemaPrefix' | translate:{ value: currentSchema.name } }}
+      </p>
+      <p *ngIf="schema() as currentSchema" class="entry-list__meta">
+        {{ currentSchema.description || ('entryList.meta.schemaDriven' | translate) }}
+      </p>
+      <p *ngIf="lastUpdatedAt() as timestamp" class="entry-list__meta">
+        {{ 'entryList.meta.lastUpdated' | translate:{ value: (timestamp | date:'dd/MM/yyyy, HH:mm') } }}
+      </p>
+    </div>
+    <div class="entry-list__actions">
+      <a *ngIf="createLink() as create" [routerLink]="create" class="entry-list__create">
+        {{ 'entryList.actions.create' | translate }}
+      </a>
+      <button type="button" (click)="refresh()" [disabled]="isLoading()">
+        {{ (isLoading() ? 'entryList.actions.refreshing' : 'entryList.actions.refresh') | translate }}
+      </button>
+    </div>
+  </header>
+
+  <section *ngIf="errorMessage() as error" class="entry-list__alert entry-list__alert--error">
+    <p>{{ error }}</p>
+  </section>
+
+  <section class="entry-list__content" *ngIf="entries().length > 0; else emptyState">
+    <table class="entry-list__table">
+      <thead>
+        <tr>
+          <th *ngFor="let column of columns(); trackBy: trackByColumn">{{ column.label }}</th>
+          <th class="entry-list__table-actions">{{ 'entryList.table.actions' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let entry of entries(); trackBy: trackByEntry"
+          class="entry-list__row--clickable"
+          [class.entry-list__row--owned]="isOwnedByCurrentUser(entry)"
+          (click)="openEntry(entry)"
+        >
+          <td *ngFor="let column of columns(); trackBy: trackByColumn" [attr.data-label]="column.label">
+            <ng-container *ngIf="column.key === '__title'; else defaultColumn">
+              <div class="entry-list__title-cell">
+                <span>{{ formatCell(entry, column) }}</span>
+                <span *ngIf="isOwnedByCurrentUser(entry)" class="entry-list__owned-badge">
+                  {{ 'entryList.badges.mine' | translate }}
+                </span>
+              </div>
+            </ng-container>
+            <ng-template #defaultColumn>
+              <ng-container *ngIf="isDateColumn(column); else plainCell">
+                {{ formatCell(entry, column) | date:'dd/MM/yyyy, HH:mm' }}
+              </ng-container>
+            </ng-template>
+            <ng-template #plainCell>{{ formatCell(entry, column) }}</ng-template>
+          </td>
+          <td class="entry-list__table-actions" [attr.data-label]="'entryList.table.actions' | translate">
+            <button type="button" (click)="$event.stopPropagation(); openEntry(entry)">
+              {{ 'entryList.actions.view' | translate }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <ng-template #emptyState>
+    <section class="entry-list__empty">
+      <p>{{ (isLoading() ? 'entryList.status.loading' : 'entryList.status.empty') | translate }}</p>
+    </section>
+  </ng-template>
+</section>

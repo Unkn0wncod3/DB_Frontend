@@ -1,0 +1,188 @@
+<section class="profile">
+  <header class="profile__header">
+    <h1>{{ 'profile.title' | translate }}</h1>
+    <p>{{ 'profile.subtitle' | translate }}</p>
+  </header>
+
+  <p class="profile__alert profile__alert--success" *ngIf="successMessage() as success">
+    {{ success }}
+  </p>
+  <p class="profile__alert profile__alert--error" *ngIf="errorMessage() as error">
+    {{ error }}
+  </p>
+
+  <div class="profile__body" *ngIf="!isLoading(); else loadingState">
+    <form class="profile__form" [formGroup]="form" (ngSubmit)="saveChanges()">
+      <label class="profile__field">
+        <span>{{ 'profile.fields.username' | translate }}</span>
+        <input type="text" formControlName="username" autocomplete="username" />
+        <small class="profile__error" *ngIf="form.controls.username.invalid && form.controls.username.touched">
+          {{ 'profile.errors.usernameRequired' | translate }}
+        </small>
+      </label>
+
+      <label class="profile__field">
+        <span>{{ 'profile.fields.profilePictureUrl' | translate }}</span>
+        <input
+          type="url"
+          formControlName="profile_picture_url"
+          [placeholder]="'profile.fields.profilePicturePlaceholder' | translate"
+          autocomplete="off"
+        />
+        <small class="profile__hint">{{ 'profile.fields.profilePictureHint' | translate }}</small>
+      </label>
+
+      <fieldset class="profile__preferences">
+        <legend>{{ 'profile.preferences.title' | translate }}</legend>
+        <div class="profile__field">
+          <span>{{ 'profile.preferences.theme.label' | translate }}</span>
+          <select formControlName="theme">
+            <option value="system">{{ 'profile.preferences.theme.system' | translate }}</option>
+            <option value="light">{{ 'profile.preferences.theme.light' | translate }}</option>
+            <option value="dark">{{ 'profile.preferences.theme.dark' | translate }}</option>
+          </select>
+          <small class="profile__hint">{{ 'profile.preferences.theme.hint' | translate }}</small>
+        </div>
+
+        <div class="profile__field">
+          <span>{{ 'profile.preferences.language.label' | translate }}</span>
+          <select formControlName="language">
+            <option value="en">{{ 'profile.preferences.language.en' | translate }}</option>
+            <option value="de">{{ 'profile.preferences.language.de' | translate }}</option>
+          </select>
+        </div>
+
+        <div class="profile__notifications">
+          <span>{{ 'profile.preferences.notifications.label' | translate }}</span>
+          <label>
+            <input type="checkbox" formControlName="email_notifications" />
+            {{ 'profile.preferences.notifications.email' | translate }}
+          </label>
+          <label>
+            <input type="checkbox" formControlName="push_notifications" />
+            {{ 'profile.preferences.notifications.push' | translate }}
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="profile__actions">
+        <button type="button" class="profile__secondary-action" (click)="openPasswordDialog()">
+          {{ 'profile.actions.changePassword' | translate }}
+        </button>
+        <button type="submit" [disabled]="isSaving()">
+          {{ isSaving() ? ('profile.actions.saving' | translate) : ('profile.actions.save' | translate) }}
+        </button>
+      </div>
+    </form>
+
+    <section class="profile__meta" *ngIf="profile() as user">
+      <ng-container *ngIf="preferencesDisplay(user) as prefs">
+      <h2>{{ 'profile.meta.title' | translate }}</h2>
+      <div class="profile__avatar">
+        <img [src]="profileImageSrc(user)" [alt]="user.username" (error)="handleProfileImageError($event)" />
+        <p>{{ 'profile.meta.profilePicture' | translate }}</p>
+      </div>
+      <dl>
+        <div>
+          <dt>{{ 'profile.meta.username' | translate }}</dt>
+          <dd>{{ user.username }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'profile.meta.role' | translate }}</dt>
+          <dd>{{ ('layout.roles.' + user.role) | translate }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'profile.meta.id' | translate }}</dt>
+          <dd>{{ user.id }}</dd>
+        </div>
+        <div *ngIf="user.created_at">
+          <dt>{{ 'profile.meta.createdAt' | translate }}</dt>
+          <dd>{{ user.created_at | date: 'medium' }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'profile.meta.theme' | translate }}</dt>
+          <dd>{{ ('profile.preferences.theme.' + prefs.theme) | translate }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'profile.meta.language' | translate }}</dt>
+          <dd>{{ ('profile.preferences.language.' + prefs.language) | translate }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'profile.meta.notifications' | translate }}</dt>
+          <dd>
+            <span class="profile__meta-chip" [class.profile__meta-chip--active]="prefs.notifications.email">
+              {{ 'profile.preferences.notifications.email' | translate }}
+            </span>
+            <span class="profile__meta-chip" [class.profile__meta-chip--active]="prefs.notifications.push">
+              {{ 'profile.preferences.notifications.push' | translate }}
+            </span>
+          </dd>
+        </div>
+      </dl>
+      </ng-container>
+    </section>
+  </div>
+
+  <ng-template #loadingState>
+    <p class="profile__loading">{{ 'profile.status.loading' | translate }}</p>
+  </ng-template>
+
+  <div class="profile__dialog-backdrop" *ngIf="isPasswordDialogOpen()">
+    <section class="profile__dialog" (click)="$event.stopPropagation()">
+      <header class="profile__dialog-header">
+        <div>
+          <h2>{{ 'profile.passwordDialog.title' | translate }}</h2>
+          <p>{{ 'profile.passwordDialog.subtitle' | translate }}</p>
+        </div>
+      </header>
+
+      <form class="profile__dialog-form" [formGroup]="passwordForm" (ngSubmit)="savePasswordChange()">
+        <label class="profile__field">
+          <span>{{ 'profile.passwordDialog.newPassword' | translate }}</span>
+          <div class="profile__password-input">
+            <input
+              [type]="showNewPassword() ? 'text' : 'password'"
+              formControlName="password"
+              autocomplete="new-password"
+              [placeholder]="'profile.fields.passwordPlaceholder' | translate"
+            />
+            <button type="button" class="profile__password-toggle" (click)="togglePasswordVisibility('new')">
+              {{ (showNewPassword() ? 'profile.passwordDialog.hide' : 'profile.passwordDialog.show') | translate }}
+            </button>
+          </div>
+        </label>
+
+        <label class="profile__field">
+          <span>{{ 'profile.passwordDialog.confirmPassword' | translate }}</span>
+          <div class="profile__password-input">
+            <input
+              [type]="showConfirmPassword() ? 'text' : 'password'"
+              formControlName="confirm_password"
+              autocomplete="new-password"
+              [placeholder]="'profile.passwordDialog.confirmPlaceholder' | translate"
+            />
+            <button type="button" class="profile__password-toggle" (click)="togglePasswordVisibility('confirm')">
+              {{ (showConfirmPassword() ? 'profile.passwordDialog.hide' : 'profile.passwordDialog.show') | translate }}
+            </button>
+          </div>
+        </label>
+
+        <small class="profile__error" *ngIf="passwordForm.controls.password.invalid && passwordForm.controls.password.touched">
+          {{ 'profile.passwordDialog.passwordHint' | translate }}
+        </small>
+        <small class="profile__error" *ngIf="passwordMismatch()">
+          {{ 'profile.passwordDialog.mismatch' | translate }}
+        </small>
+
+        <div class="profile__dialog-actions">
+          <button type="button" class="profile__secondary-action" (click)="closePasswordDialog()">
+            {{ 'profile.passwordDialog.cancel' | translate }}
+          </button>
+          <button type="submit" [disabled]="passwordForm.invalid || passwordMismatch() || isSaving()">
+            {{ isSaving() ? ('profile.actions.saving' | translate) : ('profile.passwordDialog.confirm' | translate) }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+</section>

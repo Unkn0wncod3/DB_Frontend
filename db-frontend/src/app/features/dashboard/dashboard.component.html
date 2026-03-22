@@ -1,0 +1,134 @@
+<section class="dashboard">
+  <header class="dashboard__header">
+    <div>
+      <h1>{{ 'dashboard.title' | translate }}</h1>
+      <p>{{ 'dashboard.subtitle' | translate }}</p>
+    </div>
+    <div class="dashboard__actions">
+      <button type="button" class="dashboard__refresh" (click)="forceRefresh()" [disabled]="isLoading()">
+        <span *ngIf="isLoading(); else idleState">{{ 'dashboard.actions.refreshing' | translate }}</span>
+        <ng-template #idleState>{{ 'dashboard.actions.refresh' | translate }}</ng-template>
+      </button>
+      <span class="dashboard__meta" *ngIf="lastUpdated() as timestamp">
+        {{ 'dashboard.meta.lastUpdated' | translate:{ value: (timestamp | date:'dd/MM/yyyy, HH:mm') } }}
+      </span>
+    </div>
+  </header>
+
+  <section *ngIf="(createTypeOptions().length > 0 && auth.canCreateEntries()) || auth.canManageSchemas()" class="dashboard__quick-create">
+    <div class="dashboard__quick-create-copy">
+      <p class="dashboard__quick-create-kicker">{{ 'dashboard.actions.createTitle' | translate }}</p>
+      <h2>{{ (createMode() === 'entry' ? 'dashboard.actions.createEntryTitle' : 'dashboard.actions.createSchemaTitle') | translate }}</h2>
+      <p>{{ (createMode() === 'entry' ? 'dashboard.actions.createEntryHelp' : 'dashboard.actions.createSchemaHelp') | translate }}</p>
+    </div>
+    <div class="dashboard__quick-create-controls">
+      <div class="dashboard__quick-create-toolbar">
+        <div class="dashboard__quick-create-modes">
+          <button
+            type="button"
+            class="dashboard__quick-create-mode"
+            [class.dashboard__quick-create-mode--active]="createMode() === 'entry'"
+            (click)="selectCreateMode('entry')"
+          >
+            {{ 'dashboard.actions.modeEntry' | translate }}
+          </button>
+          <button
+            *ngIf="auth.canManageSchemas()"
+            type="button"
+            class="dashboard__quick-create-mode"
+            [class.dashboard__quick-create-mode--active]="createMode() === 'schema'"
+            (click)="selectCreateMode('schema')"
+          >
+            {{ 'dashboard.actions.modeSchema' | translate }}
+          </button>
+        </div>
+        <button
+          type="button"
+          class="dashboard__refresh"
+          (click)="startCreate()"
+          [disabled]="(createMode() === 'entry' && !selectedCreateType()) || (createMode() === 'schema' && !auth.canManageSchemas())"
+        >
+          {{
+            (createMode() === 'entry' ? 'dashboard.actions.createEntryButton' : 'dashboard.actions.createSchemaButton')
+              | translate:{ schema: selectedCreateTypeLabel() }
+          }}
+        </button>
+      </div>
+      <div class="dashboard__quick-create-options" *ngIf="createMode() === 'entry'">
+        <button
+          *ngFor="let option of createTypeOptions()"
+          type="button"
+          class="dashboard__quick-create-chip"
+          [class.dashboard__quick-create-chip--active]="selectedCreateType() === option.type"
+          (click)="selectCreateType(option.type)"
+        >
+          {{ option.label }}
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section *ngIf="errorMessage() as error" class="dashboard__error">
+    <p>{{ error }}</p>
+  </section>
+
+  <section class="dashboard__grid">
+    <article class="dashboard__card dashboard__card--highlight">
+      <div class="dashboard__card-link">
+        <h2>{{ 'dashboard.totals.entries' | translate }}</h2>
+        <p class="dashboard__value">{{ totalEntries() | number }}</p>
+      </div>
+    </article>
+  </section>
+
+  <section *ngIf="!hasDashboardContent() && !isLoading()" class="dashboard__panel dashboard__panel--empty">
+    <p>{{ 'dashboard.status.emptyState' | translate }}</p>
+  </section>
+
+  <div class="dashboard__latest-grid">
+    <section class="dashboard__panel">
+      <header>
+        <h2>{{ 'dashboard.sections.latestCreated' | translate }}</h2>
+      </header>
+      <ul class="dashboard__recent-list" *ngIf="latestCreated().length > 0; else latestCreatedEmpty">
+        <li *ngFor="let item of latestCreated(); trackBy: trackEntry" class="dashboard__recent-item dashboard__recent-item--link">
+          <a [routerLink]="entryLink(item)" class="dashboard__recent-link">
+            <div class="dashboard__recent-content">
+              <strong>{{ item.title || ('dashboard.labels.unknownEntry' | translate) }}</strong>
+              <p class="dashboard__recent-meta">
+                {{ 'dashboard.labels.entryMeta' | translate:{ schema: item.schema_name, status: (item.status || '-'), visibility: item.visibility_level } }}
+              </p>
+            </div>
+            <time *ngIf="latestTimestamp(item, 'created') as ts">{{ ts | date:'dd/MM/yyyy, HH:mm' }}</time>
+          </a>
+        </li>
+      </ul>
+      <ng-template #latestCreatedEmpty>
+        <p>{{ 'dashboard.status.noRecentCreate' | translate }}</p>
+      </ng-template>
+    </section>
+
+    <section class="dashboard__panel">
+      <header>
+        <h2>{{ 'dashboard.sections.latestUpdated' | translate }}</h2>
+      </header>
+      <ul class="dashboard__recent-list" *ngIf="latestUpdated().length > 0; else latestUpdatedEmpty">
+        <li *ngFor="let item of latestUpdated(); trackBy: trackEntry" class="dashboard__recent-item dashboard__recent-item--link">
+          <a [routerLink]="entryLink(item)" class="dashboard__recent-link">
+            <div class="dashboard__recent-content">
+              <strong>{{ item.title || ('dashboard.labels.unknownEntry' | translate) }}</strong>
+              <p class="dashboard__recent-meta">
+                {{ 'dashboard.labels.entryMeta' | translate:{ schema: item.schema_name, status: (item.status || '-'), visibility: item.visibility_level } }}
+              </p>
+            </div>
+            <time *ngIf="latestTimestamp(item, 'updated') as ts">{{ ts | date:'dd/MM/yyyy, HH:mm' }}</time>
+          </a>
+        </li>
+      </ul>
+      <ng-template #latestUpdatedEmpty>
+        <p>{{ 'dashboard.status.noRecentUpdate' | translate }}</p>
+      </ng-template>
+    </section>
+  </div>
+
+</section>

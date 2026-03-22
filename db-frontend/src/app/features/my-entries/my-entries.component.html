@@ -1,0 +1,62 @@
+<section class="my-entries">
+  <header class="my-entries__header">
+    <div class="my-entries__title">
+      <a routerLink="/" class="my-entries__back">{{ 'myEntries.actions.back' | translate }}</a>
+      <h1>{{ 'myEntries.title' | translate }}</h1>
+      <p>{{ 'myEntries.subtitle' | translate }}</p>
+      <p *ngIf="lastUpdatedAt() as timestamp" class="my-entries__meta">
+        {{ 'myEntries.meta.lastUpdated' | translate:{ value: (timestamp | date:'dd/MM/yyyy, HH:mm') } }}
+      </p>
+      <p class="my-entries__meta">
+        {{ 'myEntries.meta.total' | translate:{ value: total() } }}
+      </p>
+    </div>
+
+    <div class="my-entries__actions">
+      <button type="button" (click)="refresh()" [disabled]="isLoading()">
+        {{ (isLoading() ? 'myEntries.actions.refreshing' : 'myEntries.actions.refresh') | translate }}
+      </button>
+    </div>
+  </header>
+
+  <section *ngIf="errorMessage() as error" class="my-entries__alert my-entries__alert--error">
+    <p>{{ error }}</p>
+  </section>
+
+  <section class="my-entries__content" *ngIf="items().length > 0; else emptyState">
+    <table class="my-entries__table">
+      <thead>
+        <tr>
+          <th>{{ 'myEntries.table.schema' | translate }}</th>
+          <th>{{ 'myEntries.table.title' | translate }}</th>
+          <th>{{ 'myEntries.table.status' | translate }}</th>
+          <th>{{ 'myEntries.table.visibility' | translate }}</th>
+          <th>{{ 'myEntries.table.updated' | translate }}</th>
+          <th class="my-entries__table-actions">{{ 'myEntries.table.actions' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items(); trackBy: trackByEntry" class="my-entries__row--clickable" (click)="openEntry(item)">
+          <td [attr.data-label]="'myEntries.table.schema' | translate">{{ item.schema?.name ?? item.entry.schema_id }}</td>
+          <td [attr.data-label]="'myEntries.table.title' | translate">{{ entryTitle(item) }}</td>
+          <td [attr.data-label]="'myEntries.table.status' | translate">{{ item.entry.status || '—' }}</td>
+          <td [attr.data-label]="'myEntries.table.visibility' | translate">{{ item.entry.visibility_level }}</td>
+          <td [attr.data-label]="'myEntries.table.updated' | translate">
+            {{ (item.entry.updated_at || item.entry.created_at) | date:'dd/MM/yyyy, HH:mm' }}
+          </td>
+          <td class="my-entries__table-actions" [attr.data-label]="'myEntries.table.actions' | translate">
+            <button type="button" (click)="$event.stopPropagation(); openEntry(item)">
+              {{ 'myEntries.actions.view' | translate }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <ng-template #emptyState>
+    <section class="my-entries__empty">
+      <p>{{ (isLoading() ? 'myEntries.status.loading' : 'myEntries.status.empty') | translate }}</p>
+    </section>
+  </ng-template>
+</section>
