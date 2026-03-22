@@ -788,16 +788,7 @@
   "footer": {
     "github": "GitHub",
     "contact": "Contact",
-    "imprint": "Imprint",
-    "refresh": "Refresh status",
-    "refreshing": "Checking...",
-    "neverChecked": "Not checked yet",
-    "checkedAt": "Checked {{ value }}",
-    "status": {
-      "online": "API online",
-      "offline": "API offline",
-      "unknown": "Status unknown"
-    }
+    "imprint": "Imprint"
   },
   "contact": {
     "title": "Get in touch with the DB project",

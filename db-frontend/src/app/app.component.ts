@@ -1,21 +1,20 @@
-import { Component, DestroyRef, OnDestroy, OnInit } from '@angular/core';
-import { DatePipe, NgFor, NgIf } from '@angular/common';
+import { Component, DestroyRef } from '@angular/core';
+import { NgFor, NgIf } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ApiStatusService } from './core/services/api-status.service';
 import { AuthService, AuthenticatedUser } from './core/services/auth.service';
 import { ThemeService } from './core/services/theme.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslateModule, NgFor, NgIf, DatePipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslateModule, NgFor, NgIf],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent {
   readonly languages = ['en', 'de'];
   readonly defaultProfileImage =
     'https://media.istockphoto.com/id/1495088043/de/vektor/benutzerprofil-symbol-avatar-oder-personensymbol-profilbild-portr%C3%A4tsymbol-standard.jpg?s=612x612&w=0&k=20&c=mmj93kpr1sFn8VJYI_MUabWE4B86zRD5Uf9fBbTbQqk=';
@@ -24,7 +23,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly translate: TranslateService,
-    readonly apiStatus: ApiStatusService,
     public readonly auth: AuthService,
     public readonly theme: ThemeService,
     private readonly destroyRef: DestroyRef
@@ -57,18 +55,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.translate.use(lang);
     this.currentLang = lang;
-  }
-
-  ngOnInit(): void {
-    // API status is admin-only and checked on demand from the footer.
-  }
-
-  ngOnDestroy(): void {
-    // no-op
-  }
-
-  refreshApiStatus(): void {
-    this.apiStatus.refreshStatus();
   }
 
   logout(): void {

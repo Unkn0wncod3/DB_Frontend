@@ -796,16 +796,7 @@
   "footer": {
     "github": "GitHub",
     "contact": "Kontakt",
-    "imprint": "Impressum",
-    "refresh": "Status aktualisieren",
-    "refreshing": "Prüfe...",
-    "neverChecked": "Noch nicht geprüft",
-    "checkedAt": "Geprüft um {{ value }}",
-    "status": {
-      "online": "API online",
-      "offline": "API offline",
-      "unknown": "Status unbekannt"
-    }
+    "imprint": "Impressum"
   },
   "contact": {
     "title": "Kontakt zum DB-Frontend",
