@@ -1,5 +1,5 @@
-import { DatePipe, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, HostListener, computed, inject, signal } from '@angular/core';
+import { DatePipe, DOCUMENT, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DestroyRef, HostListener, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -63,6 +63,7 @@ export class EntryDetailComponent {
   private readonly schemaService = inject(SchemaService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly translate = inject(TranslateService);
+  private readonly document = inject(DOCUMENT);
   readonly auth = inject(AuthService);
 
   readonly isLoading = signal(false);
@@ -238,6 +239,7 @@ export class EntryDetailComponent {
   private formValueSubscription?: Subscription;
   private pendingLeaveResolver: ((allow: boolean) => void) | null = null;
   private createFieldKeyAutoSync = true;
+  private originalBodyOverflow = '';
 
   constructor() {
     this.metaForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
@@ -264,6 +266,15 @@ export class EntryDetailComponent {
       this.currentSchemaKey = schemaKey;
       this.currentEntryId = entryId;
       void this.load();
+    });
+
+    effect(() => {
+      const hasOpenDialog = this.isFieldDialogOpen() || this.isRelationDialogOpen() || this.isLeaveDialogOpen();
+      this.setBodyScrollLock(hasOpenDialog);
+    });
+
+    this.destroyRef.onDestroy(() => {
+      this.setBodyScrollLock(false);
     });
   }
 
@@ -1267,6 +1278,27 @@ export class EntryDetailComponent {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '_')
       .replace(/^_+|_+$/g, '');
+  }
+
+  private setBodyScrollLock(locked: boolean): void {
+    const body = this.document.body;
+    if (!body) {
+      return;
+    }
+
+    if (locked) {
+      if (!body.dataset['entryDetailScrollLock']) {
+        this.originalBodyOverflow = body.style.overflow;
+      }
+      body.style.overflow = 'hidden';
+      body.dataset['entryDetailScrollLock'] = 'true';
+      return;
+    }
+
+    if (body.dataset['entryDetailScrollLock']) {
+      body.style.overflow = this.originalBodyOverflow;
+      delete body.dataset['entryDetailScrollLock'];
+    }
   }
 
   private resolveLeaveDecision(allow: boolean): void {

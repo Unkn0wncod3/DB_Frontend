@@ -513,15 +513,21 @@
   padding: 1.5rem;
   background: rgba(15, 23, 42, 0.45);
   z-index: 30;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 
 .entry-detail__dialog {
   width: min(420px, 100%);
+  max-height: calc(100vh - 3rem);
+  display: flex;
+  flex-direction: column;
   padding: 1.5rem;
   border: 1px solid var(--detail-border);
   border-radius: 1rem;
   background: var(--detail-surface);
   box-shadow: var(--shadow-strong);
+  overflow: hidden;
 }
 
 .entry-detail__dialog--wide {
@@ -546,6 +552,9 @@
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.35rem;
 }
 
 .entry-detail__dialog-form label {
@@ -593,6 +602,7 @@
   gap: 0.75rem;
   max-height: 18rem;
   overflow: auto;
+  overscroll-behavior: contain;
   padding-right: 0.2rem;
 }
 
@@ -632,6 +642,11 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
+  position: sticky;
+  bottom: 0;
+  margin-top: 0.25rem;
+  padding-top: 0.75rem;
+  background: linear-gradient(180deg, rgba(36, 47, 69, 0), var(--detail-surface) 28%);
 }
 
 .entry-detail__button--split {
@@ -659,6 +674,20 @@
 
   .entry-detail__panel {
     padding: 1.1rem;
+  }
+
+  .entry-detail__dialog-backdrop {
+    padding: 1rem;
+    align-items: end;
+  }
+
+  .entry-detail__dialog {
+    max-height: calc(100vh - 2rem);
+    padding: 1.1rem;
+  }
+
+  .entry-detail__dialog-actions {
+    flex-wrap: wrap;
   }
 
   .entry-detail__hero-actions,
