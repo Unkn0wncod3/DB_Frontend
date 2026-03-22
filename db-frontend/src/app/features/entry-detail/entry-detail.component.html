@@ -190,10 +190,10 @@
           <div class="entry-detail__entity-header">
             <div class="entry-detail__relations-card-head">
               <a *ngIf="relationCounterpartLink(relation) as link; else fallbackRelationTitle" [routerLink]="link" class="entry-detail__relations-link">
-                {{ relationCounterpart(relation)?.title || ('entryDetail.relations.labels.entryFallback' | translate:{ id: relation.to_entry_id }) }}
+                {{ relationCounterpart(relation)?.title || ('entryDetail.relations.labels.entryFallback' | translate:{ id: relationCounterpartFallbackId(relation) }) }}
               </a>
               <ng-template #fallbackRelationTitle>
-                <strong>{{ relationCounterpart(relation)?.title || ('entryDetail.relations.labels.entryFallback' | translate:{ id: relation.to_entry_id }) }}</strong>
+                <strong>{{ relationCounterpart(relation)?.title || ('entryDetail.relations.labels.entryFallback' | translate:{ id: relationCounterpartFallbackId(relation) }) }}</strong>
               </ng-template>
               <div class="entry-detail__chips">
                 <span class="entry-detail__chip">{{ relationTypeLabel(relation.relation_type) }}</span>
@@ -209,7 +209,7 @@
             </div>
             <div>
               <dt>{{ 'entryDetail.relations.columns.targetId' | translate }}</dt>
-              <dd>{{ relationCounterpart(relation)?.id || relation.to_entry_id }}</dd>
+              <dd>{{ relationCounterpart(relation)?.id || relationCounterpartFallbackId(relation) }}</dd>
             </div>
           </dl>
           <div class="entry-detail__entity-actions" *ngIf="access().manage_relations || access().manage">

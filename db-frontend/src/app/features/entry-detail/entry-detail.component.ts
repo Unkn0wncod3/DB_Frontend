@@ -6,7 +6,7 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 import { EntryService } from '../../core/services/entry.service';
@@ -17,6 +17,7 @@ import {
   EntryBundle,
   EntryHistoryRecord,
   EntryPermissionRecord,
+  EntryRelationTargetRecord,
   EntryRecord,
   EntryRelationRecord,
   EntrySchema,
@@ -48,14 +49,6 @@ import {
 interface DetailField {
   field: SchemaField;
   control: FormControl<unknown>;
-}
-
-interface RelationLookupItem {
-  id: string | number;
-  title: string;
-  schema_id: string | number;
-  schema_key: string;
-  schema_name: string;
 }
 
 @Component({
@@ -99,8 +92,8 @@ export class EntryDetailComponent {
   readonly permissions = signal<EntryPermissionRecord[]>([]);
   readonly fields = signal<DetailField[]>([]);
   readonly referenceTitles = signal<Record<string, string>>({});
-  readonly relationEntries = signal<RelationLookupItem[]>([]);
-  readonly relationLookupEntries = signal<RelationLookupItem[]>([]);
+  readonly relationEntries = signal<EntryRelationTargetRecord[]>([]);
+  readonly relationLookupEntries = signal<EntryRelationTargetRecord[]>([]);
   readonly relationSearch = signal('');
   readonly relationTypeFilter = signal<'all' | string>('all');
   readonly relationSchemaFilter = signal<'all' | string>('all');
@@ -425,7 +418,7 @@ export class EntryDetailComponent {
     if (relation) {
       this.editingRelation.set(relation);
       this.relationForm.reset({
-        to_entry_id: String(relation.to_entry_id),
+        to_entry_id: this.relationCounterpartId(relation),
         relation_type: relation.relation_type,
         sort_order: relation.sort_order ?? 0
       });
@@ -757,16 +750,19 @@ export class EntryDetailComponent {
     return candidate && candidate.trim().length > 0 ? candidate : null;
   }
 
-  relationCounterpart(relation: EntryRelationRecord): RelationLookupItem | null {
-    const currentEntryId = String(this.entry()?.id ?? '');
-    const counterpartId =
-      String(relation.from_entry_id) === currentEntryId ? String(relation.to_entry_id) : String(relation.from_entry_id);
+  relationCounterpart(relation: EntryRelationRecord): EntryRelationTargetRecord | null {
+    const counterpartId = this.relationCounterpartId(relation);
     return this.relationEntries().find((item) => String(item.id) === counterpartId) ?? null;
   }
 
   relationCounterpartLink(relation: EntryRelationRecord): string[] | null {
     const counterpart = this.relationCounterpart(relation);
     return counterpart ? ['/entries', counterpart.schema_key, String(counterpart.id)] : null;
+  }
+
+  relationCounterpartFallbackId(relation: EntryRelationRecord): string {
+    const counterpart = this.relationCounterpart(relation);
+    return counterpart?.id != null ? String(counterpart.id) : this.relationCounterpartId(relation);
   }
 
   relationDirectionLabel(relation: EntryRelationRecord): string {
@@ -779,19 +775,19 @@ export class EntryDetailComponent {
     return this.translate.instant(`entryDetail.relations.types.${type}`);
   }
 
-  relationCandidateSubtitle(item: RelationLookupItem): string {
+  relationCandidateSubtitle(item: EntryRelationTargetRecord): string {
     return `${item.schema_name} · #${item.id}`;
   }
 
-  selectRelationCandidate(item: RelationLookupItem): void {
+  selectRelationCandidate(item: EntryRelationTargetRecord): void {
     this.relationForm.controls.to_entry_id.setValue(String(item.id));
   }
 
-  isSelectedRelationCandidate(item: RelationLookupItem): boolean {
+  isSelectedRelationCandidate(item: EntryRelationTargetRecord): boolean {
     return String(item.id) === String(this.relationForm.controls.to_entry_id.getRawValue() ?? '');
   }
 
-  selectedRelationTarget(): RelationLookupItem | null {
+  selectedRelationTarget(): EntryRelationTargetRecord | null {
     const selectedId = String(this.relationForm.controls.to_entry_id.getRawValue() ?? '');
     return this.relationLookupEntries().find((item) => String(item.id) === selectedId) ?? this.relationEntries().find((item) => String(item.id) === selectedId) ?? null;
   }
@@ -808,9 +804,6 @@ export class EntryDetailComponent {
       const bundle = await firstValueFrom(this.entryService.getEntryBundle(this.currentEntryId));
       this.applyBundle(bundle);
       await this.loadReferenceTitles(bundle.entry, bundle.schema);
-      await this.loadRelationEntries().catch(() => {
-        this.relationEntries.set([]);
-      });
     } catch (error) {
       if (this.shouldRedirectGuestToLogin(error)) {
         this.auth.handleUnauthorized();
@@ -832,6 +825,7 @@ export class EntryDetailComponent {
     this.access.set({ ...this.emptyAccess(), ...(bundle.access ?? this.emptyAccess()) });
     this.history.set(bundle.history ?? []);
     this.relations.set(bundle.relations ?? []);
+    this.relationEntries.set(bundle.relation_targets ?? []);
     this.attachments.set(bundle.attachments ?? []);
     this.permissions.set(bundle.permissions ?? []);
     this.rebuildForms(bundle.entry, bundle.schema);
@@ -843,9 +837,9 @@ export class EntryDetailComponent {
       return;
     }
 
-    const relations = await firstValueFrom(this.entryService.getRelations(entry.id));
-    this.relations.set(relations);
-    await this.loadRelationEntries();
+    const bundle = await firstValueFrom(this.entryService.getEntryBundle(entry.id));
+    this.relations.set(bundle.relations ?? []);
+    this.relationEntries.set(bundle.relation_targets ?? []);
   }
 
   private rebuildForms(entry: EntryRecord, schema: EntrySchema | null): void {
@@ -932,27 +926,6 @@ export class EntryDetailComponent {
     );
   }
 
-  private async loadRelationEntries(): Promise<void> {
-    const [schemas, entries] = await Promise.all([
-      firstValueFrom(this.schemaService.loadSchemas(false, true)),
-      firstValueFrom(this.entryService.listEntries({}) as Observable<EntryRecord[]>)
-    ]);
-
-    const schemaMap = new Map(schemas.map((schema) => [String(schema.id), schema]));
-    const items = (entries as EntryRecord[]).map<RelationLookupItem>((item) => {
-      const relatedSchema = schemaMap.get(String(item.schema_id));
-      return {
-        id: item.id,
-        title: resolveEntryTitle(item, relatedSchema ?? null),
-        schema_id: item.schema_id,
-        schema_key: relatedSchema?.key ?? '',
-        schema_name: relatedSchema?.name ?? this.translate.instant('entryDetail.labels.unknownId')
-      };
-    });
-
-    this.relationEntries.set(items);
-  }
-
   private async loadRelationLookupEntries(): Promise<void> {
     const schemaFilter = this.relationSchemaFilter();
     const lookupEntries = await firstValueFrom(
@@ -967,7 +940,7 @@ export class EntryDetailComponent {
     this.relationLookupEntries.set(
       lookupEntries
         .filter((item) => String(item.id) !== currentEntryId)
-        .map<RelationLookupItem>((item) => ({
+        .map<EntryRelationTargetRecord>((item) => ({
           id: item.id,
           title: item.title,
           schema_id: item.schema_id,
@@ -994,6 +967,11 @@ export class EntryDetailComponent {
     }
 
     this.relationLookupEntries.set([fallback, ...this.relationLookupEntries()]);
+  }
+
+  private relationCounterpartId(relation: EntryRelationRecord): string {
+    const currentEntryId = String(this.entry()?.id ?? '');
+    return String(relation.from_entry_id) === currentEntryId ? String(relation.to_entry_id) : String(relation.from_entry_id);
   }
 
 

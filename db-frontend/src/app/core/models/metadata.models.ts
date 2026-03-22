@@ -184,6 +184,7 @@ export interface EntryBundle {
   access: EntryAccessMap;
   history: EntryHistoryRecord[];
   relations: EntryRelationRecord[];
+  relation_targets: EntryRelationTargetRecord[];
   attachments: AttachmentRecord[];
   permissions: EntryPermissionRecord[];
 }
@@ -200,6 +201,14 @@ export interface EntryLookupParams {
 }
 
 export interface EntryLookupRecord {
+  id: string | number;
+  title: string;
+  schema_id: string | number;
+  schema_key: string;
+  schema_name: string;
+}
+
+export interface EntryRelationTargetRecord {
   id: string | number;
   title: string;
   schema_id: string | number;
