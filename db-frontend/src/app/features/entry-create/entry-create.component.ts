@@ -27,6 +27,17 @@ interface FormField {
   control: FormControl<unknown>;
 }
 
+interface EntryCreateDraftState {
+  meta: {
+    title: string;
+    status: string;
+    visibility_level: VisibilityLevel;
+    owner_id: string;
+    comment: string;
+  };
+  fields: Record<string, unknown>;
+}
+
 @Component({
   selector: 'app-entry-create',
   standalone: true,
@@ -222,7 +233,7 @@ export class EntryCreateComponent {
       }
 
       this.isFieldDialogOpen.set(false);
-      await this.loadSchema();
+      await this.loadSchema(true);
       this.successMessage.set(
         this.translate.instant(editingField ? 'schemaFields.status.updated' : 'schemaFields.status.created', { value: label })
       );
@@ -256,7 +267,7 @@ export class EntryCreateComponent {
       if (this.editingField()?.id === field.id) {
         this.closeFieldDialog();
       }
-      await this.loadSchema();
+      await this.loadSchema(true);
       this.successMessage.set(this.translate.instant('schemaFields.status.deleted', { value: field.label || field.key }));
     } catch (error) {
       this.errorMessage.set(this.describeError(error));
@@ -319,10 +330,12 @@ export class EntryCreateComponent {
     }
   }
 
-  private async loadSchema(): Promise<void> {
+  private async loadSchema(preserveDraft = false): Promise<void> {
     if (!this.currentSchemaKey) {
       return;
     }
+
+    const draft = preserveDraft ? this.captureDraftState() : null;
 
     try {
       const schemas = await firstValueFrom(this.schemaService.loadSchemas());
@@ -337,7 +350,8 @@ export class EntryCreateComponent {
       const controls: Record<string, FormControl<unknown>> = {};
       const formFields = sortSchemaFields(schema.fields).map<FormField>((field) => {
         const validators = field.is_required ? [Validators.required] : [];
-        const control = this.fb.control(this.defaultFieldValue(field), validators);
+        const draftValue = draft?.fields[field.key];
+        const control = this.fb.control(draftValue !== undefined ? draftValue : this.defaultFieldValue(field), validators);
         controls[field.key] = control;
         return { field, control };
       });
@@ -345,16 +359,39 @@ export class EntryCreateComponent {
       this.formFields.set(formFields);
       this.form = this.fb.group(controls);
       const currentUser = this.auth.user();
-      this.metaForm.patchValue({
-        title: schema.name,
-        status: 'active',
-        visibility_level: 'internal',
-        owner_id: currentUser?.id != null ? String(currentUser.id) : ''
-      });
+      this.metaForm.patchValue(
+        draft?.meta ?? {
+          title: schema.name,
+          status: 'active',
+          visibility_level: 'internal',
+          owner_id: currentUser?.id != null ? String(currentUser.id) : '',
+          comment: ''
+        },
+        { emitEvent: false }
+      );
       this.errorMessage.set(null);
     } catch (error) {
       this.errorMessage.set(this.describeError(error));
     }
+  }
+
+  private captureDraftState(): EntryCreateDraftState {
+    const meta = this.metaForm.getRawValue();
+    const fields = this.formFields().reduce<Record<string, unknown>>((result, item) => {
+      result[item.field.key] = item.control.getRawValue();
+      return result;
+    }, {});
+
+    return {
+      meta: {
+        title: meta.title,
+        status: meta.status,
+        visibility_level: meta.visibility_level as VisibilityLevel,
+        owner_id: meta.owner_id,
+        comment: meta.comment
+      },
+      fields
+    };
   }
 
   private buildPayload(schema: EntrySchema): CreateEntryPayload {

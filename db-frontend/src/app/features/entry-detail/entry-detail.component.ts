@@ -54,6 +54,17 @@ interface DetailField {
   control: FormControl<unknown>;
 }
 
+interface EntryDetailDraftState {
+  meta: {
+    title: string;
+    status: string;
+    visibility_level: VisibilityLevel;
+    owner_id: string;
+    comment: string;
+  };
+  fields: Record<string, unknown>;
+}
+
 @Component({
   selector: 'app-entry-detail',
   standalone: true,
@@ -904,7 +915,7 @@ export class EntryDetailComponent {
         );
       }
       this.isFieldDialogOpen.set(false);
-      await this.load();
+      await this.load(true);
       this.showSuccessMessage(
         this.translate.instant(editingField ? 'schemaFields.status.updated' : 'schemaFields.status.created', { value: label })
       );
@@ -935,7 +946,7 @@ export class EntryDetailComponent {
 
     try {
       await firstValueFrom(this.schemaService.deleteField(schema.id, field.id));
-      await this.load();
+      await this.load(true);
       this.showSuccessMessage(this.translate.instant('schemaFields.status.deleted', { value: field.label || field.key }));
     } catch (error) {
       this.errorMessage.set(this.describeError(error, 'load'));
@@ -1200,17 +1211,19 @@ export class EntryDetailComponent {
     return this.relationLookupEntries().find((item) => String(item.id) === selectedId) ?? this.relationEntries().find((item) => String(item.id) === selectedId) ?? null;
   }
 
-  private async load(): Promise<void> {
+  private async load(preserveDraft = false): Promise<void> {
     if (!this.currentEntryId) {
       return;
     }
+
+    const draft = preserveDraft ? this.captureDraftState() : null;
 
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
     try {
       const bundle = await firstValueFrom(this.entryService.getEntryBundle(this.currentEntryId));
-      this.applyBundle(bundle);
+      this.applyBundle(bundle, draft);
       await this.loadReferenceTitles(bundle.entry, bundle.schema);
     } catch (error) {
       if (this.shouldRedirectGuestToLogin(error)) {
@@ -1227,7 +1240,7 @@ export class EntryDetailComponent {
     }
   }
 
-  private applyBundle(bundle: EntryBundle): void {
+  private applyBundle(bundle: EntryBundle, draft: EntryDetailDraftState | null = null): void {
     this.entry.set(bundle.entry);
     this.schema.set(bundle.schema);
     this.access.set({ ...this.emptyAccess(), ...(bundle.access ?? this.emptyAccess()) });
@@ -1236,7 +1249,7 @@ export class EntryDetailComponent {
     this.relationEntries.set(bundle.relation_targets ?? []);
     this.attachments.set(bundle.attachments ?? []);
     this.permissions.set(bundle.permissions ?? []);
-    this.rebuildForms(bundle.entry, bundle.schema);
+    this.rebuildForms(bundle.entry, bundle.schema, draft);
   }
 
   private async reloadRelations(): Promise<void> {
@@ -1390,9 +1403,9 @@ export class EntryDetailComponent {
     }
   }
 
-  private rebuildForms(entry: EntryRecord, schema: EntrySchema | null): void {
+  private rebuildForms(entry: EntryRecord, schema: EntrySchema | null, draft: EntryDetailDraftState | null = null): void {
     this.metaForm.reset(
-      {
+      draft?.meta ?? {
         title: entry.title ?? '',
         status: entry.status ?? '',
         visibility_level: entry.visibility_level ?? 'internal',
@@ -1405,7 +1418,8 @@ export class EntryDetailComponent {
     const controls: Record<string, FormControl<unknown>> = {};
     const fields = sortSchemaFields(schema?.fields ?? []).map<DetailField>((field) => {
       const validators = field.is_required ? [Validators.required] : [];
-      const control = this.fb.control(this.prepareFieldControlValue(entry, field), validators);
+      const draftValue = draft?.fields[field.key];
+      const control = this.fb.control(draftValue !== undefined ? draftValue : this.prepareFieldControlValue(entry, field), validators);
       controls[field.key] = control;
       return { field, control };
     });
@@ -1419,6 +1433,29 @@ export class EntryDetailComponent {
     this.applyFormAccessState();
     this.originalComparableState.set(this.serializeComparableState(entry, schema));
     this.formRevision.update((value) => value + 1);
+  }
+
+  private captureDraftState(): EntryDetailDraftState | null {
+    if (!this.entry()) {
+      return null;
+    }
+
+    const meta = this.metaForm.getRawValue();
+    const fields = this.fields().reduce<Record<string, unknown>>((result, item) => {
+      result[item.field.key] = item.control.getRawValue();
+      return result;
+    }, {});
+
+    return {
+      meta: {
+        title: meta.title,
+        status: meta.status,
+        visibility_level: meta.visibility_level as VisibilityLevel,
+        owner_id: meta.owner_id,
+        comment: meta.comment
+      },
+      fields
+    };
   }
 
   private applyFormAccessState(): void {
