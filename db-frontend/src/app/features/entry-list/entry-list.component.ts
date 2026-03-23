@@ -37,10 +37,38 @@ export class EntryListComponent {
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly entries = signal<EntryRecord[]>([]);
+  readonly searchQuery = signal('');
   readonly schema = signal<EntrySchema | null>(null);
   readonly lastUpdatedAt = signal<number | null>(null);
   readonly schemaLabel = computed(() => this.schema()?.name ?? humanizeKey(this.currentSchemaKey ?? 'entries'));
   readonly columns = computed(() => this.buildColumns(this.schema()));
+  readonly filteredEntries = computed(() => {
+    const query = this.searchQuery().trim().toLowerCase();
+
+    return this.entries().filter((entry) => {
+      if (!query) {
+        return true;
+      }
+
+      const searchValues = [
+        resolveEntryTitle(entry, this.schema()),
+        entry.status,
+        entry.visibility_level,
+        entry.id,
+        entry.owner_id,
+        entry.updated_at,
+        entry.created_at,
+        ...this.columns().map((column) => this.formatCell(entry, column))
+      ];
+
+      return searchValues
+        .filter((value) => value != null && String(value).trim().length > 0)
+        .join(' ')
+        .toLowerCase()
+        .includes(query);
+    });
+  });
+  readonly total = computed(() => this.filteredEntries().length);
 
   private currentSchemaKey: string | null = null;
 
@@ -64,6 +92,10 @@ export class EntryListComponent {
 
   async refresh(): Promise<void> {
     await this.load();
+  }
+
+  onSearchInput(value: string): void {
+    this.searchQuery.set((value || '').trim());
   }
 
   openEntry(entry: EntryRecord): void {
@@ -95,7 +127,8 @@ export class EntryListComponent {
       return entry.updated_at ?? '';
     }
 
-    return formatFieldValue(getFieldValue(entry, column.field!), column.field);
+    const formatted = formatFieldValue(getFieldValue(entry, column.field!), column.field);
+    return formatted == null ? '' : String(formatted);
   }
 
   isDateColumn(column: DisplayColumn): boolean {

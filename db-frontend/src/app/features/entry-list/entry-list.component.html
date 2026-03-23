@@ -12,6 +12,9 @@
       <p *ngIf="lastUpdatedAt() as timestamp" class="entry-list__meta">
         {{ 'entryList.meta.lastUpdated' | translate:{ value: (timestamp | date:'dd/MM/yyyy, HH:mm') } }}
       </p>
+      <p class="entry-list__meta">
+        {{ 'entryList.meta.total' | translate:{ value: total() } }}
+      </p>
     </div>
     <div class="entry-list__actions">
       <a *ngIf="createLink() as create" [routerLink]="create" class="entry-list__create">
@@ -27,7 +30,19 @@
     <p>{{ error }}</p>
   </section>
 
-  <section class="entry-list__content" *ngIf="entries().length > 0; else emptyState">
+  <section class="entry-list__search">
+    <label class="entry-list__search-field">
+      <span>{{ 'entryList.filters.searchLabel' | translate }}</span>
+      <input
+        type="search"
+        [value]="searchQuery()"
+        (input)="onSearchInput(($any($event.target).value || ''))"
+        [placeholder]="'entryList.filters.searchPlaceholder' | translate"
+      />
+    </label>
+  </section>
+
+  <section class="entry-list__content" *ngIf="filteredEntries().length > 0; else emptyState">
     <table class="entry-list__table">
       <thead>
         <tr>
@@ -37,7 +52,7 @@
       </thead>
       <tbody>
         <tr
-          *ngFor="let entry of entries(); trackBy: trackByEntry"
+          *ngFor="let entry of filteredEntries(); trackBy: trackByEntry"
           class="entry-list__row--clickable"
           [class.entry-list__row--owned]="isOwnedByCurrentUser(entry)"
           (click)="openEntry(entry)"
