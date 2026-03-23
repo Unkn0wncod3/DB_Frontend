@@ -169,6 +169,25 @@ export class AuthService {
     return typeof value === 'boolean' ? value : false;
   }
 
+  canAccessRelationTree(): boolean {
+    if (!this.isAuthenticated()) {
+      return false;
+    }
+
+    const preferences = this.user()?.preferences;
+    if (!preferences || typeof preferences !== 'object') {
+      return false;
+    }
+
+    const navigationPreferences = preferences['navigation_preferences'];
+    if (!navigationPreferences || typeof navigationPreferences !== 'object') {
+      return false;
+    }
+
+    const value = (navigationPreferences as Record<string, unknown>)['show_relation_tree_tab'];
+    return typeof value === 'boolean' ? value : false;
+  }
+
   canViewAdminVisibility(): boolean {
     return this.isAdmin();
   }

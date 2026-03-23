@@ -19,6 +19,7 @@ import {
   EntryRecord,
   EntryRecordWithAccess,
   EntryRelationRecord,
+  EntryRelationTreeResponse,
   UpdateEntryPayload
 } from '../models/metadata.models';
 
@@ -148,6 +149,10 @@ export class EntryService {
 
   getRelations(entryId: string | number): Observable<EntryRelationRecord[]> {
     return this.api.request<EntryRelationRecord[]>('GET', `/entries/${encodeURIComponent(String(entryId))}/relations`);
+  }
+
+  getRelationTree(entryId: string | number): Observable<EntryRelationTreeResponse> {
+    return this.api.request<EntryRelationTreeResponse>('GET', `/entries/${encodeURIComponent(String(entryId))}/relation-tree`);
   }
 
   lookupEntries(params: EntryLookupParams = {}): Observable<EntryLookupRecord[]> {

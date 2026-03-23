@@ -1,0 +1,193 @@
+.relation-tree-node {
+  position: relative;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.relation-tree-node__branch {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.relation-tree-node__branch-line {
+  width: 0.9rem;
+  height: 1px;
+  background: linear-gradient(90deg, var(--color-border-strong), var(--color-primary));
+  flex: 0 0 auto;
+}
+
+.relation-tree-node__relation {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  align-items: center;
+  min-width: 0;
+}
+
+.relation-tree-node__relation-type,
+.relation-tree-node__relation-direction,
+.relation-tree-node__reference-badge,
+.relation-tree-node__schema-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.14rem 0.45rem;
+  font-size: 0.64rem;
+  font-weight: 700;
+}
+
+.relation-tree-node__relation-type {
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--color-primary);
+}
+
+.relation-tree-node__relation-direction {
+  background: var(--color-note-bg);
+  color: var(--color-text-soft);
+}
+
+.relation-tree-node__card {
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-primary);
+  border-radius: 0.85rem;
+  background: linear-gradient(180deg, var(--color-panel) 0%, var(--color-panel-muted) 100%);
+  padding: 0.68rem 0.8rem;
+  box-shadow: var(--shadow-strong);
+}
+
+.relation-tree-node--root > .relation-tree-node__card {
+  border-left-color: #0f766e;
+}
+
+.relation-tree-node--reference > .relation-tree-node__card {
+  border-left-color: #d97706;
+  background: linear-gradient(180deg, var(--color-panel) 0%, rgba(245, 158, 11, 0.08) 100%);
+}
+
+.relation-tree-node__card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.relation-tree-node__eyebrow {
+  margin: 0 0 0.15rem;
+  color: var(--color-text-muted);
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.relation-tree-node__schema-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+  margin-bottom: 0.2rem;
+}
+
+.relation-tree-node__schema-badge {
+  gap: 0.35rem;
+  background: rgba(15, 118, 110, 0.12);
+  color: #0f766e;
+}
+
+.relation-tree-node__card-head h3 {
+  margin: 0;
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  line-height: 1.2;
+}
+
+.relation-tree-node__reference-badge {
+  background: rgba(217, 119, 6, 0.14);
+  color: #b45309;
+  white-space: nowrap;
+}
+
+.relation-tree-node__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+  gap: 0.35rem 0.65rem;
+  margin: 0.5rem 0 0;
+}
+
+.relation-tree-node__meta div {
+  display: grid;
+  gap: 0.08rem;
+}
+
+.relation-tree-node__meta dt {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.relation-tree-node__meta dd {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.82rem;
+  line-height: 1.22;
+  word-break: break-word;
+}
+
+.relation-tree-node__reference-hint {
+  margin: 0.45rem 0 0;
+  font-size: 0.74rem;
+  color: var(--color-warning-text);
+  font-weight: 600;
+}
+
+.relation-tree-node__children {
+  position: relative;
+  margin-left: 0.6rem;
+  padding-left: 0.7rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.relation-tree-node__children::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0.25rem;
+  width: 2px;
+  background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-border-strong) 100%);
+  border-radius: 999px;
+}
+
+.relation-tree-node__children--compact {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  align-items: start;
+  gap: 0.7rem;
+}
+
+.relation-tree-node__children--compact > .relation-tree-node {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .relation-tree-node__card {
+    padding: 0.62rem 0.68rem;
+  }
+
+  .relation-tree-node__card-head {
+    flex-direction: column;
+  }
+
+  .relation-tree-node__children {
+    margin-left: 0.3rem;
+    padding-left: 0.55rem;
+  }
+
+  .relation-tree-node__children--compact {
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+  }
+}

@@ -5,6 +5,7 @@
       "dashboard": "Dashboard",
       "schemas": "Schemas",
       "myEntries": "Meine Einträge",
+      "relationTree": "Relationsbaum",
       "profile": "Profil",
       "explorer": "API Explorer",
       "logs": "Protokolle",
@@ -211,6 +212,11 @@
         "label": "Benachrichtigungen",
         "email": "E-Mail-Updates"
       },
+      "navigation": {
+        "title": "Navigation",
+        "hint": "Lege fest, welche optionalen Bereiche in deiner Hauptnavigation sichtbar sind.",
+        "showRelationTreeTab": "Relationsbaum-Tab anzeigen"
+      },
       "admin": {
         "title": "Admin Preferences",
         "hint": "Steuere, welche Admin-Bereiche in deiner Navigation sichtbar sind.",
@@ -239,6 +245,7 @@
       "language": "Sprache",
       "contactEmail": "E-Mail",
       "notifications": "Benachrichtigungen",
+      "navigationPreferences": "Navigation",
       "adminPreferences": "Admin Preferences"
     },
     "errors": {
@@ -359,6 +366,59 @@
       "vehicles": "Fahrzeuge",
       "platforms": "Plattformen",
       "notes": "Notizen"
+    }
+  },
+  "relationTree": {
+    "hero": {
+      "eyebrow": "Baumansicht",
+      "title": "Relationsbaum für Einträge",
+      "subtitle": "Lädt einen Eintrag und rendert die Backend-Antwort direkt als rekursiven Baum. Referenz-Knoten bleiben sichtbar, werden aber nicht erneut aufgeklappt."
+    },
+    "form": {
+      "entryId": "Eintrags-ID",
+      "placeholder": "z. B. 123"
+    },
+    "actions": {
+      "load": "Baum laden",
+      "refresh": "Aktualisieren"
+    },
+    "states": {
+      "loading": "Relationsbaum wird geladen...",
+      "empty": "Gib eine Eintrags-ID ein, um den Relationsbaum anzuzeigen."
+    },
+    "summary": {
+      "title": "Gerenderter Baum",
+      "subtitle": "Root-Eintrag #{{id}}"
+    },
+    "legend": {
+      "default": "Expandierter Knoten",
+      "reference": "Referenz-Knoten"
+    },
+    "labels": {
+      "root": "Root-Eintrag",
+      "entry": "Eintrag",
+      "untitled": "Unbenannter Eintrag",
+      "schema": "Schema",
+      "schemaInfo": "Schema-Info",
+      "id": "ID",
+      "status": "Status",
+      "visibility": "Sichtbarkeit",
+      "noStatus": "Kein Status"
+    },
+    "direction": {
+      "incoming": "Eingehend",
+      "outgoing": "Ausgehend"
+    },
+    "reference": {
+      "badge": "Referenz",
+      "generic": "Dieser Knoten wird als Referenz angezeigt und nicht weiter aufgeklappt.",
+      "cycle": "Bereits im Pfad vorhanden.",
+      "duplicate": "Bereits an anderer Stelle dargestellt."
+    },
+    "errors": {
+      "notFound": "Der Eintrag wurde nicht gefunden.",
+      "forbidden": "Du hast keine Berechtigung, diesen Relationsbaum anzusehen.",
+      "generic": "Der Relationsbaum konnte nicht geladen werden."
     }
   },
   "entryDetail": {

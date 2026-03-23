@@ -1,0 +1,67 @@
+<article class="relation-tree-node" [class.relation-tree-node--root]="isRoot" [class.relation-tree-node--reference]="node.is_reference">
+  <div class="relation-tree-node__branch" *ngIf="!isRoot && node.via_relation">
+    <span class="relation-tree-node__branch-line" aria-hidden="true"></span>
+    <div class="relation-tree-node__relation">
+      <span class="relation-tree-node__relation-type">{{ node.via_relation.relation_type }}</span>
+      <span class="relation-tree-node__relation-direction">{{ relationDirectionLabelKey() | translate }}</span>
+    </div>
+  </div>
+
+  <section class="relation-tree-node__card">
+    <div class="relation-tree-node__card-head">
+      <div>
+        <p class="relation-tree-node__eyebrow">
+          {{ isRoot ? ('relationTree.labels.root' | translate) : ('relationTree.labels.entry' | translate) }}
+        </p>
+        <div class="relation-tree-node__schema-row">
+          <span class="relation-tree-node__schema-badge">
+            <span>{{ schemaName() }}</span>
+          </span>
+        </div>
+        <h3>{{ node.entry.title || ('relationTree.labels.untitled' | translate) }}</h3>
+      </div>
+      <span class="relation-tree-node__reference-badge" *ngIf="node.is_reference">
+        {{ 'relationTree.reference.badge' | translate }}
+      </span>
+    </div>
+
+    <dl class="relation-tree-node__meta">
+      <div>
+        <dt>{{ 'relationTree.labels.schema' | translate }}</dt>
+        <dd [title]="schemaDescription() || null">{{ schemaName() }}</dd>
+      </div>
+      <div *ngIf="schemaDescription() as description">
+        <dt>{{ 'relationTree.labels.schemaInfo' | translate }}</dt>
+        <dd>{{ description }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'relationTree.labels.id' | translate }}</dt>
+        <dd>#{{ node.entry.id }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'relationTree.labels.status' | translate }}</dt>
+        <dd>{{ node.entry.status || ('relationTree.labels.noStatus' | translate) }}</dd>
+      </div>
+      <div *ngIf="node.entry.visibility_level">
+        <dt>{{ 'relationTree.labels.visibility' | translate }}</dt>
+        <dd>{{ ('entryDetail.visibility.' + node.entry.visibility_level) | translate }}</dd>
+      </div>
+    </dl>
+
+    <p class="relation-tree-node__reference-hint" *ngIf="referenceHintKey() as hintKey">
+      {{ hintKey | translate }}
+    </p>
+  </section>
+
+  <div
+    class="relation-tree-node__children"
+    [class.relation-tree-node__children--compact]="useCompactChildrenLayout()"
+    *ngIf="hasChildren()"
+  >
+    <app-entry-relation-tree-node
+      *ngFor="let child of node.children; trackBy: trackChild"
+      [node]="child"
+      [depth]="depth + 1"
+    ></app-entry-relation-tree-node>
+  </div>
+</article>

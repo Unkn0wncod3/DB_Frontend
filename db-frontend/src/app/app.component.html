@@ -11,6 +11,9 @@
       <a routerLink="/entries/mine" routerLinkActive="is-active">
         {{ 'layout.nav.myEntries' | translate }}
       </a>
+      <a *ngIf="auth.canAccessRelationTree()" routerLink="/relation-tree" routerLinkActive="is-active">
+        {{ 'layout.nav.relationTree' | translate }}
+      </a>
       <a *ngIf="auth.canAccessApiExplorer()" routerLink="/explorer" routerLinkActive="is-active">
         {{ 'layout.nav.explorer' | translate }}
       </a>

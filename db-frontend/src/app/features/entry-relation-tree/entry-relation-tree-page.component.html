@@ -1,0 +1,56 @@
+<section class="relation-tree-page">
+  <header class="relation-tree-page__hero">
+    <div>
+      <p class="relation-tree-page__eyebrow">{{ 'relationTree.hero.eyebrow' | translate }}</p>
+      <h1>{{ 'relationTree.hero.title' | translate }}</h1>
+      <p>{{ 'relationTree.hero.subtitle' | translate }}</p>
+    </div>
+
+    <form class="relation-tree-page__search" [formGroup]="form" (ngSubmit)="submit()">
+      <label>
+        <span>{{ 'relationTree.form.entryId' | translate }}</span>
+        <input
+          type="text"
+          formControlName="entryId"
+          [placeholder]="'relationTree.form.placeholder' | translate"
+          inputmode="numeric"
+        />
+      </label>
+      <div class="relation-tree-page__actions">
+        <button type="submit" [disabled]="isLoading()">{{ 'relationTree.actions.load' | translate }}</button>
+        <button type="button" class="relation-tree-page__ghost" (click)="refresh()" [disabled]="!currentEntryId() || isLoading()">
+          {{ 'relationTree.actions.refresh' | translate }}
+        </button>
+      </div>
+    </form>
+  </header>
+
+  <p class="relation-tree-page__alert relation-tree-page__alert--error" *ngIf="errorMessage() as error">
+    {{ error }}
+  </p>
+
+  <section class="relation-tree-page__state" *ngIf="isLoading()">
+    <p>{{ 'relationTree.states.loading' | translate }}</p>
+  </section>
+
+  <section class="relation-tree-page__state" *ngIf="!isLoading() && !currentEntryId()">
+    <p>{{ 'relationTree.states.empty' | translate }}</p>
+  </section>
+
+  <section class="relation-tree-page__tree" *ngIf="!isLoading() && hasLoadedTree() && tree() as relationTree">
+    <header class="relation-tree-page__summary">
+      <div>
+        <h2>{{ 'relationTree.summary.title' | translate }}</h2>
+        <p>{{ 'relationTree.summary.subtitle' | translate:{ id: relationTree.root_entry_id } }}</p>
+      </div>
+      <div class="relation-tree-page__legend">
+        <span class="relation-tree-page__legend-item">{{ 'relationTree.legend.default' | translate }}</span>
+        <span class="relation-tree-page__legend-item relation-tree-page__legend-item--reference">
+          {{ 'relationTree.legend.reference' | translate }}
+        </span>
+      </div>
+    </header>
+
+    <app-entry-relation-tree-node [node]="relationTree.tree" [isRoot]="true"></app-entry-relation-tree-node>
+  </section>
+</section>

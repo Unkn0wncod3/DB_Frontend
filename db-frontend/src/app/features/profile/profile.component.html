@@ -73,6 +73,15 @@
           </label>
         </div>
 
+        <div class="profile__admin-preferences">
+          <span>{{ 'profile.preferences.navigation.title' | translate }}</span>
+          <p>{{ 'profile.preferences.navigation.hint' | translate }}</p>
+          <label class="profile__toggle">
+            <input type="checkbox" formControlName="show_relation_tree_tab" />
+            <span>{{ 'profile.preferences.navigation.showRelationTreeTab' | translate }}</span>
+          </label>
+        </div>
+
         <div class="profile__admin-preferences" *ngIf="showAdminPreferences()">
           <span>{{ 'profile.preferences.admin.title' | translate }}</span>
           <p>{{ 'profile.preferences.admin.hint' | translate }}</p>
@@ -134,6 +143,14 @@
           <dd>
             <span class="profile__meta-chip" [class.profile__meta-chip--active]="prefs.notifications.email">
               {{ 'profile.preferences.notifications.email' | translate }}
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt>{{ 'profile.meta.navigationPreferences' | translate }}</dt>
+          <dd>
+            <span class="profile__meta-chip" [class.profile__meta-chip--active]="prefs.navigation_preferences.show_relation_tree_tab">
+              {{ 'profile.preferences.navigation.showRelationTreeTab' | translate }}
             </span>
           </dd>
         </div>

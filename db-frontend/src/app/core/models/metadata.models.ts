@@ -141,6 +141,52 @@ export interface EntryRelationRecord {
   created_at?: string;
 }
 
+export type EntryRelationTreeDirection = 'incoming' | 'outgoing';
+
+export type EntryRelationTreeReferenceReason = 'cycle' | 'duplicate' | null;
+
+export interface EntryRelationTreeRelationRecord {
+  relation_id: string | number;
+  from_entry_id: string | number;
+  to_entry_id: string | number;
+  relation_type: string;
+  sort_order?: number | null;
+  metadata_json?: Record<string, unknown> | null;
+  direction: EntryRelationTreeDirection;
+}
+
+export interface EntryRelationTreeSchemaRecord {
+  id: string | number;
+  key: string;
+  name: string;
+  description?: string | null;
+  icon?: string | null;
+  is_active: boolean;
+}
+
+export interface EntryRelationTreeEntryRecord {
+  id: string | number;
+  schema_id: string | number;
+  schema?: EntryRelationTreeSchemaRecord | null;
+  title: string;
+  status?: string | null;
+  visibility_level?: VisibilityLevel | null;
+  owner_id?: string | number | null;
+}
+
+export interface EntryRelationTreeNode {
+  entry: EntryRelationTreeEntryRecord;
+  via_relation: EntryRelationTreeRelationRecord | null;
+  children: EntryRelationTreeNode[];
+  is_reference: boolean;
+  reference_reason: EntryRelationTreeReferenceReason;
+}
+
+export interface EntryRelationTreeResponse {
+  root_entry_id: string | number;
+  tree: EntryRelationTreeNode;
+}
+
 export interface AttachmentRecord {
   id: string | number;
   entry_id: string | number;

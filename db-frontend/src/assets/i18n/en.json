@@ -5,6 +5,7 @@
       "dashboard": "Dashboard",
       "schemas": "Schemas",
       "myEntries": "My entries",
+      "relationTree": "Relation tree",
       "profile": "Profile",
       "explorer": "API Explorer",
       "logs": "Logs",
@@ -170,6 +171,11 @@
         "label": "Notifications",
         "email": "Email updates"
       },
+      "navigation": {
+        "title": "Navigation",
+        "hint": "Choose which optional areas should appear in your main navigation.",
+        "showRelationTreeTab": "Show relation tree tab"
+      },
       "admin": {
         "title": "Admin Preferences",
         "hint": "Control which admin areas stay visible in your navigation.",
@@ -198,6 +204,7 @@
       "language": "Language",
       "contactEmail": "Email",
       "notifications": "Notifications",
+      "navigationPreferences": "Navigation",
       "adminPreferences": "Admin Preferences"
     },
     "errors": {
@@ -306,6 +313,59 @@
       "vehicles": "Vehicles",
       "platforms": "Platforms",
       "notes": "Notes"
+    }
+  },
+  "relationTree": {
+    "hero": {
+      "eyebrow": "Tree view",
+      "title": "Entry relation tree",
+      "subtitle": "Load one entry and render the backend response directly as a recursive tree. References stay visible, but they are not expanded again."
+    },
+    "form": {
+      "entryId": "Entry ID",
+      "placeholder": "e.g. 123"
+    },
+    "actions": {
+      "load": "Load tree",
+      "refresh": "Refresh"
+    },
+    "states": {
+      "loading": "Loading relation tree...",
+      "empty": "Enter an entry ID to display its relation tree."
+    },
+    "summary": {
+      "title": "Rendered tree",
+      "subtitle": "Root entry #{{id}}"
+    },
+    "legend": {
+      "default": "Expanded node",
+      "reference": "Reference node"
+    },
+    "labels": {
+      "root": "Root entry",
+      "entry": "Entry",
+      "untitled": "Untitled entry",
+      "schema": "Schema",
+      "schemaInfo": "Schema info",
+      "id": "ID",
+      "status": "Status",
+      "visibility": "Visibility",
+      "noStatus": "No status"
+    },
+    "direction": {
+      "incoming": "Incoming",
+      "outgoing": "Outgoing"
+    },
+    "reference": {
+      "badge": "Reference",
+      "generic": "This node is shown as a reference and is not expanded further.",
+      "cycle": "Already present in this path.",
+      "duplicate": "Already rendered in another branch."
+    },
+    "errors": {
+      "notFound": "The entry could not be found.",
+      "forbidden": "You do not have permission to view this relation tree.",
+      "generic": "The relation tree could not be loaded."
     }
   },
   "entryDetail": {

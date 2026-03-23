@@ -13,6 +13,7 @@ import { LoginComponent } from './features/auth/login.component';
 import { ProfileComponent } from './features/profile/profile.component';
 import { UserManagementComponent } from './features/users/user-management.component';
 import { AuditLogsComponent } from './features/logs/audit-logs.component';
+import { EntryRelationTreePageComponent } from './features/entry-relation-tree/entry-relation-tree-page.component';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
 import { editorGuard } from './core/guards/editor.guard';
@@ -28,6 +29,7 @@ export const routes: Routes = [
   { path: 'entries/:schemaKey/new', component: EntryCreateComponent, canActivate: [authGuard, editorGuard] },
   { path: 'entries/activities/timeline', component: ActivitiesTimelineComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
+  { path: 'relation-tree', component: EntryRelationTreePageComponent, canActivate: [authGuard] },
   { path: 'entries/:schemaKey', component: EntryListComponent },
   { path: 'entries/:schemaKey/:id', component: EntryDetailComponent, canDeactivate: [pendingEntryChangesGuard] },
   { path: 'explorer', component: ApiExplorerComponent, canActivate: [authGuard, adminGuard] },

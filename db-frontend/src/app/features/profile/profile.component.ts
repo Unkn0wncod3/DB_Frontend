@@ -16,6 +16,7 @@ interface ProfileFormPreferences {
   contact_email: string;
   email_notifications: boolean;
   show_api_explorer: boolean;
+  show_relation_tree_tab: boolean;
 }
 
 @Component({
@@ -40,7 +41,8 @@ export class ProfileComponent {
     language: ['en'],
     contact_email: ['', [Validators.email]],
     email_notifications: [false],
-    show_api_explorer: [false]
+    show_api_explorer: [false],
+    show_relation_tree_tab: [false]
   });
   readonly passwordForm = this.fb.nonNullable.group({
     password: ['', [Validators.required]],
@@ -223,7 +225,8 @@ export class ProfileComponent {
       language: normalizedPreferences.language,
       contact_email: normalizedPreferences.contact_email,
       email_notifications: normalizedPreferences.notifications.email,
-      show_api_explorer: normalizedPreferences.admin_preferences.show_api_explorer
+      show_api_explorer: normalizedPreferences.admin_preferences.show_api_explorer,
+      show_relation_tree_tab: normalizedPreferences.navigation_preferences.show_relation_tree_tab
     });
   }
 
@@ -237,6 +240,9 @@ export class ProfileComponent {
       notifications: {
         email: !!formValue['email_notifications']
       },
+      navigation_preferences: {
+        show_relation_tree_tab: !!formValue['show_relation_tree_tab']
+      },
       admin_preferences: {
         show_api_explorer: !!formValue['show_api_explorer']
       }
@@ -248,6 +254,7 @@ export class ProfileComponent {
     language: string;
     contact_email: string;
     notifications: { email: boolean };
+    navigation_preferences: { show_relation_tree_tab: boolean };
     admin_preferences: { show_api_explorer: boolean };
   } {
     const defaultPrefs: ProfileFormPreferences = {
@@ -255,7 +262,8 @@ export class ProfileComponent {
       language: 'en',
       contact_email: '',
       email_notifications: false,
-      show_api_explorer: false
+      show_api_explorer: false,
+      show_relation_tree_tab: false
     };
 
     if (!preferences || typeof preferences !== 'object') {
@@ -264,6 +272,7 @@ export class ProfileComponent {
         language: defaultPrefs.language,
         contact_email: defaultPrefs.contact_email,
         notifications: { email: false },
+        navigation_preferences: { show_relation_tree_tab: defaultPrefs.show_relation_tree_tab },
         admin_preferences: { show_api_explorer: defaultPrefs.show_api_explorer }
       };
     }
@@ -272,8 +281,15 @@ export class ProfileComponent {
     const language = (preferences['language'] as string) ?? defaultPrefs.language;
     const contactEmail = typeof preferences['contact_email'] === 'string' ? (preferences['contact_email'] as string) : defaultPrefs.contact_email;
     const notifications = preferences['notifications'];
+    const navigationPreferences = preferences['navigation_preferences'];
     const adminPreferences = preferences['admin_preferences'];
     const email = typeof notifications === 'object' && notifications !== null ? Boolean((notifications as Record<string, unknown>)['email']) : false;
+    const showRelationTreeTab =
+      typeof navigationPreferences === 'object' && navigationPreferences !== null
+        ? typeof (navigationPreferences as Record<string, unknown>)['show_relation_tree_tab'] === 'boolean'
+          ? Boolean((navigationPreferences as Record<string, unknown>)['show_relation_tree_tab'])
+          : defaultPrefs.show_relation_tree_tab
+        : defaultPrefs.show_relation_tree_tab;
     const showApiExplorer =
       typeof adminPreferences === 'object' && adminPreferences !== null
         ? typeof (adminPreferences as Record<string, unknown>)['show_api_explorer'] === 'boolean'
@@ -287,6 +303,9 @@ export class ProfileComponent {
       contact_email: contactEmail,
       notifications: {
         email
+      },
+      navigation_preferences: {
+        show_relation_tree_tab: showRelationTreeTab
       },
       admin_preferences: {
         show_api_explorer: showApiExplorer
