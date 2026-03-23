@@ -1,7 +1,16 @@
 <section class="entry-detail">
   <header class="entry-detail__hero">
     <div class="entry-detail__hero-copy">
-      <a routerLink="/" class="entry-detail__back">{{ 'entryDetail.actions.back' | translate }}</a>
+      <div class="entry-detail__hero-links">
+        <a routerLink="/" class="entry-detail__back">{{ 'entryDetail.actions.back' | translate }}</a>
+        <a
+          *ngIf="entryListLink() as listLink"
+          [routerLink]="listLink"
+          class="entry-detail__button entry-detail__button--ghost entry-detail__list-link"
+        >
+          {{ 'entryDetail.actions.backToList' | translate }}
+        </a>
+      </div>
       <p class="entry-detail__eyebrow" *ngIf="schema() as currentSchema">{{ currentSchema.name }}</p>
       <h1>{{ entry() ? entryTitle() : ('entryDetail.labels.unknownId' | translate) }}</h1>
       <p class="entry-detail__lede" *ngIf="schema() as currentSchema">

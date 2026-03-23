@@ -375,6 +375,7 @@
     },
     "actions": {
       "back": "Zurück zum Dashboard",
+      "backToList": "Zurück zur Liste",
       "refresh": "Neu laden",
       "save": "Speichern",
       "delete": "Löschen"

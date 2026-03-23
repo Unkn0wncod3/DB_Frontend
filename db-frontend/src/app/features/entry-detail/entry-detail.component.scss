@@ -57,6 +57,13 @@
   gap: 0.75rem;
 }
 
+.entry-detail__hero-links {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .entry-detail__hero-copy h1 {
   margin: 0;
   font-size: clamp(2rem, 4vw, 3rem);
@@ -165,11 +172,15 @@
 }
 
 .entry-detail__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 2.75rem;
   padding: 0.7rem 1.1rem;
   border: 1px solid transparent;
   cursor: pointer;
   font-weight: 700;
+  text-decoration: none;
   transition: border-color 0.2s ease, opacity 0.2s ease;
 }
 
@@ -194,6 +205,10 @@
   border-color: var(--color-danger);
   background: var(--color-error-bg);
   color: var(--color-error-text);
+}
+
+.entry-detail__list-link {
+  width: fit-content;
 }
 
 .entry-detail__chip--muted {

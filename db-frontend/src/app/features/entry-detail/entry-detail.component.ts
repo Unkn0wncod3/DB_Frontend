@@ -382,6 +382,11 @@ export class EntryDetailComponent {
     await this.load();
   }
 
+  entryListLink(): string[] | null {
+    const schemaKey = this.schema()?.key ?? this.currentSchemaKey;
+    return schemaKey ? ['/entries', schemaKey] : null;
+  }
+
   hasPendingChanges(): boolean {
     return this.canEditAny() && (this.hasUnsavedChanges() || this.hasCommentDraft());
   }

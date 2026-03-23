@@ -322,6 +322,7 @@
     },
     "actions": {
       "back": "Back to dashboard",
+      "backToList": "Back to list",
       "refresh": "Reload",
       "save": "Save changes",
       "delete": "Delete"
