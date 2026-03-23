@@ -403,6 +403,10 @@
       "disabled": "Inaktiv"
     },
     "sections": {
+      "metadata": "Eintrags-Metadaten",
+      "metadataHelp": "Kernfelder, Besitz und Aktualisierungskommentar.",
+      "schemaFieldsNamed": "{{ schema }} Felder",
+      "schemaFieldsHelp": "Diese Eingaben werden direkt aus den Felddefinitionen im Bundle erzeugt.",
       "raw": "Rohdaten",
       "formattedData": "Formatierte Daten",
       "formattedDataHelp": "Lesbare Werte auf Basis der Schema-Felddefinitionen.",
