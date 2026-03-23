@@ -27,7 +27,7 @@
       <button
         type="button"
         class="entry-detail__button entry-detail__button--primary"
-        *ngIf="canEdit()"
+        *ngIf="canEditAny()"
         (click)="save()"
         [disabled]="!canSave()"
       >
@@ -56,7 +56,7 @@
             <h2>{{ 'entryDetail.sections.metadata' | translate }}</h2>
             <p>{{ 'entryDetail.sections.metadataHelp' | translate }}</p>
           </div>
-          <span class="entry-detail__state-badge" *ngIf="!canEdit()">{{ 'entryDetail.status.readOnlyShort' | translate }}</span>
+          <span class="entry-detail__state-badge" *ngIf="!canEditAny()">{{ 'entryDetail.status.readOnlyShort' | translate }}</span>
         </header>
 
         <form class="entry-detail__form entry-detail__form--meta" [formGroup]="metaForm">
@@ -150,7 +150,7 @@
       </div>
     </section>
 
-    <section class="entry-detail__panel" *ngIf="relations().length > 0 || access().manage_relations || access().manage">
+    <section class="entry-detail__panel" *ngIf="relations().length > 0 || canManageRelations()">
       <header class="entry-detail__panel-header">
         <div>
           <h2>{{ 'entryDetail.sections.relations' | translate }}</h2>
@@ -173,7 +173,7 @@
             <option *ngFor="let type of relationTypes" [value]="type">{{ relationTypeLabel(type) }}</option>
           </select>
           <button
-            *ngIf="access().manage_relations || access().manage"
+            *ngIf="canManageRelations()"
             type="button"
             class="entry-detail__button entry-detail__button--primary"
             (click)="openRelationDialog()"
@@ -212,7 +212,7 @@
               <dd>{{ relationCounterpart(relation)?.id || relationCounterpartFallbackId(relation) }}</dd>
             </div>
           </dl>
-          <div class="entry-detail__entity-actions" *ngIf="access().manage_relations || access().manage">
+          <div class="entry-detail__entity-actions" *ngIf="canManageRelations()">
             <button type="button" class="entry-detail__button entry-detail__button--ghost" (click)="openRelationDialog(relation)">
               {{ 'schemaFields.actions.edit' | translate }}
             </button>

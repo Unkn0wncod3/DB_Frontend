@@ -147,7 +147,11 @@ export class EntryDetailComponent {
     return entry ? resolveEntryTitle(entry, this.schema()) : this.translate.instant('entryDetail.labels.unknownId');
   });
   readonly canEdit = computed(() => this.access().manage || this.access().edit);
+  readonly canEditStatus = computed(() => this.access().manage || this.access().edit_status);
+  readonly canEditVisibility = computed(() => this.access().manage || this.access().edit_visibility);
+  readonly canEditAny = computed(() => this.canEdit() || this.canEditStatus() || this.canEditVisibility());
   readonly canDelete = computed(() => this.access().manage || this.access().delete);
+  readonly canManageRelations = computed(() => this.access().manage_relations || this.access().manage);
   readonly canManageAttachments = computed(() => this.access().manage_attachments || this.access().manage);
   readonly canManagePermissions = computed(() => this.access().manage_permissions || this.access().manage);
   readonly isAttachmentsBusy = computed(() => this.isLoadingAttachments() || this.isSavingAttachment());
@@ -166,7 +170,7 @@ export class EntryDetailComponent {
   });
   readonly canSave = computed(() => {
     this.formRevision();
-    return this.canEdit() && !this.isSaving() && !this.form.invalid && !this.metaForm.invalid && (this.hasUnsavedChanges() || this.hasCommentDraft());
+    return this.canEditAny() && !this.isSaving() && !this.form.invalid && !this.metaForm.invalid && (this.hasUnsavedChanges() || this.hasCommentDraft());
   });
   readonly statusOptions = computed(() => {
     const current = this.metaForm.controls.status.getRawValue().trim();
@@ -379,7 +383,7 @@ export class EntryDetailComponent {
   }
 
   hasPendingChanges(): boolean {
-    return this.canEdit() && (this.hasUnsavedChanges() || this.hasCommentDraft());
+    return this.canEditAny() && (this.hasUnsavedChanges() || this.hasCommentDraft());
   }
 
   confirmDiscardChanges(): boolean | Promise<boolean> {
@@ -506,7 +510,7 @@ export class EntryDetailComponent {
 
   async openRelationDialog(relation?: EntryRelationRecord): Promise<void> {
     const entry = this.entry();
-    if (!entry || !(this.access().manage_relations || this.access().manage)) {
+    if (!entry || !this.canManageRelations()) {
       return;
     }
 
@@ -556,7 +560,7 @@ export class EntryDetailComponent {
 
   async saveRelation(): Promise<void> {
     const entry = this.entry();
-    if (!entry || this.relationForm.invalid || this.isSavingRelation()) {
+    if (!entry || !this.canManageRelations() || this.relationForm.invalid || this.isSavingRelation()) {
       return;
     }
 
@@ -634,7 +638,7 @@ export class EntryDetailComponent {
 
   async saveAttachment(): Promise<void> {
     const entry = this.entry();
-    if (!entry || this.attachmentForm.invalid || this.isSavingAttachment()) {
+    if (!entry || !this.canManageAttachments() || this.attachmentForm.invalid || this.isSavingAttachment()) {
       return;
     }
 
@@ -743,7 +747,7 @@ export class EntryDetailComponent {
 
   async savePermission(): Promise<void> {
     const entry = this.entry();
-    if (!entry || this.permissionForm.invalid || this.isSavingPermission()) {
+    if (!entry || !this.canManagePermissions() || this.permissionForm.invalid || this.isSavingPermission()) {
       return;
     }
 
@@ -815,7 +819,7 @@ export class EntryDetailComponent {
   async deleteRelation(relation?: EntryRelationRecord): Promise<void> {
     const entry = this.entry();
     const targetRelation = relation ?? this.editingRelation();
-    if (!entry || !targetRelation || this.isDeletingRelation()) {
+    if (!entry || !this.canManageRelations() || !targetRelation || this.isDeletingRelation()) {
       return;
     }
 
@@ -1273,6 +1277,10 @@ export class EntryDetailComponent {
   }
 
   private async ensurePermissionUsersLoaded(): Promise<void> {
+    if (!this.canManagePermissions()) {
+      return;
+    }
+
     if (this.permissionUsers().length > 0 || this.isLoadingPermissionUsers()) {
       return;
     }
@@ -1321,22 +1329,28 @@ export class EntryDetailComponent {
   }
 
   private applyFormAccessState(): void {
-    if (!this.canEdit()) {
-      this.metaForm.disable({ emitEvent: false });
-      this.form.disable({ emitEvent: false });
+    this.metaForm.disable({ emitEvent: false });
+    this.form.enable({ emitEvent: false });
+    this.form.disable({ emitEvent: false });
+
+    if (!this.canEditAny()) {
       return;
     }
 
-    this.metaForm.enable({ emitEvent: false });
-    this.form.enable({ emitEvent: false });
     this.metaForm.controls.comment.enable({ emitEvent: false });
 
-    if (!(this.access().edit_status || this.access().manage)) {
-      this.metaForm.controls.status.disable({ emitEvent: false });
+    if (this.canEdit()) {
+      this.metaForm.controls.title.enable({ emitEvent: false });
+      this.metaForm.controls.owner_id.enable({ emitEvent: false });
+      this.form.enable({ emitEvent: false });
     }
 
-    if (!(this.access().edit_visibility || this.access().manage)) {
-      this.metaForm.controls.visibility_level.disable({ emitEvent: false });
+    if (this.canEditStatus()) {
+      this.metaForm.controls.status.enable({ emitEvent: false });
+    }
+
+    if (this.canEditVisibility()) {
+      this.metaForm.controls.visibility_level.enable({ emitEvent: false });
     }
   }
 
