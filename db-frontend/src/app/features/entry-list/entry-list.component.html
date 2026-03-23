@@ -31,6 +31,14 @@
   </section>
 
   <section class="entry-list__search">
+    <label class="entry-list__search-field entry-list__search-field--select">
+      <span>{{ 'entryList.filters.fieldLabel' | translate }}</span>
+      <select [value]="searchField()" (change)="onSearchFieldChange(($any($event.target).value || 'all'))">
+        <option *ngFor="let option of searchFieldOptions(); trackBy: trackBySearchField" [value]="option.key">
+          {{ option.label }}
+        </option>
+      </select>
+    </label>
     <label class="entry-list__search-field">
       <span>{{ 'entryList.filters.searchLabel' | translate }}</span>
       <input

@@ -17,6 +17,11 @@ interface DisplayColumn {
   field?: SchemaField;
 }
 
+interface SearchFieldOption {
+  key: string;
+  label: string;
+}
+
 @Component({
   selector: 'app-entry-list',
   standalone: true,
@@ -38,34 +43,34 @@ export class EntryListComponent {
   readonly errorMessage = signal<string | null>(null);
   readonly entries = signal<EntryRecord[]>([]);
   readonly searchQuery = signal('');
+  readonly searchField = signal('all');
   readonly schema = signal<EntrySchema | null>(null);
   readonly lastUpdatedAt = signal<number | null>(null);
   readonly schemaLabel = computed(() => this.schema()?.name ?? humanizeKey(this.currentSchemaKey ?? 'entries'));
   readonly columns = computed(() => this.buildColumns(this.schema()));
+  readonly searchFieldOptions = computed<SearchFieldOption[]>(() => [
+    { key: 'all', label: this.translate.instant('entryList.filters.allFields') },
+    { key: '__title', label: this.translate.instant('entryList.filters.title') },
+    { key: '__status', label: this.translate.instant('entryList.filters.status') },
+    { key: '__visibility', label: this.translate.instant('entryList.filters.visibility') },
+    { key: '__id', label: this.translate.instant('entryList.filters.id') },
+    { key: '__owner', label: this.translate.instant('entryList.filters.owner') },
+    { key: '__created', label: this.translate.instant('entryList.filters.created') },
+    { key: '__updated', label: this.translate.instant('entryList.filters.updated') },
+    ...this.columns()
+      .filter((column) => !['__title', '__status', '__visibility', '__updated'].includes(column.key))
+      .map((column) => ({ key: column.key, label: column.label }))
+  ]);
   readonly filteredEntries = computed(() => {
     const query = this.searchQuery().trim().toLowerCase();
+    const searchField = this.searchField();
 
     return this.entries().filter((entry) => {
       if (!query) {
         return true;
       }
 
-      const searchValues = [
-        resolveEntryTitle(entry, this.schema()),
-        entry.status,
-        entry.visibility_level,
-        entry.id,
-        entry.owner_id,
-        entry.updated_at,
-        entry.created_at,
-        ...this.columns().map((column) => this.formatCell(entry, column))
-      ];
-
-      return searchValues
-        .filter((value) => value != null && String(value).trim().length > 0)
-        .join(' ')
-        .toLowerCase()
-        .includes(query);
+      return this.getSearchValues(entry, searchField).some((value) => value.toLowerCase().includes(query));
     });
   });
   readonly total = computed(() => this.filteredEntries().length);
@@ -98,6 +103,10 @@ export class EntryListComponent {
     this.searchQuery.set((value || '').trim());
   }
 
+  onSearchFieldChange(value: string): void {
+    this.searchField.set(value || 'all');
+  }
+
   openEntry(entry: EntryRecord): void {
     void this.router.navigate(['/entries', this.currentSchemaKey, entry.id]);
   }
@@ -108,6 +117,10 @@ export class EntryListComponent {
 
   trackByColumn(_index: number, column: DisplayColumn): string {
     return column.key;
+  }
+
+  trackBySearchField(_index: number, option: SearchFieldOption): string {
+    return option.key;
   }
 
   formatCell(entry: EntryRecord, column: DisplayColumn): string {
@@ -138,6 +151,43 @@ export class EntryListComponent {
   isOwnedByCurrentUser(entry: EntryRecord): boolean {
     const currentUserId = this.auth.user()?.id;
     return currentUserId != null && entry.owner_id != null && String(entry.owner_id) === String(currentUserId);
+  }
+
+  private getSearchValues(entry: EntryRecord, searchField: string): string[] {
+    if (searchField === 'all') {
+      return [
+        resolveEntryTitle(entry, this.schema()),
+        entry.status,
+        entry.visibility_level,
+        entry.id,
+        entry.owner_id,
+        entry.updated_at,
+        entry.created_at,
+        ...this.columns().map((column) => this.formatCell(entry, column))
+      ]
+        .filter((value) => value != null && String(value).trim().length > 0)
+        .map((value) => String(value).trim());
+    }
+
+    if (searchField === '__id') {
+      return entry.id == null ? [] : [String(entry.id)];
+    }
+
+    if (searchField === '__owner') {
+      return entry.owner_id == null ? [] : [String(entry.owner_id)];
+    }
+
+    if (searchField === '__created') {
+      return entry.created_at ? [String(entry.created_at)] : [];
+    }
+
+    const matchingColumn = this.columns().find((column) => column.key === searchField);
+    if (!matchingColumn) {
+      return [];
+    }
+
+    const value = this.formatCell(entry, matchingColumn);
+    return value.trim().length > 0 ? [value.trim()] : [];
   }
 
   private async load(): Promise<void> {

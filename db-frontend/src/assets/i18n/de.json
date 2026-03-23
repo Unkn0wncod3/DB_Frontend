@@ -673,6 +673,15 @@
       "timeline": "Timeline öffnen"
     },
     "filters": {
+      "fieldLabel": "Suchfeld",
+      "allFields": "Alle Felder",
+      "title": "Titel",
+      "status": "Status",
+      "visibility": "Sichtbarkeit",
+      "id": "ID",
+      "owner": "Owner",
+      "created": "Erstellt",
+      "updated": "Aktualisiert",
       "searchLabel": "Suche",
       "searchPlaceholder": "Suchbegriff eingeben...",
       "pageSizeLabel": "Seitengröße"

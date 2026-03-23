@@ -624,6 +624,15 @@
       "timeline": "Open timeline"
     },
     "filters": {
+      "fieldLabel": "Search field",
+      "allFields": "All fields",
+      "title": "Title",
+      "status": "Status",
+      "visibility": "Visibility",
+      "id": "ID",
+      "owner": "Owner",
+      "created": "Created",
+      "updated": "Updated",
       "searchLabel": "Search",
       "searchPlaceholder": "Type to filter entries...",
       "pageSizeLabel": "Page size"
