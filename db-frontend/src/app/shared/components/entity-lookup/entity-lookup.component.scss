@@ -1,0 +1,134 @@
+.entity-lookup-host {
+  display: block;
+  width: 100%;
+}
+
+.entity-lookup {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.entity-lookup__control {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-input-border, var(--color-border));
+  border-radius: 0.75rem;
+  background: var(--color-input-bg, var(--color-panel));
+  padding-right: 0.25rem;
+}
+
+.entity-lookup__control input {
+  border: none;
+  padding: 0.75rem 0.9rem;
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+}
+
+.entity-lookup__control input:focus {
+  outline: none;
+}
+
+.entity-lookup__clear {
+  border: none;
+  background: transparent;
+  color: var(--color-text-soft);
+  padding: 0 0.45rem;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.entity-lookup__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.5rem;
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: 0.85rem;
+  box-shadow: var(--shadow-elevated);
+  z-index: 20;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.entity-lookup__dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.entity-lookup__dropdown li + li {
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 72%, transparent);
+}
+
+.entity-lookup__option {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  padding: 0.8rem 0.95rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  text-align: left;
+  font: inherit;
+}
+
+.entity-lookup__option:hover {
+  background: var(--color-panel-muted);
+}
+
+.entity-lookup__description,
+.entity-lookup__meta,
+.entity-lookup__status,
+.entity-lookup__id {
+  font-size: 0.82rem;
+}
+
+.entity-lookup__description,
+.entity-lookup__meta {
+  color: var(--color-text-soft);
+}
+
+.entity-lookup__meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.entity-lookup__id {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.entity-lookup__status {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.entity-lookup__state {
+  padding: 0.9rem 1rem;
+  color: var(--color-text-soft);
+  font-size: 0.92rem;
+  text-align: center;
+}
+
+.entity-lookup__close {
+  width: 100%;
+  border: none;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-panel-muted);
+  padding: 0.65rem 0.8rem;
+  cursor: pointer;
+  color: var(--color-text);
+  font: inherit;
+}

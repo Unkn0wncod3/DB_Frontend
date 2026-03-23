@@ -1,0 +1,37 @@
+<div class="entity-lookup" [class.entity-lookup--open]="isOpen()">
+  <div class="entity-lookup__control">
+    <input
+      #searchInput
+      type="text"
+      [formControl]="searchControl"
+      (focus)="openSearch()"
+      (click)="openSearch()"
+      [attr.aria-label]="config().accessibleLabel | translate"
+      [placeholder]="config().placeholder | translate"
+      autocomplete="off"
+    />
+  </div>
+
+  <div class="entity-lookup__dropdown" *ngIf="isOpen()">
+    <p *ngIf="isLoading()" class="entity-lookup__state">{{ config().loadingLabel | translate }}</p>
+
+    <ul *ngIf="!isLoading()">
+      <li *ngFor="let option of results(); trackBy: trackByOption">
+        <button type="button" class="entity-lookup__option" (click)="selectOption(option)">
+          <strong>{{ option.label }}</strong>
+          <span *ngIf="option.description" class="entity-lookup__description">{{ option.description }}</span>
+          <div class="entity-lookup__meta-row" *ngIf="option.id || option.meta || option.status">
+            <span class="entity-lookup__id" *ngIf="option.id">{{ option.idLabel || option.id }}</span>
+            <span class="entity-lookup__meta" *ngIf="option.meta">{{ option.meta }}</span>
+            <span class="entity-lookup__status" *ngIf="option.status">{{ option.status }}</span>
+          </div>
+        </button>
+      </li>
+      <li *ngIf="results().length === 0" class="entity-lookup__state">
+        {{ config().noResultsLabel | translate }}
+      </li>
+    </ul>
+
+    <button type="button" class="entity-lookup__close" (click)="closeSearch()">{{ config().closeLabel | translate }}</button>
+  </div>
+</div>

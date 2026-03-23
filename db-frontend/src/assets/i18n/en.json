@@ -757,6 +757,20 @@
     "unknown": "Unknown platform",
     "error": "Unable to load platforms"
   },
+  "userLookup": {
+    "accessibleLabel": "User lookup field",
+    "placeholder": "User or ID",
+    "clear": "Clear selection",
+    "loading": "Loading users...",
+    "noResults": "No matching users",
+    "close": "Close list",
+    "optionId": "ID {{ value }}",
+    "role": "Role: {{ value }}",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    }
+  },
   "entryCreate": {
     "title": "Create entry for {{ schema }}",
     "subtitle": "Fill the schema fields and entry metadata to create a new entry.",

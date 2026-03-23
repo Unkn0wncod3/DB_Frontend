@@ -37,6 +37,7 @@ import {
   shouldShowSchemaFieldOptionsInput
 } from '../../core/utils/schema-field-dialog.utils';
 import { SchemaFieldCardComponent } from '../../shared/components/schema-field-card/schema-field-card.component';
+import { EntityLookupComponent, EntityLookupConfig, EntityLookupOption } from '../../shared/components/entity-lookup/entity-lookup.component';
 import {
   formatFieldValue,
   getFieldOptions,
@@ -56,7 +57,7 @@ interface DetailField {
 @Component({
   selector: 'app-entry-detail',
   standalone: true,
-  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterModule, DatePipe, TranslateModule, SchemaFieldCardComponent],
+  imports: [NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, ReactiveFormsModule, RouterModule, DatePipe, TranslateModule, SchemaFieldCardComponent, EntityLookupComponent],
   templateUrl: './entry-detail.component.html',
   styleUrls: ['./entry-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -113,6 +114,16 @@ export class EntryDetailComponent {
   readonly permissionUserSearch = signal('');
   readonly originalComparableState = signal('');
   readonly formRevision = signal(0);
+  readonly ownerLookupConfig: EntityLookupConfig = {
+    accessibleLabel: 'userLookup.accessibleLabel',
+    placeholder: 'userLookup.placeholder',
+    clearLabel: 'userLookup.clear',
+    loadingLabel: 'userLookup.loading',
+    noResultsLabel: 'userLookup.noResults',
+    closeLabel: 'userLookup.close',
+    search: async (term: string) => this.searchOwnerUsers(term),
+    hydrate: async (value: string | number) => this.hydrateOwnerUser(value)
+  };
   readonly visibilityLevels: VisibilityLevel[] = ['public', 'internal', 'restricted', 'private'];
   readonly defaultStatusOptions = ['draft', 'review', 'active', 'inactive', 'archived'];
   readonly fieldTypes: FieldDataType[] = ['text', 'long_text', 'integer', 'decimal', 'boolean', 'date', 'datetime', 'email', 'url', 'select', 'multi_select', 'reference', 'file', 'json'];
@@ -322,6 +333,7 @@ export class EntryDetailComponent {
   private pendingLeaveResolver: ((allow: boolean) => void) | null = null;
   private createFieldKeyAutoSync = true;
   private originalBodyOverflow = '';
+  private ownerLookupUsers: UserAccount[] | null = null;
 
   constructor() {
     this.metaForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
@@ -1300,6 +1312,62 @@ export class EntryDetailComponent {
     } finally {
       this.isLoadingPermissionUsers.set(false);
     }
+  }
+
+  private async searchOwnerUsers(term: string): Promise<EntityLookupOption[]> {
+    const users = await this.loadOwnerLookupUsers();
+    const normalizedTerm = term.trim().toLowerCase();
+
+    return users
+      .filter((user) => {
+        if (!normalizedTerm) {
+          return true;
+        }
+
+        return [user.username, user.role, user.id, user.is_active ? 'active' : 'inactive']
+          .filter((value) => value != null)
+          .join(' ')
+          .toLowerCase()
+          .includes(normalizedTerm);
+      })
+      .sort((left, right) => left.username.localeCompare(right.username))
+      .slice(0, 24)
+      .map((user) => this.toOwnerLookupOption(user));
+  }
+
+  private async hydrateOwnerUser(value: string | number): Promise<EntityLookupOption | null> {
+    const normalized = String(value).trim();
+    if (!normalized) {
+      return null;
+    }
+
+    const cachedUser = (await this.loadOwnerLookupUsers()).find((user) => String(user.id) === normalized);
+    return cachedUser ? this.toOwnerLookupOption(cachedUser) : null;
+  }
+
+  private async loadOwnerLookupUsers(): Promise<UserAccount[]> {
+    if (this.ownerLookupUsers) {
+      return this.ownerLookupUsers;
+    }
+
+    const users = await firstValueFrom(this.userService.listUsers(200, 0));
+    this.ownerLookupUsers = users ?? [];
+
+    if (this.permissionUsers().length === 0 && this.ownerLookupUsers.length > 0) {
+      this.permissionUsers.set(this.ownerLookupUsers);
+    }
+
+    return this.ownerLookupUsers;
+  }
+
+  private toOwnerLookupOption(user: UserAccount): EntityLookupOption {
+    return {
+      id: String(user.id),
+      idLabel: this.translate.instant('userLookup.optionId', { value: user.id }),
+      label: user.username,
+      description: this.translate.instant('userLookup.role', { value: this.translate.instant(`layout.roles.${user.role}`) }),
+      status: this.translate.instant(user.is_active ? 'userLookup.status.active' : 'userLookup.status.inactive')
+    };
   }
 
   private rebuildForms(entry: EntryRecord, schema: EntrySchema | null): void {

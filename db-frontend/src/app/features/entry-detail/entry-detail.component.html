@@ -93,7 +93,7 @@
           <div class="entry-detail__field-card">
             <label for="entry-owner">{{ 'entryDetail.meta.ownerId' | translate }}</label>
             <p class="entry-detail__field-help">{{ 'entryDetail.meta.ownerHelp' | translate }}</p>
-            <input id="entry-owner" type="text" formControlName="owner_id" />
+            <app-entity-lookup id="entry-owner" [config]="ownerLookupConfig" formControlName="owner_id"></app-entity-lookup>
           </div>
 
           <div class="entry-detail__field-card entry-detail__field-card--full">
