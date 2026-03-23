@@ -63,6 +63,8 @@ interface DetailField {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EntryDetailComponent {
+  private static readonly SUCCESS_TOAST_TIMEOUT_MS = 3500;
+
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
@@ -334,6 +336,7 @@ export class EntryDetailComponent {
   private createFieldKeyAutoSync = true;
   private originalBodyOverflow = '';
   private ownerLookupUsers: UserAccount[] | null = null;
+  private successMessageTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     this.metaForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
@@ -386,6 +389,7 @@ export class EntryDetailComponent {
     });
 
     this.destroyRef.onDestroy(() => {
+      this.clearSuccessMessageTimeout();
       this.setBodyScrollLock(false);
     });
   }
@@ -459,7 +463,7 @@ export class EntryDetailComponent {
         })
       );
       await this.load();
-      this.successMessage.set(this.translate.instant('entryDetail.status.saved'));
+      this.showSuccessMessage(this.translate.instant('entryDetail.status.saved'));
     } catch (error) {
       this.errorMessage.set(this.describeError(error, 'save'));
     } finally {
@@ -597,10 +601,10 @@ export class EntryDetailComponent {
       const editingRelation = this.editingRelation();
       if (editingRelation) {
         await firstValueFrom(this.entryService.updateRelation(entry.id, editingRelation.id, payload));
-        this.successMessage.set(this.translate.instant('entryDetail.relations.status.updated'));
+        this.showSuccessMessage(this.translate.instant('entryDetail.relations.status.updated'));
       } else {
         await firstValueFrom(this.entryService.createRelation(entry.id, payload));
-        this.successMessage.set(this.translate.instant('entryDetail.relations.status.created'));
+        this.showSuccessMessage(this.translate.instant('entryDetail.relations.status.created'));
       }
 
       this.closeRelationDialog();
@@ -678,10 +682,10 @@ export class EntryDetailComponent {
       const editingAttachment = this.editingAttachment();
       if (editingAttachment) {
         await firstValueFrom(this.entryService.updateAttachment(entry.id, editingAttachment.id, payload));
-        this.successMessage.set(this.translate.instant('entryDetail.attachments.status.updated'));
+        this.showSuccessMessage(this.translate.instant('entryDetail.attachments.status.updated'));
       } else {
         await firstValueFrom(this.entryService.createAttachment(entry.id, payload));
-        this.successMessage.set(this.translate.instant('entryDetail.attachments.status.created'));
+        this.showSuccessMessage(this.translate.instant('entryDetail.attachments.status.created'));
       }
 
       this.closeAttachmentDialog();
@@ -713,7 +717,7 @@ export class EntryDetailComponent {
 
     try {
       await firstValueFrom(this.entryService.deleteAttachment(entry.id, attachment.id));
-      this.successMessage.set(this.translate.instant('entryDetail.attachments.status.deleted'));
+      this.showSuccessMessage(this.translate.instant('entryDetail.attachments.status.deleted'));
       if (this.editingAttachment() && String(this.editingAttachment()?.id) === String(attachment.id)) {
         this.closeAttachmentDialog();
       }
@@ -784,10 +788,10 @@ export class EntryDetailComponent {
       const editingPermission = this.editingPermission();
       if (editingPermission) {
         await firstValueFrom(this.entryService.updatePermission(entry.id, editingPermission.id, payload));
-        this.successMessage.set(this.translate.instant('entryDetail.permissions.status.updated'));
+        this.showSuccessMessage(this.translate.instant('entryDetail.permissions.status.updated'));
       } else {
         await firstValueFrom(this.entryService.createPermission(entry.id, payload));
-        this.successMessage.set(this.translate.instant('entryDetail.permissions.status.created'));
+        this.showSuccessMessage(this.translate.instant('entryDetail.permissions.status.created'));
       }
 
       this.closePermissionDialog();
@@ -821,7 +825,7 @@ export class EntryDetailComponent {
 
     try {
       await firstValueFrom(this.entryService.deletePermission(entry.id, permission.id));
-      this.successMessage.set(this.translate.instant('entryDetail.permissions.status.deleted'));
+      this.showSuccessMessage(this.translate.instant('entryDetail.permissions.status.deleted'));
       if (this.editingPermission() && String(this.editingPermission()?.id) === String(permission.id)) {
         this.closePermissionDialog();
       }
@@ -846,7 +850,7 @@ export class EntryDetailComponent {
 
     try {
       await firstValueFrom(this.entryService.deleteRelation(entry.id, targetRelation.id));
-      this.successMessage.set(this.translate.instant('entryDetail.relations.status.deleted'));
+      this.showSuccessMessage(this.translate.instant('entryDetail.relations.status.deleted'));
       if (!relation) {
         this.closeRelationDialog();
       }
@@ -901,7 +905,7 @@ export class EntryDetailComponent {
       }
       this.isFieldDialogOpen.set(false);
       await this.load();
-      this.successMessage.set(
+      this.showSuccessMessage(
         this.translate.instant(editingField ? 'schemaFields.status.updated' : 'schemaFields.status.created', { value: label })
       );
     } catch (error) {
@@ -932,7 +936,7 @@ export class EntryDetailComponent {
     try {
       await firstValueFrom(this.schemaService.deleteField(schema.id, field.id));
       await this.load();
-      this.successMessage.set(this.translate.instant('schemaFields.status.deleted', { value: field.label || field.key }));
+      this.showSuccessMessage(this.translate.instant('schemaFields.status.deleted', { value: field.label || field.key }));
     } catch (error) {
       this.errorMessage.set(this.describeError(error, 'load'));
     } finally {
@@ -1368,6 +1372,22 @@ export class EntryDetailComponent {
       description: this.translate.instant('userLookup.role', { value: this.translate.instant(`layout.roles.${user.role}`) }),
       status: this.translate.instant(user.is_active ? 'userLookup.status.active' : 'userLookup.status.inactive')
     };
+  }
+
+  private showSuccessMessage(message: string): void {
+    this.clearSuccessMessageTimeout();
+    this.successMessage.set(message);
+    this.successMessageTimeoutId = setTimeout(() => {
+      this.successMessage.set(null);
+      this.successMessageTimeoutId = null;
+    }, EntryDetailComponent.SUCCESS_TOAST_TIMEOUT_MS);
+  }
+
+  private clearSuccessMessageTimeout(): void {
+    if (this.successMessageTimeoutId != null) {
+      clearTimeout(this.successMessageTimeoutId);
+      this.successMessageTimeoutId = null;
+    }
   }
 
   private rebuildForms(entry: EntryRecord, schema: EntrySchema | null): void {
